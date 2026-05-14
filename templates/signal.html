@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>音声室 / KYOUKAI</title>
+  <link rel="stylesheet" href="/static/space.css" />
+  <style>
+    .room-title { margin: 0 0 8px; font-size: 18px; font-weight: 400; letter-spacing: 0.16em; color: #c8c1a1; }
+    .room-desc, .log { color: var(--sp-muted); font-family: var(--sp-mono); font-size: 11px; }
+    .panel { padding: 20px; border: 1px dotted #26352d; background: rgba(8, 10, 7, 0.78); margin: 28px 0; }
+    .row { display: flex; gap: 12px; align-items: center; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: #394235; }
+    .dot.active { background: #d8c77c; box-shadow: 0 0 8px rgba(216, 199, 124, 0.35); }
+    button { height: 34px; padding: 0 16px; border: 1px solid #29372d; border-radius: 0; background: #080a07; color: #b7c2a0; font-family: var(--sp-mono); cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="sp-scanline" aria-hidden="true"></div>
+  <main class="sp-container sp-fadein">
+    <span class="sp-eyebrow">KYOUKAI / 音声室</span>
+    <h1 class="room-title">音声室</h1>
+    <p class="room-desc">午前二時以降、受信しやすくなると言われています。</p>
+    <section class="panel">
+      <div class="row"><span class="dot" id="dot"></span><span class="log" id="status">待機中</span></div>
+      <p><button type="button" id="toggle">受信する</button></p>
+      <div class="log" id="genome">genome: 読み込み中</div>
+    </section>
+    <aside class="ky-signal" data-signal-box>
+      <div class="ky-signal-head">補助装置</div>
+      <div class="ky-signal-body" data-signal-copy>音の下に別の案内が混じります。</div>
+    </aside>
+    <a href="/" class="sp-back">入口へ戻る</a>
+  </main>
+  <script>
+    const dot = document.getElementById("dot");
+    const status = document.getElementById("status");
+    const toggle = document.getElementById("toggle");
+    const genome = document.getElementById("genome");
+    let active = false;
+    let audioContext = null;
+    let oscillator = null;
+    let gain = null;
+
+    fetch("/api/genome")
+      .then((response) => response.json())
+      .then((data) => {
+        genome.textContent = `phase ${data.phase} / noise ${data.noise_level} / mutation ${data.last_mutation_type}`;
+        document.querySelector("[data-signal-box]").dataset.phase = String(data.phase);
+        document.querySelector("[data-signal-copy]").textContent =
+          data.noise_level > 20 ? "未確認接続: 雑音に広告の形だけが浮いています / 未挿入" : "未確認接続: 無音。枠だけあります / 未挿入";
+      })
+      .catch(() => {
+        genome.textContent = "genome: 取得失敗";
+      });
+
+    toggle.addEventListener("click", () => {
+      active = !active;
+      dot.classList.toggle("active", active);
+      status.textContent = active ? "受信中" : "待機中";
+      toggle.textContent = active ? "止める" : "受信する";
+      if (active) {
+        audioContext = audioContext || new AudioContext();
+        oscillator = audioContext.createOscillator();
+        gain = audioContext.createGain();
+        oscillator.frequency.value = 44;
+        gain.gain.value = 0.018;
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+        oscillator.start();
+      } else if (oscillator) {
+        oscillator.stop();
+        oscillator = null;
+      }
+    });
+  </script>
+</body>
+</html>

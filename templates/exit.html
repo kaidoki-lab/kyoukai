@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>脱出室 / KYOUKAI</title>
+  <link rel="stylesheet" href="/static/space.css" />
+  <style>
+    .room-title { margin: 0 0 8px; font-size: 18px; font-weight: 400; letter-spacing: 0.16em; color: #c8c1a1; }
+    .room-desc, .counter, .message { color: var(--sp-muted); font-family: var(--sp-mono); font-size: 11px; }
+    .exit-list { list-style: none; margin: 28px 0; padding: 0; }
+    .exit-list li { border-top: 1px dotted #26352d; }
+    .exit-list li:last-child { border-bottom: 1px dotted #26352d; }
+    .exit-link { display: flex; justify-content: space-between; padding: 13px 0; text-decoration: none; font-family: var(--sp-mono); color: #b7c2a0; }
+    .message { padding: 12px 14px; border-left: 2px solid #29372d; background: rgba(8, 10, 7, 0.78); }
+  </style>
+</head>
+<body>
+  <div class="sp-scanline" aria-hidden="true"></div>
+  <main class="sp-container sp-fadein">
+    <span class="sp-eyebrow">KYOUKAI / 脱出室</span>
+    <h1 class="room-title">脱出室</h1>
+    <p class="room-desc">どれを選んでも、ここを通った記録だけが増えます。</p>
+    <div class="counter">試行 <span id="attempt">0</span></div>
+    <ul class="exit-list">
+      <li><a class="exit-link" href="/exit">出口 甲 <span>-&gt;</span></a></li>
+      <li><a class="exit-link" href="/exit">出口 乙 <span>-&gt;</span></a></li>
+      <li><a class="exit-link" href="/exit">境界外 <span>-&gt;</span></a></li>
+    </ul>
+    <div class="message" id="message">帰り道を選んでください。</div>
+    <aside class="ky-signal" data-signal-box>
+      <div class="ky-signal-head">外部信号</div>
+      <div class="ky-signal-body" data-signal-copy>出口脇の細い枠。まだ何も販売していません。</div>
+    </aside>
+    <a href="/" class="sp-back">入口へ戻る</a>
+  </main>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    let attempt = Number.parseInt(params.get("n") || "0", 10);
+    document.getElementById("attempt").textContent = attempt;
+    document.querySelectorAll(".exit-link").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        window.location.href = "/exit?n=" + (attempt + 1);
+      });
+    });
+    if (attempt > 0) {
+      document.getElementById("message").textContent = "戻されました。";
+    }
+    fetch("/api/genome")
+      .then((response) => response.json())
+      .then((data) => {
+        document.querySelector("[data-signal-box]").dataset.phase = String(data.phase);
+        document.querySelector("[data-signal-copy]").textContent =
+          attempt >= 3 ? "境界外リンク: 何度も見ると濃くなります / 広告コード未挿入" : "境界外リンク: 出口ではありません / 広告コード未挿入";
+      })
+      .catch(() => {});
+  </script>
+</body>
+</html>

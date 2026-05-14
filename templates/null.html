@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>未接続領域 / KYOUKAI</title>
+  <link rel="stylesheet" href="/static/space.css" />
+  <style>
+    .null-wrap { min-height: 100vh; display: flex; align-items: center; }
+    .null-code { margin: 0 0 6px; font-family: var(--sp-mono); font-size: 48px; font-weight: 300; color: #26352d; }
+    .null-label, .null-body p, #null-ts { color: #58614f; font-family: var(--sp-mono); font-size: 12px; }
+    .null-links { list-style: none; margin: 28px 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+    .null-links a { color: #8f9b78; font-family: var(--sp-mono); font-size: 11px; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="sp-scanline" aria-hidden="true"></div>
+  <div class="null-wrap">
+    <main class="sp-container sp-fadein">
+      <p class="null-code">404?</p>
+      <span class="null-label">未接続領域 / NULL</span>
+      <div class="null-body">
+        <p>ここは部屋ではありません。部屋だった跡です。</p>
+        <p id="genome-state">genome: 読み込み中</p>
+      </div>
+      <aside class="ky-signal" data-signal-box>
+        <div class="ky-signal-head">未確認接続</div>
+        <div class="ky-signal-body" data-signal-copy>空欄がひとつあります。まだ接続されていません。</div>
+      </aside>
+      <ul class="null-links">
+        <li><a href="/">入口へ戻る</a></li>
+        <li><a href="/observation">観測室へ戻る</a></li>
+        <li><a href="/null">もう一度見る</a></li>
+      </ul>
+      <p id="null-ts"></p>
+    </main>
+  </div>
+  <script>
+    document.getElementById("null-ts").textContent = "timestamp: " + new Date().toISOString().replace("T", " ").slice(0, 19);
+    fetch("/api/genome")
+      .then((response) => response.json())
+      .then((data) => {
+        document.getElementById("genome-state").textContent = "genome phase " + data.phase;
+        document.querySelector("[data-signal-box]").dataset.phase = String(data.phase);
+        document.querySelector("[data-signal-copy]").textContent =
+          data.phase >= 1 ? "未確認接続: phase に反応しています / 広告コード未挿入" : "未確認接続: 空欄のままです / 広告コード未挿入";
+      })
+      .catch(() => {});
+  </script>
+</body>
+</html>

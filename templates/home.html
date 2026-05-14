@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KYOUKAI</title>
+  <link rel="stylesheet" href="/static/space.css" />
+</head>
+<body class="altar-page">
+  <div class="sp-scanline" aria-hidden="true"></div>
+  <div class="altar-noise" aria-hidden="true"></div>
+
+  <main class="altar-shell">
+    <section class="altar-frame" aria-label="KYOUKAI">
+      <img class="altar-image" src="/static/kyoukai_altar.jpg" alt="" />
+
+      <a class="hotspot hotspot-observation" href="/observation" aria-label="fragment-001"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-archive" href="/archive" aria-label="fragment-002"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-signal" href="/signal" aria-label="fragment-003"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-signal-alt" href="/signal" aria-label="fragment-004"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-exit" href="/exit" aria-label="fragment-005"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-null" href="/null" aria-label="fragment-006"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-boundary" href="/signal" aria-label="fragment-007"><span aria-hidden="true"></span></a>
+    </section>
+
+    <aside class="altar-signal-panel" data-signal-box aria-hidden="true">
+      <div class="altar-signal-title" data-altar-state>--- --- ---</div>
+      <div class="altar-signal-copy" data-signal-copy>................</div>
+    </aside>
+  </main>
+
+  <script>
+    (function () {
+      const state = document.querySelector("[data-altar-state]");
+      const signalBox = document.querySelector("[data-signal-box]");
+      const signalCopy = document.querySelector("[data-signal-copy]");
+      const hour = new Date().getHours();
+
+      if (hour >= 2 && hour < 4) {
+        document.body.classList.add("midnight");
+      }
+
+      fetch("/api/genome")
+        .then((response) => response.json())
+        .then((data) => {
+          const phase = Math.max(0, Math.min(3, Number(data.phase || 0)));
+          document.body.dataset.phase = String(phase);
+          signalBox.dataset.phase = String(phase);
+          state.textContent = ["---", ":::", "////", "!!!!"][phase];
+          signalCopy.textContent = phase >= 2 ? "zzzt... 003 003 003" : "... ... ...";
+          if (Number(data.mutation_count || 0) > 0) {
+            document.body.classList.add("mutated-altar");
+          }
+        })
+        .catch(() => {
+          state.textContent = "xxx";
+        });
+    })();
+  </script>
+</body>
+</html>

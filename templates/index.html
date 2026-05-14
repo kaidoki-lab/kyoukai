@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>異常観測部屋 / KYOUKAI</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="facility observation-room" id="facility">
+      <img class="room-bg-layer" src="/static/kyoukai_observation_room.png" alt="KYOUKAI異常観測部屋" />
+      <div class="room-crt-noise" aria-hidden="true"></div>
+
+      <section class="left-terminal" aria-label="深夜の観測端末">
+        <header class="terminal-head">
+          <div>
+            <p class="eyebrow">観測ログ</p>
+            <h1>異常観測部屋</h1>
+          </div>
+          <div class="signal" id="connectionStatus">接続待ち</div>
+        </header>
+
+        <section class="terminal-box log-section">
+          <h2>観測ログ / LOG</h2>
+          <ol id="logList"></ol>
+        </section>
+
+        <section class="terminal-box status-terminal">
+          <h2>観測ステータス / STATUS</h2>
+          <div class="terminal-status-grid">
+            <div><span>気分</span><strong id="mood">quiet</strong></div>
+            <div><span>位相</span><strong id="phase">0</strong></div>
+            <div><span>最終入力</span><strong id="lastAction">-</strong></div>
+            <div><span>観測音</span><strong id="audioParams">tempo 60 / noise 0</strong></div>
+          </div>
+        </section>
+
+        <section class="terminal-box signals-section" id="signalsSection" aria-label="外部信号">
+          <h2>外部信号 / SIGNAL INCOMING</h2>
+          <p class="signal-note">広告コード未挿入 / Genome状態に反応する空枠</p>
+          <div id="signalsList" class="signals-list"></div>
+        </section>
+
+        <aside class="signal-slot signal-slot-left" data-signal-slot="left_terminal_bottom">
+          <span>SIGNAL DETECTED</span>
+          <strong>--- --- ---</strong>
+        </aside>
+
+        <form id="actionForm" class="input-row terminal-command">
+          <input id="actionInput" name="action" autocomplete="off" placeholder="コマンド入力 / みつめる / よぶ / なでる" />
+          <button type="submit">SEND</button>
+        </form>
+
+        <button id="audioToggle" class="terminal-audio" type="button">観測補助AI</button>
+      </section>
+
+      <section class="crt-stage" aria-label="中央CRT生命体">
+        <div class="crt-glass" aria-hidden="true"></div>
+        <div class="creature-stage">
+          <div class="halo" aria-hidden="true"></div>
+          <svg id="creature" class="creature" viewBox="0 0 260 260" role="img" aria-label="KYOUKAI genome organism">
+            <defs>
+              <radialGradient id="coreGradient" cx="48%" cy="40%" r="62%">
+                <stop offset="0%" stop-color="#effff9" />
+                <stop offset="45%" stop-color="#80ead4" />
+                <stop offset="100%" stop-color="#263a59" />
+              </radialGradient>
+              <filter id="softNoise">
+                <feTurbulence id="turbulence" type="fractalNoise" baseFrequency="0.014" numOctaves="2" result="noise" />
+                <feDisplacementMap id="displace" in="SourceGraphic" in2="noise" scale="3" />
+              </filter>
+            </defs>
+            <path id="bodyShape" d="M130 31 C178 31 221 71 221 126 C221 184 185 231 130 231 C74 231 39 184 39 126 C39 71 82 31 130 31 Z" />
+            <circle class="core-ring" cx="130" cy="130" r="37" />
+            <circle id="core" class="core" cx="130" cy="130" r="20" />
+            <circle class="eye left" cx="100" cy="111" r="7" />
+            <circle class="eye right" cx="160" cy="111" r="7" />
+            <path class="mouth" d="M104 166 C119 176 141 176 157 166" />
+          </svg>
+        </div>
+        <aside class="signal-slot signal-slot-crt" data-signal-slot="crt_bottom">
+          <span>NO CARRIER</span>
+        </aside>
+      </section>
+
+      <aside class="panel right-monitor" aria-label="Genome監視札">
+        <div class="panel-head">
+          <span>GENOME MONITOR</span>
+          <strong>STATUS BOARD</strong>
+        </div>
+
+        <div class="summary-band" id="eventBand">
+          <div><span>主傾向</span><strong id="dominantTrait">none</strong></div>
+          <div><span>直近変異</span><strong id="lastMutation">none</strong></div>
+        </div>
+
+        <div class="stats">
+          <div><span>観測者数</span><strong id="observerCount">0</strong></div>
+          <div><span>位相漂流</span><strong id="phaseDrift">0</strong></div>
+          <div><span>ゲノム安定性</span><strong id="stability">100</strong></div>
+          <div><span>変異レベル</span><strong id="mutationLevel">0</strong></div>
+          <div><span>変異回数</span><strong id="mutationCount">0</strong></div>
+          <div><span>ノイズレベル</span><strong id="noiseLevel">0</strong></div>
+          <div><span>不安定値</span><strong id="instability">0</strong></div>
+          <div><span>テンポ</span><strong id="tempo">60</strong></div>
+          <div><span>沈黙観測</span><strong id="silentObservation">0</strong></div>
+          <div><span>境界圧</span><strong id="boundaryPressure">0</strong></div>
+          <div><span>オーディオ不安定</span><strong id="audioInstability">0</strong></div>
+          <div><span>視覚不安定</span><strong id="visualInstability">0</strong></div>
+        </div>
+
+        <aside class="signal-slot signal-slot-right" data-signal-slot="right_monitor_inner">
+          <span>観測補助装置</span>
+          <strong>slot empty</strong>
+        </aside>
+      </aside>
+
+      <div id="contaminationOverlay" class="contamination-overlay" aria-hidden="true">
+        <div class="contamination-inner">
+          <p class="contamination-label">外部信号混入</p>
+          <p id="contaminationText" class="contamination-text"></p>
+          <a id="contaminationLink" class="contamination-link" href="#external-signal">未確認接続</a>
+        </div>
+      </div>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "name": "kyoukai",
+  "version": "0.4.0",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/run-local.js",
+    "build": "node scripts/check-build.js",
+    "start": "node scripts/run-local.js",
+    "preview": "node scripts/run-local.js"
+  }
+}

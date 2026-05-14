@@ -1,0 +1,13 @@
+node_modules/
+dist/
+build/
+.env
+.env.local
+.vite/
+.next/
+.DS_Store
+*.log
+__pycache__/
+*.py[cod]
+kyoukai.db
+*.zip
