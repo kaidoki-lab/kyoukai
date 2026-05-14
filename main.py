@@ -1017,31 +1017,41 @@ if FASTAPI_AVAILABLE:
     from fastapi import Body
     from fastapi.responses import JSONResponse
 
+    def render_template(request: Request, name: str) -> HTMLResponse:
+        try:
+            return templates.TemplateResponse(
+                request=request,
+                name=name,
+                context={"request": request},
+            )
+        except TypeError:
+            return templates.TemplateResponse(name, {"request": request})
+
     # ─── Pages ──────────────────────────────────────────────────────────────
 
     @app.get("/", response_class=HTMLResponse)
     async def entrance(request: Request) -> HTMLResponse:
-        return templates.TemplateResponse("home.html", {"request": request})
+        return render_template(request, "home.html")
 
     @app.get("/observation", response_class=HTMLResponse)
     async def observation(request: Request) -> HTMLResponse:
-        return templates.TemplateResponse("index.html", {"request": request})
+        return render_template(request, "index.html")
 
     @app.get("/archive", response_class=HTMLResponse)
     async def archive(request: Request) -> HTMLResponse:
-        return templates.TemplateResponse("archive.html", {"request": request})
+        return render_template(request, "archive.html")
 
     @app.get("/signal", response_class=HTMLResponse)
     async def signal_room(request: Request) -> HTMLResponse:
-        return templates.TemplateResponse("signal.html", {"request": request})
+        return render_template(request, "signal.html")
 
     @app.get("/exit", response_class=HTMLResponse)
     async def exit_room(request: Request) -> HTMLResponse:
-        return templates.TemplateResponse("exit.html", {"request": request})
+        return render_template(request, "exit.html")
 
     @app.get("/null", response_class=HTMLResponse)
     async def null_room(request: Request) -> HTMLResponse:
-        return templates.TemplateResponse("null.html", {"request": request})
+        return render_template(request, "null.html")
 
     # ─── API ────────────────────────────────────────────────
 
