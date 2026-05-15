@@ -50,6 +50,9 @@
     const emergency = document.querySelector("[data-emergency]");
     const videoStage = document.querySelector("[data-video-stage]");
     const radioStart = document.querySelector("[data-radio-start]");
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
 
     const radioFallbackLines = [
       "現在、受信域八十三番に接続しています。意味のない言葉が、夜を満たしていきます。",
@@ -112,14 +115,7 @@
       lastRadioLine = line;
       radioLine.textContent = line;
       setFrequency();
-      if (!("speechSynthesis" in window) || !radioVoiceActive) return;
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(line);
-      utterance.lang = "ja-JP";
-      utterance.rate = 0.78;
-      utterance.pitch = 0.76;
-      utterance.volume = room.dataset.mode === "radio" ? 0.78 : 0.28;
-      window.speechSynthesis.speak(utterance);
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     }
 
     function stopRadioVoice() {
@@ -135,11 +131,9 @@
         stopRadioVoice();
         return;
       }
-      radioVoiceActive = true;
-      radioStart.classList.add("is-active");
+      radioVoiceActive = false;
+      radioStart.classList.remove("is-active");
       speakRadioLine();
-      window.clearInterval(radioTimer);
-      radioTimer = window.setInterval(speakRadioLine, 9200);
     }
 
     function setTvFragment() {
@@ -184,7 +178,7 @@
       else room.dataset.mode = "silent";
       setFrequency();
       setTvFragment();
-      if (room.dataset.mode === "radio" && radioVoiceActive) speakRadioLine();
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     }
 
     function interrupt() {
@@ -208,6 +202,9 @@
     window.setInterval(drift, 9000 + Math.random() * 6000);
     window.setInterval(interrupt, 7000);
     window.setInterval(setTvFragment, 3200);
+    window.setInterval(() => {
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    }, 1200);
 
     window.addEventListener("pagehide", stopRadioVoice);
     window.addEventListener("beforeunload", stopRadioVoice);

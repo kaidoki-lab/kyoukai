@@ -512,7 +512,7 @@ a.sp-link:hover,
   position: absolute;
   left: 13%;
   top: 34%;
-  content: "VOICE OFF";
+  content: "VOICE DISABLED";
   color: rgba(255, 223, 150, 0.42);
   font-family: var(--sp-mono);
   font-size: clamp(7px, 0.62vw, 10px);
@@ -527,7 +527,7 @@ a.sp-link:hover,
 }
 
 .signal-radio-touch.is-active::before {
-  content: "VOICE ON";
+  content: "VOICE DISABLED";
   color: rgba(147, 255, 72, 0.7);
 }
 
