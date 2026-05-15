@@ -1092,10 +1092,10 @@ body:has(.observation-room) {
 }
 
 .crt-stage {
-  left: 41.2%;
-  top: 27.8%;
-  width: 29.8%;
-  height: 41.8%;
+  left: 42.05%;
+  top: 29.35%;
+  width: 28.55%;
+  height: 37.25%;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -1148,10 +1148,10 @@ body:has(.observation-room) {
 .observation-room .creature-stage {
   position: absolute;
   z-index: 2;
-  left: 50%;
-  top: 53%;
-  width: 78%;
-  height: 78%;
+  left: 51.2%;
+  top: 55.2%;
+  width: 88%;
+  height: 88%;
   min-height: 0;
   display: grid;
   place-items: center;
@@ -1167,15 +1167,15 @@ body:has(.observation-room) {
 }
 
 .observation-room .halo {
-  width: min(52%, 250px);
+  width: min(58%, 270px);
   opacity: 0.55;
   border-color: hsla(var(--phase-hue), 90%, 70%, 0.28);
 }
 
 .observation-room .creature {
-  width: min(68%, 300px);
-  max-height: 84%;
-  transform: translateY(3%);
+  width: min(74%, 330px);
+  max-height: 90%;
+  transform: translateY(4.5%) scaleY(0.96);
   filter:
     drop-shadow(0 0 14px hsla(var(--phase-hue), 96%, 66%, 0.55))
     drop-shadow(0 0 22px rgba(35, 247, 255, 0.18));
