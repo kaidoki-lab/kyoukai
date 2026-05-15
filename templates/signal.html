@@ -3,76 +3,165 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>音声室 / KYOUKAI</title>
+  <title>受信域 / KYOUKAI</title>
   <link rel="stylesheet" href="/static/space.css" />
-  <style>
-    .room-title { margin: 0 0 8px; font-size: 18px; font-weight: 400; letter-spacing: 0.16em; color: #c8c1a1; }
-    .room-desc, .log { color: var(--sp-muted); font-family: var(--sp-mono); font-size: 11px; }
-    .panel { padding: 20px; border: 1px dotted #26352d; background: rgba(8, 10, 7, 0.78); margin: 28px 0; }
-    .row { display: flex; gap: 12px; align-items: center; }
-    .dot { width: 7px; height: 7px; border-radius: 50%; background: #394235; }
-    .dot.active { background: #d8c77c; box-shadow: 0 0 8px rgba(216, 199, 124, 0.35); }
-    button { height: 34px; padding: 0 16px; border: 1px solid #29372d; border-radius: 0; background: #080a07; color: #b7c2a0; font-family: var(--sp-mono); cursor: pointer; }
-  </style>
 </head>
-<body>
-  <div class="sp-scanline" aria-hidden="true"></div>
-  <main class="sp-container sp-fadein">
-    <span class="sp-eyebrow">KYOUKAI / 音声室</span>
-    <h1 class="room-title">音声室</h1>
-    <p class="room-desc">午前二時以降、受信しやすくなると言われています。</p>
-    <section class="panel">
-      <div class="row"><span class="dot" id="dot"></span><span class="log" id="status">待機中</span></div>
-      <p><button type="button" id="toggle">受信する</button></p>
-      <div class="log" id="genome">genome: 読み込み中</div>
-    </section>
-    <aside class="ky-signal" data-signal-box>
-      <div class="ky-signal-head">補助装置</div>
-      <div class="ky-signal-body" data-signal-copy>音の下に別の案内が混じります。</div>
-    </aside>
-    <a href="/" class="sp-back">入口へ戻る</a>
+<body class="signal-room-body">
+  <main class="signal-room" data-mode="scan">
+    <figure class="signal-chapel-frame" aria-label="KYOUKAI 受信域">
+      <img class="signal-chapel-image" src="/static/kyoukai_signal_room.png" alt="教会内の古い受信機" />
+
+      <section class="signal-tv-screen" aria-label="テレビ受信画面">
+        <div class="signal-tv-video" data-video-stage>
+          <div class="signal-static" aria-hidden="true"></div>
+          <div class="signal-waveform" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div class="signal-broadcast-text" data-broadcast-text>RECEIVING...</div>
+        </div>
+      </section>
+
+      <aside class="signal-radio-display" aria-live="polite">
+        <span data-frequency>83.04MHz</span>
+        <b data-radio-line>受信域八十三番に接続しています。</b>
+      </aside>
+
+      <aside class="signal-floating-log" aria-label="受信ログ">
+        <span>SIGNAL LOST</span>
+        <span>UNKNOWN SOURCE</span>
+        <span>RECEIVING...</span>
+        <span>DRIFT DETECTED</span>
+        <span>ARCHIVE FAILED</span>
+      </aside>
+
+      <div class="signal-emergency" data-emergency aria-hidden="true">受信しました</div>
+    </figure>
+
+    <a class="signal-return" href="/" aria-label="入口へ戻る">000 / return</a>
   </main>
+
   <script>
-    const dot = document.getElementById("dot");
-    const status = document.getElementById("status");
-    const toggle = document.getElementById("toggle");
-    const genome = document.getElementById("genome");
-    let active = false;
-    let audioContext = null;
-    let oscillator = null;
-    let gain = null;
+    const room = document.querySelector(".signal-room");
+    const broadcastText = document.querySelector("[data-broadcast-text]");
+    const radioLine = document.querySelector("[data-radio-line]");
+    const frequency = document.querySelector("[data-frequency]");
+    const emergency = document.querySelector("[data-emergency]");
+    const videoStage = document.querySelector("[data-video-stage]");
+
+    const radioLines = [
+      "現在、受信域八十三番に接続しています。意味のない言葉が、夜を満たしていきます。",
+      "こちらは境界外放送です。予報では、午前三時から未明にかけて、沈黙が強まるでしょう。",
+      "第六観測波、通過。存在しない町の灯りが、まだ消えていません。",
+      "受信番号、零、零、七。聞こえている方は、そのまま聞いてください。",
+      "この放送は終了していません。終了予定も、登録されていません。",
+      "遠い窓から、白い信号が流入しています。意味は確認されていません。",
+    ];
+
+    const tvFragments = [
+      "受信域へようこそ",
+      "意味のない言葉が",
+      "夜を満たしていく",
+      "深流する放送",
+      "SIGNAL CORRUPTION",
+      "UNKNOWN SOURCE",
+    ];
+
+    const emergencies = [
+      "受信しました",
+      "信号が混線しています",
+      "この放送は終了していません",
+      "ARCHIVE FAILED",
+      "UNKNOWN SOURCE",
+    ];
+
+    const videoSources = [
+      // "/static/signal-fragment-01.mp4",
+      // "https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0",
+    ];
+
+    const startMode = Math.random() > 0.5 ? "television" : "radio";
+    room.dataset.mode = startMode;
+
+    function pick(list) {
+      return list[Math.floor(Math.random() * list.length)];
+    }
+
+    function setRadioLine() {
+      radioLine.textContent = pick(radioLines);
+      frequency.textContent = `${(76 + Math.random() * 18).toFixed(2)}MHz`;
+    }
+
+    function setTvFragment() {
+      broadcastText.textContent = pick(tvFragments);
+      videoStage.dataset.fragment = String(Math.floor(Math.random() * 9));
+      tuneVideoSource();
+    }
+
+    function tuneVideoSource() {
+      const existing = videoStage.querySelector("[data-signal-media]");
+      if (room.dataset.mode !== "television" || !videoSources.length) {
+        existing?.remove();
+        return;
+      }
+      const source = pick(videoSources);
+      const isYoutube = source.includes("youtube.com") || source.includes("youtu.be");
+      if (existing?.dataset.source === source) return;
+      existing?.remove();
+      const media = isYoutube ? document.createElement("iframe") : document.createElement("video");
+      media.className = "signal-media";
+      media.dataset.signalMedia = "true";
+      media.dataset.source = source;
+      if (isYoutube) {
+        media.src = source;
+        media.allow = "autoplay; encrypted-media; picture-in-picture";
+        media.referrerPolicy = "strict-origin-when-cross-origin";
+      } else {
+        media.src = source;
+        media.autoplay = true;
+        media.muted = true;
+        media.loop = true;
+        media.playsInline = true;
+      }
+      media.setAttribute("aria-hidden", "true");
+      videoStage.prepend(media);
+    }
+
+    function drift() {
+      const next = Math.random();
+      if (next < 0.34) room.dataset.mode = "television";
+      else if (next < 0.68) room.dataset.mode = "radio";
+      else room.dataset.mode = "silent";
+      setRadioLine();
+      setTvFragment();
+    }
+
+    function interrupt() {
+      if (Math.random() > 0.28) return;
+      emergency.textContent = pick(emergencies);
+      emergency.setAttribute("aria-hidden", "false");
+      emergency.classList.add("is-live");
+      window.setTimeout(() => {
+        emergency.classList.remove("is-live");
+        emergency.setAttribute("aria-hidden", "true");
+      }, 1800);
+    }
+
+    setRadioLine();
+    setTvFragment();
+    window.setInterval(drift, 9000 + Math.random() * 6000);
+    window.setInterval(interrupt, 7000);
+    window.setInterval(setRadioLine, 5400);
+    window.setInterval(setTvFragment, 3200);
 
     fetch("/api/genome")
       .then((response) => response.json())
       .then((data) => {
-        genome.textContent = `phase ${data.phase} / noise ${data.noise_level} / mutation ${data.last_mutation_type}`;
-        document.querySelector("[data-signal-box]").dataset.phase = String(data.phase);
-        document.querySelector("[data-signal-copy]").textContent =
-          data.noise_level > 20 ? "未確認接続: 雑音に広告の形だけが浮いています / 未挿入" : "未確認接続: 無音。枠だけあります / 未挿入";
+        room.dataset.phase = String(data.phase || 0);
+        if (Number(data.noise_level || 0) > 60) room.classList.add("signal-heavy-noise");
       })
       .catch(() => {
-        genome.textContent = "genome: 取得失敗";
+        room.dataset.phase = "unknown";
       });
-
-    toggle.addEventListener("click", () => {
-      active = !active;
-      dot.classList.toggle("active", active);
-      status.textContent = active ? "受信中" : "待機中";
-      toggle.textContent = active ? "止める" : "受信する";
-      if (active) {
-        audioContext = audioContext || new AudioContext();
-        oscillator = audioContext.createOscillator();
-        gain = audioContext.createGain();
-        oscillator.frequency.value = 44;
-        gain.gain.value = 0.018;
-        oscillator.connect(gain);
-        gain.connect(audioContext.destination);
-        oscillator.start();
-      } else if (oscillator) {
-        oscillator.stop();
-        oscillator = null;
-      }
-    });
   </script>
 </body>
 </html>
