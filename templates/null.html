@@ -3,50 +3,201 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>未接続領域 / KYOUKAI</title>
+  <title>崩落域 / KYOUKAI</title>
   <link rel="stylesheet" href="/static/space.css" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1522978966321203" crossorigin="anonymous"></script>
-  <style>
-    .null-wrap { min-height: 100vh; display: flex; align-items: center; }
-    .null-code { margin: 0 0 6px; font-family: var(--sp-mono); font-size: 48px; font-weight: 300; color: #26352d; }
-    .null-label, .null-body p, #null-ts { color: #58614f; font-family: var(--sp-mono); font-size: 12px; }
-    .null-links { list-style: none; margin: 28px 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-    .null-links a { color: #8f9b78; font-family: var(--sp-mono); font-size: 11px; text-decoration: none; }
-  </style>
 </head>
-<body>
-  <div class="sp-scanline" aria-hidden="true"></div>
-  <div class="null-wrap">
-    <main class="sp-container sp-fadein">
-      <p class="null-code">404?</p>
-      <span class="null-label">未接続領域 / NULL</span>
-      <div class="null-body">
-        <p>ここは部屋ではありません。部屋だった跡です。</p>
-        <p id="genome-state">genome: 読み込み中</p>
+<body class="collapse-room-body">
+  <main class="collapse-room" data-collapse-level="0" data-phase="0">
+    <section class="collapse-camera" aria-label="崩落域監視カメラ">
+      <div class="collapse-arcade" data-camera-stage>
+        <div class="arcade-ceiling">
+          <span>営業中</span>
+          <span>接続過多</span>
+          <span>景品増殖</span>
+          <span>観測中</span>
+        </div>
+
+        <div class="arcade-wall">
+          <span class="pop pop-a">OPEN OPEN OPEN</span>
+          <span class="pop pop-b">100円 100円 100円</span>
+          <span class="pop pop-c">SIGNAL SALE</span>
+          <span class="pop pop-d">押すな 押せ</span>
+          <span class="pop pop-e">景品は戻りません</span>
+          <span class="pop pop-f">PHASE FIXED?</span>
+        </div>
+
+        <div class="arcade-machines">
+          <div class="arcade-machine machine-pink">
+            <b>UFO</b>
+            <span>接続景品</span>
+            <i>777</i>
+          </div>
+          <div class="arcade-machine machine-cyan">
+            <b>CAM</b>
+            <span>観測筐体</span>
+            <i>404</i>
+          </div>
+          <div class="arcade-machine machine-yellow">
+            <b>POP</b>
+            <span>情報過多</span>
+            <i>MAX</i>
+          </div>
+          <div class="arcade-machine machine-green">
+            <b>NOISE</b>
+            <span>圧縮失敗</span>
+            <i>!!!</i>
+          </div>
+        </div>
+
+        <div class="arcade-prizes" aria-hidden="true">
+          <span>境界玉</span>
+          <span>未接続ラムネ</span>
+          <span>観測札</span>
+          <span>光る何か</span>
+          <span>安いLED</span>
+        </div>
+
+        <div class="arcade-floor" aria-hidden="true"></div>
+
+        <div class="collapse-stickers" aria-hidden="true">
+          <span>ただいま維持失敗中</span>
+          <span>connection unstable</span>
+          <span>見るほど増えます</span>
+          <span>NO REFUND</span>
+          <span>情報を入れすぎました</span>
+        </div>
       </div>
-      <aside class="ky-signal" data-signal-box>
-        <div class="ky-signal-head">未確認接続</div>
-        <div class="ky-signal-body" data-signal-copy>空欄がひとつあります。まだ接続されていません。</div>
-      </aside>
-      <ul class="null-links">
-        <li><a href="/">入口へ戻る</a></li>
-        <li><a href="/observation">観測室へ戻る</a></li>
-        <li><a href="/null">もう一度見る</a></li>
-      </ul>
-      <p id="null-ts"></p>
-    </main>
-  </div>
+
+      <div class="collapse-mosaic" aria-hidden="true"></div>
+      <div class="collapse-scan" aria-hidden="true"></div>
+
+      <div class="collapse-hud">
+        <div>
+          <strong>CAMERA_01</strong>
+          <span>FIXED / ARCADE NULL</span>
+        </div>
+        <div>
+          <strong>SIGNAL</strong>
+          <span id="nullSignal">connection unstable</span>
+        </div>
+        <div>
+          <strong>PHASE</strong>
+          <span id="nullPhase">loading</span>
+        </div>
+        <div>
+          <strong>OBSERVATION</strong>
+          <span id="nullOps">00 touches</span>
+        </div>
+      </div>
+
+      <div class="collapse-floaters" aria-hidden="true">
+        <span>CAMERA OFFSET</span>
+        <span>PRIZE LOST</span>
+        <span>FRAME DROP</span>
+        <span>COLOR BLEED</span>
+        <span>POP POP POP</span>
+        <span>LIMIT NEAR</span>
+      </div>
+
+      <div class="collapse-final" aria-hidden="true">
+        <div class="poop-symbol">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <p>SYSTEM LIMIT REACHED</p>
+        <p>NO FURTHER CHANGES / MAX CORRUPTION / PHASE FIXED</p>
+      </div>
+    </section>
+
+    <nav class="collapse-dpad" aria-label="監視カメラ方向キー">
+      <button type="button" data-move="up" aria-label="上へ動かす">↑</button>
+      <button type="button" data-move="left" aria-label="左へ動かす">←</button>
+      <button type="button" data-move="down" aria-label="下へ動かす">↓</button>
+      <button type="button" data-move="right" aria-label="右へ動かす">→</button>
+    </nav>
+
+    <a class="collapse-return" href="/">000 / return</a>
+  </main>
+
   <script>
-    document.getElementById("null-ts").textContent = "timestamp: " + new Date().toISOString().replace("T", " ").slice(0, 19);
+    const room = document.querySelector(".collapse-room");
+    const opsNode = document.getElementById("nullOps");
+    const phaseNode = document.getElementById("nullPhase");
+    const signalNode = document.getElementById("nullSignal");
+    const buttons = [...document.querySelectorAll("[data-move]")];
+    const startedAt = Date.now();
+    let operations = 0;
+    let phase = 0;
+    let cameraX = 0;
+    let cameraY = 0;
+    let lastLevel = 0;
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function levelFromState() {
+      const elapsed = Math.floor((Date.now() - startedAt) / 60000);
+      const phasePressure = Math.floor(phase / 2);
+      return clamp(Math.floor(operations / 2) + elapsed + phasePressure, 0, 9);
+    }
+
+    function updateCollapse() {
+      const level = levelFromState();
+      lastLevel = level;
+      room.dataset.collapseLevel = String(level);
+      room.style.setProperty("--cam-x", `${cameraX}px`);
+      room.style.setProperty("--cam-y", `${cameraY}px`);
+      room.style.setProperty("--collapse", String(level));
+      room.classList.toggle("is-final", level >= 8);
+      opsNode.textContent = `${String(operations).padStart(2, "0")} touches`;
+      signalNode.textContent = level >= 8 ? "MAX CORRUPTION" : level >= 5 ? "connection extremely unstable" : "connection unstable";
+    }
+
+    function moveCamera(direction) {
+      operations += 1;
+      const drift = 12 + lastLevel * 3;
+      if (direction === "up") cameraY -= drift;
+      if (direction === "down") cameraY += drift;
+      if (direction === "left") cameraX -= drift;
+      if (direction === "right") cameraX += drift;
+      cameraX = clamp(cameraX, -120, 120);
+      cameraY = clamp(cameraY, -90, 90);
+      room.classList.remove("is-jolting");
+      void room.offsetWidth;
+      room.classList.add("is-jolting");
+      updateCollapse();
+    }
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => moveCamera(button.dataset.move));
+    });
+
+    document.addEventListener("keydown", (event) => {
+      const map = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" };
+      if (!map[event.key]) return;
+      event.preventDefault();
+      moveCamera(map[event.key]);
+    });
+
     fetch("/api/genome")
       .then((response) => response.json())
       .then((data) => {
-        document.getElementById("genome-state").textContent = "genome phase " + data.phase;
-        document.querySelector("[data-signal-box]").dataset.phase = String(data.phase);
-        document.querySelector("[data-signal-copy]").textContent =
-          data.phase >= 1 ? "未確認接続: phase に反応しています / 広告コード未挿入" : "未確認接続: 空欄のままです / 広告コード未挿入";
+        phase = Number(data.phase || 0);
+        room.dataset.phase = String(phase);
+        phaseNode.textContent = `phase ${phase}`;
+        updateCollapse();
       })
-      .catch(() => {});
+      .catch(() => {
+        phaseNode.textContent = "phase unreadable";
+        updateCollapse();
+      });
+
+    updateCollapse();
+    setInterval(updateCollapse, 3000);
   </script>
 </body>
 </html>
