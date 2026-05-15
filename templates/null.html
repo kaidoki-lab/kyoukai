@@ -10,62 +10,13 @@
 <body class="collapse-room-body">
   <main class="collapse-room" data-collapse-level="0" data-phase="0">
     <section class="collapse-camera" aria-label="崩落域監視カメラ">
-      <div class="collapse-arcade" data-camera-stage>
-        <div class="arcade-ceiling">
-          <span>営業中</span>
-          <span>接続過多</span>
-          <span>景品増殖</span>
-          <span>観測中</span>
-        </div>
-
-        <div class="arcade-wall">
-          <span class="pop pop-a">OPEN OPEN OPEN</span>
-          <span class="pop pop-b">100円 100円 100円</span>
-          <span class="pop pop-c">SIGNAL SALE</span>
-          <span class="pop pop-d">押すな 押せ</span>
-          <span class="pop pop-e">景品は戻りません</span>
-          <span class="pop pop-f">PHASE FIXED?</span>
-        </div>
-
-        <div class="arcade-machines">
-          <div class="arcade-machine machine-pink">
-            <b>UFO</b>
-            <span>接続景品</span>
-            <i>777</i>
-          </div>
-          <div class="arcade-machine machine-cyan">
-            <b>CAM</b>
-            <span>観測筐体</span>
-            <i>404</i>
-          </div>
-          <div class="arcade-machine machine-yellow">
-            <b>POP</b>
-            <span>情報過多</span>
-            <i>MAX</i>
-          </div>
-          <div class="arcade-machine machine-green">
-            <b>NOISE</b>
-            <span>圧縮失敗</span>
-            <i>!!!</i>
-          </div>
-        </div>
-
-        <div class="arcade-prizes" aria-hidden="true">
-          <span>境界玉</span>
-          <span>未接続ラムネ</span>
-          <span>観測札</span>
-          <span>光る何か</span>
-          <span>安いLED</span>
-        </div>
-
-        <div class="arcade-floor" aria-hidden="true"></div>
-
+      <div class="collapse-arcade collapse-arcade-image" data-camera-stage>
         <div class="collapse-stickers" aria-hidden="true">
-          <span>ただいま維持失敗中</span>
           <span>connection unstable</span>
-          <span>見るほど増えます</span>
-          <span>NO REFUND</span>
+          <span>CAMERA OFFSET</span>
           <span>情報を入れすぎました</span>
+          <span>NO REFUND</span>
+          <span>まだ営業しています</span>
         </div>
       </div>
 
@@ -75,7 +26,7 @@
       <div class="collapse-hud">
         <div>
           <strong>CAMERA_01</strong>
-          <span>FIXED / ARCADE NULL</span>
+          <span>ARCADE_A / MAIN FLOOR</span>
         </div>
         <div>
           <strong>SIGNAL</strong>
@@ -91,13 +42,19 @@
         </div>
       </div>
 
+      <div class="collapse-meter" aria-hidden="true">
+        <span>CORRUPTION</span>
+        <strong id="nullPercent">0%</strong>
+        <i></i>
+      </div>
+
       <div class="collapse-floaters" aria-hidden="true">
-        <span>CAMERA OFFSET</span>
-        <span>PRIZE LOST</span>
-        <span>FRAME DROP</span>
-        <span>COLOR BLEED</span>
-        <span>POP POP POP</span>
-        <span>LIMIT NEAR</span>
+        <span>COLOR SHIFT</span>
+        <span>NOISE</span>
+        <span>MOSAIC</span>
+        <span>SIGNAL DRIFT</span>
+        <span>UI FRAGMENT</span>
+        <span>COMPRESSION LOSS</span>
       </div>
 
       <div class="collapse-final" aria-hidden="true">
@@ -127,6 +84,7 @@
     const opsNode = document.getElementById("nullOps");
     const phaseNode = document.getElementById("nullPhase");
     const signalNode = document.getElementById("nullSignal");
+    const percentNode = document.getElementById("nullPercent");
     const buttons = [...document.querySelectorAll("[data-move]")];
     const startedAt = Date.now();
     let operations = 0;
@@ -147,13 +105,16 @@
 
     function updateCollapse() {
       const level = levelFromState();
+      const percent = clamp(Math.round((level / 9) * 100), 0, 100);
       lastLevel = level;
       room.dataset.collapseLevel = String(level);
       room.style.setProperty("--cam-x", `${cameraX}px`);
       room.style.setProperty("--cam-y", `${cameraY}px`);
       room.style.setProperty("--collapse", String(level));
+      room.style.setProperty("--corruption", `${percent}%`);
       room.classList.toggle("is-final", level >= 8);
       opsNode.textContent = `${String(operations).padStart(2, "0")} touches`;
+      percentNode.textContent = `${percent}%`;
       signalNode.textContent = level >= 8 ? "MAX CORRUPTION" : level >= 5 ? "connection extremely unstable" : "connection unstable";
     }
 
