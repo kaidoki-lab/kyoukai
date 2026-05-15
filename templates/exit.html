@@ -6,56 +6,115 @@
   <title>脱出室 / KYOUKAI</title>
   <link rel="stylesheet" href="/static/space.css" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1522978966321203" crossorigin="anonymous"></script>
-  <style>
-    .room-title { margin: 0 0 8px; font-size: 18px; font-weight: 400; letter-spacing: 0.16em; color: #c8c1a1; }
-    .room-desc, .counter, .message { color: var(--sp-muted); font-family: var(--sp-mono); font-size: 11px; }
-    .exit-list { list-style: none; margin: 28px 0; padding: 0; }
-    .exit-list li { border-top: 1px dotted #26352d; }
-    .exit-list li:last-child { border-bottom: 1px dotted #26352d; }
-    .exit-link { display: flex; justify-content: space-between; padding: 13px 0; text-decoration: none; font-family: var(--sp-mono); color: #b7c2a0; }
-    .message { padding: 12px 14px; border-left: 2px solid #29372d; background: rgba(8, 10, 7, 0.78); }
-  </style>
 </head>
-<body>
-  <div class="sp-scanline" aria-hidden="true"></div>
-  <main class="sp-container sp-fadein">
-    <span class="sp-eyebrow">KYOUKAI / 脱出室</span>
-    <h1 class="room-title">脱出室</h1>
-    <p class="room-desc">どれを選んでも、ここを通った記録だけが増えます。</p>
-    <div class="counter">試行 <span id="attempt">0</span></div>
-    <ul class="exit-list">
-      <li><a class="exit-link" href="/exit">出口 甲 <span>-&gt;</span></a></li>
-      <li><a class="exit-link" href="/exit">出口 乙 <span>-&gt;</span></a></li>
-      <li><a class="exit-link" href="/exit">境界外 <span>-&gt;</span></a></li>
-    </ul>
-    <div class="message" id="message">帰り道を選んでください。</div>
-    <aside class="ky-signal" data-signal-box>
-      <div class="ky-signal-head">外部信号</div>
-      <div class="ky-signal-body" data-signal-copy>出口脇の細い枠。まだ何も販売していません。</div>
+<body class="exit-realm-body">
+  <main class="exit-realm" data-scene="emergency" data-attempt="0">
+    <section class="exit-frame" aria-label="脱出室">
+      <div class="exit-image" aria-hidden="true"></div>
+      <div class="exit-vignette" aria-hidden="true"></div>
+
+      <div class="exit-hud">
+        <span>KYOUKAI / EXIT</span>
+        <span id="exitSceneLabel">非常口？</span>
+        <span>attempt <b id="exitAttempt">0</b></span>
+      </div>
+
+      <button class="exit-point exit-point-x" type="button" data-choice="x" aria-label="X地点を調べる">X</button>
+      <button class="exit-point exit-point-y" type="button" data-choice="y" aria-label="Y地点を調べる">Y</button>
+      <button class="exit-point exit-point-z" type="button" data-choice="z" aria-label="Z地点を調べる">Z</button>
+
+      <div class="exit-message" id="exitMessage">出口のようなものが見えています。</div>
+      <div class="exit-trace" aria-hidden="true">
+        <span>DOOR</span>
+        <span>WINDOW</span>
+        <span>RETURN</span>
+        <span>NO EXIT</span>
+      </div>
+    </section>
+
+    <aside class="exit-side">
+      <div class="exit-side-title">soft corridor protocol</div>
+      <p id="exitHint">X / Y / Z のどれかを押してください。戻れたように見える場所も、戻り先とは限りません。</p>
+      <div class="exit-route" id="exitRoute">route: emergency</div>
+      <a href="/" class="exit-return">入口へ戻る</a>
     </aside>
-    <a href="/" class="sp-back">入口へ戻る</a>
   </main>
+
   <script>
+    const scenes = {
+      emergency: {
+        label: "非常口？",
+        route: "emergency",
+        message: "出口のようなものが見えています。",
+        next: { x: "hall", y: "window", z: "corner" }
+      },
+      hall: {
+        label: "やわらかい廊下",
+        route: "hall",
+        message: "廊下は少し柔らかく、足音だけが戻ってきます。",
+        next: { x: "window", y: "emergency", z: "corner" }
+      },
+      corner: {
+        label: "まがりかど",
+        route: "corner",
+        message: "曲がった先に、さっき見たはずの扉があります。",
+        next: { x: "emergency", y: "hall", z: "window" }
+      },
+      window: {
+        label: "窓の外",
+        route: "window",
+        message: "外はあります。けれど出口ではありません。",
+        next: { x: "emergency", y: "corner", z: "hall" }
+      }
+    };
+
+    const realm = document.querySelector(".exit-realm");
+    const messageNode = document.getElementById("exitMessage");
+    const sceneLabelNode = document.getElementById("exitSceneLabel");
+    const attemptNode = document.getElementById("exitAttempt");
+    const hintNode = document.getElementById("exitHint");
+    const routeNode = document.getElementById("exitRoute");
     const params = new URLSearchParams(window.location.search);
+    let scene = scenes[params.get("scene")] ? params.get("scene") : "emergency";
     let attempt = Number.parseInt(params.get("n") || "0", 10);
-    document.getElementById("attempt").textContent = attempt;
-    document.querySelectorAll(".exit-link").forEach((link) => {
-      link.addEventListener("click", (event) => {
-        event.preventDefault();
-        window.location.href = "/exit?n=" + (attempt + 1);
+
+    function renderScene() {
+      const current = scenes[scene];
+      realm.dataset.scene = scene;
+      realm.dataset.attempt = String(attempt);
+      sceneLabelNode.textContent = current.label;
+      attemptNode.textContent = String(attempt);
+      messageNode.textContent = attempt > 0 ? current.message : "出口のようなものが見えています。";
+      routeNode.textContent = `route: ${current.route} / n=${attempt}`;
+      hintNode.textContent = attempt >= 6
+        ? "何度選んでも、部屋は出口の形だけを変えます。"
+        : "X / Y / Z のどれかを押してください。戻れたように見える場所も、戻り先とは限りません。";
+    }
+
+    document.querySelectorAll("[data-choice]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const current = scenes[scene];
+        scene = current.next[button.dataset.choice] || "emergency";
+        attempt += 1;
+        const nextUrl = new URL(window.location.href);
+        nextUrl.searchParams.set("scene", scene);
+        nextUrl.searchParams.set("n", String(attempt));
+        window.history.replaceState({}, "", nextUrl);
+        realm.classList.remove("exit-shift");
+        void realm.offsetWidth;
+        realm.classList.add("exit-shift");
+        renderScene();
       });
     });
-    if (attempt > 0) {
-      document.getElementById("message").textContent = "戻されました。";
-    }
+
     fetch("/api/genome")
       .then((response) => response.json())
       .then((data) => {
-        document.querySelector("[data-signal-box]").dataset.phase = String(data.phase);
-        document.querySelector("[data-signal-copy]").textContent =
-          attempt >= 3 ? "境界外リンク: 何度も見ると濃くなります / 広告コード未挿入" : "境界外リンク: 出口ではありません / 広告コード未挿入";
+        realm.dataset.phase = String(data.phase || 0);
       })
       .catch(() => {});
+
+    renderScene();
   </script>
 </body>
 </html>
