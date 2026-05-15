@@ -3,45 +3,144 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>記録室 / KYOUKAI</title>
+  <title>残留域 / KYOUKAI</title>
   <link rel="stylesheet" href="/static/space.css" />
-  <style>
-    .room-title { margin: 0 0 8px; font-size: 18px; font-weight: 400; letter-spacing: 0.16em; color: #c8c1a1; }
-    .room-desc, #status { color: var(--sp-muted); font-family: var(--sp-mono); font-size: 11px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px 24px; margin: 28px 0; padding: 14px; border: 1px dotted #26352d; background: rgba(8, 10, 7, 0.78); }
-    .item { font-family: var(--sp-mono); font-size: 11px; }
-    .key { color: #58614f; }
-    .val { color: #b7c2a0; }
-  </style>
 </head>
-<body>
-  <div class="sp-scanline" aria-hidden="true"></div>
-  <main class="sp-container sp-fadein">
-    <span class="sp-eyebrow">KYOUKAI / 記録室</span>
-    <h1 class="room-title">記録室</h1>
-    <p class="room-desc">残っているものだけを並べています。欠けた部分は欠けたままです。</p>
-    <div class="grid" id="genome-grid"><span id="status">読み込み中</span></div>
-    <aside class="ky-signal" data-signal-box>
-      <div class="ky-signal-head">境界外リンク</div>
-      <div class="ky-signal-body" data-signal-copy>記録棚の下に未確認接続があります。</div>
-    </aside>
-    <a href="/" class="sp-back">入口へ戻る</a>
+<body class="archive-room-body">
+  <main class="archive-room" data-archive-clicks="0">
+    <figure class="archive-frame" aria-label="KYOUKAI 残留域">
+      <img class="archive-room-image" src="/static/kyoukai_archive_room.png" alt="白い隔離室とカルテラック" />
+
+      <button class="archive-rack-hit" type="button" data-rack aria-label="カルテラック"></button>
+
+      <section class="archive-card" data-card aria-hidden="true">
+        <div class="archive-card-meta">
+          <span data-card-label>ARCHIVE-000</span>
+          <b data-card-title>分類不明</b>
+          <em data-card-state>記録状態：残留</em>
+        </div>
+        <div class="archive-card-body" data-card-body></div>
+        <a class="archive-card-link" data-card-link href="#external-signal" target="_blank" rel="nofollow sponsored noopener">残っていたリンクを開く</a>
+      </section>
+
+      <div class="archive-room-status" aria-hidden="true">
+        <span>RESIDUAL STORAGE</span>
+        <span>NO INDEX</span>
+        <span data-click-count>000</span>
+      </div>
+    </figure>
+    <a class="archive-return" href="/" aria-label="入口へ戻る">000 / return</a>
   </main>
+
   <script>
-    fetch("/api/genome")
-      .then((response) => response.json())
-      .then((data) => {
-        const fields = ["phase", "mutation_count", "last_mutation_type", "dominant_trait", "stability", "noise_level", "instability", "observer_count", "updated_at"];
-        document.getElementById("genome-grid").innerHTML = fields
-          .map((key) => `<div class="item"><span class="key">${key}: </span><span class="val">${data[key] ?? ""}</span></div>`)
-          .join("");
-        document.querySelector("[data-signal-box]").dataset.phase = String(data.phase);
-        document.querySelector("[data-signal-copy]").textContent =
-          data.mutation_count > 0 ? "観測支援物資: 変質履歴に反応 / 広告コード未挿入" : "観測支援物資: まだ封がされています / 広告コード未挿入";
-      })
-      .catch(() => {
-        document.getElementById("status").textContent = "記録取得失敗";
-      });
+    const archiveItems = [
+      {
+        type: "image",
+        id: "ukiyoe-001",
+        label: "ARCHIVE-001",
+        title: "分類不明",
+        note: "巨大ワニが都庁風建物にしがみつく",
+        src: "",
+      },
+      {
+        type: "image",
+        id: "ukiyoe-002",
+        label: "ARCHIVE-002",
+        title: "分類不明",
+        note: "巨大ペリカンを飛行機から見る",
+        src: "",
+      },
+      {
+        type: "image",
+        id: "ukiyoe-003",
+        label: "ARCHIVE-003",
+        title: "分類不明",
+        note: "キリンがアパート二階で餌をもらう",
+        src: "",
+      },
+      {
+        type: "image",
+        id: "ukiyoe-004",
+        label: "ARCHIVE-004",
+        title: "分類不明",
+        note: "アナコンダが冷蔵庫から出る",
+        src: "",
+      },
+      {
+        type: "affiliate",
+        id: "affiliate-001",
+        label: "ARCHIVE-PR-001",
+        title: "混入記録",
+        note: "外部接続あり",
+        image: "",
+        url: "https://px.a8.net/svt/ejp?a8mat=4B3R2X+4S2ALU+5GDG+NV9N7",
+      },
+    ];
+
+    const room = document.querySelector(".archive-room");
+    const rack = document.querySelector("[data-rack]");
+    const card = document.querySelector("[data-card]");
+    const cardLabel = document.querySelector("[data-card-label]");
+    const cardTitle = document.querySelector("[data-card-title]");
+    const cardState = document.querySelector("[data-card-state]");
+    const cardBody = document.querySelector("[data-card-body]");
+    const cardLink = document.querySelector("[data-card-link]");
+    const clickCount = document.querySelector("[data-click-count]");
+
+    let clicks = 0;
+    let affiliateCooldown = 10;
+
+    function chooseArchiveItem() {
+      const imageItems = archiveItems.filter((item) => item.type === "image");
+      const affiliateItems = archiveItems.filter((item) => item.type === "affiliate");
+      const canShowAffiliate = affiliateCooldown >= 10 && Math.random() < 0.07;
+      if (canShowAffiliate && affiliateItems.length) {
+        affiliateCooldown = 0;
+        return affiliateItems[Math.floor(Math.random() * affiliateItems.length)];
+      }
+      affiliateCooldown += 1;
+      return imageItems[Math.floor(Math.random() * imageItems.length)];
+    }
+
+    function renderArchiveItem(item) {
+      card.classList.remove("is-affiliate");
+      card.setAttribute("aria-hidden", "false");
+      cardLabel.textContent = item.label;
+      cardTitle.textContent = item.title;
+      cardState.textContent = item.type === "affiliate" ? "記録状態：混入" : "記録状態：残留";
+      cardBody.replaceChildren();
+      cardLink.style.display = "none";
+
+      if (item.type === "affiliate") {
+        card.classList.add("is-affiliate");
+        const plate = document.createElement("div");
+        plate.className = "archive-residue-plate";
+        plate.textContent = item.note;
+        cardBody.append(plate);
+        cardLink.href = item.url;
+        cardLink.style.display = "";
+        return;
+      }
+
+      if (item.src) {
+        const image = document.createElement("img");
+        image.src = item.src;
+        image.alt = item.title;
+        cardBody.append(image);
+      } else {
+        const placeholder = document.createElement("div");
+        placeholder.className = "archive-residue-plate";
+        placeholder.textContent = item.note;
+        cardBody.append(placeholder);
+      }
+    }
+
+    rack.addEventListener("click", () => {
+      clicks += 1;
+      room.dataset.archiveClicks = String(clicks);
+      clickCount.textContent = String(clicks).padStart(3, "0");
+      renderArchiveItem(chooseArchiveItem());
+    });
   </script>
 </body>
 </html>
