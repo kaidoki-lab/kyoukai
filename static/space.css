@@ -451,7 +451,7 @@ a.sp-link:hover,
   position: absolute;
   left: 45.8%;
   top: 35.4%;
-  width: 33%;
+  width: 14%;
   z-index: 3;
   display: grid;
   gap: 0.25rem;
@@ -471,9 +471,47 @@ a.sp-link:hover,
 }
 
 .signal-radio-display b {
-  max-width: 78%;
-  font-weight: 400;
-  color: rgba(246, 231, 194, 0.72);
+  display: none;
+}
+
+.signal-radio-line {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.signal-radio-touch {
+  position: absolute;
+  left: 44.4%;
+  top: 32.7%;
+  width: 36.2%;
+  height: 14.5%;
+  z-index: 6;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.signal-radio-touch::after {
+  position: absolute;
+  left: 9%;
+  top: 38%;
+  width: 7px;
+  height: 7px;
+  content: "";
+  border-radius: 50%;
+  background: rgba(255, 45, 35, 0.52);
+  box-shadow: 0 0 8px rgba(255, 45, 35, 0.46);
+  opacity: 0.42;
+}
+
+.signal-radio-touch.is-active::after {
+  background: rgba(147, 255, 72, 0.72);
+  box-shadow: 0 0 12px rgba(147, 255, 72, 0.5);
+  opacity: 0.86;
 }
 
 .signal-floating-log {

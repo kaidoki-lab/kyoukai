@@ -21,10 +21,12 @@
         </div>
       </section>
 
-      <aside class="signal-radio-display" aria-live="polite">
+      <button class="signal-radio-touch" type="button" data-radio-start aria-label="ラジオ受信を開始"></button>
+      <aside class="signal-radio-display" aria-hidden="true">
         <span data-frequency>83.04MHz</span>
-        <b data-radio-line>受信域八十三番に接続しています。</b>
+        <b>VOICE RX</b>
       </aside>
+      <span class="signal-radio-line" data-radio-line aria-live="polite"></span>
 
       <aside class="signal-floating-log" aria-label="受信ログ">
         <span>SIGNAL LOST</span>
@@ -47,10 +49,11 @@
     const frequency = document.querySelector("[data-frequency]");
     const emergency = document.querySelector("[data-emergency]");
     const videoStage = document.querySelector("[data-video-stage]");
+    const radioStart = document.querySelector("[data-radio-start]");
 
-    const radioLines = [
+    const radioFallbackLines = [
       "現在、受信域八十三番に接続しています。意味のない言葉が、夜を満たしていきます。",
-      "こちらは境界外放送です。予報では、午前三時から未明にかけて、沈黙が強まるでしょう。",
+      "こちらは境界外放送です。午前三時から未明にかけて、沈黙が強まるでしょう。",
       "第六観測波、通過。存在しない町の灯りが、まだ消えていません。",
       "受信番号、零、零、七。聞こえている方は、そのまま聞いてください。",
       "この放送は終了していません。終了予定も、登録されていません。",
@@ -79,16 +82,52 @@
       // "https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0",
     ];
 
-    const startMode = Math.random() > 0.5 ? "television" : "radio";
-    room.dataset.mode = startMode;
+    let radioVoiceActive = false;
+    let radioTimer = null;
+    let lastRadioLine = "";
+
+    room.dataset.mode = Math.random() > 0.5 ? "television" : "radio";
 
     function pick(list) {
       return list[Math.floor(Math.random() * list.length)];
     }
 
-    function setRadioLine() {
-      radioLine.textContent = pick(radioLines);
+    async function getRadioLine() {
+      try {
+        const response = await fetch("/api/radio-line", { cache: "no-store" });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.line) return data.line;
+        }
+      } catch (_) {}
+      return pick(radioFallbackLines);
+    }
+
+    function setFrequency() {
       frequency.textContent = `${(76 + Math.random() * 18).toFixed(2)}MHz`;
+    }
+
+    async function speakRadioLine() {
+      const line = await getRadioLine();
+      lastRadioLine = line;
+      radioLine.textContent = line;
+      setFrequency();
+      if (!("speechSynthesis" in window) || !radioVoiceActive) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(line);
+      utterance.lang = "ja-JP";
+      utterance.rate = 0.78;
+      utterance.pitch = 0.76;
+      utterance.volume = room.dataset.mode === "radio" ? 0.78 : 0.28;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function startRadioVoice() {
+      radioVoiceActive = true;
+      radioStart.classList.add("is-active");
+      speakRadioLine();
+      window.clearInterval(radioTimer);
+      radioTimer = window.setInterval(speakRadioLine, 9200);
     }
 
     function setTvFragment() {
@@ -131,8 +170,9 @@
       if (next < 0.34) room.dataset.mode = "television";
       else if (next < 0.68) room.dataset.mode = "radio";
       else room.dataset.mode = "silent";
-      setRadioLine();
+      setFrequency();
       setTvFragment();
+      if (room.dataset.mode === "radio" && radioVoiceActive) speakRadioLine();
     }
 
     function interrupt() {
@@ -146,11 +186,18 @@
       }, 1800);
     }
 
-    setRadioLine();
+    radioStart.addEventListener("click", startRadioVoice);
+    setFrequency();
     setTvFragment();
+    getRadioLine().then((line) => {
+      lastRadioLine = line;
+      radioLine.textContent = line;
+    });
+    window.setTimeout(() => {
+      if (!radioVoiceActive) startRadioVoice();
+    }, 900);
     window.setInterval(drift, 9000 + Math.random() * 6000);
     window.setInterval(interrupt, 7000);
-    window.setInterval(setRadioLine, 5400);
     window.setInterval(setTvFragment, 3200);
 
     fetch("/api/genome")

@@ -14,6 +14,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
+from urllib.error import URLError
+from urllib.request import Request as UrlRequest, urlopen
 
 try:
     import asyncio
@@ -35,6 +37,8 @@ BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = Path(os.environ.get("KYOUKAI_DB_PATH") or (Path(tempfile.gettempdir()) / "kyoukai.db" if os.environ.get("VERCEL") else BASE_DIR / "kyoukai.db"))
 TICK_SECONDS = 3
 SILENCE_THRESHOLD_SECONDS = 12
+OLLAMA_URL = os.environ.get("KYOUKAI_OLLAMA_URL", "http://127.0.0.1:11434/api/generate")
+OLLAMA_MODEL = os.environ.get("KYOUKAI_OLLAMA_MODEL", "qwen2.5:0.5b")
 
 TRAIT_KEYS = [
     "trait_softness",
@@ -580,6 +584,46 @@ def log_signal_click(slot_name: str, signal_id: int, provider: str) -> None:
 # ─────────────────────────────────────────────────────────────────────────────
 
 
+RADIO_FALLBACK_LINES = [
+    "現在、受信域八十三番に接続しています。意味のない言葉が、夜を満たしていきます。",
+    "こちらは境界外放送です。午前三時から未明にかけて、沈黙が強まるでしょう。",
+    "第六観測波、通過。存在しない町の灯りが、まだ消えていません。",
+    "受信番号、零、零、七。聞こえている方は、そのまま聞いてください。",
+    "この放送は終了していません。終了予定も、登録されていません。",
+    "遠い窓から、白い信号が流入しています。意味は確認されていません。",
+]
+
+
+def generate_radio_line() -> dict[str, Any]:
+    """Generate one broken midnight broadcast line via local Ollama when available."""
+    prompt = (
+        "KYOUKAIの受信域で流れる、意味が少し崩れた深夜ラジオ放送文を日本語で一文だけ作ってください。"
+        "ニュース、天気予報、周波数、存在しない地名、受信番号のどれかを含める。"
+        "ホラー、血、霊、怪物、説明口調は禁止。45文字から90文字。"
+    )
+    payload = json.dumps({
+        "model": OLLAMA_MODEL,
+        "prompt": prompt,
+        "stream": False,
+        "options": {"temperature": 0.9, "num_predict": 80},
+    }).encode("utf-8")
+    try:
+        request = UrlRequest(
+            OLLAMA_URL,
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urlopen(request, timeout=2.2) as response:
+            data = json.loads(response.read().decode("utf-8"))
+        text = str(data.get("response", "")).strip().replace("\n", " ")
+        if text:
+            return {"line": text[:160], "source": "ollama", "model": OLLAMA_MODEL}
+    except (OSError, URLError, TimeoutError, json.JSONDecodeError):
+        pass
+    return {"line": random.choice(RADIO_FALLBACK_LINES), "source": "fallback", "model": "local-script"}
+
+
 def apply_effect(genome: dict[str, Any], effect: dict[str, Any]) -> None:
     for key, value in effect.items():
         if key in {"log", "jp_log", "mood"}:
@@ -933,6 +977,14 @@ class KyoukaiHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
             return
+        if clean_path == "/api/radio-line":
+            body = json.dumps(generate_radio_line(), ensure_ascii=False).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
         self.send_error(404)
 
     def do_POST(self) -> None:
@@ -1159,6 +1211,10 @@ if FASTAPI_AVAILABLE:
         mutation = str(genome.get("last_mutation_type", "none"))
         signals = get_active_signals(phase, mutation)
         return JSONResponse({"signals": signals})
+
+    @app.get("/api/radio-line")
+    async def api_radio_line() -> JSONResponse:
+        return JSONResponse(generate_radio_line())
 
     @app.post("/api/signals")
     async def api_post_signal(body: dict = Body(...)) -> JSONResponse:
