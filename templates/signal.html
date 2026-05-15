@@ -122,7 +122,19 @@
       window.speechSynthesis.speak(utterance);
     }
 
+    function stopRadioVoice() {
+      radioVoiceActive = false;
+      radioStart.classList.remove("is-active");
+      window.clearInterval(radioTimer);
+      radioTimer = null;
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    }
+
     function startRadioVoice() {
+      if (radioVoiceActive) {
+        stopRadioVoice();
+        return;
+      }
       radioVoiceActive = true;
       radioStart.classList.add("is-active");
       speakRadioLine();
@@ -193,12 +205,15 @@
       lastRadioLine = line;
       radioLine.textContent = line;
     });
-    window.setTimeout(() => {
-      if (!radioVoiceActive) startRadioVoice();
-    }, 900);
     window.setInterval(drift, 9000 + Math.random() * 6000);
     window.setInterval(interrupt, 7000);
     window.setInterval(setTvFragment, 3200);
+
+    window.addEventListener("pagehide", stopRadioVoice);
+    window.addEventListener("beforeunload", stopRadioVoice);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) stopRadioVoice();
+    });
 
     fetch("/api/genome")
       .then((response) => response.json())

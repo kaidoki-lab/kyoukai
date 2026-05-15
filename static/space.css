@@ -508,10 +508,27 @@ a.sp-link:hover,
   opacity: 0.42;
 }
 
+.signal-radio-touch::before {
+  position: absolute;
+  left: 13%;
+  top: 34%;
+  content: "VOICE OFF";
+  color: rgba(255, 223, 150, 0.42);
+  font-family: var(--sp-mono);
+  font-size: clamp(7px, 0.62vw, 10px);
+  letter-spacing: 0.12em;
+  text-shadow: 0 0 8px rgba(255, 190, 90, 0.22);
+}
+
 .signal-radio-touch.is-active::after {
   background: rgba(147, 255, 72, 0.72);
   box-shadow: 0 0 12px rgba(147, 255, 72, 0.5);
   opacity: 0.86;
+}
+
+.signal-radio-touch.is-active::before {
+  content: "VOICE ON";
+  color: rgba(147, 255, 72, 0.7);
 }
 
 .signal-floating-log {
