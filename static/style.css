@@ -1239,7 +1239,8 @@ body:has(.observation-room) {
 
 .signal-slot span,
 .signal-slot strong,
-.signal-slot button {
+.signal-slot button,
+.signal-slot small {
   display: block;
   max-width: 100%;
   overflow: hidden;
@@ -1264,6 +1265,13 @@ body:has(.observation-room) {
   text-align: left;
   cursor: pointer;
   white-space: normal;
+}
+
+.signal-slot small {
+  margin-top: 5px;
+  color: rgba(255, 207, 88, 0.82);
+  font-size: 0.58rem;
+  line-height: 1.25;
 }
 
 .signal-slot[data-phase="1"] {

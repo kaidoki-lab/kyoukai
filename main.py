@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 try:
     import asyncio
@@ -300,6 +301,7 @@ class GenomeStore:
                         "INSERT INTO affiliate_signals (label, url, signal_text, trigger_phase, trigger_mutation, display_mode, enabled, created_at) VALUES (?, ?, ?, ?, ?, ?, 1, ?)",
                         (lbl, url, txt, phase, mut, mode, now_iso()),
                     )
+            self._ensure_kyoukai_affiliate_signal(connection)
             row = connection.execute("SELECT data FROM genome WHERE id = 1").fetchone()
             if row is None:
                 genome = GENOME_DEFAULTS | {"updated_at": now_iso(), "last_input_at": time.time()}
@@ -331,6 +333,64 @@ class GenomeStore:
             END
             WHERE slot_name IS NULL OR slot_name = 'left_terminal_bottom'
             """
+        )
+
+    def _ensure_kyoukai_affiliate_signal(self, connection: sqlite3.Connection) -> None:
+        signal = {
+            "label": "観測補助装置",
+            "url": "https://px.a8.net/svt/ejp?a8mat=4B3R2X+4S2ALU+5GDG+NV9N7",
+            "signal_text": "仮想観測基盤を検出 / 深夜稼働ノード応答あり",
+            "trigger_phase": 1,
+            "trigger_mutation": "any",
+            "display_mode": "panel",
+            "affiliate_provider": "A8",
+            "slot_name": "right_monitor_inner",
+            "weight": 5,
+        }
+        row = connection.execute(
+            "SELECT id FROM affiliate_signals WHERE label = ? OR url = ?",
+            (signal["label"], signal["url"]),
+        ).fetchone()
+        if row:
+            connection.execute(
+                """
+                UPDATE affiliate_signals
+                SET url = ?, signal_text = ?, trigger_phase = ?, trigger_mutation = ?,
+                    display_mode = ?, enabled = 1, affiliate_provider = ?, slot_name = ?, weight = ?
+                WHERE id = ?
+                """,
+                (
+                    signal["url"],
+                    signal["signal_text"],
+                    signal["trigger_phase"],
+                    signal["trigger_mutation"],
+                    signal["display_mode"],
+                    signal["affiliate_provider"],
+                    signal["slot_name"],
+                    signal["weight"],
+                    row["id"],
+                ),
+            )
+            return
+        connection.execute(
+            """
+            INSERT INTO affiliate_signals
+                (label, url, signal_text, trigger_phase, trigger_mutation, display_mode,
+                 enabled, created_at, affiliate_provider, slot_name, weight)
+            VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?)
+            """,
+            (
+                signal["label"],
+                signal["url"],
+                signal["signal_text"],
+                signal["trigger_phase"],
+                signal["trigger_mutation"],
+                signal["display_mode"],
+                now_iso(),
+                signal["affiliate_provider"],
+                signal["slot_name"],
+                signal["weight"],
+            ),
         )
 
     def get(self) -> dict[str, Any]:
@@ -422,6 +482,17 @@ class GenomeStore:
 store = GenomeStore(DB_PATH)
 
 
+ALLOWED_AFFILIATE_HOSTS = {"px.a8.net"}
+
+
+def is_allowed_affiliate_url(url: str) -> bool:
+    try:
+        parsed = urlparse(url)
+    except ValueError:
+        return False
+    return parsed.scheme == "https" and parsed.netloc.lower() in ALLOWED_AFFILIATE_HOSTS
+
+
 # ─── Affiliate Signal System ─────────────────────────────────────────────────
 
 def get_active_signals(phase: int, mutation_type: str, limit: int = 6) -> list[dict[str, Any]]:
@@ -437,6 +508,7 @@ def get_active_signals(phase: int, mutation_type: str, limit: int = 6) -> list[d
                 CASE WHEN trigger_mutation = ? THEN 0
                      WHEN trigger_mutation = 'any' THEN 1
                      ELSE 2 END,
+                weight DESC,
                 id
             LIMIT ?
             """,
@@ -458,6 +530,7 @@ def get_signals_by_mode(phase: int, mutation_type: str, mode: str) -> list[dict[
                 CASE WHEN trigger_mutation = ? THEN 0
                      WHEN trigger_mutation = 'any' THEN 1
                      ELSE 2 END,
+                weight DESC,
                 id
             """,
             (phase, mode, mutation_type),
@@ -466,9 +539,12 @@ def get_signals_by_mode(phase: int, mutation_type: str, mode: str) -> list[dict[
 
 
 def display_signal(row: dict[str, Any]) -> dict[str, Any]:
-    """Return an inert public signal payload without ad or affiliate links."""
-    row["url"] = "#external-signal"
+    """Return a public signal payload, allowing only approved affiliate redirects."""
+    original_url = str(row.get("url") or "")
+    row["url"] = original_url if is_allowed_affiliate_url(original_url) else "#external-signal"
     row["signal_kind"] = "external_signal"
+    row["is_affiliate"] = is_allowed_affiliate_url(row["url"])
+    row["disclosure"] = "PR / アフィリエイトリンクを含みます" if row["is_affiliate"] else ""
     row.setdefault("affiliate_provider", "none")
     row.setdefault("slot_name", "left_terminal_bottom")
     row.setdefault("weight", 1)

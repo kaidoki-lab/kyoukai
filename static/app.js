@@ -190,7 +190,14 @@ function showContaminationOverlay(signal) {
   if (!elements.contaminationOverlay || !elements.contaminationText || !elements.contaminationLink) return;
   window.clearTimeout(state.contaminationTimer);
   elements.contaminationText.textContent = signal.signal_text || "";
-  elements.contaminationLink.href = "#external-signal";
+  elements.contaminationLink.href = signal.url || "#external-signal";
+  if (signal.is_affiliate) {
+    elements.contaminationLink.target = "_blank";
+    elements.contaminationLink.rel = "nofollow sponsored noopener";
+  } else {
+    elements.contaminationLink.removeAttribute("target");
+    elements.contaminationLink.removeAttribute("rel");
+  }
   elements.contaminationLink.textContent = signal.label ? `${signal.label} / 未接続` : "未確認接続 / 未接続";
   elements.contaminationOverlay.classList.add("visible");
   elements.contaminationOverlay.setAttribute("aria-hidden", "false");
@@ -212,9 +219,16 @@ function renderSignalsPanel(signals) {
     ...signals.map((sig) => {
       const item = document.createElement("a");
       item.className = "signal-entry";
-      item.href = "#external-signal";
+      item.href = sig.url || "#external-signal";
       item.setAttribute("aria-label", "外部信号枠。広告コードは未挿入です。");
-      item.addEventListener("click", (event) => event.preventDefault());
+      if (sig.is_affiliate) {
+        item.target = "_blank";
+        item.rel = "nofollow sponsored noopener";
+      }
+      item.addEventListener("click", (event) => {
+        trackSignalClick(sig.slot_name || "signals_panel", sig);
+        if (!sig.is_affiliate) event.preventDefault();
+      });
       const label = document.createElement("span");
       label.className = "signal-entry-label";
       label.textContent = sig.signal_text || sig.label || "外部信号";
@@ -251,9 +265,15 @@ function renderSignalBanners(signals, genome, summary) {
       <button type="button" data-signal-id="${signal.id}" data-provider="${signal.affiliate_provider || "none"}">
         ${signal.signal_text || signal.label || "SIGNAL DETECTED"}
       </button>
+      ${signal.disclosure ? `<small>${signal.disclosure}</small>` : ""}
     `;
     const button = slot.querySelector("button");
-    button?.addEventListener("click", () => trackSignalClick(slotName, signal));
+    button?.addEventListener("click", () => {
+      trackSignalClick(slotName, signal);
+      if (signal.is_affiliate && signal.url) {
+        window.open(signal.url, "_blank", "noopener,noreferrer");
+      }
+    });
   });
 }
 
