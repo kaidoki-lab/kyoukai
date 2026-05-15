@@ -10,6 +10,11 @@
     <main class="facility observation-room" id="facility">
       <img class="room-bg-layer" src="/static/kyoukai_observation_room.png" alt="KYOUKAI異常観測部屋" />
       <div class="room-crt-noise" aria-hidden="true"></div>
+      <a class="room-signal-poster" data-signal-slot="room_poster" href="#external-signal" aria-label="external signal">
+        <span class="poster-kicker">PR / SIGNAL</span>
+        <strong>OBSERVATION NODE</strong>
+        <small>VIRTUAL VPS</small>
+      </a>
 
       <section class="left-terminal" aria-label="深夜の観測端末">
         <header class="terminal-head">
@@ -27,6 +32,11 @@
 
         <section class="terminal-box status-terminal">
           <h2>観測ステータス / STATUS</h2>
+          <div class="observation-runtime">
+            <span>OBSERVATION ACTIVE</span>
+            <strong id="observationActive">000:00:00</strong>
+            <em id="signalPing">ping --</em>
+          </div>
           <div class="terminal-status-grid">
             <div><span>気分</span><strong id="mood">quiet</strong></div>
             <div><span>位相</span><strong id="phase">0</strong></div>

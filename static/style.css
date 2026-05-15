@@ -1109,6 +1109,20 @@ body:has(.observation-room) {
     0 0 18px rgba(255, 42, 168, 0.14);
 }
 
+.crt-stage::before {
+  position: absolute;
+  inset: 1.5%;
+  content: "";
+  z-index: 2;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse at 50% 54%, transparent 36%, rgba(0, 0, 0, 0.28) 66%, rgba(0, 0, 0, 0.74) 100%),
+    linear-gradient(90deg, rgba(255, 0, 120, 0.12), transparent 18%, transparent 82%, rgba(0, 255, 255, 0.1));
+  mix-blend-mode: screen;
+  animation: crtResidual 4.8s steps(3, end) infinite;
+}
+
 .crt-stage::after,
 .crt-glass {
   position: absolute;
@@ -1135,13 +1149,21 @@ body:has(.observation-room) {
   position: absolute;
   z-index: 2;
   left: 50%;
-  top: 50%;
-  width: 82%;
-  height: 82%;
+  top: 53%;
+  width: 78%;
+  height: 78%;
   min-height: 0;
   display: grid;
   place-items: center;
-  transform: translate(calc(-50% + var(--shake-x)), calc(-50% + var(--shake-y)));
+  transform:
+    translate(calc(-50% + var(--shake-x)), calc(-50% + var(--shake-y)))
+    perspective(520px)
+    rotateX(1.8deg)
+    scaleX(0.97);
+  filter:
+    drop-shadow(2px 0 0 rgba(255, 0, 120, 0.22))
+    drop-shadow(-2px 0 0 rgba(0, 255, 255, 0.18));
+  animation: crtCreatureDrift 5.4s ease-in-out infinite;
 }
 
 .observation-room .halo {
@@ -1153,6 +1175,11 @@ body:has(.observation-room) {
 .observation-room .creature {
   width: min(68%, 300px);
   max-height: 84%;
+  transform: translateY(3%);
+  filter:
+    drop-shadow(0 0 14px hsla(var(--phase-hue), 96%, 66%, 0.55))
+    drop-shadow(0 0 22px rgba(35, 247, 255, 0.18));
+  mix-blend-mode: screen;
 }
 
 .right-monitor {
@@ -1190,6 +1217,38 @@ body:has(.observation-room) {
   gap: 0.4vw;
 }
 
+.observation-runtime {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.18rem 0.4rem;
+  margin: 0 0 0.55vh;
+  padding: 0.46vh 0.45vw;
+  border: 1px solid rgba(147, 255, 72, 0.32);
+  background:
+    linear-gradient(90deg, rgba(147, 255, 72, 0.1), transparent 64%),
+    rgba(0, 0, 0, 0.5);
+  color: #d9ffb8;
+  text-shadow: 0 0 9px rgba(147, 255, 72, 0.38);
+}
+
+.observation-runtime span {
+  font-size: clamp(8px, 0.56vw, 10px);
+  letter-spacing: 0.08em;
+}
+
+.observation-runtime strong {
+  color: #f9fff1;
+  font-size: clamp(11px, 0.84vw, 15px);
+}
+
+.observation-runtime em {
+  grid-column: 1 / -1;
+  color: rgba(35, 247, 255, 0.86);
+  font-size: clamp(8px, 0.56vw, 10px);
+  font-style: normal;
+}
+
 .right-monitor .summary-band div,
 .right-monitor .stats div {
   min-height: 0;
@@ -1198,19 +1257,58 @@ body:has(.observation-room) {
   background: rgba(0, 0, 0, 0.42);
 }
 
+.right-monitor .stats div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(36px, 0.44fr) minmax(48px, 0.56fr);
+  align-items: center;
+  column-gap: 0.35vw;
+}
+
+.right-monitor .stats div::after {
+  content: attr(data-status);
+  color: #49cfff;
+  font-size: clamp(7px, 0.48vw, 9px);
+  line-height: 1;
+  text-align: right;
+  text-transform: uppercase;
+  text-shadow: 0 0 8px currentColor;
+  white-space: nowrap;
+}
+
+.right-monitor .stats div[data-status="stable"]::after {
+  color: #93ff48;
+}
+
+.right-monitor .stats div[data-status="warning"]::after {
+  color: #ffd154;
+}
+
+.right-monitor .stats div[data-status="critical"]::after {
+  color: #ff305c;
+}
+
+.right-monitor .stats div[data-status="signal"]::after {
+  color: #35f7ff;
+}
+
 .right-monitor .summary-band span,
 .right-monitor .stats span {
+  min-width: 0;
   color: #ffc0eb;
   font-size: clamp(8px, 0.58vw, 10px);
+  line-height: 1.18;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .right-monitor .summary-band strong,
 .right-monitor .stats strong {
-  margin-top: 0.2vh;
-  color: #d8ff89;
-  font-size: clamp(13px, 1.05vw, 19px);
+  margin-top: 0;
+  color: #f7fff9;
+  font-size: clamp(11px, 0.82vw, 15px);
   line-height: 1.05;
-  text-shadow: 0 0 9px rgba(147, 255, 72, 0.65);
+  text-align: right;
+  text-shadow: 0 0 9px rgba(255, 255, 255, 0.34);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1291,18 +1389,91 @@ body:has(.observation-room) {
 }
 
 .signal-slot-crt {
-  position: absolute;
-  left: 50%;
-  bottom: 2.5%;
-  width: 58%;
-  transform: translateX(-50%);
-  z-index: 6;
-  text-align: center;
-  opacity: 0.82;
+  display: none;
 }
 
 .signal-slot-right {
   margin-top: 0.25vh;
+}
+
+.room-signal-poster {
+  position: absolute;
+  z-index: 6;
+  left: 73.8%;
+  top: 12.7%;
+  width: 8.5%;
+  min-height: 10.8%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.22rem;
+  padding: 0.75vh 0.55vw;
+  transform: rotate(-7deg) skew(-3deg);
+  transform-origin: 48% 54%;
+  border: 1px solid rgba(255, 207, 88, 0.74);
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.12) 0 2px, transparent 2px 5px),
+    linear-gradient(145deg, rgba(255, 205, 70, 0.8), rgba(255, 42, 168, 0.5) 48%, rgba(0, 0, 0, 0.72));
+  color: #180009;
+  font-family: "Courier New", Consolas, monospace;
+  text-decoration: none;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.26);
+  box-shadow:
+    0 0 13px rgba(255, 42, 168, 0.36),
+    inset 0 0 18px rgba(0, 0, 0, 0.34);
+  opacity: 0.88;
+  overflow: hidden;
+}
+
+.room-signal-poster::before,
+.room-signal-poster::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.room-signal-poster::before {
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.18), transparent 22%, transparent 78%, rgba(0, 0, 0, 0.22)),
+    radial-gradient(circle at 18% 16%, rgba(255, 255, 255, 0.24), transparent 18%);
+  mix-blend-mode: overlay;
+}
+
+.room-signal-poster::after {
+  left: 16%;
+  right: 16%;
+  top: -4px;
+  height: 8px;
+  background: rgba(255, 235, 160, 0.52);
+  box-shadow: 0 0 8px rgba(255, 235, 160, 0.42);
+}
+
+.room-signal-poster:hover,
+.room-signal-poster:focus-visible {
+  opacity: 1;
+  transform: rotate(-6deg) skew(-3deg) translateY(-1px);
+  filter:
+    drop-shadow(3px 0 0 rgba(255, 0, 120, 0.38))
+    drop-shadow(-3px 0 0 rgba(0, 255, 255, 0.28));
+}
+
+.room-signal-poster .poster-kicker {
+  color: #4a001d;
+  font-size: clamp(7px, 0.44vw, 9px);
+  letter-spacing: 0.08em;
+}
+
+.room-signal-poster strong {
+  color: #090004;
+  font-size: clamp(10px, 0.78vw, 15px);
+  line-height: 1.02;
+}
+
+.room-signal-poster small {
+  color: rgba(0, 0, 0, 0.78);
+  font-size: clamp(7px, 0.5vw, 10px);
+  line-height: 1.1;
 }
 
 .mutation-flash .crt-stage {
@@ -1324,8 +1495,18 @@ body:has(.observation-room) {
     0 0 24px rgba(255, 42, 168, 0.3);
 }
 
+.phase-2 .crt-stage::after,
+.phase-3 .crt-stage::after {
+  opacity: 0.5;
+  animation: scanlineJitter 1.9s steps(2, end) infinite;
+}
+
 .phase-3 .room-bg-layer {
   filter: saturate(1.28) contrast(1.18) brightness(0.78) hue-rotate(-8deg);
+}
+
+.phase-3 .room-signal-poster {
+  animation: signalBlink 1.4s steps(2, end) infinite;
 }
 
 .observation-room .contamination-overlay {
@@ -1351,6 +1532,39 @@ body:has(.observation-room) {
   }
 }
 
+@keyframes crtResidual {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.56;
+  }
+  45% {
+    transform: scale(1.012, 0.992) translateY(1px);
+    opacity: 0.74;
+  }
+  58% {
+    transform: scale(0.992, 1.01) translateX(1px);
+    opacity: 0.62;
+  }
+}
+
+@keyframes crtCreatureDrift {
+  0%, 100% {
+    filter:
+      drop-shadow(2px 0 0 rgba(255, 0, 120, 0.2))
+      drop-shadow(-2px 0 0 rgba(0, 255, 255, 0.16));
+  }
+  50% {
+    filter:
+      drop-shadow(3px 0 0 rgba(255, 0, 120, 0.28))
+      drop-shadow(-3px 0 0 rgba(0, 255, 255, 0.24));
+  }
+}
+
+@keyframes scanlineJitter {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(2px); }
+}
+
 @keyframes signalBlink {
   0%, 100% { opacity: 0.72; }
   50% { opacity: 1; }
@@ -1362,7 +1576,7 @@ body:has(.observation-room) {
   }
 
   .observation-room {
-    min-height: 1450px;
+    min-height: 1530px;
   }
 
   .room-bg-layer {
@@ -1372,7 +1586,8 @@ body:has(.observation-room) {
 
   .left-terminal,
   .crt-stage,
-  .right-monitor {
+  .right-monitor,
+  .room-signal-poster {
     left: 16px;
     right: 16px;
     width: auto;
@@ -1391,5 +1606,11 @@ body:has(.observation-room) {
   .right-monitor {
     top: 1030px;
     height: 390px;
+  }
+
+  .room-signal-poster {
+    top: 1428px;
+    min-height: 76px;
+    transform: rotate(-2deg);
   }
 }

@@ -5,6 +5,7 @@ const state = {
   impulse: 0,
   lastMutationEventId: 0,
   contaminationTimer: null,
+  observationStartedAt: Date.now(),
   audio: {
     context: null,
     timer: null,
@@ -34,6 +35,8 @@ const elements = {
   visualInstability: document.querySelector("#visualInstability"),
   lastAction: document.querySelector("#lastAction"),
   audioParams: document.querySelector("#audioParams"),
+  observationActive: document.querySelector("#observationActive"),
+  signalPing: document.querySelector("#signalPing"),
   logList: document.querySelector("#logList"),
   form: document.querySelector("#actionForm"),
   input: document.querySelector("#actionInput"),
@@ -65,11 +68,13 @@ function connect() {
   state.socket.addEventListener("message", (event) => {
     const payload = JSON.parse(event.data);
     if (payload.type !== "genome") return;
+    const configuredSignals = (payload.affiliate_panel || []).filter(isConfiguredSignal);
     renderGenome(payload.genome, payload.genome_summary || payload.genome.genome_summary || {});
-    renderSignalsPanel(payload.affiliate_panel || []);
-    renderSignalBanners(payload.affiliate_panel || [], payload.genome, payload.genome_summary || {});
-    if (payload.affiliate_popup?.length) {
-      state.pendingPopupSignals = payload.affiliate_popup;
+    renderSignalsPanel((payload.affiliate_panel || []).filter((signal) => !signal.is_affiliate));
+    renderSignalBanners(configuredSignals, payload.genome, payload.genome_summary || {});
+    const configuredPopups = (payload.affiliate_popup || []).filter(isConfiguredSignal);
+    if (configuredPopups.length) {
+      state.pendingPopupSignals = configuredPopups;
     }
   });
 
@@ -78,6 +83,10 @@ function connect() {
     elements.connectionStatus?.classList.remove("live");
     window.setTimeout(connect, 1500);
   });
+}
+
+function isConfiguredSignal(signal) {
+  return signal?.is_affiliate && signal?.affiliate_provider === "A8" && !String(signal.url || "").includes("YOUR_A8_CODE");
 }
 
 function renderGenome(genome, summary) {
@@ -105,6 +114,8 @@ function renderGenome(genome, summary) {
   setText(elements.lastAction, genome.last_action || "-");
   setText(elements.audioParams, `${summary.audio_mode || "baseline"} / tempo ${genome.tempo} / noise ${genome.noise_level}`);
   document.querySelector("#signalsSection")?.setAttribute("data-phase", String(genome.phase));
+  renderObservationRuntime(genome, summary);
+  renderStatStates(genome, summary);
 
   const mutation = summary.current_mutation || genome.last_mutation_type || "none";
   const trait = summary.dominant_trait || "none";
@@ -159,6 +170,41 @@ function updateCreature(genome, summary) {
   if (elements.creature) elements.creature.style.animationDuration = `${breath}s`;
   elements.turbulence?.setAttribute("baseFrequency", String(noiseFrequency));
   elements.displace?.setAttribute("scale", String(displacement));
+}
+
+function renderObservationRuntime(genome, summary) {
+  const sessionSeconds = Math.floor((Date.now() - state.observationStartedAt) / 1000);
+  const seconds = Math.max(0, Math.floor(Number(genome.stay_time || 0)) + sessionSeconds);
+  const hours = String(Math.floor(seconds / 3600)).padStart(3, "0");
+  const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+  const secs = String(seconds % 60).padStart(2, "0");
+  setText(elements.observationActive, `${hours}:${minutes}:${secs}`);
+  const ping = Math.max(7, Math.round(120 - Number(genome.stability || 0) + Number(summary.instability || 0)));
+  setText(elements.signalPing, `signal ping ${ping}ms`);
+}
+
+function renderStatStates(genome, summary) {
+  const stateMap = [
+    [elements.phaseDrift, genome.phase_drift, ["signal", 20, 55]],
+    [elements.stability, 100 - Number(genome.stability || 0), ["stable", 18, 48]],
+    [elements.mutationLevel, genome.mutation_level, ["stable", 3, 8]],
+    [elements.mutationCount, genome.mutation_count, ["stable", 2, 7]],
+    [elements.noiseLevel, genome.noise_level, ["stable", 35, 70]],
+    [elements.instability, summary.instability, ["stable", 35, 68]],
+    [elements.audioInstability, genome.audio_instability, ["stable", 35, 70]],
+    [elements.visualInstability, genome.visual_instability, ["stable", 35, 70]],
+    [elements.observerCount, genome.observer_count, ["signal", 3, 12]],
+    [elements.silentObservation, genome.silent_observation, ["signal", 12, 36]],
+    [elements.boundaryPressure, genome.boundary_pressure, ["stable", 35, 70]],
+    [elements.tempo, Math.abs(Number(genome.tempo || 60) - 60), ["stable", 28, 65]],
+  ];
+
+  stateMap.forEach(([element, rawValue, labels]) => {
+    if (!element) return;
+    const value = Number(rawValue || 0);
+    const status = value >= labels[2] ? "critical" : value >= labels[1] ? "warning" : labels[0];
+    element.parentElement?.setAttribute("data-status", status);
+  });
 }
 
 function setClassGroup(element, prefix, nextClass) {
@@ -257,6 +303,26 @@ function renderSignalBanners(signals, genome, summary) {
 
     if (!signal) {
       slot.innerHTML = `<span>SIGNAL DETECTED</span><strong>${phase >= 2 ? "noise only" : "--- --- ---"}</strong>`;
+      if (slot.matches("a")) {
+        slot.href = "#external-signal";
+        slot.removeAttribute("target");
+        slot.removeAttribute("rel");
+      }
+      return;
+    }
+
+    if (slot.classList.contains("room-signal-poster")) {
+      slot.href = signal.url || "#external-signal";
+      if (signal.is_affiliate) {
+        slot.target = "_blank";
+        slot.rel = "nofollow sponsored noopener";
+      }
+      slot.innerHTML = `
+        <span class="poster-kicker">PR / SIGNAL</span>
+        <strong>${signal.label || "OBSERVATION NODE"}</strong>
+        <small>${signal.signal_text || "external signal"}</small>
+      `;
+      slot.onclick = () => trackSignalClick(slotName, signal);
       return;
     }
 
@@ -279,7 +345,7 @@ function renderSignalBanners(signals, genome, summary) {
 
 function chooseSignalForSlot(signals, slotName, index) {
   if (!signals.length) return null;
-  return signals.find((signal) => signal.slot_name === slotName) || signals[index % signals.length];
+  return signals.find((signal) => signal.slot_name === slotName) || null;
 }
 
 function slotSignalLabel(slotName, isMidnight) {
@@ -308,8 +374,20 @@ function trackSignalClick(slotName, signal) {
 
 function renderLogs(logs, noiseLevel, phaseDrift) {
   if (!elements.logList) return;
+  const humanFragments = [
+    "まだ見てる？",
+    "反応した",
+    "近づいてる",
+    "さっきより静か",
+    "見返してきた",
+  ];
+  const visibleLogs = logs.slice(0, 36);
+  if (visibleLogs.length && Number(noiseLevel || 0) + Number(phaseDrift || 0) > 18) {
+    const fragmentIndex = (Number(noiseLevel || 0) + Number(phaseDrift || 0)) % humanFragments.length;
+    visibleLogs.splice(2, 0, `[handwritten] ${humanFragments[fragmentIndex]}`);
+  }
   elements.logList.replaceChildren(
-    ...logs.slice(0, 38).map((log, index) => {
+    ...visibleLogs.map((log, index) => {
       const item = document.createElement("li");
       if (log.includes("SIGNAL")) {
         item.classList.add("log-signal");

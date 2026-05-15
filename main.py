@@ -340,11 +340,11 @@ class GenomeStore:
             "label": "観測補助装置",
             "url": "https://px.a8.net/svt/ejp?a8mat=4B3R2X+4S2ALU+5GDG+NV9N7",
             "signal_text": "仮想観測基盤を検出 / 深夜稼働ノード応答あり",
-            "trigger_phase": 1,
+            "trigger_phase": 0,
             "trigger_mutation": "any",
             "display_mode": "panel",
             "affiliate_provider": "A8",
-            "slot_name": "right_monitor_inner",
+            "slot_name": "room_poster",
             "weight": 5,
         }
         row = connection.execute(
@@ -541,9 +541,13 @@ def get_signals_by_mode(phase: int, mutation_type: str, mode: str) -> list[dict[
 def display_signal(row: dict[str, Any]) -> dict[str, Any]:
     """Return a public signal payload, allowing only approved affiliate redirects."""
     original_url = str(row.get("url") or "")
-    row["url"] = original_url if is_allowed_affiliate_url(original_url) else "#external-signal"
+    is_configured_affiliate = (
+        is_allowed_affiliate_url(original_url)
+        and "YOUR_A8_CODE" not in original_url
+    )
+    row["url"] = original_url if is_configured_affiliate else "#external-signal"
     row["signal_kind"] = "external_signal"
-    row["is_affiliate"] = is_allowed_affiliate_url(row["url"])
+    row["is_affiliate"] = is_configured_affiliate
     row["disclosure"] = "PR / アフィリエイトリンクを含みます" if row["is_affiliate"] else ""
     row.setdefault("affiliate_provider", "none")
     row.setdefault("slot_name", "left_terminal_bottom")
