@@ -21,20 +21,12 @@
       <a class="hotspot hotspot-signal-alt" href="/signal" aria-label="fragment-004"><span aria-hidden="true"></span></a>
       <a class="hotspot hotspot-exit" href="/exit" aria-label="fragment-005"><span aria-hidden="true"></span></a>
       <a class="hotspot hotspot-null" href="/null" aria-label="fragment-006"><span aria-hidden="true"></span></a>
-      <a class="hotspot hotspot-boundary" href="/signal" aria-label="fragment-007"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-girl-film" href="/signal" aria-label="fragment-007"><span aria-hidden="true"></span></a>
     </section>
-
-    <aside class="altar-signal-panel" data-signal-box aria-hidden="true">
-      <div class="altar-signal-title" data-altar-state>--- --- ---</div>
-      <div class="altar-signal-copy" data-signal-copy>................</div>
-    </aside>
   </main>
 
   <script>
     (function () {
-      const state = document.querySelector("[data-altar-state]");
-      const signalBox = document.querySelector("[data-signal-box]");
-      const signalCopy = document.querySelector("[data-signal-copy]");
       const hour = new Date().getHours();
 
       if (hour >= 2 && hour < 4) {
@@ -46,16 +38,11 @@
         .then((data) => {
           const phase = Math.max(0, Math.min(3, Number(data.phase || 0)));
           document.body.dataset.phase = String(phase);
-          signalBox.dataset.phase = String(phase);
-          state.textContent = ["---", ":::", "////", "!!!!"][phase];
-          signalCopy.textContent = phase >= 2 ? "zzzt... 003 003 003" : "... ... ...";
           if (Number(data.mutation_count || 0) > 0) {
             document.body.classList.add("mutated-altar");
           }
         })
-        .catch(() => {
-          state.textContent = "xxx";
-        });
+        .catch(() => {});
     })();
   </script>
 </body>

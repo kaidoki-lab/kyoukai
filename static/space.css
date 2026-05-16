@@ -1064,36 +1064,7 @@ a.sp-link:hover,
 .hotspot-signal-alt { left: 24%; top: 57%; width: 13%; height: 10%; }
 .hotspot-exit { left: 17%; top: 33%; width: 12%; height: 17%; }
 .hotspot-null { left: 2%; top: 27%; width: 12%; height: 24%; }
-.hotspot-boundary { left: 77%; top: 7%; width: 17%; height: 14%; }
-
-.altar-signal-panel {
-  position: relative;
-  margin: 12px 0 0 auto;
-  width: min(520px, 100%);
-  padding: 10px 12px;
-  border: 1px solid rgba(0, 255, 140, 0.42);
-  background:
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 6px),
-    rgba(6, 0, 9, 0.76);
-  color: #d8ffd0;
-  font-family: var(--sp-mono);
-  font-size: 12px;
-  box-shadow:
-    0 0 16px rgba(0, 255, 140, 0.25),
-    0 0 32px rgba(255, 0, 160, 0.18);
-}
-
-.altar-signal-panel[data-phase="2"],
-.altar-signal-panel[data-phase="3"] {
-  border-color: rgba(255, 45, 198, 0.75);
-  color: #ffe2fb;
-  animation: panelBlink 1.4s steps(2, end) infinite;
-}
-
-.altar-signal-title {
-  margin-bottom: 4px;
-  color: #ffef8d;
-}
+.hotspot-girl-film { left: 1%; top: 60%; width: 22%; height: 17%; }
 
 .midnight .altar-image {
   filter: saturate(1.42) contrast(1.16) hue-rotate(-12deg);
