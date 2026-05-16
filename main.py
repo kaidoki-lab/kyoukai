@@ -988,6 +988,23 @@ class KyoukaiHandler(BaseHTTPRequestHandler):
         self.send_error(404)
 
     def do_POST(self) -> None:
+        if self.path == "/api/action":
+            length = int(self.headers.get("Content-Length", 0))
+            raw = self.rfile.read(length)
+            try:
+                body = json.loads(raw)
+                genome = apply_action(str(body.get("action", "")))
+                stdlib_hub.broadcast(genome)
+                resp = json.dumps(state_payload(genome), ensure_ascii=False).encode()
+                self.send_response(200)
+            except Exception as exc:
+                resp = json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False).encode()
+                self.send_response(400)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(resp)))
+            self.end_headers()
+            self.wfile.write(resp)
+            return
         if self.path == "/api/signal-click":
             length = int(self.headers.get("Content-Length", 0))
             raw = self.rfile.read(length)
@@ -1228,6 +1245,15 @@ if FASTAPI_AVAILABLE:
                 display_mode=str(body.get("display_mode", "panel")),
             )
             return JSONResponse({"ok": True, "signal": signal})
+        except Exception as exc:
+            return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
+
+    @app.post("/api/action")
+    async def api_action(body: dict = Body(...)) -> JSONResponse:
+        try:
+            genome = apply_action(str(body.get("action", "")))
+            await fastapi_manager.broadcast(genome)
+            return JSONResponse(state_payload(genome))
         except Exception as exc:
             return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
 

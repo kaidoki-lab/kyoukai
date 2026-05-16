@@ -17,10 +17,12 @@ const elements = {
   facility: document.querySelector("#facility"),
   connectionStatus: document.querySelector("#connectionStatus"),
   observerCount: document.querySelector("#observerCount"),
+  observerCountInline: document.querySelector("#observerCountInline"),
   phase: document.querySelector("#phase"),
   stability: document.querySelector("#stability"),
   mutationLevel: document.querySelector("#mutationLevel"),
   mutationCount: document.querySelector("#mutationCount"),
+  mutationCountInline: document.querySelector("#mutationCountInline"),
   instability: document.querySelector("#instability"),
   noiseLevel: document.querySelector("#noiseLevel"),
   tempo: document.querySelector("#tempo"),
@@ -96,10 +98,12 @@ function renderGenome(genome, summary) {
   state.summary = summary;
 
   setText(elements.observerCount, genome.observer_count);
+  setText(elements.observerCountInline, genome.observer_count);
   setText(elements.phase, genome.phase);
   setText(elements.stability, genome.stability);
   setText(elements.mutationLevel, genome.mutation_level);
   setText(elements.mutationCount, genome.mutation_count ?? 0);
+  setText(elements.mutationCountInline, genome.mutation_count ?? 0);
   setText(elements.instability, summary.instability ?? 0);
   setText(elements.noiseLevel, genome.noise_level);
   setText(elements.tempo, genome.tempo);
@@ -410,9 +414,33 @@ function disturbText(text) {
     .join("");
 }
 
-function sendAction(action) {
-  if (!state.socket || state.socket.readyState !== WebSocket.OPEN) return;
-  state.socket.send(JSON.stringify({ type: "action", action }));
+async function sendAction(action) {
+  const normalizedAction = String(action || "").trim();
+  if (!normalizedAction) return;
+
+  if (state.socket && state.socket.readyState === WebSocket.OPEN) {
+    state.socket.send(JSON.stringify({ type: "action", action: normalizedAction }));
+    return;
+  }
+
+  setText(elements.connectionStatus, "HTTP観測");
+  renderLogs([`[queued] ${normalizedAction}`, ...(state.genome?.log_history || [])], state.genome?.noise_level || 0, state.genome?.phase_drift || 0);
+
+  try {
+    const response = await fetch("/api/action", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: normalizedAction }),
+    });
+    if (!response.ok) throw new Error(`action failed: ${response.status}`);
+    const payload = await response.json();
+    if (payload.type === "genome" && payload.genome) {
+      renderGenome(payload.genome, payload.genome_summary || payload.genome.genome_summary || {});
+    }
+  } catch (error) {
+    setText(elements.connectionStatus, "未接続");
+    renderLogs([`[local only] ${normalizedAction}`, "[warn] action endpoint unreachable", ...(state.genome?.log_history || [])], state.genome?.noise_level || 0, state.genome?.phase_drift || 0);
+  }
 }
 
 function startAudio() {
@@ -523,4 +551,5 @@ elements.form?.addEventListener("submit", (event) => {
 
 elements.audioToggle?.addEventListener("click", startAudio);
 
+renderLogs(["[boot] observation terminal wake", "[boot] genome socket opening", "[wait] signal ping --"], 0, 0);
 connect();
