@@ -20,7 +20,12 @@
       <div class="exit-message" id="exitMessage" aria-live="polite">戻れそうな場所があります。</div>
     </section>
 
-    <a href="/" class="exit-return" aria-label="入口へ戻る">000 / return</a>
+    <aside class="exit-side" aria-label="脱出室の記録">
+      <div class="exit-side-title">soft corridor protocol</div>
+      <p id="exitHint">どこかが薄く接続されています。確かな出口とは限りません。</p>
+      <div class="exit-route" id="exitRoute">route: emergency</div>
+      <a href="/" class="exit-return">入口へ戻る</a>
+    </aside>
   </main>
 
   <script>
@@ -45,6 +50,8 @@
 
     const realm = document.querySelector(".exit-realm");
     const messageNode = document.getElementById("exitMessage");
+    const hintNode = document.getElementById("exitHint");
+    const routeNode = document.getElementById("exitRoute");
     const params = new URLSearchParams(window.location.search);
     let scene = scenes[params.get("scene")] ? params.get("scene") : "emergency";
     let attempt = Number.parseInt(params.get("n") || "0", 10);
@@ -54,6 +61,10 @@
       realm.dataset.scene = scene;
       realm.dataset.attempt = String(attempt);
       messageNode.textContent = attempt > 0 ? current.message : "戻れそうな場所があります。";
+      routeNode.textContent = `route: ${scene} / n=${attempt}`;
+      hintNode.textContent = attempt >= 6
+        ? "同じ場所が何度も違う顔で戻ってきます。"
+        : "どこかが薄く接続されています。確かな出口とは限りません。";
     }
 
     document.querySelectorAll("[data-choice]").forEach((button) => {
