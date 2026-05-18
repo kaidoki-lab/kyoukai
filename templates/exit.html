@@ -13,67 +13,38 @@
       <div class="exit-image" aria-hidden="true"></div>
       <div class="exit-vignette" aria-hidden="true"></div>
 
-      <div class="exit-hud">
-        <span>KYOUKAI / EXIT</span>
-        <span id="exitSceneLabel">非常口？</span>
-        <span>attempt <b id="exitAttempt">0</b></span>
-      </div>
+      <button class="exit-point exit-point-x" type="button" data-choice="x" aria-label="調べる"></button>
+      <button class="exit-point exit-point-y" type="button" data-choice="y" aria-label="調べる"></button>
+      <button class="exit-point exit-point-z" type="button" data-choice="z" aria-label="調べる"></button>
 
-      <button class="exit-point exit-point-x" type="button" data-choice="x" aria-label="X地点を調べる">X</button>
-      <button class="exit-point exit-point-y" type="button" data-choice="y" aria-label="Y地点を調べる">Y</button>
-      <button class="exit-point exit-point-z" type="button" data-choice="z" aria-label="Z地点を調べる">Z</button>
-
-      <div class="exit-message" id="exitMessage">出口のようなものが見えています。</div>
-      <div class="exit-trace" aria-hidden="true">
-        <span>DOOR</span>
-        <span>WINDOW</span>
-        <span>RETURN</span>
-        <span>NO EXIT</span>
-      </div>
+      <div class="exit-message" id="exitMessage" aria-live="polite">戻れそうな場所があります。</div>
     </section>
 
-    <aside class="exit-side">
-      <div class="exit-side-title">soft corridor protocol</div>
-      <p id="exitHint">X / Y / Z のどれかを押してください。戻れたように見える場所も、戻り先とは限りません。</p>
-      <div class="exit-route" id="exitRoute">route: emergency</div>
-      <a href="/" class="exit-return">入口へ戻る</a>
-    </aside>
+    <a href="/" class="exit-return" aria-label="入口へ戻る">000 / return</a>
   </main>
 
   <script>
     const scenes = {
       emergency: {
-        label: "非常口？",
-        route: "emergency",
-        message: "出口のようなものが見えています。",
-        next: { x: "hall", y: "window", z: "corner" }
+        message: "出口の形だけが残っています。",
+        next: { x: "hall", y: "window", z: "corner" },
       },
       hall: {
-        label: "やわらかい廊下",
-        route: "hall",
-        message: "廊下は少し柔らかく、足音だけが戻ってきます。",
-        next: { x: "window", y: "emergency", z: "corner" }
+        message: "足音だけが、少し遅れて戻ってきます。",
+        next: { x: "window", y: "emergency", z: "corner" },
       },
       corner: {
-        label: "まがりかど",
-        route: "corner",
-        message: "曲がった先に、さっき見たはずの扉があります。",
-        next: { x: "emergency", y: "hall", z: "window" }
+        message: "曲がった先に、さっき見た扉があります。",
+        next: { x: "emergency", y: "hall", z: "window" },
       },
       window: {
-        label: "窓の外",
-        route: "window",
-        message: "外はあります。けれど出口ではありません。",
-        next: { x: "emergency", y: "corner", z: "hall" }
-      }
+        message: "外はあります。出口とは限りません。",
+        next: { x: "emergency", y: "corner", z: "hall" },
+      },
     };
 
     const realm = document.querySelector(".exit-realm");
     const messageNode = document.getElementById("exitMessage");
-    const sceneLabelNode = document.getElementById("exitSceneLabel");
-    const attemptNode = document.getElementById("exitAttempt");
-    const hintNode = document.getElementById("exitHint");
-    const routeNode = document.getElementById("exitRoute");
     const params = new URLSearchParams(window.location.search);
     let scene = scenes[params.get("scene")] ? params.get("scene") : "emergency";
     let attempt = Number.parseInt(params.get("n") || "0", 10);
@@ -82,13 +53,7 @@
       const current = scenes[scene];
       realm.dataset.scene = scene;
       realm.dataset.attempt = String(attempt);
-      sceneLabelNode.textContent = current.label;
-      attemptNode.textContent = String(attempt);
-      messageNode.textContent = attempt > 0 ? current.message : "出口のようなものが見えています。";
-      routeNode.textContent = `route: ${current.route} / n=${attempt}`;
-      hintNode.textContent = attempt >= 6
-        ? "何度選んでも、部屋は出口の形だけを変えます。"
-        : "X / Y / Z のどれかを押してください。戻れたように見える場所も、戻り先とは限りません。";
+      messageNode.textContent = attempt > 0 ? current.message : "戻れそうな場所があります。";
     }
 
     document.querySelectorAll("[data-choice]").forEach((button) => {
