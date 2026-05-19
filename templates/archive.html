@@ -224,6 +224,8 @@
       }
     }
 
+    window.KYOUKAI_ROOM = 'archive';
+
     rack.addEventListener("click", () => {
       clicks += 1;
       room.dataset.archiveClicks = String(clicks);
@@ -231,5 +233,6 @@
       renderArchiveItem(chooseArchiveItem());
     });
   </script>
+  <script src="/static/bgm.js"></script>
 </body>
 </html>
