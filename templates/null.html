@@ -8,20 +8,43 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1522978966321203" crossorigin="anonymous"></script>
 </head>
 <body class="collapse-room-body">
-  <main class="collapse-room" data-collapse-level="0" data-phase="0">
+  <main class="collapse-room" data-stage="0" data-collapse-level="0" data-phase="0">
     <section class="collapse-camera" aria-label="崩落域監視カメラ">
-      <div class="collapse-arcade collapse-arcade-image" data-camera-stage>
-        <div class="collapse-stickers" aria-hidden="true">
-          <span>connection unstable</span>
-          <span>CAMERA OFFSET</span>
-          <span>情報を入れすぎました</span>
-          <span>NO REFUND</span>
-          <span>まだ営業しています</span>
+      <div class="collapse-feed" data-camera-feed>
+        <div class="collapse-arcade collapse-arcade-image" data-camera-stage>
+          <div class="collapse-stickers" aria-hidden="true">
+            <span>connection unstable</span>
+            <span>CAMERA OFFSET</span>
+            <span>情報を入れすぎました</span>
+            <span>NO REFUND</span>
+            <span>まだ営業しています</span>
+          </div>
+        </div>
+
+        <div class="collapse-mosaic" aria-hidden="true"></div>
+        <div class="collapse-scan" aria-hidden="true"></div>
+
+        <div class="collapse-floaters" aria-hidden="true">
+          <span>COLOR SHIFT</span>
+          <span>NOISE</span>
+          <span>MOSAIC</span>
+          <span>SIGNAL DRIFT</span>
+          <span>UI FRAGMENT</span>
+          <span>COMPRESSION LOSS</span>
+        </div>
+
+        <div class="collapse-final" aria-hidden="true">
+          <div class="poop-symbol">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <p>SYSTEM LIMIT REACHED</p>
+          <p>NO FURTHER CHANGES / PHASE FIXED</p>
+          <p>これ以上は変化しません</p>
         </div>
       </div>
-
-      <div class="collapse-mosaic" aria-hidden="true"></div>
-      <div class="collapse-scan" aria-hidden="true"></div>
 
       <div class="collapse-hud">
         <div>
@@ -34,7 +57,7 @@
         </div>
         <div>
           <strong>PHASE</strong>
-          <span id="nullPhase">loading</span>
+          <span id="nullPhase">phase 0</span>
         </div>
         <div>
           <strong>OBSERVATION</strong>
@@ -42,123 +65,169 @@
         </div>
       </div>
 
-      <div class="collapse-meter" aria-hidden="true">
+      <div class="collapse-meter" aria-live="polite">
         <span>CORRUPTION</span>
         <strong id="nullPercent">0%</strong>
+        <small id="nullStageText">STAGE 0 / stable</small>
         <i></i>
-      </div>
-
-      <div class="collapse-floaters" aria-hidden="true">
-        <span>COLOR SHIFT</span>
-        <span>NOISE</span>
-        <span>MOSAIC</span>
-        <span>SIGNAL DRIFT</span>
-        <span>UI FRAGMENT</span>
-        <span>COMPRESSION LOSS</span>
-      </div>
-
-      <div class="collapse-final" aria-hidden="true">
-        <div class="poop-symbol">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <p>SYSTEM LIMIT REACHED</p>
-        <p>NO FURTHER CHANGES / MAX CORRUPTION / PHASE FIXED</p>
       </div>
     </section>
 
     <nav class="collapse-dpad" aria-label="監視カメラ方向キー">
       <button type="button" data-move="up" aria-label="上へ動かす">↑</button>
       <button type="button" data-move="left" aria-label="左へ動かす">←</button>
-      <button type="button" data-move="down" aria-label="下へ動かす">↓</button>
+      <span class="collapse-dpad-core" aria-hidden="true">＋</span>
       <button type="button" data-move="right" aria-label="右へ動かす">→</button>
+      <button type="button" data-move="down" aria-label="下へ動かす">↓</button>
     </nav>
 
     <a class="collapse-return" href="/">000 / return</a>
   </main>
 
   <script>
-    const room = document.querySelector(".collapse-room");
-    const opsNode = document.getElementById("nullOps");
-    const phaseNode = document.getElementById("nullPhase");
-    const signalNode = document.getElementById("nullSignal");
-    const percentNode = document.getElementById("nullPercent");
-    const buttons = [...document.querySelectorAll("[data-move]")];
-    const startedAt = Date.now();
-    let operations = 0;
-    let phase = 0;
-    let cameraX = 0;
-    let cameraY = 0;
-    let lastLevel = 0;
+    (() => {
+      const room = document.querySelector(".collapse-room");
+      const opsNode = document.getElementById("nullOps");
+      const phaseNode = document.getElementById("nullPhase");
+      const signalNode = document.getElementById("nullSignal");
+      const percentNode = document.getElementById("nullPercent");
+      const stageNode = document.getElementById("nullStageText");
+      const buttons = [...document.querySelectorAll("[data-move]")];
 
-    function clamp(value, min, max) {
-      return Math.max(min, Math.min(max, value));
-    }
+      const state = {
+        cameraX: 0,
+        cameraY: 0,
+        touches: 0,
+        corruption: 0,
+        phase: 0,
+        lastObservers: null,
+        locked: false
+      };
 
-    function levelFromState() {
-      const elapsed = Math.floor((Date.now() - startedAt) / 60000);
-      const phasePressure = Math.floor(phase / 2);
-      return clamp(Math.floor(operations / 2) + elapsed + phasePressure, 0, 9);
-    }
+      const moveStep = 18;
+      const maxOffsetX = 80;
+      const maxOffsetY = 50;
 
-    function updateCollapse() {
-      const level = levelFromState();
-      const percent = clamp(Math.round((level / 9) * 100), 0, 100);
-      lastLevel = level;
-      room.dataset.collapseLevel = String(level);
-      room.style.setProperty("--cam-x", `${cameraX}px`);
-      room.style.setProperty("--cam-y", `${cameraY}px`);
-      room.style.setProperty("--collapse", String(level));
-      room.style.setProperty("--corruption", `${percent}%`);
-      room.classList.toggle("is-final", level >= 8);
-      opsNode.textContent = `${String(operations).padStart(2, "0")} touches`;
-      percentNode.textContent = `${percent}%`;
-      signalNode.textContent = level >= 8 ? "MAX CORRUPTION" : level >= 5 ? "connection extremely unstable" : "connection unstable";
-    }
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
 
-    function moveCamera(direction) {
-      operations += 1;
-      const drift = 12 + lastLevel * 3;
-      if (direction === "up") cameraY -= drift;
-      if (direction === "down") cameraY += drift;
-      if (direction === "left") cameraX -= drift;
-      if (direction === "right") cameraX += drift;
-      cameraX = clamp(cameraX, -120, 120);
-      cameraY = clamp(cameraY, -90, 90);
-      room.classList.remove("is-jolting");
-      void room.offsetWidth;
-      room.classList.add("is-jolting");
-      updateCollapse();
-    }
+      function stageFromCorruption(value) {
+        if (value >= 100) return 5;
+        if (value >= 80) return 4;
+        if (value >= 60) return 3;
+        if (value >= 40) return 2;
+        if (value >= 20) return 1;
+        return 0;
+      }
 
-    buttons.forEach((button) => {
-      button.addEventListener("click", () => moveCamera(button.dataset.move));
-    });
+      function cssLevelFromStage(stage) {
+        return stage >= 5 ? 9 : stage * 2;
+      }
 
-    document.addEventListener("keydown", (event) => {
-      const map = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" };
-      if (!map[event.key]) return;
-      event.preventDefault();
-      moveCamera(map[event.key]);
-    });
+      function stageLabel(stage) {
+        return [
+          "STAGE 0 / stable",
+          "STAGE 1 / color shift",
+          "STAGE 2 / mosaic",
+          "STAGE 3 / signal drift",
+          "STAGE 4 / information overload",
+          "STAGE 5 / phase fixed"
+        ][stage] || "STAGE ? / unreadable";
+      }
 
-    fetch("/api/genome")
-      .then((response) => response.json())
-      .then((data) => {
-        phase = Number(data.phase || 0);
-        room.dataset.phase = String(phase);
-        phaseNode.textContent = `phase ${phase}`;
-        updateCollapse();
-      })
-      .catch(() => {
-        phaseNode.textContent = "phase unreadable";
-        updateCollapse();
+      function signalLabel(stage) {
+        if (stage >= 5) return "MAX CORRUPTION";
+        if (stage >= 4) return "signal lost";
+        if (stage >= 3) return "connection poor";
+        if (stage >= 2) return "connection unstable";
+        if (stage >= 1) return "connection weak";
+        return "connection unstable";
+      }
+
+      function render() {
+        const stage = stageFromCorruption(state.corruption);
+        const cssLevel = cssLevelFromStage(stage);
+
+        room.dataset.stage = String(stage);
+        room.dataset.collapseLevel = String(cssLevel);
+        room.dataset.phase = String(state.phase);
+        room.style.setProperty("--cam-x", `${state.cameraX}px`);
+        room.style.setProperty("--cam-y", `${state.cameraY}px`);
+        room.style.setProperty("--collapse", String(cssLevel));
+        room.style.setProperty("--corruption", `${state.corruption}%`);
+        room.classList.toggle("is-final", stage >= 5);
+
+        opsNode.textContent = `${String(state.touches).padStart(2, "0")} touches`;
+        percentNode.textContent = `${state.corruption}%`;
+        stageNode.textContent = stageLabel(stage);
+        signalNode.textContent = signalLabel(stage);
+        phaseNode.textContent = `phase ${state.phase}`;
+      }
+
+      function addCorruption(amount) {
+        if (state.locked) return;
+        state.corruption = clamp(state.corruption + amount, 0, 100);
+        if (state.corruption >= 100) {
+          state.corruption = 100;
+          state.locked = true;
+        }
+        render();
+      }
+
+      function moveCamera(direction) {
+        if (state.locked) return;
+
+        if (direction === "up") state.cameraY -= moveStep;
+        if (direction === "down") state.cameraY += moveStep;
+        if (direction === "left") state.cameraX -= moveStep;
+        if (direction === "right") state.cameraX += moveStep;
+
+        state.cameraX = clamp(state.cameraX, -maxOffsetX, maxOffsetX);
+        state.cameraY = clamp(state.cameraY, -maxOffsetY, maxOffsetY);
+        state.touches += 1;
+
+        room.classList.remove("is-jolting");
+        void room.offsetWidth;
+        room.classList.add("is-jolting");
+
+        addCorruption(4);
+      }
+
+      async function readGenome() {
+        try {
+          const response = await fetch("/api/genome", { cache: "no-store" });
+          const data = await response.json();
+          const nextPhase = Number(data.phase || 0);
+          const nextObservers = Number(data.observer_count ?? data.observers ?? 0);
+
+          state.phase = Number.isFinite(nextPhase) ? nextPhase : 0;
+          if (state.lastObservers !== null && nextObservers > state.lastObservers) {
+            addCorruption(clamp(nextObservers - state.lastObservers, 1, 3));
+          }
+          state.lastObservers = Number.isFinite(nextObservers) ? nextObservers : state.lastObservers;
+        } catch {
+          signalNode.textContent = "genome unreadable";
+        }
+        render();
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => moveCamera(button.dataset.move));
       });
 
-    updateCollapse();
-    setInterval(updateCollapse, 3000);
+      document.addEventListener("keydown", (event) => {
+        const map = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" };
+        if (!map[event.key]) return;
+        event.preventDefault();
+        moveCamera(map[event.key]);
+      });
+
+      render();
+      readGenome();
+      setInterval(() => addCorruption(1), 10000);
+      setInterval(readGenome, 8000);
+    })();
   </script>
 </body>
 </html>

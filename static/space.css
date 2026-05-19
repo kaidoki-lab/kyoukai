@@ -1582,7 +1582,7 @@ a.sp-link:hover,
   filter: saturate(2.4) contrast(1.5) hue-rotate(112deg);
 }
 
-.collapse-room.is-jolting .collapse-camera {
+.collapse-room.is-jolting .collapse-feed {
   animation: collapseJolt 160ms steps(2, end);
 }
 
@@ -1752,6 +1752,135 @@ a.sp-link:hover,
   50% { transform: translate(calc(var(--collapse) * -1px), 3px) skewX(-1deg); }
   75% { transform: translate(3px, calc(var(--collapse) * 1px)) skewX(0deg); }
   100% { transform: translate(0, 0) skewX(0deg); }
+}
+
+/* /null foundation: fixed controls, camera-only motion, staged bright corruption. */
+.collapse-feed {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  transform: translate(var(--cam-x), var(--cam-y));
+  transition: transform 180ms steps(2, end);
+  will-change: transform;
+}
+
+.collapse-feed .collapse-arcade {
+  transform: scale(calc(1 + var(--collapse) * 0.012));
+}
+
+.collapse-dpad {
+  z-index: 40;
+  right: 10px;
+  width: 90px;
+  grid-template-columns: repeat(3, 30px);
+  grid-template-areas:
+    ". up ."
+    "left core right"
+    ". down .";
+  justify-content: center;
+}
+
+.collapse-dpad button,
+.collapse-dpad-core {
+  width: 30px;
+  height: 30px;
+  box-sizing: border-box;
+}
+
+.collapse-dpad-core {
+  grid-area: core;
+  display: grid;
+  place-items: center;
+  border: 3px solid #24002f;
+  border-radius: 4px;
+  background: #ff43cb;
+  color: #fff600;
+  font: 900 17px/1 var(--sp-mono);
+  box-shadow: 3px 3px 0 #00eaff;
+}
+
+.collapse-meter small {
+  display: block;
+  margin-top: 2px;
+  color: #fff600;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+
+.collapse-room[data-stage="0"] .collapse-floaters {
+  opacity: 0.18;
+}
+
+.collapse-room[data-stage="1"] .collapse-floaters {
+  opacity: 0.48;
+}
+
+.collapse-room[data-stage="2"] .collapse-floaters {
+  opacity: 0.72;
+}
+
+.collapse-room[data-stage="3"] .collapse-floaters,
+.collapse-room[data-stage="4"] .collapse-floaters,
+.collapse-room[data-stage="5"] .collapse-floaters {
+  opacity: 1;
+}
+
+.collapse-room[data-stage="0"] .collapse-scan {
+  opacity: 0.24;
+}
+
+.collapse-room[data-stage="1"] .collapse-scan {
+  opacity: 0.48;
+}
+
+.collapse-room[data-stage="2"] .collapse-scan {
+  opacity: 0.68;
+}
+
+.collapse-room[data-stage="3"] .collapse-scan,
+.collapse-room[data-stage="4"] .collapse-scan,
+.collapse-room[data-stage="5"] .collapse-scan {
+  opacity: 0.82;
+}
+
+.collapse-room[data-stage="1"] .collapse-arcade-image {
+  filter: saturate(1.55) contrast(1.08) hue-rotate(9deg);
+}
+
+.collapse-room[data-stage="2"] .collapse-arcade-image {
+  filter: saturate(1.9) contrast(1.16) hue-rotate(28deg);
+}
+
+.collapse-room[data-stage="3"] .collapse-arcade-image {
+  filter: saturate(2.15) contrast(1.24) hue-rotate(54deg);
+}
+
+.collapse-room[data-stage="4"] .collapse-arcade-image {
+  filter: saturate(2.45) contrast(1.34) hue-rotate(86deg);
+}
+
+.collapse-room[data-stage="5"] .collapse-arcade-image {
+  filter: saturate(2.7) contrast(1.42) hue-rotate(112deg);
+}
+
+.collapse-room[data-stage="4"] .collapse-camera::after,
+.collapse-room[data-stage="5"] .collapse-camera::after {
+  content: "SYSTEM LIMIT / 情報過密 / NO REFUND / PHASE FIXED / まだ営業しています";
+  position: absolute;
+  z-index: 23;
+  left: 14px;
+  right: 112px;
+  bottom: 72px;
+  padding: 8px 12px;
+  border: 3px solid #24002f;
+  background: rgba(255, 246, 0, 0.86);
+  color: #ff006a;
+  font-size: clamp(11px, 1.5vw, 18px);
+  font-weight: 900;
+  text-align: center;
+  text-shadow: 2px 2px 0 #00eaff;
+  box-shadow: 5px 5px 0 #ff43cb;
+  pointer-events: none;
 }
 
 /* 脱出室 /exit */
