@@ -14,6 +14,17 @@
 
       <section class="signal-tv-screen" aria-label="テレビ受信画面">
         <div class="signal-tv-video" data-video-stage>
+          <video
+            id="signalVideo"
+            class="signal-media"
+            data-signal-media
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            aria-hidden="true"
+          ></video>
           <div class="signal-static" aria-hidden="true"></div>
           <div class="signal-waveform" aria-hidden="true">
             <span></span><span></span><span></span><span></span><span></span>
@@ -50,6 +61,7 @@
     const frequency = document.querySelector("[data-frequency]");
     const emergency = document.querySelector("[data-emergency]");
     const videoStage = document.querySelector("[data-video-stage]");
+    const signalVideo = document.getElementById("signalVideo");
     const radioStart = document.querySelector("[data-radio-start]");
     if ("speechSynthesis" in window) {
       window.speechSynthesis.cancel();
@@ -82,15 +94,15 @@
     ];
 
     const videoSources = [
-      // "/static/signal-fragment-01.mp4",
-      // "https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0",
+      "/videos/signal01.mp4",
     ];
 
     let radioVoiceActive = false;
     let radioTimer = null;
     let lastRadioLine = "";
+    let lastVideoSource = "";
 
-    room.dataset.mode = Math.random() > 0.5 ? "television" : "radio";
+    room.dataset.mode = "television";
 
     function pick(list) {
       return list[Math.floor(Math.random() * list.length)];
@@ -143,33 +155,38 @@
       tuneVideoSource();
     }
 
-    function tuneVideoSource() {
-      const existing = videoStage.querySelector("[data-signal-media]");
-      if (room.dataset.mode !== "television" || !videoSources.length) {
-        existing?.remove();
+    function pickVideoSource() {
+      if (videoSources.length < 2) return videoSources[0];
+      let next = pick(videoSources);
+      if (next === lastVideoSource) next = pick(videoSources.filter((source) => source !== lastVideoSource));
+      return next;
+    }
+
+    async function tuneVideoSource(forceNext = false) {
+      if (!signalVideo || !videoSources.length) return;
+      if (room.dataset.mode !== "television") {
+        signalVideo.pause();
+        signalVideo.classList.remove("is-visible");
         return;
       }
-      const source = pick(videoSources);
-      const isYoutube = source.includes("youtube.com") || source.includes("youtu.be");
-      if (existing?.dataset.source === source) return;
-      existing?.remove();
-      const media = isYoutube ? document.createElement("iframe") : document.createElement("video");
-      media.className = "signal-media";
-      media.dataset.signalMedia = "true";
-      media.dataset.source = source;
-      if (isYoutube) {
-        media.src = source;
-        media.allow = "autoplay; encrypted-media; picture-in-picture";
-        media.referrerPolicy = "strict-origin-when-cross-origin";
-      } else {
-        media.src = source;
-        media.autoplay = true;
-        media.muted = true;
-        media.loop = true;
-        media.playsInline = true;
+      let source = signalVideo.dataset.source || "";
+      if (!source || forceNext) {
+        source = pickVideoSource();
+        signalVideo.dataset.source = source;
+        signalVideo.src = source;
+        lastVideoSource = source;
       }
-      media.setAttribute("aria-hidden", "true");
-      videoStage.prepend(media);
+      signalVideo.controls = false;
+      signalVideo.muted = true;
+      signalVideo.loop = true;
+      signalVideo.playsInline = true;
+      videoStage.classList.add("has-local-video");
+      signalVideo.classList.add("is-visible");
+      try {
+        await signalVideo.play();
+      } catch (_) {
+        signalVideo.classList.remove("is-visible");
+      }
     }
 
     function drift() {
@@ -194,6 +211,11 @@
     }
 
     radioStart.addEventListener("click", startRadioVoice);
+    signalVideo?.addEventListener("ended", () => tuneVideoSource(true));
+    signalVideo?.addEventListener("error", () => {
+      signalVideo.classList.remove("is-visible");
+      signalVideo.dataset.source = "";
+    });
     setFrequency();
     setTvFragment();
     getRadioLine().then((line) => {

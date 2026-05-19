@@ -351,6 +351,20 @@ a.sp-link:hover,
     brightness(0.78)
     blur(0.25px);
   mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.signal-media.is-visible {
+  opacity: 0.72;
+}
+
+.signal-tv-video.has-local-video .signal-static {
+  opacity: 0.34;
+  mix-blend-mode: screen;
+}
+
+.signal-tv-video.has-local-video .signal-broadcast-text {
+  opacity: 0.62;
 }
 
 .signal-tv-video::before {
@@ -1770,21 +1784,26 @@ a.sp-link:hover,
 
 .collapse-dpad {
   z-index: 40;
-  right: 10px;
-  width: 90px;
-  grid-template-columns: repeat(3, 30px);
+  right: 18px;
+  width: 154px;
+  grid-template-columns: repeat(3, 48px);
   grid-template-areas:
     ". up ."
     "left core right"
     ". down .";
+  gap: 7px;
   justify-content: center;
 }
 
 .collapse-dpad button,
 .collapse-dpad-core {
-  width: 30px;
-  height: 30px;
+  width: 48px;
+  height: 48px;
   box-sizing: border-box;
+}
+
+.collapse-dpad button {
+  font-size: 28px;
 }
 
 .collapse-dpad-core {
@@ -1795,7 +1814,7 @@ a.sp-link:hover,
   border-radius: 4px;
   background: #ff43cb;
   color: #fff600;
-  font: 900 17px/1 var(--sp-mono);
+  font: 900 26px/1 var(--sp-mono);
   box-shadow: 3px 3px 0 #00eaff;
 }
 

@@ -943,6 +943,10 @@ class KyoukaiHandler(BaseHTTPRequestHandler):
             relative = clean_path.removeprefix("/static/")
             self.serve_file(BASE_DIR / "static" / relative)
             return
+        if clean_path.startswith("/videos/"):
+            relative = clean_path.removeprefix("/videos/")
+            self.serve_file(BASE_DIR / "videos" / relative)
+            return
         if clean_path == "/api/genome":
             genome = store.get()
             summary = genome_summary(genome)
@@ -1161,6 +1165,9 @@ if FASTAPI_AVAILABLE:
 
     app = FastAPI(title="KYOUKAI alpha", lifespan=lifespan)
     app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+    videos_dir = BASE_DIR / "videos"
+    videos_dir.mkdir(exist_ok=True)
+    app.mount("/videos", StaticFiles(directory=videos_dir), name="videos")
     templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
     from fastapi import Body
