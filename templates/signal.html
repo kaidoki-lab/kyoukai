@@ -8,44 +8,23 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1522978966321203" crossorigin="anonymous"></script>
 </head>
 <body class="signal-room-body">
-  <main class="signal-room" data-mode="television">
+  <main class="signal-room" data-audio="locked">
     <figure class="signal-chapel-frame" aria-label="KYOUKAI signal room">
       <img class="signal-chapel-image" src="/static/kyoukai_signal_room.png" alt="Signal room background" />
 
-      <section class="signal-tv-screen" aria-label="CRT signal screen">
-        <div class="signal-tv-video" data-video-stage>
-          <video
-            id="signalVideo"
-            class="signal-media"
-            data-signal-media
-            autoplay
-            muted
-            loop
-            playsinline
-            preload="metadata"
-            aria-hidden="true"
-          ></video>
-          <div class="signal-crt-noise" aria-hidden="true"></div>
-          <div class="signal-crt-glass" aria-hidden="true"></div>
-        </div>
+      <section class="signal-tv-screen" aria-label="Video receiver">
+        <video
+          id="signalVideo"
+          class="signal-media"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          aria-label="Signal video"
+        ></video>
+        <button class="signal-audio-hit" type="button" aria-label="Enable signal audio"></button>
       </section>
-
-      <button class="signal-radio-touch" type="button" data-radio-start aria-label="Radio receiver"></button>
-      <aside class="signal-radio-display" aria-hidden="true">
-        <span data-frequency>83.04MHz</span>
-        <b>VOICE RX</b>
-      </aside>
-      <span class="signal-radio-line" data-radio-line aria-live="polite"></span>
-
-      <aside class="signal-floating-log" aria-label="Signal log">
-        <span>SIGNAL LOST</span>
-        <span>UNKNOWN SOURCE</span>
-        <span>RECEIVING...</span>
-        <span>DRIFT DETECTED</span>
-        <span>ARCHIVE FAILED</span>
-      </aside>
-
-      <div class="signal-emergency" data-emergency aria-hidden="true">SIGNAL DETECTED</div>
     </figure>
 
     <a class="signal-return" href="/" aria-label="Return to entrance">000 / return</a>
@@ -53,64 +32,17 @@
 
   <script>
     const room = document.querySelector(".signal-room");
-    const radioLine = document.querySelector("[data-radio-line]");
-    const frequency = document.querySelector("[data-frequency]");
-    const emergency = document.querySelector("[data-emergency]");
-    const videoStage = document.querySelector("[data-video-stage]");
     const signalVideo = document.getElementById("signalVideo");
-    const radioStart = document.querySelector("[data-radio-start]");
+    const audioHit = document.querySelector(".signal-audio-hit");
+    let videoSources = [];
+    let lastVideoSource = "";
 
     if ("speechSynthesis" in window) {
       window.speechSynthesis.cancel();
     }
 
-    const radioFallbackLines = [
-      "現在、受信域八十三番に接続しています。意味のない言葉が、夜を満たしていきます。",
-      "こちらは境界外放送です。存在しない灯りが、まだ消えていません。",
-      "受信番号、二、八、三。聞こえている方は、そのまま聞いてください。",
-      "この放送は終了していません。終了予定も、登録されていません。",
-      "遠い棚から、浅い信号が流れています。意味は確認されていません。",
-    ];
-
-    const emergencies = [
-      "SIGNAL DETECTED",
-      "SOURCE UNKNOWN",
-      "ARCHIVE FAILED",
-      "DRIFT DETECTED",
-      "NO PROGRAM END",
-    ];
-
-    let videoSources = [];
-    let lastVideoSource = "";
-
     function pick(list) {
       return list[Math.floor(Math.random() * list.length)];
-    }
-
-    async function getRadioLine() {
-      try {
-        const response = await fetch("/api/radio-line", { cache: "no-store" });
-        if (response.ok) {
-          const data = await response.json();
-          if (data.line) return data.line;
-        }
-      } catch (_) {}
-      return pick(radioFallbackLines);
-    }
-
-    function setFrequency() {
-      frequency.textContent = `${(76 + Math.random() * 18).toFixed(2)}MHz`;
-    }
-
-    async function updateRadioLine() {
-      radioLine.textContent = await getRadioLine();
-      setFrequency();
-      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-    }
-
-    function stopRadioVoice() {
-      radioStart.classList.remove("is-active");
-      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     }
 
     function pickVideoSource() {
@@ -122,9 +54,8 @@
       return next;
     }
 
-    async function tuneVideoSource(forceNext = false) {
+    async function playSignalVideo(forceNext = false) {
       if (!signalVideo || !videoSources.length) {
-        videoStage.classList.remove("has-local-video");
         signalVideo?.classList.remove("is-visible");
         return;
       }
@@ -138,10 +69,8 @@
       }
 
       signalVideo.controls = false;
-      signalVideo.muted = true;
       signalVideo.loop = true;
       signalVideo.playsInline = true;
-      videoStage.classList.add("has-local-video");
       signalVideo.classList.add("is-visible");
 
       try {
@@ -151,31 +80,18 @@
       }
     }
 
-    function drift() {
-      room.dataset.mode = "television";
-      setFrequency();
-      tuneVideoSource(false);
-      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    async function unlockAudio() {
+      if (!signalVideo) return;
+      signalVideo.muted = false;
+      signalVideo.volume = 0.82;
+      room.dataset.audio = "unlocked";
+      try {
+        await signalVideo.play();
+      } catch (_) {
+        signalVideo.muted = true;
+        room.dataset.audio = "locked";
+      }
     }
-
-    function interrupt() {
-      if (Math.random() > 0.18) return;
-      emergency.textContent = pick(emergencies);
-      emergency.setAttribute("aria-hidden", "false");
-      emergency.classList.add("is-live");
-      window.setTimeout(() => {
-        emergency.classList.remove("is-live");
-        emergency.setAttribute("aria-hidden", "true");
-      }, 1600);
-    }
-
-    signalVideo?.addEventListener("ended", () => tuneVideoSource(true));
-    signalVideo?.addEventListener("error", () => {
-      signalVideo.classList.remove("is-visible");
-      signalVideo.dataset.source = "";
-      tuneVideoSource(true);
-    });
-    radioStart.addEventListener("click", updateRadioLine);
 
     async function loadLocalVideos() {
       try {
@@ -183,36 +99,27 @@
         if (!response.ok) return;
         const data = await response.json();
         videoSources = Array.isArray(data.videos) ? data.videos : [];
-        tuneVideoSource(true);
+        await playSignalVideo(true);
       } catch (_) {
         videoSources = [];
       }
     }
 
-    setFrequency();
-    loadLocalVideos();
-    updateRadioLine();
-    window.setInterval(drift, 11000 + Math.random() * 5000);
-    window.setInterval(interrupt, 9000);
-    window.setInterval(() => {
+    signalVideo?.addEventListener("ended", () => playSignalVideo(true));
+    signalVideo?.addEventListener("error", () => {
+      signalVideo.classList.remove("is-visible");
+      signalVideo.dataset.source = "";
+      playSignalVideo(true);
+    });
+    audioHit?.addEventListener("click", unlockAudio);
+    window.addEventListener("pagehide", () => {
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-    }, 1200);
-
-    window.addEventListener("pagehide", stopRadioVoice);
-    window.addEventListener("beforeunload", stopRadioVoice);
+    });
     document.addEventListener("visibilitychange", () => {
-      if (document.hidden) stopRadioVoice();
+      if (document.hidden && "speechSynthesis" in window) window.speechSynthesis.cancel();
     });
 
-    fetch("/api/genome")
-      .then((response) => response.json())
-      .then((data) => {
-        room.dataset.phase = String(data.phase || 0);
-        if (Number(data.noise_level || 0) > 60) room.classList.add("signal-heavy-noise");
-      })
-      .catch(() => {
-        room.dataset.phase = "unknown";
-      });
+    loadLocalVideos();
   </script>
 </body>
 </html>
