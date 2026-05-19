@@ -1780,7 +1780,8 @@ a.sp-link:hover,
 
 .exit-frame {
   position: relative;
-  min-height: calc(100vh - 36px);
+  aspect-ratio: 16 / 9;
+  min-height: auto;
   overflow: hidden;
   border: 3px solid rgba(117, 52, 115, 0.68);
   border-radius: 12px;
@@ -1988,7 +1989,7 @@ a.sp-link:hover,
   }
 
   .exit-frame {
-    min-height: 66vh;
+    min-height: auto;
   }
 
   .exit-side {
@@ -2002,7 +2003,7 @@ a.sp-link:hover,
   }
 
   .exit-frame {
-    min-height: 62vh;
+    min-height: auto;
   }
 
   .exit-point {
