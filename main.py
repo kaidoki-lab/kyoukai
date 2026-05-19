@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import quote, urlparse
 from urllib.error import URLError
 from urllib.request import Request as UrlRequest, urlopen
 
@@ -34,6 +34,7 @@ except ModuleNotFoundError:
 
 
 BASE_DIR = Path(__file__).resolve().parent
+VIDEOS_DIR = BASE_DIR / "videos"
 DB_PATH = Path(os.environ.get("KYOUKAI_DB_PATH") or (Path(tempfile.gettempdir()) / "kyoukai.db" if os.environ.get("VERCEL") else BASE_DIR / "kyoukai.db"))
 TICK_SECONDS = 3
 SILENCE_THRESHOLD_SECONDS = 12
@@ -559,6 +560,17 @@ def display_signal(row: dict[str, Any]) -> dict[str, Any]:
     return row
 
 
+def list_signal_videos() -> list[str]:
+    """Return local video files that can be played inside the /signal TV screen."""
+    if not VIDEOS_DIR.exists():
+        return []
+    videos: list[str] = []
+    for path in sorted(VIDEOS_DIR.iterdir(), key=lambda item: item.name.lower()):
+        if path.is_file() and path.suffix.lower() in {".mp4", ".webm", ".m4v"}:
+            videos.append("/videos/" + quote(path.name))
+    return videos
+
+
 def add_affiliate_signal(label: str, url: str, signal_text: str, trigger_phase: int = 0,
                          trigger_mutation: str = "any", display_mode: str = "panel") -> dict[str, Any]:
     """Insert a new affiliate signal into the database."""
@@ -989,6 +1001,14 @@ class KyoukaiHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
             return
+        if clean_path == "/api/videos":
+            body = json.dumps({"videos": list_signal_videos()}, ensure_ascii=False).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
         self.send_error(404)
 
     def do_POST(self) -> None:
@@ -1165,7 +1185,7 @@ if FASTAPI_AVAILABLE:
 
     app = FastAPI(title="KYOUKAI alpha", lifespan=lifespan)
     app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
-    videos_dir = BASE_DIR / "videos"
+    videos_dir = VIDEOS_DIR
     videos_dir.mkdir(exist_ok=True)
     app.mount("/videos", StaticFiles(directory=videos_dir), name="videos")
     templates = Jinja2Templates(directory=BASE_DIR / "templates")
@@ -1239,6 +1259,10 @@ if FASTAPI_AVAILABLE:
     @app.get("/api/radio-line")
     async def api_radio_line() -> JSONResponse:
         return JSONResponse(generate_radio_line())
+
+    @app.get("/api/videos")
+    async def api_videos() -> JSONResponse:
+        return JSONResponse({"videos": list_signal_videos()})
 
     @app.post("/api/signals")
     async def api_post_signal(body: dict = Body(...)) -> JSONResponse:

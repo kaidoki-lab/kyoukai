@@ -344,27 +344,27 @@ a.sp-link:hover,
   height: 104%;
   border: 0;
   object-fit: cover;
-  opacity: 0.58;
+  opacity: 0;
   filter:
     saturate(0.72)
     contrast(1.35)
     brightness(0.78)
     blur(0.25px);
-  mix-blend-mode: screen;
+  mix-blend-mode: normal;
   pointer-events: none;
 }
 
 .signal-media.is-visible {
-  opacity: 0.72;
+  opacity: 0.9;
 }
 
 .signal-tv-video.has-local-video .signal-static {
-  opacity: 0.34;
+  opacity: 0.2;
   mix-blend-mode: screen;
 }
 
 .signal-tv-video.has-local-video .signal-broadcast-text {
-  opacity: 0.62;
+  opacity: 0.42;
 }
 
 .signal-tv-video::before {
