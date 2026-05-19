@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>受信域 / KYOUKAI</title>
+  <title>SIGNAL / KYOUKAI</title>
   <link rel="stylesheet" href="/static/space.css" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1522978966321203" crossorigin="anonymous"></script>
 </head>
 <body class="signal-room-body">
-  <main class="signal-room" data-mode="scan">
-    <figure class="signal-chapel-frame" aria-label="KYOUKAI 受信域">
-      <img class="signal-chapel-image" src="/static/kyoukai_signal_room.png" alt="教会内の古い受信機" />
+  <main class="signal-room" data-mode="television">
+    <figure class="signal-chapel-frame" aria-label="KYOUKAI signal room">
+      <img class="signal-chapel-image" src="/static/kyoukai_signal_room.png" alt="Signal room background" />
 
-      <section class="signal-tv-screen" aria-label="テレビ受信画面">
+      <section class="signal-tv-screen" aria-label="CRT signal screen">
         <div class="signal-tv-video" data-video-stage>
           <video
             id="signalVideo"
@@ -25,22 +25,19 @@
             preload="metadata"
             aria-hidden="true"
           ></video>
-          <div class="signal-static" aria-hidden="true"></div>
-          <div class="signal-waveform" aria-hidden="true">
-            <span></span><span></span><span></span><span></span><span></span>
-          </div>
-          <div class="signal-broadcast-text" data-broadcast-text>RECEIVING...</div>
+          <div class="signal-crt-noise" aria-hidden="true"></div>
+          <div class="signal-crt-glass" aria-hidden="true"></div>
         </div>
       </section>
 
-      <button class="signal-radio-touch" type="button" data-radio-start aria-label="ラジオ受信を開始"></button>
+      <button class="signal-radio-touch" type="button" data-radio-start aria-label="Radio receiver"></button>
       <aside class="signal-radio-display" aria-hidden="true">
         <span data-frequency>83.04MHz</span>
         <b>VOICE RX</b>
       </aside>
       <span class="signal-radio-line" data-radio-line aria-live="polite"></span>
 
-      <aside class="signal-floating-log" aria-label="受信ログ">
+      <aside class="signal-floating-log" aria-label="Signal log">
         <span>SIGNAL LOST</span>
         <span>UNKNOWN SOURCE</span>
         <span>RECEIVING...</span>
@@ -48,59 +45,43 @@
         <span>ARCHIVE FAILED</span>
       </aside>
 
-      <div class="signal-emergency" data-emergency aria-hidden="true">受信しました</div>
+      <div class="signal-emergency" data-emergency aria-hidden="true">SIGNAL DETECTED</div>
     </figure>
 
-    <a class="signal-return" href="/" aria-label="入口へ戻る">000 / return</a>
+    <a class="signal-return" href="/" aria-label="Return to entrance">000 / return</a>
   </main>
 
   <script>
     const room = document.querySelector(".signal-room");
-    const broadcastText = document.querySelector("[data-broadcast-text]");
     const radioLine = document.querySelector("[data-radio-line]");
     const frequency = document.querySelector("[data-frequency]");
     const emergency = document.querySelector("[data-emergency]");
     const videoStage = document.querySelector("[data-video-stage]");
     const signalVideo = document.getElementById("signalVideo");
     const radioStart = document.querySelector("[data-radio-start]");
+
     if ("speechSynthesis" in window) {
       window.speechSynthesis.cancel();
     }
 
     const radioFallbackLines = [
       "現在、受信域八十三番に接続しています。意味のない言葉が、夜を満たしていきます。",
-      "こちらは境界外放送です。午前三時から未明にかけて、沈黙が強まるでしょう。",
-      "第六観測波、通過。存在しない町の灯りが、まだ消えていません。",
-      "受信番号、零、零、七。聞こえている方は、そのまま聞いてください。",
+      "こちらは境界外放送です。存在しない灯りが、まだ消えていません。",
+      "受信番号、二、八、三。聞こえている方は、そのまま聞いてください。",
       "この放送は終了していません。終了予定も、登録されていません。",
-      "遠い窓から、白い信号が流入しています。意味は確認されていません。",
-    ];
-
-    const tvFragments = [
-      "受信域へようこそ",
-      "意味のない言葉が",
-      "夜を満たしていく",
-      "深流する放送",
-      "SIGNAL CORRUPTION",
-      "UNKNOWN SOURCE",
+      "遠い棚から、浅い信号が流れています。意味は確認されていません。",
     ];
 
     const emergencies = [
-      "受信しました",
-      "信号が混線しています",
-      "この放送は終了していません",
+      "SIGNAL DETECTED",
+      "SOURCE UNKNOWN",
       "ARCHIVE FAILED",
-      "UNKNOWN SOURCE",
+      "DRIFT DETECTED",
+      "NO PROGRAM END",
     ];
 
     let videoSources = [];
-
-    let radioVoiceActive = false;
-    let radioTimer = null;
-    let lastRadioLine = "";
     let lastVideoSource = "";
-
-    room.dataset.mode = "television";
 
     function pick(list) {
       return list[Math.floor(Math.random() * list.length)];
@@ -121,42 +102,23 @@
       frequency.textContent = `${(76 + Math.random() * 18).toFixed(2)}MHz`;
     }
 
-    async function speakRadioLine() {
-      const line = await getRadioLine();
-      lastRadioLine = line;
-      radioLine.textContent = line;
+    async function updateRadioLine() {
+      radioLine.textContent = await getRadioLine();
       setFrequency();
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     }
 
     function stopRadioVoice() {
-      radioVoiceActive = false;
       radioStart.classList.remove("is-active");
-      window.clearInterval(radioTimer);
-      radioTimer = null;
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-    }
-
-    function startRadioVoice() {
-      if (radioVoiceActive) {
-        stopRadioVoice();
-        return;
-      }
-      radioVoiceActive = false;
-      radioStart.classList.remove("is-active");
-      speakRadioLine();
-    }
-
-    function setTvFragment() {
-      broadcastText.textContent = pick(tvFragments);
-      videoStage.dataset.fragment = String(Math.floor(Math.random() * 9));
-      tuneVideoSource();
     }
 
     function pickVideoSource() {
       if (videoSources.length < 2) return videoSources[0];
       let next = pick(videoSources);
-      if (next === lastVideoSource) next = pick(videoSources.filter((source) => source !== lastVideoSource));
+      if (next === lastVideoSource) {
+        next = pick(videoSources.filter((source) => source !== lastVideoSource));
+      }
       return next;
     }
 
@@ -166,11 +128,7 @@
         signalVideo?.classList.remove("is-visible");
         return;
       }
-      if (room.dataset.mode !== "television") {
-        signalVideo.pause();
-        signalVideo.classList.remove("is-visible");
-        return;
-      }
+
       let source = signalVideo.dataset.source || "";
       if (!source || forceNext) {
         source = pickVideoSource();
@@ -178,12 +136,14 @@
         signalVideo.src = source;
         lastVideoSource = source;
       }
+
       signalVideo.controls = false;
       signalVideo.muted = true;
       signalVideo.loop = true;
       signalVideo.playsInline = true;
       videoStage.classList.add("has-local-video");
       signalVideo.classList.add("is-visible");
+
       try {
         await signalVideo.play();
       } catch (_) {
@@ -194,27 +154,28 @@
     function drift() {
       room.dataset.mode = "television";
       setFrequency();
-      setTvFragment();
+      tuneVideoSource(false);
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     }
 
     function interrupt() {
-      if (Math.random() > 0.28) return;
+      if (Math.random() > 0.18) return;
       emergency.textContent = pick(emergencies);
       emergency.setAttribute("aria-hidden", "false");
       emergency.classList.add("is-live");
       window.setTimeout(() => {
         emergency.classList.remove("is-live");
         emergency.setAttribute("aria-hidden", "true");
-      }, 1800);
+      }, 1600);
     }
 
-    radioStart.addEventListener("click", startRadioVoice);
     signalVideo?.addEventListener("ended", () => tuneVideoSource(true));
     signalVideo?.addEventListener("error", () => {
       signalVideo.classList.remove("is-visible");
       signalVideo.dataset.source = "";
+      tuneVideoSource(true);
     });
+    radioStart.addEventListener("click", updateRadioLine);
 
     async function loadLocalVideos() {
       try {
@@ -229,14 +190,10 @@
     }
 
     setFrequency();
-    loadLocalVideos().then(setTvFragment);
-    getRadioLine().then((line) => {
-      lastRadioLine = line;
-      radioLine.textContent = line;
-    });
-    window.setInterval(drift, 9000 + Math.random() * 6000);
-    window.setInterval(interrupt, 7000);
-    window.setInterval(setTvFragment, 3200);
+    loadLocalVideos();
+    updateRadioLine();
+    window.setInterval(drift, 11000 + Math.random() * 5000);
+    window.setInterval(interrupt, 9000);
     window.setInterval(() => {
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     }, 1200);
