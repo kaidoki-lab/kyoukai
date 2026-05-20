@@ -83,13 +83,28 @@
                 <feDisplacementMap id="displace" in="SourceGraphic" in2="noise" scale="3" />
               </filter>
             </defs>
+            <g id="creatureOrgans" class="creature-organs" aria-hidden="true">
+              <path id="organLeft" class="organ organ-left" d="M75 128 C40 108 38 70 63 48 C78 67 87 92 85 122 Z" />
+              <path id="organRight" class="organ organ-right" d="M185 128 C220 108 222 70 197 48 C182 67 173 92 175 122 Z" />
+              <path id="organCrown" class="organ organ-crown" d="M105 61 C116 27 143 27 155 61 C139 53 121 53 105 61 Z" />
+              <path id="organTail" class="organ organ-tail" d="M129 219 C145 249 122 265 105 236 C115 236 124 229 129 219 Z" />
+            </g>
             <path id="bodyShape" d="M130 31 C178 31 221 71 221 126 C221 184 185 231 130 231 C74 231 39 184 39 126 C39 71 82 31 130 31 Z" />
             <circle class="core-ring" cx="130" cy="130" r="37" />
             <circle id="core" class="core" cx="130" cy="130" r="20" />
+            <g id="creatureEyes" class="creature-eyes">
+              <circle class="eye extra extra-a" cx="130" cy="88" r="4" />
+              <circle class="eye extra extra-b" cx="82" cy="137" r="4" />
+              <circle class="eye extra extra-c" cx="178" cy="137" r="4" />
+            </g>
             <circle class="eye left" cx="100" cy="111" r="7" />
             <circle class="eye right" cx="160" cy="111" r="7" />
             <path class="mouth" d="M104 166 C119 176 141 176 157 166" />
           </svg>
+          <div class="creature-id-readout" aria-hidden="true">
+            <strong id="creatureName">Unknown Organism</strong>
+            <span id="creatureSpecies">U-00000000</span>
+          </div>
         </div>
         <aside class="signal-slot signal-slot-crt" data-signal-slot="crt_bottom">
           <span>NO CARRIER</span>
@@ -101,6 +116,21 @@
           <span>GENOME MONITOR</span>
           <strong>STATUS BOARD</strong>
         </div>
+
+        <section class="creature-readout" aria-label="Creature genome monitor">
+          <div>
+            <span>CREATURE</span>
+            <strong id="creaturePanelName">Unknown Organism</strong>
+          </div>
+          <div class="creature-readout-grid">
+            <div><span>BRANCH</span><strong id="creatureBranch">none</strong></div>
+            <div><span>VARIANT</span><strong id="creatureVariant">normal</strong></div>
+            <div><span>CORE</span><strong id="creatureCore">unknown</strong></div>
+            <div><span>SHELL</span><strong id="creatureShell">unknown</strong></div>
+            <div><span>ORGANS</span><strong id="creatureOrgansText">none</strong></div>
+            <div><span>DANGER</span><strong id="creatureDanger">0</strong></div>
+          </div>
+        </section>
 
         <div class="summary-band" id="eventBand">
           <div><span>主傾向</span><strong id="dominantTrait">none</strong></div>

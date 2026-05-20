@@ -41,6 +41,19 @@ SILENCE_THRESHOLD_SECONDS = 12
 OLLAMA_URL = os.environ.get("KYOUKAI_OLLAMA_URL", "http://127.0.0.1:11434/api/generate")
 OLLAMA_MODEL = os.environ.get("KYOUKAI_OLLAMA_MODEL", "qwen2.5:0.5b")
 
+try:
+    from genome_system import CreatureGeneratorAI, get_creature_params
+    from genome_system.genome_defs import CORES, MUTATIONS, ORGANS, SHELLS
+
+    GENOME_SYSTEM_AVAILABLE = True
+except Exception:
+    CreatureGeneratorAI = None  # type: ignore[assignment]
+    CORES: dict[str, Any] = {}
+    MUTATIONS: dict[str, Any] = {}
+    ORGANS: dict[str, Any] = {}
+    SHELLS: dict[str, Any] = {}
+    GENOME_SYSTEM_AVAILABLE = False
+
 TRAIT_KEYS = [
     "trait_softness",
     "trait_aggression",
@@ -95,6 +108,10 @@ GENOME_DEFAULTS: dict[str, Any] = {
     "last_event_flags": {},
     "genome_summary": {},
 }
+
+CREATURE_GENERATED_DIR = Path(tempfile.gettempdir()) / "kyoukai_creatures"
+_creature_generator = CreatureGeneratorAI(CREATURE_GENERATED_DIR) if GENOME_SYSTEM_AVAILABLE and CreatureGeneratorAI else None
+_creature_cache: dict[str, dict[str, Any]] = {}
 
 COMMAND_EFFECTS: dict[str, dict[str, Any]] = {
     "なでる": {
@@ -189,6 +206,109 @@ def genome_summary(genome: dict[str, Any]) -> dict[str, Any]:
         "audio_mode": mutation_audio_mode(str(genome.get("last_mutation_type", "none"))),
         "visual_mode": str(genome.get("last_mutation_type", "none")).replace("_", "-"),
         "phase": int(genome["phase"]),
+    }
+
+
+def kyoukai_to_evo_genome(genome: dict[str, Any]) -> dict[str, Any]:
+    """Map the existing KYOUKAI genome to the standalone creature genome scale."""
+    return {
+        "AGGRO": clamp(
+            int(genome.get("trait_aggression", 0))
+            + int(genome.get("noise_level", 0)) // 3
+            + max(0, 100 - int(genome.get("stability", 100))) // 4,
+            0,
+            100,
+        ),
+        "CALM": clamp(
+            int(genome.get("trait_softness", 0))
+            + int(genome.get("trait_attachment", 0))
+            + int(genome.get("stability", 100)) // 5,
+            0,
+            100,
+        ),
+        "CURIOSITY": clamp(
+            int(genome.get("trait_curiosity", 0))
+            + int(genome.get("trait_gaze", 0))
+            + int(genome.get("observer_count", 0)) * 3
+            + int(genome.get("silent_observation", 0)) // 3,
+            0,
+            100,
+        ),
+        "DISTORTION": clamp(
+            int(genome.get("trait_corruption", 0))
+            + int(genome.get("phase_drift", 0))
+            + int(genome.get("visual_instability", 0)) // 2
+            + int(genome.get("boundary_pressure", 0)) // 4,
+            0,
+            100,
+        ),
+        "last_update": str(genome.get("updated_at", "")),
+    }
+
+
+def creature_rarity(genome: dict[str, Any], evo: dict[str, Any]) -> str:
+    peak = max(int(evo.get(key, 0)) for key in ("AGGRO", "CALM", "CURIOSITY", "DISTORTION"))
+    phase = int(genome.get("phase", 0))
+    mutations = int(genome.get("mutation_count", 0))
+    if phase >= 3 or peak >= 86:
+        return "Myth"
+    if mutations >= 5 or peak >= 68:
+        return "Legend"
+    if mutations >= 2 or peak >= 42:
+        return "Rare"
+    return "Common"
+
+
+def public_creature_payload(genome: dict[str, Any]) -> dict[str, Any]:
+    evo = kyoukai_to_evo_genome(genome)
+    if not GENOME_SYSTEM_AVAILABLE or not _creature_generator:
+        return {"available": False, "evo": evo}
+
+    params = get_creature_params(evo)
+    params["rarity"] = creature_rarity(genome, evo)
+    key = "|".join(
+        [
+            str(params.get("branch", "none")),
+            str(params.get("variant", "normal")),
+            str(params.get("danger", 0)),
+            str(params.get("rarity", "Common")),
+            str(genome.get("phase", 0)),
+            str(genome.get("mutation_count", 0)),
+            str(genome.get("last_mutation_type", "none")),
+        ]
+    )
+    creature = _creature_cache.get(key)
+    if creature is None:
+        creature = _creature_generator.generate(
+            branch=str(params["branch"]),
+            variant=str(params["variant"]),
+            rarity=str(params["rarity"]),
+            danger=int(params["danger"]),
+            seed_text=key,
+        )
+        _creature_cache[key] = creature
+
+    cg = creature.get("genome", {})
+    organs = [str(ORGANS.get(organ, organ)) for organ in cg.get("organs", [])]
+    core = str(CORES.get(str(cg.get("core", "")), {}).get("name", cg.get("core", "unknown")))
+    mutation = str(MUTATIONS.get(str(cg.get("mutation", "")), cg.get("mutation", "None")))
+    shell = str(SHELLS.get(str(cg.get("shell", "")), cg.get("shell", "unknown")))
+    return {
+        "available": True,
+        "evo": evo,
+        "params": params,
+        "species_id": creature.get("species_id", ""),
+        "name": creature.get("name", "Unknown Organism"),
+        "branch": creature.get("branch", params["branch"]),
+        "variant": creature.get("variant", params["variant"]),
+        "rarity": creature.get("rarity", params["rarity"]),
+        "danger": creature.get("danger", params["danger"]),
+        "body_plan": cg.get("body_plan", "larva_soft"),
+        "silhouette": cg.get("silhouette", "larva_soft"),
+        "core": core,
+        "organs": organs,
+        "shell": shell,
+        "mutation": mutation,
     }
 
 
@@ -922,6 +1042,7 @@ def state_payload(genome: dict[str, Any]) -> dict[str, Any]:
         "type": "genome",
         "genome": genome,
         "genome_summary": summary,
+        "creature": public_creature_payload(genome),
         "affiliate_panel": panel_signals,
                 "affiliate_popup": popup_signals,
     }
@@ -989,6 +1110,15 @@ class KyoukaiHandler(BaseHTTPRequestHandler):
             body = json.dumps({"signals": signals}, ensure_ascii=False).encode()
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        if clean_path == "/api/creature":
+            genome = store.get()
+            body = json.dumps(public_creature_payload(genome), ensure_ascii=False).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
@@ -1255,6 +1385,10 @@ if FASTAPI_AVAILABLE:
         mutation = str(genome.get("last_mutation_type", "none"))
         signals = get_active_signals(phase, mutation)
         return JSONResponse({"signals": signals})
+
+    @app.get("/api/creature")
+    async def api_creature() -> JSONResponse:
+        return JSONResponse(public_creature_payload(store.get()))
 
     @app.get("/api/radio-line")
     async def api_radio_line() -> JSONResponse:

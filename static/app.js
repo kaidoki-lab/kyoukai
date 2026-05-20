@@ -1,6 +1,7 @@
 const state = {
   socket: null,
   genome: null,
+  creature: null,
   summary: null,
   impulse: 0,
   lastMutationEventId: 0,
@@ -50,6 +51,19 @@ const elements = {
   creature: document.querySelector("#creature"),
   bodyShape: document.querySelector("#bodyShape"),
   core: document.querySelector("#core"),
+  organLeft: document.querySelector("#organLeft"),
+  organRight: document.querySelector("#organRight"),
+  organCrown: document.querySelector("#organCrown"),
+  organTail: document.querySelector("#organTail"),
+  creatureName: document.querySelector("#creatureName"),
+  creatureSpecies: document.querySelector("#creatureSpecies"),
+  creaturePanelName: document.querySelector("#creaturePanelName"),
+  creatureBranch: document.querySelector("#creatureBranch"),
+  creatureVariant: document.querySelector("#creatureVariant"),
+  creatureCore: document.querySelector("#creatureCore"),
+  creatureShell: document.querySelector("#creatureShell"),
+  creatureOrgansText: document.querySelector("#creatureOrgansText"),
+  creatureDanger: document.querySelector("#creatureDanger"),
   turbulence: document.querySelector("#turbulence"),
   displace: document.querySelector("#displace"),
 };
@@ -72,6 +86,7 @@ function connect() {
     if (payload.type !== "genome") return;
     const configuredSignals = (payload.affiliate_panel || []).filter(isConfiguredSignal);
     renderGenome(payload.genome, payload.genome_summary || payload.genome.genome_summary || {});
+    renderCreature(payload.creature);
     renderSignalsPanel((payload.affiliate_panel || []).filter((signal) => !signal.is_affiliate));
     renderSignalBanners(configuredSignals, payload.genome, payload.genome_summary || {});
     const configuredPopups = (payload.affiliate_popup || []).filter(isConfiguredSignal);
@@ -174,6 +189,55 @@ function updateCreature(genome, summary) {
   if (elements.creature) elements.creature.style.animationDuration = `${breath}s`;
   elements.turbulence?.setAttribute("baseFrequency", String(noiseFrequency));
   elements.displace?.setAttribute("scale", String(displacement));
+}
+
+const bodyPlanPaths = {
+  larva_soft: "M130 42 C172 42 207 82 207 132 C207 189 176 224 130 224 C84 224 53 189 53 132 C53 82 88 42 130 42 Z",
+  spiked_predator: "M130 30 L151 58 L188 47 L184 88 L221 108 L190 134 L204 184 L158 181 L130 232 L102 181 L56 184 L70 134 L39 108 L76 88 L72 47 L109 58 Z",
+  tentacled: "M130 54 C178 54 203 88 194 130 C186 166 207 204 177 221 C154 235 148 201 130 201 C112 201 106 235 83 221 C53 204 74 166 66 130 C57 88 82 54 130 54 Z",
+  rift_serpent: "M80 52 C156 31 218 72 190 125 C172 159 116 141 107 177 C101 203 135 221 164 203 C142 235 91 235 66 200 C39 162 82 139 114 129 C153 116 173 77 80 52 Z",
+  raptor: "M125 35 C174 43 204 83 191 124 C219 140 215 184 174 180 C159 215 104 226 83 190 C51 184 49 142 78 126 C60 78 84 42 125 35 Z",
+  many_eyed: "M130 38 C184 38 217 81 217 131 C217 188 181 226 130 226 C79 226 43 188 43 131 C43 81 76 38 130 38 Z",
+  cathedral_throat: "M130 35 C179 35 214 72 214 122 C214 181 181 229 130 229 C79 229 46 181 46 122 C46 72 81 35 130 35 Z M89 156 C111 136 149 136 171 156 C157 189 104 189 89 156 Z",
+  void_leviathan: "M44 130 C74 43 180 31 216 93 C244 142 196 209 125 226 C152 190 147 155 112 150 C84 146 62 159 44 130 Z",
+  amorphous: "M127 43 C169 24 214 69 202 112 C239 153 194 229 143 213 C102 246 33 203 60 153 C23 107 77 34 127 43 Z",
+  eye_cathedral: "M130 25 C166 61 198 52 214 101 C192 119 205 168 175 201 C150 188 119 237 88 204 C108 174 54 164 47 117 C82 112 78 62 130 25 Z",
+  halo_titan: "M130 26 C189 26 229 75 229 132 C229 197 188 238 130 238 C72 238 31 197 31 132 C31 75 71 26 130 26 Z M84 76 C110 57 151 57 176 76",
+};
+
+function renderCreature(creature) {
+  if (!creature || creature.available === false) return;
+  state.creature = creature;
+  const bodyPlan = String(creature.body_plan || creature.silhouette || "larva_soft");
+  const branch = String(creature.branch || "none");
+  const variant = String(creature.variant || "normal");
+  const danger = Number(creature.danger || 0);
+  const organs = Array.isArray(creature.organs) ? creature.organs : [];
+  const path = bodyPlanPaths[bodyPlan] || bodyPlanPaths.larva_soft;
+
+  elements.bodyShape?.setAttribute("d", path);
+  setText(elements.creatureName, creature.name || "Unknown Organism");
+  setText(elements.creatureSpecies, creature.species_id || "U-00000000");
+  setText(elements.creaturePanelName, creature.name || "Unknown Organism");
+  setText(elements.creatureBranch, branch.toUpperCase());
+  setText(elements.creatureVariant, variant.toUpperCase());
+  setText(elements.creatureCore, creature.core || "unknown");
+  setText(elements.creatureShell, creature.shell || "unknown");
+  setText(elements.creatureOrgansText, organs.slice(0, 3).join(" / ") || "none");
+  setText(elements.creatureDanger, danger);
+
+  document.body.dataset.creatureBranch = branch;
+  document.body.dataset.creatureVariant = variant;
+  if (elements.facility) {
+    elements.facility.dataset.bodyPlan = bodyPlan;
+    elements.facility.style.setProperty("--creature-danger", String(Math.min(1, danger / 40)));
+  }
+
+  const organText = organs.join(" ").toLowerCase();
+  elements.organLeft?.classList.toggle("is-active", /wing|antenna|tentacle|antler|spike|crown/.test(organText));
+  elements.organRight?.classList.toggle("is-active", /wing|antenna|tentacle|antler|spike|crown/.test(organText));
+  elements.organCrown?.classList.toggle("is-active", /crown|antler|halo|eye/.test(organText) || branch === "attention");
+  elements.organTail?.classList.toggle("is-active", /tentacle|spine|limb|asymmetry/.test(organText) || branch === "chaos");
 }
 
 function renderObservationRuntime(genome, summary) {
@@ -436,10 +500,21 @@ async function sendAction(action) {
     const payload = await response.json();
     if (payload.type === "genome" && payload.genome) {
       renderGenome(payload.genome, payload.genome_summary || payload.genome.genome_summary || {});
+      renderCreature(payload.creature);
     }
   } catch (error) {
     setText(elements.connectionStatus, "未接続");
     renderLogs([`[local only] ${normalizedAction}`, "[warn] action endpoint unreachable", ...(state.genome?.log_history || [])], state.genome?.noise_level || 0, state.genome?.phase_drift || 0);
+  }
+}
+
+async function fetchCreature() {
+  try {
+    const response = await fetch("/api/creature", { cache: "no-store" });
+    if (!response.ok) return;
+    renderCreature(await response.json());
+  } catch {
+    // Observation can still run with the base organism if the creature bridge is unavailable.
   }
 }
 
@@ -552,4 +627,5 @@ elements.form?.addEventListener("submit", (event) => {
 elements.audioToggle?.addEventListener("click", startAudio);
 
 renderLogs(["[boot] observation terminal wake", "[boot] genome socket opening", "[wait] signal ping --"], 0, 0);
+fetchCreature();
 connect();

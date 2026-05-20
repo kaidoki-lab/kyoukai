@@ -33,6 +33,7 @@ body {
   --shake-x: 0px;
   --shake-y: 0px;
   --breath: 4s;
+  --creature-danger: 0;
   --phase-hue: 176;
   --impulse: 0;
   --core-scale: 1;
@@ -184,6 +185,35 @@ h2 {
   transition: fill 480ms ease, transform 420ms ease;
 }
 
+.organ {
+  fill: hsla(var(--phase-hue), 82%, 64%, 0.42);
+  stroke: rgba(231, 255, 249, 0.22);
+  stroke-width: 2;
+  opacity: 0;
+  transform-origin: 130px 130px;
+  transition: opacity 380ms ease, transform 460ms ease, fill 460ms ease;
+}
+
+.organ.is-active {
+  opacity: 0.82;
+}
+
+.organ-left.is-active {
+  transform: translateX(calc(var(--creature-danger) * -8px)) rotate(calc(var(--creature-danger) * -10deg));
+}
+
+.organ-right.is-active {
+  transform: translateX(calc(var(--creature-danger) * 8px)) rotate(calc(var(--creature-danger) * 10deg));
+}
+
+.organ-crown.is-active {
+  transform: translateY(calc(var(--creature-danger) * -7px)) scale(calc(1 + var(--creature-danger) * 0.14));
+}
+
+.organ-tail.is-active {
+  transform: translateY(calc(var(--creature-danger) * 6px)) scaleY(calc(1 + var(--creature-danger) * 0.18));
+}
+
 .core-ring {
   fill: none;
   stroke: rgba(5, 14, 16, 0.36);
@@ -201,6 +231,16 @@ h2 {
 .eye {
   fill: #061014;
   opacity: 0.78;
+}
+
+.eye.extra {
+  opacity: 0;
+  transition: opacity 360ms ease;
+}
+
+body[data-creature-branch="attention"] .eye.extra,
+body[data-creature-branch="chaos"] .eye.extra {
+  opacity: 0.72;
 }
 
 .mouth {
@@ -456,6 +496,32 @@ body[data-trait="distance"] .halo {
 
 body[data-trait="corruption"] .noise-field {
   opacity: calc(var(--noise-opacity) + 0.08);
+}
+
+body[data-creature-branch="aggression"] .organ {
+  fill: rgba(230, 107, 117, 0.5);
+}
+
+body[data-creature-branch="kind"] .organ {
+  fill: rgba(215, 196, 109, 0.42);
+}
+
+body[data-creature-branch="chaos"] .creature {
+  animation-timing-function: steps(7, end);
+}
+
+body[data-creature-variant="malice"] #bodyShape,
+body[data-creature-variant="unstable"] #bodyShape {
+  stroke-width: 5;
+}
+
+body[data-creature-variant="malice"] #bodyShape {
+  stroke: rgba(230, 107, 117, 0.4);
+}
+
+body[data-creature-variant="unstable"] #bodyShape {
+  stroke: rgba(35, 247, 255, 0.28);
+  stroke-dasharray: 6 5;
 }
 
 body[data-mutation="soft_bloom"] #bodyShape {
@@ -1186,13 +1252,49 @@ body:has(.observation-room) {
   mix-blend-mode: screen;
 }
 
+.creature-id-readout {
+  position: absolute;
+  left: 50%;
+  bottom: 10%;
+  width: min(72%, 210px);
+  transform: translateX(-50%);
+  display: grid;
+  gap: 2px;
+  padding: 5px 8px;
+  border: 1px solid rgba(35, 247, 255, 0.24);
+  background: rgba(0, 0, 0, 0.58);
+  color: #cafff6;
+  font-family: Consolas, "Courier New", monospace;
+  text-align: center;
+  text-shadow: 0 0 8px rgba(35, 247, 255, 0.48);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.creature-id-readout strong,
+.creature-id-readout span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.creature-id-readout strong {
+  font-size: clamp(9px, 0.72vw, 12px);
+  letter-spacing: 0.04em;
+}
+
+.creature-id-readout span {
+  color: #ff9fe0;
+  font-size: clamp(7px, 0.56vw, 9px);
+}
+
 .right-monitor {
   right: 2.7%;
   top: 17.2%;
   width: 20.6%;
   height: 68.4%;
   display: grid;
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: auto auto auto 1fr;
   gap: 0.7vh;
   padding: 0.7vh 0.55vw;
   overflow: hidden;
@@ -1234,6 +1336,52 @@ body:has(.observation-room) {
 .right-monitor .summary-band {
   grid-template-columns: 1fr 1fr;
   gap: 0.4vw;
+}
+
+.creature-readout {
+  display: grid;
+  gap: 0.42vh;
+  padding: 0.48vh 0.42vw;
+  border: 1px solid rgba(147, 255, 72, 0.24);
+  background:
+    linear-gradient(90deg, rgba(147, 255, 72, 0.08), rgba(35, 247, 255, 0.06)),
+    rgba(0, 0, 0, 0.86);
+  box-shadow: inset 0 0 18px rgba(147, 255, 72, 0.08);
+}
+
+.creature-readout > div:first-child {
+  display: grid;
+  gap: 2px;
+  padding-bottom: 0.38vh;
+  border-bottom: 1px dotted rgba(147, 255, 72, 0.28);
+}
+
+.creature-readout-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3vh 0.32vw;
+}
+
+.creature-readout-grid div {
+  min-width: 0;
+}
+
+.creature-readout span {
+  display: block;
+  color: #9efcff;
+  font-size: clamp(7px, 0.48vw, 9px);
+  line-height: 1.1;
+}
+
+.creature-readout strong {
+  display: block;
+  min-width: 0;
+  color: #edfff7;
+  font-size: clamp(9px, 0.62vw, 11px);
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .observation-runtime {
