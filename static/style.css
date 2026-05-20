@@ -1219,9 +1219,9 @@ body:has(.observation-room) {
   position: absolute;
   z-index: 2;
   left: 51%;
-  top: 53.4%;
-  width: 72%;
-  height: 72%;
+  top: 52%;
+  width: 58%;
+  height: 58%;
   min-height: 0;
   display: grid;
   place-items: center;
@@ -1237,14 +1237,14 @@ body:has(.observation-room) {
 }
 
 .observation-room .halo {
-  width: min(56%, 145px);
+  width: min(52%, 118px);
   opacity: 0.55;
   border-color: hsla(var(--phase-hue), 90%, 70%, 0.28);
 }
 
 .observation-room .creature {
-  width: min(70%, 170px);
-  max-height: 86%;
+  width: min(62%, 132px);
+  max-height: 74%;
   transform: translateY(2%) scaleY(0.96);
   filter:
     drop-shadow(0 0 14px hsla(var(--phase-hue), 96%, 66%, 0.55))
@@ -1255,12 +1255,12 @@ body:has(.observation-room) {
 .creature-id-readout {
   position: absolute;
   left: 50%;
-  bottom: 10%;
-  width: min(72%, 210px);
+  bottom: 7%;
+  width: min(66%, 150px);
   transform: translateX(-50%);
   display: grid;
   gap: 2px;
-  padding: 5px 8px;
+  padding: 3px 6px;
   border: 1px solid rgba(35, 247, 255, 0.24);
   background: rgba(0, 0, 0, 0.58);
   color: #cafff6;
@@ -1279,13 +1279,13 @@ body:has(.observation-room) {
 }
 
 .creature-id-readout strong {
-  font-size: clamp(9px, 0.72vw, 12px);
+  font-size: clamp(7px, 0.58vw, 10px);
   letter-spacing: 0.04em;
 }
 
 .creature-id-readout span {
   color: #ff9fe0;
-  font-size: clamp(7px, 0.56vw, 9px);
+  font-size: clamp(6px, 0.46vw, 8px);
 }
 
 .right-monitor {
@@ -1340,8 +1340,8 @@ body:has(.observation-room) {
 
 .creature-readout {
   display: grid;
-  gap: 0.42vh;
-  padding: 0.48vh 0.42vw;
+  gap: 0.28vh;
+  padding: 0.36vh 0.34vw;
   border: 1px solid rgba(147, 255, 72, 0.24);
   background:
     linear-gradient(90deg, rgba(147, 255, 72, 0.08), rgba(35, 247, 255, 0.06)),
@@ -1352,14 +1352,14 @@ body:has(.observation-room) {
 .creature-readout > div:first-child {
   display: grid;
   gap: 2px;
-  padding-bottom: 0.38vh;
+  padding-bottom: 0.24vh;
   border-bottom: 1px dotted rgba(147, 255, 72, 0.28);
 }
 
 .creature-readout-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.3vh 0.32vw;
+  gap: 0.2vh 0.26vw;
 }
 
 .creature-readout-grid div {
@@ -1369,7 +1369,7 @@ body:has(.observation-room) {
 .creature-readout span {
   display: block;
   color: #9efcff;
-  font-size: clamp(7px, 0.48vw, 9px);
+  font-size: clamp(6px, 0.44vw, 8px);
   line-height: 1.1;
 }
 
@@ -1377,7 +1377,7 @@ body:has(.observation-room) {
   display: block;
   min-width: 0;
   color: #edfff7;
-  font-size: clamp(9px, 0.62vw, 11px);
+  font-size: clamp(8px, 0.56vw, 10px);
   line-height: 1.15;
   overflow: hidden;
   text-overflow: ellipsis;
