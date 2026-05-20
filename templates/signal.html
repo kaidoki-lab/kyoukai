@@ -18,13 +18,13 @@
           class="signal-media"
           autoplay
           muted
-          loop
           playsinline
           preload="metadata"
           aria-label="Signal video"
         ></video>
         <button class="signal-audio-hit" type="button" aria-label="Enable signal audio"></button>
       </section>
+      <button class="signal-channel-hit" type="button" aria-label="Change channel"></button>
     </figure>
 
     <a class="signal-return" href="/" aria-label="Return to entrance">000 / return</a>
@@ -34,6 +34,7 @@
     const room = document.querySelector(".signal-room");
     const signalVideo = document.getElementById("signalVideo");
     const audioHit = document.querySelector(".signal-audio-hit");
+    const channelHit = document.querySelector(".signal-channel-hit");
     let videoSources = [];
     let lastVideoSource = "";
 
@@ -69,7 +70,7 @@
       }
 
       signalVideo.controls = false;
-      signalVideo.loop = true;
+      signalVideo.loop = false;
       signalVideo.playsInline = true;
       signalVideo.classList.add("is-visible");
 
@@ -112,6 +113,7 @@
       playSignalVideo(true);
     });
     audioHit?.addEventListener("click", unlockAudio);
+    channelHit?.addEventListener("click", () => playSignalVideo(true));
     window.addEventListener("pagehide", () => {
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     });

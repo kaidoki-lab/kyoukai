@@ -352,6 +352,27 @@ a.sp-link:hover,
   pointer-events: none;
 }
 
+.signal-channel-hit {
+  position: absolute;
+  left: 72.5%;
+  top: 42.2%;
+  z-index: 6;
+  display: block;
+  width: 6.9%;
+  height: 31.2%;
+  border: 0;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.001);
+  color: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.signal-channel-hit:focus-visible {
+  outline: 1px solid rgba(233, 206, 152, 0.42);
+  outline-offset: 2px;
+}
+
 .signal-return {
   position: fixed;
   left: 18px;
