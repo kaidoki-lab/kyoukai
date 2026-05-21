@@ -40,7 +40,8 @@ TICK_SECONDS = 3
 SILENCE_THRESHOLD_SECONDS = 12
 OLLAMA_URL = os.environ.get("KYOUKAI_OLLAMA_URL", "http://127.0.0.1:11434/api/generate")
 OLLAMA_MODEL = os.environ.get("KYOUKAI_OLLAMA_MODEL", "qwen2.5:0.5b")
-GA_MEASUREMENT_ID = os.environ.get("GA_MEASUREMENT_ID", "").strip()
+DEFAULT_GA_MEASUREMENT_ID = "G-ZXWYDXKCYS"
+GA_MEASUREMENT_ID = os.environ.get("GA_MEASUREMENT_ID", DEFAULT_GA_MEASUREMENT_ID).strip()
 
 try:
     from genome_system import CreatureGeneratorAI, get_creature_params
@@ -1152,6 +1153,7 @@ class KyoukaiHandler(BaseHTTPRequestHandler):
             body = json.dumps(site_config_payload(), ensure_ascii=False).encode()
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Cache-Control", "no-store")
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
@@ -1417,7 +1419,7 @@ if FASTAPI_AVAILABLE:
 
     @app.get("/api/site-config")
     async def api_site_config() -> JSONResponse:
-        return JSONResponse(site_config_payload())
+        return JSONResponse(site_config_payload(), headers={"Cache-Control": "no-store"})
 
     @app.post("/api/signals")
     async def api_post_signal(body: dict = Body(...)) -> JSONResponse:
