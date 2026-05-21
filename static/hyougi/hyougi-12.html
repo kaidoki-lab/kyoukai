@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>評議録｜評議その十二</title>
+
+<style>
+:root{
+  --gold:#f3c86a;
+  --gold2:#fff1b8;
+  --white:#fff8df;
+  --glass-red:rgba(120,32,28,.45);
+  --glass-blue:rgba(34,72,120,.50);
+  --glass-green:rgba(42,95,70,.34);
+}
+
+*{ box-sizing:border-box; }
+
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#000;
+  font-family:"Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo",sans-serif;
+}
+
+body{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.stage{
+  position:relative;
+  width:min(100vw,56.25vh);
+  height:min(100vh,177.77vw);
+  aspect-ratio:9 / 16;
+  overflow:hidden;
+  isolation:isolate;
+  color:var(--white);
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(255,237,180,.55), rgba(243,200,106,.18) 22%, transparent 50%),
+    radial-gradient(ellipse at 50% 95%, rgba(255,214,120,.25), transparent 48%),
+    linear-gradient(180deg,#17110a 0%,#0b0806 52%,#020201 100%);
+}
+
+.temple-depth{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.88) 0%,transparent 16%,transparent 84%,rgba(0,0,0,.88) 100%),
+    radial-gradient(ellipse at 50% 92%,transparent 0 28%,rgba(255,232,162,.12) 28.5% 29.1%,transparent 30%);
+  z-index:-5;
+}
+
+.stained-left,.stained-right{
+  position:absolute;
+  top:4%;
+  width:24%;
+  height:72%;
+  border-radius:45% 45% 4% 4%;
+  background:
+    radial-gradient(circle at 50% 24%,rgba(255,248,218,.85) 0 6%,transparent 6.5%),
+    conic-gradient(from 15deg,var(--glass-red),var(--gold),var(--glass-blue),var(--glass-green),var(--gold),var(--glass-red));
+  clip-path:polygon(50% 0%,84% 9%,100% 100%,0 100%,16% 9%);
+  filter:brightness(1.25) saturate(1.15) drop-shadow(0 0 34px rgba(255,217,126,.45));
+  opacity:.82;
+  z-index:-4;
+  animation:glassGlow 20s ease-in-out forwards;
+}
+
+.stained-left{ left:3%; }
+.stained-right{ right:3%; transform:scaleX(-1); }
+
+.light-beam{
+  position:absolute;
+  left:50%;
+  top:-10%;
+  width:72%;
+  height:110%;
+  transform:translateX(-50%);
+  background:linear-gradient(180deg,rgba(255,246,205,.66),rgba(255,221,138,.20) 38%,transparent 75%);
+  clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);
+  filter:blur(14px);
+  opacity:.72;
+  z-index:-3;
+  animation:beamBreathe 20s ease-in-out forwards;
+}
+
+.floor-glow{
+  position:absolute;
+  left:50%;
+  bottom:-8%;
+  width:120%;
+  height:28%;
+  transform:translateX(-50%);
+  background:radial-gradient(ellipse,rgba(255,218,128,.46),rgba(255,218,128,.14) 42%,transparent 70%);
+  filter:blur(12px);
+  z-index:-1;
+}
+
+.sigil{
+  position:absolute;
+  left:50%;
+  top:34%;
+  width:68%;
+  aspect-ratio:1 / 1;
+  transform:translate(-50%,-50%);
+  opacity:.74;
+  filter:drop-shadow(0 0 22px rgba(255,224,145,.72));
+  z-index:1;
+  animation:sigilClosing 20s ease-in-out forwards;
+}
+
+.sigil div{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+}
+
+.circle{
+  width:42%;
+  height:42%;
+  border:5px solid rgba(255,248,222,.92);
+  border-radius:50%;
+  box-shadow:0 0 30px rgba(255,218,128,.72), inset 0 0 22px rgba(255,218,128,.22);
+}
+
+.ring2{
+  width:68%;
+  height:68%;
+  border:2px solid rgba(255,218,128,.28);
+  border-radius:50%;
+}
+
+.hline{
+  width:92%;
+  height:3px;
+  background:linear-gradient(90deg,transparent,rgba(255,230,150,.95),transparent);
+}
+
+.vline{
+  width:7px;
+  height:64%;
+  border-radius:999px;
+  background:linear-gradient(180deg,transparent,rgba(255,248,222,.96) 18%,rgba(255,248,222,.96) 82%,transparent);
+}
+
+.brand{
+  position:absolute;
+  left:50%;
+  top:11%;
+  transform:translateX(-50%);
+  font-size:clamp(22px,4vw,52px);
+  font-weight:900;
+  letter-spacing:.24em;
+  color:var(--white);
+  text-shadow:0 0 8px rgba(255,255,255,.95),0 0 28px rgba(255,226,150,.9),0 0 90px rgba(255,188,74,.6);
+  opacity:0;
+  z-index:8;
+  animation:brandAppear 20s ease-in-out forwards;
+}
+
+.record{
+  position:absolute;
+  left:50%;
+  top:53.5%;
+  width:84%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  z-index:9;
+  opacity:0;
+  animation:recordAppear 20s ease-in-out forwards;
+}
+
+.record-title{
+  font-size:clamp(42px,10vw,92px);
+  font-weight:900;
+  letter-spacing:.18em;
+  line-height:1.05;
+  text-shadow:0 0 10px rgba(255,255,255,.95),0 0 32px rgba(255,226,150,.95),0 0 90px rgba(255,188,74,.7);
+}
+
+.record-sub{
+  margin-top:.65rem;
+  font-size:clamp(14px,2.8vw,28px);
+  font-weight:800;
+  letter-spacing:.10em;
+  color:var(--gold2);
+  text-shadow:0 0 18px rgba(255,218,128,.9);
+}
+
+.log{
+  margin-top:.95rem;
+  font-size:clamp(13px,2.35vw,21px);
+  line-height:1.28;
+  letter-spacing:.055em;
+  color:rgba(255,248,223,.92);
+  text-shadow:0 0 12px rgba(255,218,128,.55);
+}
+
+.verdict{
+  margin-top:1.05rem;
+  font-size:clamp(48px,12vw,120px);
+  font-weight:900;
+  letter-spacing:.18em;
+  color:#fff;
+  text-shadow:0 0 12px rgba(255,255,255,1),0 0 38px rgba(255,226,150,.95),0 0 110px rgba(255,188,74,.8);
+  opacity:0;
+  animation:verdictFlash 20s ease-in-out forwards;
+}
+
+.address{
+  position:absolute;
+  left:50%;
+  bottom:7%;
+  transform:translateX(-50%);
+  font-size:clamp(16px,3.5vw,38px);
+  font-weight:900;
+  letter-spacing:.08em;
+  color:var(--white);
+  white-space:nowrap;
+  text-shadow:0 0 8px rgba(255,255,255,.95),0 0 24px rgba(255,226,150,.95),0 0 70px rgba(255,188,74,.78);
+  opacity:0;
+  z-index:9;
+  animation:addressAppear 20s ease-in-out forwards;
+}
+
+.grain{
+  position:absolute;
+  inset:0;
+  background:
+    repeating-linear-gradient(180deg,rgba(255,255,255,.025) 0 1px,transparent 1px 4px),
+    radial-gradient(ellipse at center,transparent 32%,rgba(0,0,0,.50) 86%,rgba(0,0,0,.84));
+  pointer-events:none;
+  z-index:20;
+}
+
+.fade{
+  position:absolute;
+  inset:0;
+  background:#000;
+  opacity:0;
+  z-index:21;
+  animation:finalFade 20s linear forwards;
+}
+
+@keyframes brandAppear{
+  0%,8%{opacity:0;filter:blur(10px);}
+  14%,82%{opacity:1;filter:blur(0);}
+  100%{opacity:.2;filter:blur(4px);}
+}
+
+@keyframes recordAppear{
+  0%,12%{opacity:0;transform:translate(-50%,-42%) scale(.92);filter:blur(14px);}
+  22%,84%{opacity:1;transform:translate(-50%,-50%) scale(1);filter:blur(0);}
+  100%{opacity:0;transform:translate(-50%,-58%) scale(1.04);filter:blur(8px);}
+}
+
+@keyframes verdictFlash{
+  0%,58%{opacity:0;transform:scale(.8);filter:blur(12px);}
+  66%{opacity:1;transform:scale(1.18);filter:blur(0);}
+  74%,90%{opacity:1;transform:scale(1);}
+  100%{opacity:0;transform:scale(1.1);filter:blur(6px);}
+}
+
+@keyframes addressAppear{
+  0%,72%{opacity:0;transform:translateX(-50%) scale(.72);filter:blur(10px);}
+  80%{opacity:1;transform:translateX(-50%) scale(1.08);filter:blur(0);}
+  92%,100%{opacity:1;transform:translateX(-50%) scale(1);}
+}
+
+@keyframes sigilClosing{
+  0%{opacity:.45;transform:translate(-50%,-50%) scale(.9);}
+  50%{opacity:.88;transform:translate(-50%,-50%) scale(1.03);}
+  100%{opacity:.62;transform:translate(-50%,-50%) scale(1.08);}
+}
+
+@keyframes beamBreathe{
+  0%{opacity:.38;transform:translateX(-50%) scaleX(.82);}
+  54%{opacity:.8;}
+  100%{opacity:.7;transform:translateX(-50%) scaleX(1.05);}
+}
+
+@keyframes glassGlow{
+  0%{opacity:.58;filter:brightness(.9) saturate(.9) drop-shadow(0 0 10px rgba(255,217,126,.18));}
+  60%{opacity:.9;filter:brightness(1.35) saturate(1.24) drop-shadow(0 0 38px rgba(255,217,126,.58));}
+  100%{opacity:.78;}
+}
+
+@keyframes finalFade{
+  0%,94%{opacity:0;}
+  100%{opacity:.28;}
+}
+</style>
+</head>
+
+<body>
+<main class="stage">
+
+  <div class="temple-depth"></div>
+  <div class="stained-left"></div>
+  <div class="stained-right"></div>
+  <div class="light-beam"></div>
+  <div class="floor-glow"></div>
+
+  <div class="sigil">
+    <div class="ring2"></div>
+    <div class="circle"></div>
+    <div class="hline"></div>
+    <div class="vline"></div>
+  </div>
+
+  <div class="brand">KYOUKAI</div>
+
+  <section class="record">
+    <div class="record-title">評議録</div>
+
+    <div class="record-sub">
+      評議その十二 / OBS-0012
+    </div>
+
+    <div class="log">
+      十二片、接続完了。<br>
+      評議群、円環化。<br>
+      記録は部屋へ変わる。<br>
+      次の入口、発生。
+    </div>
+
+    <div class="verdict">
+      GO
+    </div>
+
+    <div class="log">
+      第一群は閉じてよい。<br>
+      ここから先は配置の問題。<br>
+      一覧ではなく、発見にしろ。<br>
+      評議録はKYOUKAIへ接続する。
+    </div>
+  </section>
+
+  <div class="address">void-kyoukai.net</div>
+
+  <div class="grain"></div>
+  <div class="fade"></div>
+
+</main>
+</body>
+</html>

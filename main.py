@@ -1067,6 +1067,7 @@ class KyoukaiHandler(BaseHTTPRequestHandler):
         "/observation": "index.html",
         "/archive": "archive.html",
         "/signal": "signal.html",
+        "/hyougi": "hyougi.html",
         "/exit": "exit.html",
         "/null": "null.html",
         "/outside": "outside.html",
@@ -1371,6 +1372,10 @@ if FASTAPI_AVAILABLE:
     @app.get("/signal", response_class=HTMLResponse)
     async def signal_room(request: Request) -> HTMLResponse:
         return render_template(request, "signal.html")
+
+    @app.get("/hyougi", response_class=HTMLResponse)
+    async def hyougi_room(request: Request) -> HTMLResponse:
+        return render_template(request, "hyougi.html")
 
     @app.get("/exit", response_class=HTMLResponse)
     async def exit_room(request: Request) -> HTMLResponse:

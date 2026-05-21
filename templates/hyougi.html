@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>評議 / KYOUKAI</title>
+  <link rel="stylesheet" href="/static/space.css" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1522978966321203" crossorigin="anonymous"></script>
+  <script defer src="/static/analytics.js"></script>
+</head>
+<body class="hyougi-room-body">
+  <main class="hyougi-room">
+    <figure class="hyougi-frame" aria-label="評議">
+      <img class="hyougi-image" src="/static/kyoukai_hyougi_room.png" alt="評議" />
+      <div class="hyougi-void" aria-label="評議記録">
+        <iframe
+          id="hyougiFrame"
+          class="hyougi-embed"
+          title="評議記録"
+          loading="eager"
+          referrerpolicy="no-referrer"
+        ></iframe>
+      </div>
+    </figure>
+
+    <a class="hyougi-return" href="/" aria-label="入口へ戻る">000 / return</a>
+  </main>
+
+  <script>window.KYOUKAI_ROOM = 'hyougi';</script>
+  <script>
+    (() => {
+      const records = [
+        "/static/hyougi/hyougi-01.html",
+        "/static/hyougi/hyougi-02.html",
+        "/static/hyougi/hyougi-03.html",
+        "/static/hyougi/hyougi-04.html",
+        "/static/hyougi/hyougi-05.html",
+        "/static/hyougi/hyougi-06.html",
+        "/static/hyougi/hyougi-07.html",
+        "/static/hyougi/hyougi-08.html",
+        "/static/hyougi/hyougi-09.html",
+        "/static/hyougi/hyougi-10.html",
+        "/static/hyougi/hyougi-11.html",
+        "/static/hyougi/hyougi-12.html"
+      ];
+      const frame = document.getElementById("hyougiFrame");
+      let last = "";
+
+      function pickRecord() {
+        if (records.length < 2) return records[0];
+        const choices = records.filter((record) => record !== last);
+        return choices[Math.floor(Math.random() * choices.length)];
+      }
+
+      function playRecord() {
+        const next = pickRecord();
+        last = next;
+        frame.src = `${next}?t=${Date.now()}`;
+      }
+
+      playRecord();
+      window.setInterval(playRecord, 22000);
+    })();
+  </script>
+  <script src="/static/bgm.js"></script>
+</body>
+</html>

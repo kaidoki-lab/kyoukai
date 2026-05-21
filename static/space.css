@@ -867,11 +867,125 @@ a.sp-link:hover,
 
 .hotspot-observation { left: 42%; top: 47%; width: 16%; height: 11%; }
 .hotspot-archive { left: 66%; top: 35%; width: 10%; height: 17%; }
-.hotspot-signal { left: 80%; top: 45%; width: 12%; height: 24%; }
+.hotspot-hyougi { left: 80%; top: 45%; width: 12%; height: 24%; }
 .hotspot-signal-alt { left: 24%; top: 57%; width: 13%; height: 10%; }
 .hotspot-exit { left: 17%; top: 33%; width: 12%; height: 17%; }
 .hotspot-null { left: 2%; top: 27%; width: 12%; height: 24%; }
 .hotspot-girl-film { left: 1%; top: 60%; width: 22%; height: 17%; }
+
+/* KYOUKAI /hyougi council chamber */
+.hyougi-room-body {
+  width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 44%, rgba(255, 220, 160, 0.14), transparent 34%),
+    #040403;
+  color: rgba(232, 220, 198, 0.72);
+}
+
+.hyougi-room {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100vw;
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+.hyougi-frame {
+  position: relative;
+  width: min(100vw, calc(100svh * 1.7778));
+  aspect-ratio: 16 / 9;
+  margin: 0;
+  overflow: hidden;
+  background: #020202;
+  box-shadow:
+    0 0 70px rgba(0, 0, 0, 0.74),
+    inset 0 0 80px rgba(0, 0, 0, 0.62);
+}
+
+.hyougi-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.04) contrast(1.02) brightness(0.96);
+}
+
+.hyougi-void {
+  position: absolute;
+  left: 40.3%;
+  top: 12.9%;
+  width: 20.6%;
+  height: 65%;
+  border-radius: 1.2% / 0.8%;
+  z-index: 1;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(12, 12, 12, 0.18), rgba(0, 0, 0, 0.42) 66%, rgba(0, 0, 0, 0.68));
+  box-shadow:
+    inset 0 0 38px rgba(0, 0, 0, 0.8),
+    0 0 22px rgba(255, 218, 154, 0.08);
+  pointer-events: none;
+}
+
+.hyougi-embed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #000;
+}
+
+.hyougi-frame::before,
+.hyougi-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hyougi-frame::before {
+  z-index: 2;
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 4px),
+    linear-gradient(90deg, rgba(255, 190, 96, 0.06), transparent 18%, transparent 82%, rgba(32, 48, 70, 0.09));
+  mix-blend-mode: multiply;
+}
+
+.hyougi-frame::after {
+  z-index: 3;
+  opacity: 0.38;
+  background:
+    radial-gradient(circle at 55% 27%, rgba(255, 228, 180, 0.14), transparent 30%),
+    radial-gradient(circle at 50% 50%, transparent 34%, rgba(0, 0, 0, 0.5) 100%);
+  mix-blend-mode: screen;
+  animation: hyougiLight 9.5s ease-in-out infinite;
+}
+
+.hyougi-return {
+  position: fixed;
+  left: 18px;
+  bottom: 14px;
+  z-index: 5;
+  color: rgba(232, 220, 198, 0.42);
+  font-family: var(--sp-mono);
+  font-size: 11px;
+  text-decoration: none;
+}
+
+.hyougi-return:hover {
+  color: rgba(232, 220, 198, 0.9);
+}
+
+@keyframes hyougiLight {
+  0%, 100% { opacity: 0.32; }
+  50% { opacity: 0.5; }
+}
 
 .external-artifact-mount {
   position: absolute;

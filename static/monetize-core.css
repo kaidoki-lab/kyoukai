@@ -25,12 +25,12 @@
 }
 
 .ky-monetize-route--home {
-  right: 17%;
-  bottom: 8.4%;
+  right: 2.4%;
+  top: 39.5%;
   z-index: 45;
-  min-width: 82px;
-  min-height: 46px;
-  transform: rotate(5deg) skew(-2deg);
+  min-width: 74px;
+  min-height: 42px;
+  transform: rotate(-7deg) skew(-2deg);
 }
 
 .ky-monetize-route--signal {
