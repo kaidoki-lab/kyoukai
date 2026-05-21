@@ -24,7 +24,7 @@
       link.rel = item.rel;
     }
 
-    appendText(link, "span", "ky-outside-item__label", item.label || "外部接続");
+    appendText(link, "span", "ky-outside-item__label", item.label || "OUTSIDE");
     appendText(link, "span", "ky-outside-item__body", item.body || "");
 
     if (item.disclosure) {
@@ -49,7 +49,7 @@
 
       const head = document.createElement("header");
       appendText(head, "span", "ky-outside-section__id", section.id || "node");
-      appendText(head, "h2", "ky-outside-section__title", section.title || "外部接続");
+      appendText(head, "h2", "ky-outside-section__title", section.title || "OUTSIDE");
       appendText(head, "p", "ky-outside-section__note", section.note || "");
       shell.appendChild(head);
 
@@ -65,30 +65,9 @@
     });
   }
 
-  function injectOutsideRoute() {
-    if (document.body?.dataset.monetizePage === "outside") return;
-    if (document.querySelector(".ky-monetize-route")) return;
-
-    const outside = config().outside || {};
-    if (outside.enabled === false) return;
-
-    const link = document.createElement("a");
-    link.className = "ky-monetize-route";
-    link.href = outside.href || "/outside";
-    link.setAttribute("aria-label", "外部接続を開く");
-    appendText(link, "span", "ky-monetize-route__label", outside.label || "外部接続");
-    appendText(link, "span", "ky-monetize-route__sub", outside.sublabel || "OUTSIDE");
-    document.body.appendChild(link);
-  }
-
-  function init() {
-    renderOutsidePage();
-    injectOutsideRoute();
-  }
-
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init, { once: true });
+    document.addEventListener("DOMContentLoaded", renderOutsidePage, { once: true });
   } else {
-    init();
+    renderOutsidePage();
   }
 })();
