@@ -692,14 +692,16 @@ a.sp-link:hover,
 
 /* KYOUKAI entrance altar */
 .altar-page {
-  min-height: 100vh;
+  width: 100vw;
+  height: 100vh;
+  min-height: 100svh;
   background:
     radial-gradient(circle at 50% 18%, rgba(247, 24, 174, 0.22), transparent 35%),
     radial-gradient(circle at 18% 68%, rgba(23, 241, 255, 0.16), transparent 28%),
     radial-gradient(circle at 84% 74%, rgba(92, 255, 80, 0.15), transparent 26%),
     #020102;
   color: #fff2d6;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .altar-page::after {
@@ -715,9 +717,13 @@ a.sp-link:hover,
 .altar-shell {
   position: relative;
   z-index: 1;
-  width: min(100vw, 1640px);
-  margin: 0 auto;
-  padding: clamp(10px, 2vw, 26px);
+  display: grid;
+  place-items: center;
+  width: 100vw;
+  min-height: 100vh;
+  min-height: 100svh;
+  margin: 0;
+  padding: clamp(6px, 1.35vw, 18px);
 }
 
 .altar-caption {
@@ -741,7 +747,10 @@ a.sp-link:hover,
 
 .altar-frame {
   position: relative;
-  width: 100%;
+  width: min(calc(100vw - clamp(12px, 2.7vw, 36px)), calc((100svh - clamp(12px, 2.7vw, 36px)) * 1.5), 1640px);
+  max-width: 100%;
+  max-height: calc(100svh - clamp(12px, 2.7vw, 36px));
+  aspect-ratio: 3 / 2;
   overflow: hidden;
   border: 2px solid rgba(255, 42, 174, 0.5);
   background: #050005;
@@ -749,6 +758,7 @@ a.sp-link:hover,
     0 0 22px rgba(255, 42, 174, 0.48),
     0 0 44px rgba(23, 241, 255, 0.24),
     inset 0 0 60px rgba(0, 0, 0, 0.78);
+  animation: altarFrameGlow 8.8s ease-in-out infinite;
 }
 
 .altar-frame::before {
@@ -761,15 +771,33 @@ a.sp-link:hover,
     linear-gradient(90deg, rgba(255, 0, 128, 0.15), transparent 12%, transparent 88%, rgba(0, 220, 255, 0.16)),
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 9px);
   mix-blend-mode: screen;
+  animation: altarLightDrift 11s ease-in-out infinite;
+}
+
+.altar-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 52% 32%, rgba(255, 238, 180, 0.08), transparent 22%),
+    radial-gradient(circle at 72% 48%, rgba(23, 241, 255, 0.07), transparent 26%),
+    linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.18) 100%);
+  mix-blend-mode: screen;
+  opacity: 0.54;
+  animation: altarBreathLight 7.4s ease-in-out infinite;
 }
 
 .altar-image {
   display: block;
   width: 100%;
-  height: auto;
-  min-height: 62vh;
+  height: 100%;
   object-fit: cover;
+  object-position: center center;
   filter: saturate(1.22) contrast(1.08) brightness(0.96);
+  transform: scale(1.012);
+  animation: altarRoomBreathe 13s ease-in-out infinite;
 }
 
 .altar-noise {
@@ -777,11 +805,11 @@ a.sp-link:hover,
   inset: 0;
   z-index: 4;
   pointer-events: none;
-  opacity: 0.18;
+  opacity: 0.13;
   background:
     repeating-radial-gradient(circle at 18% 24%, rgba(255, 255, 255, 0.24) 0 1px, transparent 1px 3px),
     repeating-linear-gradient(117deg, transparent 0 6px, rgba(255, 0, 160, 0.14) 6px 7px);
-  animation: altarNoise 520ms steps(2, end) infinite;
+  animation: altarNoise 760ms steps(2, end) infinite;
 }
 
 .hotspot {
@@ -846,7 +874,7 @@ a.sp-link:hover,
 .hotspot-girl-film { left: 1%; top: 60%; width: 22%; height: 17%; }
 
 .midnight .altar-image {
-  filter: saturate(1.42) contrast(1.16) hue-rotate(-12deg);
+  filter: saturate(1.42) contrast(1.16) brightness(0.98) hue-rotate(-12deg);
 }
 
 .midnight .altar-caption strong {
@@ -864,6 +892,52 @@ a.sp-link:hover,
   0% { transform: translate(0, 0); }
   50% { transform: translate(-1px, 1px); }
   100% { transform: translate(1px, -1px); }
+}
+
+@keyframes altarRoomBreathe {
+  0%, 100% {
+    transform: scale(1.012) translate3d(0, 0, 0);
+    filter: saturate(1.2) contrast(1.08) brightness(0.94);
+  }
+  45% {
+    transform: scale(1.022) translate3d(0.18%, -0.16%, 0);
+    filter: saturate(1.27) contrast(1.1) brightness(1.01);
+  }
+  72% {
+    transform: scale(1.016) translate3d(-0.12%, 0.12%, 0);
+    filter: saturate(1.23) contrast(1.09) brightness(0.97);
+  }
+}
+
+@keyframes altarBreathLight {
+  0%, 100% {
+    opacity: 0.42;
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    opacity: 0.68;
+    transform: translate3d(0.5%, -0.35%, 0);
+  }
+}
+
+@keyframes altarLightDrift {
+  0%, 100% { opacity: 0.78; transform: translateX(0); }
+  48% { opacity: 0.96; transform: translateX(0.35%); }
+}
+
+@keyframes altarFrameGlow {
+  0%, 100% {
+    box-shadow:
+      0 0 20px rgba(255, 42, 174, 0.42),
+      0 0 40px rgba(23, 241, 255, 0.2),
+      inset 0 0 58px rgba(0, 0, 0, 0.78);
+  }
+  52% {
+    box-shadow:
+      0 0 26px rgba(255, 42, 174, 0.56),
+      0 0 50px rgba(23, 241, 255, 0.27),
+      inset 0 0 66px rgba(0, 0, 0, 0.7);
+  }
 }
 
 @keyframes hotspotPulse {
@@ -884,7 +958,7 @@ a.sp-link:hover,
 
 @media (max-width: 720px) {
   .altar-shell {
-    padding: 8px;
+    padding: 6px;
   }
 
   .altar-caption {
@@ -893,7 +967,7 @@ a.sp-link:hover,
   }
 
   .altar-image {
-    min-height: 72vh;
+    object-position: center center;
   }
 
   .hotspot {
