@@ -884,25 +884,25 @@ a.sp-link:hover,
 }
 
 .external-artifact-mount--altar {
-  right: clamp(4px, 1.1%, 18px);
-  bottom: clamp(18px, 5.8%, 58px);
-  width: clamp(118px, 10vw, 150px);
-  min-height: 96px;
+  right: clamp(3px, 0.9%, 14px);
+  bottom: clamp(16px, 5.4%, 52px);
+  width: clamp(96px, 8.4vw, 126px);
+  min-height: 78px;
   transform: rotate(-7deg);
-  filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.48));
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.5));
 }
 
 .external-artifact-mount--altar::before {
   content: "";
   position: absolute;
-  right: -12px;
-  bottom: 21px;
-  width: clamp(86px, 8vw, 128px);
-  height: clamp(54px, 5vw, 74px);
+  right: -10px;
+  bottom: 19px;
+  width: clamp(72px, 6.8vw, 104px);
+  height: clamp(42px, 4.1vw, 62px);
   pointer-events: none;
   background:
     radial-gradient(circle at 16% 72%, rgba(0, 0, 0, 0.46), transparent 42%),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.32), rgba(50, 9, 34, 0.22), transparent);
+    linear-gradient(90deg, rgba(0, 0, 0, 0.34), rgba(130, 0, 28, 0.22), transparent);
   clip-path: polygon(13% 12%, 100% 0, 91% 88%, 4% 100%, 0 42%);
   mix-blend-mode: multiply;
 }
@@ -910,27 +910,27 @@ a.sp-link:hover,
 .external-artifact-link {
   position: relative;
   display: block;
-  width: clamp(76px, 6.2vw, 104px);
-  height: clamp(62px, 5vw, 82px);
+  width: clamp(62px, 5.1vw, 86px);
+  height: clamp(52px, 4.2vw, 68px);
   margin-left: auto;
   overflow: hidden;
-  border: 1px solid rgba(99, 58, 70, 0.72);
-  border-right-color: rgba(255, 239, 141, 0.16);
-  border-bottom-color: rgba(23, 241, 255, 0.18);
+  border: 1px solid rgba(255, 42, 80, 0.42);
+  border-right-color: rgba(255, 226, 76, 0.18);
+  border-bottom-color: rgba(255, 0, 170, 0.24);
   background:
-    radial-gradient(circle at 28% 28%, rgba(141, 255, 191, 0.13) 0 4px, transparent 5px),
-    radial-gradient(circle at 68% 35%, rgba(255, 239, 141, 0.1) 0 3px, transparent 4px),
-    linear-gradient(150deg, rgba(23, 18, 18, 0.86), rgba(5, 3, 6, 0.9) 58%, rgba(42, 8, 31, 0.66)),
-    repeating-linear-gradient(122deg, rgba(255, 255, 255, 0.055) 0 1px, transparent 1px 9px);
-  color: rgba(221, 255, 230, 0.86);
+    radial-gradient(circle at 28% 28%, rgba(255, 225, 65, 0.16) 0 3px, transparent 4px),
+    radial-gradient(circle at 68% 35%, rgba(255, 0, 170, 0.14) 0 2px, transparent 3px),
+    linear-gradient(150deg, rgba(45, 6, 8, 0.88), rgba(8, 2, 5, 0.92) 58%, rgba(95, 0, 52, 0.64)),
+    repeating-linear-gradient(122deg, rgba(255, 64, 64, 0.06) 0 1px, transparent 1px 8px);
+  color: rgba(255, 229, 210, 0.86);
   font-family: var(--sp-mono);
   line-height: 1.05;
   text-decoration: none;
   box-shadow:
-    -10px 10px 18px rgba(0, 0, 0, 0.42),
-    0 0 18px rgba(23, 241, 255, 0.05),
+    -9px 9px 15px rgba(0, 0, 0, 0.44),
+    0 0 16px rgba(255, 0, 126, 0.08),
     inset 0 0 20px rgba(0, 0, 0, 0.76),
-    inset 7px 0 16px rgba(255, 42, 174, 0.08);
+    inset 7px 0 14px rgba(255, 42, 80, 0.12);
   clip-path: polygon(9% 0, 88% 4%, 100% 22%, 94% 91%, 72% 100%, 0 88%, 4% 18%);
   transform: translate3d(0, 0, 0);
   transition:
@@ -948,13 +948,13 @@ a.sp-link:hover,
   width: 35%;
   height: 42%;
   pointer-events: none;
-  border: 1px solid rgba(141, 255, 191, 0.22);
+  border: 1px solid rgba(255, 226, 76, 0.22);
   background:
-    radial-gradient(circle at 50% 48%, rgba(141, 255, 191, 0.32) 0 2px, transparent 3px),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.45), rgba(23, 241, 255, 0.08));
+    radial-gradient(circle at 50% 48%, rgba(255, 226, 76, 0.36) 0 2px, transparent 3px),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.48), rgba(255, 0, 170, 0.1));
   box-shadow:
     inset 0 0 9px rgba(0, 0, 0, 0.82),
-    0 0 8px rgba(141, 255, 191, 0.13);
+    0 0 8px rgba(255, 226, 76, 0.14);
   clip-path: polygon(0 8%, 92% 0, 100% 87%, 12% 100%);
 }
 
@@ -968,20 +968,20 @@ a.sp-link:hover,
   pointer-events: none;
   opacity: 0.68;
   background:
-    linear-gradient(90deg, rgba(255, 239, 141, 0.2), transparent 18%),
-    repeating-linear-gradient(180deg, rgba(23, 241, 255, 0.28) 0 1px, transparent 1px 8px);
+    linear-gradient(90deg, rgba(255, 226, 76, 0.24), transparent 18%),
+    repeating-linear-gradient(180deg, rgba(255, 0, 170, 0.32) 0 1px, transparent 1px 8px);
   clip-path: polygon(18% 0, 100% 10%, 86% 100%, 0 86%);
 }
 
 .external-artifact-link:hover,
 .external-artifact-link:focus-visible {
-  color: #ecffe9;
-  border-color: rgba(141, 255, 191, 0.38);
+  color: #fff1ce;
+  border-color: rgba(255, 226, 76, 0.42);
   outline: none;
   box-shadow:
-    -10px 10px 18px rgba(0, 0, 0, 0.42),
-    0 0 18px rgba(141, 255, 191, 0.16),
-    0 0 22px rgba(23, 241, 255, 0.12),
+    -9px 9px 15px rgba(0, 0, 0, 0.44),
+    0 0 18px rgba(255, 42, 80, 0.2),
+    0 0 22px rgba(255, 0, 170, 0.14),
     inset 0 0 22px rgba(0, 0, 0, 0.64);
   transform: translate(1px, -1px) rotate(1deg);
 }
@@ -1004,19 +1004,19 @@ a.sp-link:hover,
   position: absolute;
   right: 15%;
   bottom: 18%;
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: rgba(141, 255, 191, 0.54);
-  box-shadow: 0 0 9px rgba(141, 255, 191, 0.28);
+  background: rgba(255, 226, 76, 0.68);
+  box-shadow: 0 0 8px rgba(255, 42, 80, 0.34);
 }
 
 .external-artifact-port {
   position: absolute;
   left: 10%;
   bottom: 10%;
-  color: rgba(141, 255, 191, 0.52);
-  font-size: clamp(5px, 0.42vw, 7px);
+  color: rgba(255, 226, 76, 0.52);
+  font-size: clamp(5px, 0.36vw, 6px);
   letter-spacing: 0;
 }
 
@@ -1024,8 +1024,8 @@ a.sp-link:hover,
   position: absolute;
   right: 9%;
   top: 42%;
-  color: rgba(255, 239, 141, 0.64);
-  font-size: clamp(7px, 0.5vw, 9px);
+  color: rgba(255, 79, 103, 0.66);
+  font-size: clamp(6px, 0.44vw, 8px);
   writing-mode: vertical-rl;
 }
 
@@ -1033,8 +1033,8 @@ a.sp-link:hover,
   position: absolute;
   right: 34%;
   top: 9%;
-  color: rgba(255, 239, 141, 0.38);
-  font-size: clamp(6px, 0.45vw, 8px);
+  color: rgba(255, 226, 76, 0.4);
+  font-size: clamp(5px, 0.38vw, 7px);
   font-weight: 400;
 }
 
@@ -1043,10 +1043,10 @@ a.sp-link:hover,
   right: 2px;
   bottom: 0;
   z-index: 2;
-  width: min(148px, 42vw);
-  color: rgba(255, 242, 214, 0.58);
+  width: min(132px, 40vw);
+  color: rgba(255, 226, 210, 0.54);
   font-family: var(--sp-mono);
-  font-size: clamp(8px, 0.56vw, 10px);
+  font-size: clamp(7px, 0.5vw, 9px);
   line-height: 1.25;
   text-align: right;
   text-shadow: 0 0 6px rgba(0, 0, 0, 0.9);
