@@ -40,6 +40,7 @@ TICK_SECONDS = 3
 SILENCE_THRESHOLD_SECONDS = 12
 OLLAMA_URL = os.environ.get("KYOUKAI_OLLAMA_URL", "http://127.0.0.1:11434/api/generate")
 OLLAMA_MODEL = os.environ.get("KYOUKAI_OLLAMA_MODEL", "qwen2.5:0.5b")
+GA_MEASUREMENT_ID = os.environ.get("GA_MEASUREMENT_ID", "").strip()
 
 try:
     from genome_system import CreatureGeneratorAI, get_creature_params
@@ -691,6 +692,14 @@ def list_signal_videos() -> list[str]:
     return videos
 
 
+def site_config_payload() -> dict[str, Any]:
+    return {
+        "analytics": {
+            "gaMeasurementId": GA_MEASUREMENT_ID,
+        }
+    }
+
+
 def add_affiliate_signal(label: str, url: str, signal_text: str, trigger_phase: int = 0,
                          trigger_mutation: str = "any", display_mode: str = "panel") -> dict[str, Any]:
     """Insert a new affiliate signal into the database."""
@@ -1139,6 +1148,14 @@ class KyoukaiHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
             return
+        if clean_path == "/api/site-config":
+            body = json.dumps(site_config_payload(), ensure_ascii=False).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
         self.send_error(404)
 
     def do_POST(self) -> None:
@@ -1397,6 +1414,10 @@ if FASTAPI_AVAILABLE:
     @app.get("/api/videos")
     async def api_videos() -> JSONResponse:
         return JSONResponse({"videos": list_signal_videos()})
+
+    @app.get("/api/site-config")
+    async def api_site_config() -> JSONResponse:
+        return JSONResponse(site_config_payload())
 
     @app.post("/api/signals")
     async def api_post_signal(body: dict = Body(...)) -> JSONResponse:
