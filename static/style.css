@@ -972,6 +972,101 @@ body:has(.observation-room) {
   animation: roomNoise 420ms steps(2, end) infinite;
 }
 
+.observation-disconnect {
+  position: absolute;
+  left: 31.2%;
+  bottom: 7.4%;
+  z-index: 6;
+  width: clamp(72px, 6.6vw, 112px);
+  height: clamp(38px, 3.6vw, 58px);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(255, 48, 79, 0.42);
+  background:
+    radial-gradient(circle at 72% 32%, rgba(255, 48, 79, 0.28) 0 3px, transparent 4px),
+    linear-gradient(145deg, rgba(55, 0, 14, 0.82), rgba(4, 0, 5, 0.86) 58%, rgba(80, 0, 34, 0.58)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 8px);
+  clip-path: polygon(8% 0, 91% 4%, 100% 24%, 92% 100%, 12% 92%, 0 74%, 4% 18%);
+  color: #ffccd7;
+  font-family: Consolas, "Courier New", monospace;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: 0 0 9px rgba(255, 48, 79, 0.72);
+  box-shadow:
+    0 0 13px rgba(255, 48, 79, 0.16),
+    inset 0 0 18px rgba(0, 0, 0, 0.78),
+    inset 8px 0 16px rgba(255, 0, 120, 0.12);
+  transform: rotate(3deg) skew(-2deg);
+  opacity: 0.88;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.observation-disconnect::before,
+.observation-disconnect::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.observation-disconnect::before {
+  left: 8%;
+  top: 18%;
+  width: 14%;
+  height: 58%;
+  background: rgba(255, 48, 79, 0.46);
+  box-shadow: 0 0 9px rgba(255, 48, 79, 0.42);
+}
+
+.observation-disconnect::after {
+  inset: -22%;
+  opacity: 0;
+  background: repeating-linear-gradient(0deg, transparent 0 5px, rgba(255, 255, 255, 0.18) 5px 6px);
+}
+
+.observation-disconnect:hover,
+.observation-disconnect:focus-visible {
+  opacity: 1;
+  outline: none;
+  border-color: rgba(255, 92, 120, 0.78);
+  box-shadow:
+    0 0 18px rgba(255, 48, 79, 0.28),
+    0 0 22px rgba(255, 0, 160, 0.14),
+    inset 0 0 20px rgba(0, 0, 0, 0.74);
+  transform: translate(1px, -1px) rotate(3deg) skew(-2deg);
+}
+
+.observation-disconnect:hover::after,
+.observation-disconnect:focus-visible::after {
+  opacity: 0.16;
+  animation: disconnectStatic 240ms steps(2, end) infinite;
+}
+
+.disconnect-core,
+.disconnect-sub {
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+
+.disconnect-core {
+  color: #ffedf1;
+  font-size: clamp(13px, 1.1vw, 18px);
+  letter-spacing: 0;
+}
+
+.disconnect-sub {
+  margin-top: 3px;
+  color: rgba(255, 120, 150, 0.86);
+  font-size: clamp(6px, 0.5vw, 8px);
+  letter-spacing: 0;
+}
+
 .left-terminal,
 .right-monitor,
 .crt-stage {
@@ -1737,13 +1832,19 @@ body:has(.observation-room) {
   50% { opacity: 1; }
 }
 
+@keyframes disconnectStatic {
+  0% { transform: translate3d(-1px, 0, 0); }
+  50% { transform: translate3d(1px, -1px, 0); }
+  100% { transform: translate3d(0, 1px, 0); }
+}
+
 @media (max-width: 900px) {
   body:has(.observation-room) {
     overflow: auto;
   }
 
   .observation-room {
-    min-height: 1530px;
+    min-height: 1580px;
   }
 
   .room-bg-layer {
@@ -1754,7 +1855,8 @@ body:has(.observation-room) {
   .left-terminal,
   .crt-stage,
   .right-monitor,
-  .room-signal-poster {
+  .room-signal-poster,
+  .observation-disconnect {
     left: 16px;
     right: 16px;
     width: auto;
@@ -1779,5 +1881,12 @@ body:has(.observation-room) {
     top: 1428px;
     min-height: 76px;
     transform: rotate(-2deg);
+  }
+
+  .observation-disconnect {
+    top: 1508px;
+    bottom: auto;
+    height: 52px;
+    transform: rotate(1deg);
   }
 }
