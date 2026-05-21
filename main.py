@@ -1069,6 +1069,8 @@ class KyoukaiHandler(BaseHTTPRequestHandler):
         "/signal": "signal.html",
         "/exit": "exit.html",
         "/null": "null.html",
+        "/outside": "outside.html",
+        "/support": "outside.html",
     }
 
     def do_GET(self) -> None:
@@ -1377,6 +1379,11 @@ if FASTAPI_AVAILABLE:
     @app.get("/null", response_class=HTMLResponse)
     async def null_room(request: Request) -> HTMLResponse:
         return render_template(request, "null.html")
+
+    @app.get("/outside", response_class=HTMLResponse)
+    @app.get("/support", response_class=HTMLResponse)
+    async def outside_core(request: Request) -> HTMLResponse:
+        return render_template(request, "outside.html")
 
     # ─── API ────────────────────────────────────────────────
 
