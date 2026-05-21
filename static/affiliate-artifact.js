@@ -46,15 +46,15 @@
     const variant = mount.dataset.affiliateVariant || slot || "artifact";
     const link = document.createElement("a");
 
-    link.className = "affiliate-artifact affiliate-artifact--" + variant;
+    link.className = "external-artifact-link external-artifact-link--" + variant;
     link.href = url;
     link.target = "_blank";
     link.rel = "sponsored noopener noreferrer";
     link.setAttribute("aria-label", AMAZON_ARIA_LABEL);
 
-    appendTextElement(link, "span", "affiliate-artifact__kicker", note);
-    appendTextElement(link, "strong", "affiliate-artifact__label", label);
-    appendTextElement(link, "small", "affiliate-artifact__disclosure", DISCLOSURE_TEXT);
+    appendTextElement(link, "span", "external-artifact-core", note);
+    appendTextElement(link, "span", "external-artifact-sub", label);
+    appendTextElement(link, "span", "external-artifact-pr", DISCLOSURE_TEXT);
 
     mount.appendChild(link);
     mount.hidden = false;
