@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote, urlparse
+from urllib.parse import quote, unquote, urlparse
 from urllib.error import URLError
 from urllib.request import Request as UrlRequest, urlopen
 
@@ -1077,7 +1077,7 @@ class KyoukaiHandler(BaseHTTPRequestHandler):
             self.serve_file(BASE_DIR / "static" / relative)
             return
         if clean_path.startswith("/videos/"):
-            relative = clean_path.removeprefix("/videos/")
+            relative = Path(unquote(clean_path.removeprefix("/videos/"))).name
             self.serve_file(BASE_DIR / "videos" / relative)
             return
         if clean_path == "/api/genome":
