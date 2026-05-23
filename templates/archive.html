@@ -25,7 +25,6 @@
           <em data-card-state>記録状態：残留</em>
         </div>
         <div class="archive-card-body" data-card-body></div>
-        <a class="archive-card-link" data-card-link href="#external-signal" target="_blank" rel="nofollow sponsored noopener">残っていたリンクを開く</a>
       </section>
 
       <div class="archive-room-status" aria-hidden="true">
@@ -160,13 +159,92 @@
         src: "/static/archive/ukiyoe-015.png",
       },
       {
-        type: "affiliate",
-        id: "affiliate-001",
-        label: "ARCHIVE-PR-001",
-        title: "混入記録",
-        note: "外部接続あり",
-        image: "",
-        url: "https://px.a8.net/svt/ejp?a8mat=4B3R2X+4S2ALU+5GDG+NV9N7",
+        type: "image",
+        id: "ukiyoe-016",
+        label: "ARCHIVE-016",
+        title: "分類不明",
+        note: "富士一",
+        src: "/static/archive/ukiyoe-016.png",
+      },
+      {
+        type: "image",
+        id: "ukiyoe-017",
+        label: "ARCHIVE-017",
+        title: "分類不明",
+        note: "異鳥輸送",
+        src: "/static/archive/ukiyoe-017.png",
+      },
+      {
+        type: "image",
+        id: "ukiyoe-018",
+        label: "ARCHIVE-018",
+        title: "分類不明",
+        note: "甲羅転倒",
+        src: "/static/archive/ukiyoe-018.png",
+      },
+      {
+        type: "image",
+        id: "ukiyoe-019",
+        label: "ARCHIVE-019",
+        title: "分類不明",
+        note: "浮世驚慣",
+        src: "/static/archive/ukiyoe-019.png",
+      },
+      {
+        type: "image",
+        id: "ukiyoe-020",
+        label: "ARCHIVE-020",
+        title: "分類不明",
+        note: "狐と蛸",
+        src: "/static/archive/ukiyoe-020.png",
+      },
+      {
+        type: "image",
+        id: "ukiyoe-021",
+        label: "ARCHIVE-021",
+        title: "分類不明",
+        note: "烏賊絵師",
+        src: "/static/archive/ukiyoe-021.png",
+      },
+      {
+        type: "image",
+        id: "ukiyoe-022",
+        label: "ARCHIVE-022",
+        title: "分類不明",
+        note: "小犬高座",
+        src: "/static/archive/ukiyoe-022.png",
+      },
+      {
+        type: "image",
+        id: "ukiyoe-023",
+        label: "ARCHIVE-023",
+        title: "分類不明",
+        note: "鰐川渡り",
+        src: "/static/archive/ukiyoe-023.png",
+      },
+      {
+        type: "image",
+        id: "ukiyoe-024",
+        label: "ARCHIVE-024",
+        title: "分類不明",
+        note: "猿鳴き",
+        src: "/static/archive/ukiyoe-024.png",
+      },
+      {
+        type: "image",
+        id: "ukiyoe-025",
+        label: "ARCHIVE-025",
+        title: "分類不明",
+        note: "崖犬",
+        src: "/static/archive/ukiyoe-025.png",
+      },
+      {
+        type: "image",
+        id: "ukiyoe-026",
+        label: "ARCHIVE-026",
+        title: "分類不明",
+        note: "蝦勝負",
+        src: "/static/archive/ukiyoe-026.png",
       },
     ];
 
@@ -177,21 +255,12 @@
     const cardTitle = document.querySelector("[data-card-title]");
     const cardState = document.querySelector("[data-card-state]");
     const cardBody = document.querySelector("[data-card-body]");
-    const cardLink = document.querySelector("[data-card-link]");
     const clickCount = document.querySelector("[data-click-count]");
 
     let clicks = 0;
-    let affiliateCooldown = 10;
 
     function chooseArchiveItem() {
       const imageItems = archiveItems.filter((item) => item.type === "image");
-      const affiliateItems = archiveItems.filter((item) => item.type === "affiliate");
-      const canShowAffiliate = affiliateCooldown >= 10 && Math.random() < 0.07;
-      if (canShowAffiliate && affiliateItems.length) {
-        affiliateCooldown = 0;
-        return affiliateItems[Math.floor(Math.random() * affiliateItems.length)];
-      }
-      affiliateCooldown += 1;
       return imageItems[Math.floor(Math.random() * imageItems.length)];
     }
 
@@ -200,20 +269,8 @@
       card.setAttribute("aria-hidden", "false");
       cardLabel.textContent = item.label;
       cardTitle.textContent = item.title;
-      cardState.textContent = item.type === "affiliate" ? "記録状態：混入" : "記録状態：残留";
+      cardState.textContent = "記録状態：残留";
       cardBody.replaceChildren();
-      cardLink.style.display = "none";
-
-      if (item.type === "affiliate") {
-        card.classList.add("is-affiliate");
-        const plate = document.createElement("div");
-        plate.className = "archive-residue-plate";
-        plate.textContent = item.note;
-        cardBody.append(plate);
-        cardLink.href = item.url;
-        cardLink.style.display = "";
-        return;
-      }
 
       if (item.src) {
         const image = document.createElement("img");
