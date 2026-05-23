@@ -865,13 +865,14 @@ a.sp-link:hover,
   animation: hotspotJitter 180ms steps(2, end) infinite;
 }
 
-.hotspot-observation { left: 42%; top: 47%; width: 16%; height: 11%; }
+.hotspot-observation { left: 42%; top: 42%; width: 16%; height: 10%; }
 .hotspot-archive { left: 66%; top: 35%; width: 10%; height: 17%; }
 .hotspot-hyougi { left: 80%; top: 45%; width: 12%; height: 24%; }
 .hotspot-signal-alt { left: 24%; top: 57%; width: 13%; height: 10%; }
 .hotspot-exit { left: 17%; top: 33%; width: 12%; height: 17%; }
 .hotspot-null { left: 2%; top: 27%; width: 12%; height: 24%; }
 .hotspot-girl-film { left: 1%; top: 60%; width: 22%; height: 17%; }
+.hotspot-ofuse { left: 45%; top: 56%; width: 16%; height: 18%; }
 
 /* KYOUKAI /hyougi council chamber */
 .hyougi-room-body {
