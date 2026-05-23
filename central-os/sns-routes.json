@@ -1,0 +1,41 @@
+{
+  "version": "1.0",
+  "items": [
+    {
+      "id": "sns_01",
+      "platform": "YouTube",
+      "title": "KYOUKAIチャンネル",
+      "targetRoom": "記録室",
+      "url": "",
+      "status": "未着手",
+      "notes": "KYOUKAIの世界観を映像で紹介するチャンネル。開設予定。"
+    },
+    {
+      "id": "sns_02",
+      "platform": "TikTok",
+      "title": "KYOUKAI TikTok",
+      "targetRoom": "記録室",
+      "url": "",
+      "status": "未着手",
+      "notes": "短尺動画でKYOUKAIの断片を投稿する。更新ログ・演出紹介など。"
+    },
+    {
+      "id": "sns_03",
+      "platform": "X (Twitter)",
+      "title": "KYOUKAI公式X",
+      "targetRoom": "境界域",
+      "url": "",
+      "status": "未着手",
+      "notes": "更新情報・世界観テキスト投稿。"
+    },
+    {
+      "id": "sns_04",
+      "platform": "YouTube",
+      "title": "評議録ショート動画",
+      "targetRoom": "評議録",
+      "url": "",
+      "status": "未着手",
+      "notes": "評議録のランダム記録をショート動画化して投稿する案。"
+    }
+  ]
+}

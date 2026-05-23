@@ -701,6 +701,187 @@ def site_config_payload() -> dict[str, Any]:
     }
 
 
+CENTRAL_OS_DIR = BASE_DIR / "central-os"
+CENTRAL_OS_FILES = [
+    "rooms.json",
+    "ideas.json",
+    "monthly-goal.json",
+    "monetization.json",
+    "sns-routes.json",
+]
+PROPOSALS_FILE = CENTRAL_OS_DIR / "proposals" / "proposals.json"
+SUPERVISOR_DIR = CENTRAL_OS_DIR / "supervisor"
+GENERATION_DIR = CENTRAL_OS_DIR / "generation"
+GENERATED_DIR = CENTRAL_OS_DIR / "generated"
+GENERATED_CONTENT_FILE = GENERATED_DIR / "generated-content.json"
+METRICS_DIR = CENTRAL_OS_DIR / "metrics"
+OBSERVATIONS_DIR = CENTRAL_OS_DIR / "observations"
+OBSERVATIONS_FILE = OBSERVATIONS_DIR / "observations.json"
+CYCLE_DIR = CENTRAL_OS_DIR / "cycle"
+CYCLE_MAP_FILE = CYCLE_DIR / "cycle-map.json"
+EVOLUTION_DIR = CENTRAL_OS_DIR / "evolution"
+EVOLUTION_LOG_FILE = EVOLUTION_DIR / "evolution-log.json"
+SUPERVISOR_FILES = [
+    "supervisor-rules.md",
+    "proposal-schema.md",
+    "risk-rules.md",
+    "phase-4-review.md",
+]
+GENERATION_FILES = [
+    "generation-schema.md",
+    "generation-rules.md",
+    "content-types.md",
+    "room-generation-rules.md",
+    "sns-generation-rules.md",
+    "phase-5-review.md",
+]
+METRICS_FILES = [
+    "metrics-schema.md",
+    "metrics-rules.md",
+    "event-types.md",
+    "observation-rules.md",
+    "phase-6-review.md",
+    "metrics-sample.json",
+]
+CYCLE_FILES = [
+    "cycle-schema.md",
+    "cycle-rules.md",
+    "cycle-map.json",
+    "feedback-loop.md",
+    "phase-7-review.md",
+]
+EVOLUTION_FILES = [
+    "evolution-rules.md",
+    "evolution-log.json",
+    "evolution-schema.md",
+]
+
+
+def central_os_payload() -> dict[str, Any]:
+    """Read central-os JSON files. Per-file errors are reported, never raised."""
+    result: dict[str, Any] = {
+        "version": "1.0",
+        "data": {},
+        "errors": {},
+    }
+    for filename in CENTRAL_OS_FILES:
+        key = filename.replace(".json", "").replace("-", "_")
+        path = CENTRAL_OS_DIR / filename
+        try:
+            with open(path, encoding="utf-8") as f:
+                result["data"][key] = json.load(f)
+        except FileNotFoundError:
+            result["errors"][key] = "file not found"
+            result["data"][key] = None
+        except json.JSONDecodeError as exc:
+            result["errors"][key] = f"json parse error: {exc}"
+            result["data"][key] = None
+        except Exception as exc:
+            result["errors"][key] = f"read error: {exc}"
+            result["data"][key] = None
+
+    # proposals.json
+    try:
+        with open(PROPOSALS_FILE, encoding="utf-8") as f:
+            result["data"]["proposals"] = json.load(f)
+    except FileNotFoundError:
+        result["errors"]["proposals"] = "file not found"
+        result["data"]["proposals"] = None
+    except json.JSONDecodeError as exc:
+        result["errors"]["proposals"] = f"json parse error: {exc}"
+        result["data"]["proposals"] = None
+    except Exception as exc:
+        result["errors"]["proposals"] = f"read error: {exc}"
+        result["data"]["proposals"] = None
+
+    # supervisor metadata (existence check only)
+    result["data"]["supervisor"] = {
+        "exists": SUPERVISOR_DIR.is_dir(),
+        "files": {f: (SUPERVISOR_DIR / f).is_file() for f in SUPERVISOR_FILES},
+    }
+
+    try:
+        with open(GENERATED_CONTENT_FILE, encoding="utf-8") as f:
+            result["data"]["generated"] = json.load(f)
+    except FileNotFoundError:
+        result["errors"]["generated"] = "file not found"
+        result["data"]["generated"] = None
+    except json.JSONDecodeError as exc:
+        result["errors"]["generated"] = f"json parse error: {exc}"
+        result["data"]["generated"] = None
+    except Exception as exc:
+        result["errors"]["generated"] = f"read error: {exc}"
+        result["data"]["generated"] = None
+
+    result["data"]["generation"] = {
+        "exists": GENERATION_DIR.is_dir(),
+        "generatedExists": GENERATED_DIR.is_dir(),
+        "files": {f: (GENERATION_DIR / f).is_file() for f in GENERATION_FILES},
+        "generatedFiles": {
+            "generated-content.json": GENERATED_CONTENT_FILE.is_file(),
+        },
+    }
+
+    try:
+        with open(OBSERVATIONS_FILE, encoding="utf-8") as f:
+            result["data"]["observations"] = json.load(f)
+    except FileNotFoundError:
+        result["errors"]["observations"] = "file not found"
+        result["data"]["observations"] = None
+    except json.JSONDecodeError as exc:
+        result["errors"]["observations"] = f"json parse error: {exc}"
+        result["data"]["observations"] = None
+    except Exception as exc:
+        result["errors"]["observations"] = f"read error: {exc}"
+        result["data"]["observations"] = None
+
+    result["data"]["metrics"] = {
+        "exists": METRICS_DIR.is_dir(),
+        "observationsExists": OBSERVATIONS_DIR.is_dir(),
+        "files": {f: (METRICS_DIR / f).is_file() for f in METRICS_FILES},
+        "observationFiles": {
+            "observations.json": OBSERVATIONS_FILE.is_file(),
+        },
+    }
+
+    try:
+        with open(CYCLE_MAP_FILE, encoding="utf-8") as f:
+            result["data"]["cycleMap"] = json.load(f)
+    except FileNotFoundError:
+        result["errors"]["cycleMap"] = "file not found"
+        result["data"]["cycleMap"] = None
+    except json.JSONDecodeError as exc:
+        result["errors"]["cycleMap"] = f"json parse error: {exc}"
+        result["data"]["cycleMap"] = None
+    except Exception as exc:
+        result["errors"]["cycleMap"] = f"read error: {exc}"
+        result["data"]["cycleMap"] = None
+
+    try:
+        with open(EVOLUTION_LOG_FILE, encoding="utf-8") as f:
+            result["data"]["evolutionLog"] = json.load(f)
+    except FileNotFoundError:
+        result["errors"]["evolutionLog"] = "file not found"
+        result["data"]["evolutionLog"] = None
+    except json.JSONDecodeError as exc:
+        result["errors"]["evolutionLog"] = f"json parse error: {exc}"
+        result["data"]["evolutionLog"] = None
+    except Exception as exc:
+        result["errors"]["evolutionLog"] = f"read error: {exc}"
+        result["data"]["evolutionLog"] = None
+
+    result["data"]["cycle"] = {
+        "exists": CYCLE_DIR.is_dir(),
+        "files": {f: (CYCLE_DIR / f).is_file() for f in CYCLE_FILES},
+    }
+    result["data"]["evolution"] = {
+        "exists": EVOLUTION_DIR.is_dir(),
+        "files": {f: (EVOLUTION_DIR / f).is_file() for f in EVOLUTION_FILES},
+    }
+
+    return result
+
+
 def add_affiliate_signal(label: str, url: str, signal_text: str, trigger_phase: int = 0,
                          trigger_mutation: str = "any", display_mode: str = "panel") -> dict[str, Any]:
     """Insert a new affiliate signal into the database."""
@@ -1072,6 +1253,7 @@ class KyoukaiHandler(BaseHTTPRequestHandler):
         "/null": "null.html",
         "/outside": "outside.html",
         "/support": "outside.html",
+        "/central": "central.html",
     }
 
     def do_GET(self) -> None:
@@ -1132,6 +1314,15 @@ class KyoukaiHandler(BaseHTTPRequestHandler):
             body = json.dumps(public_creature_payload(genome), ensure_ascii=False).encode()
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        if clean_path == "/api/central-os":
+            body = json.dumps(central_os_payload(), ensure_ascii=False).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Cache-Control", "no-store")
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
@@ -1390,6 +1581,10 @@ if FASTAPI_AVAILABLE:
     async def outside_core(request: Request) -> HTMLResponse:
         return render_template(request, "outside.html")
 
+    @app.get("/central", response_class=HTMLResponse)
+    async def central_os_page(request: Request) -> HTMLResponse:
+        return render_template(request, "central.html")
+
     # ─── API ────────────────────────────────────────────────
 
     @app.get("/api/genome")
@@ -1432,6 +1627,10 @@ if FASTAPI_AVAILABLE:
     @app.get("/api/site-config")
     async def api_site_config() -> JSONResponse:
         return JSONResponse(site_config_payload(), headers={"Cache-Control": "no-store"})
+
+    @app.get("/api/central-os")
+    async def api_central_os() -> JSONResponse:
+        return JSONResponse(central_os_payload(), headers={"Cache-Control": "no-store"})
 
     @app.post("/api/signals")
     async def api_post_signal(body: dict = Body(...)) -> JSONResponse:

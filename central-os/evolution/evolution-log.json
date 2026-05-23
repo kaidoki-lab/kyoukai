@@ -1,0 +1,38 @@
+{
+  "version": "1.0",
+  "items": [
+    {
+      "id": "evo_001",
+      "date": "2026-05-23",
+      "title": "central-os 構築完了",
+      "trigger": "KYOUKAI全体の正本管理が必要になった",
+      "changedArea": "central-os",
+      "reason": "部屋、導線、提案、収益導線を分散させず記録するため。",
+      "result": "central-os を参照元として扱える状態になった。",
+      "nextObservation": "管理対象が増えても破綻しないか確認する。",
+      "status": "記録"
+    },
+    {
+      "id": "evo_002",
+      "date": "2026-05-23",
+      "title": "/central 実装完了",
+      "trigger": "central-os を画面上で確認する必要が出た",
+      "changedArea": "/central",
+      "reason": "JSONとMarkdownの管理状態を人間が一覧できるようにするため。",
+      "result": "部屋、提案、生成物などを管理画面で確認できるようになった。",
+      "nextObservation": "管理画面が重くなりすぎないか確認する。",
+      "status": "記録"
+    },
+    {
+      "id": "evo_003",
+      "date": "2026-05-24",
+      "title": "観測ループ実装完了",
+      "trigger": "行動・導線・到達状況を記録する層が必要になった",
+      "changedArea": "central-os/metrics, central-os/observations",
+      "reason": "改善判断の材料を、個人情報なしの手動・仮データとして扱うため。",
+      "result": "観測項目と表示欄が追加された。",
+      "nextObservation": "観測が提案や生成物と接続できるか確認する。",
+      "status": "記録"
+    }
+  ]
+}

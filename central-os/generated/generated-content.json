@@ -1,0 +1,75 @@
+{
+  "version": "1.0",
+  "items": [
+    {
+      "id": "gen_001",
+      "title": "外部接続用の自動販売機ビジュアル案",
+      "type": "image",
+      "targetRoom": "外部接続",
+      "targetRoute": "/outside",
+      "source": "PHASE 5 initial seed",
+      "content": "境界の外から流れ着いた古い自動販売機のビジュアル候補。",
+      "usage": "outsideページ内の外部接続オブジェクト候補。実ファイル生成は未実施。",
+      "status": "候補",
+      "adopted": false,
+      "risk": "広告UIに見えすぎると世界観が崩れる。",
+      "notes": "人間確認後に採用判断。"
+    },
+    {
+      "id": "gen_002",
+      "title": "賽銭箱導線の画像案",
+      "type": "image",
+      "targetRoom": "賽銭箱",
+      "targetRoute": "未確定",
+      "source": "PHASE 5 initial seed",
+      "content": "小さな箱として存在を匂わせる画像候補。",
+      "usage": "賽銭箱route確定後の導線候補。現時点では実装しない。",
+      "status": "保留",
+      "adopted": false,
+      "risk": "支援誘導が直接的になる可能性がある。",
+      "notes": "未確定routeのためリンク化禁止。"
+    },
+    {
+      "id": "gen_003",
+      "title": "評議録ショート動画案",
+      "type": "short-video",
+      "targetRoom": "評議録",
+      "targetRoute": "/hyougi",
+      "source": "PHASE 5 initial seed",
+      "content": "評議録の断片を短い縦動画にする構成案。",
+      "usage": "SNSまたはhyougi内記録候補。動画生成は未実施。",
+      "status": "候補",
+      "adopted": false,
+      "risk": "説明的になりすぎると評議の曖昧さが失われる。",
+      "notes": "素材生成前に人間レビュー。"
+    },
+    {
+      "id": "gen_004",
+      "title": "逆観測室の再訪問イベント案",
+      "type": "room-event",
+      "targetRoom": "逆観測室",
+      "targetRoute": "/observer",
+      "source": "PHASE 5 initial seed",
+      "content": "再訪問者だけが気配に気づくイベント案。",
+      "usage": "/observer 実装後のイベント候補。",
+      "status": "保留",
+      "adopted": false,
+      "risk": "/observer は未実装のため、現時点では実装禁止。",
+      "notes": "route実装後に再評価。"
+    },
+    {
+      "id": "gen_005",
+      "title": "観測域の滞在延長テキスト案",
+      "type": "text",
+      "targetRoom": "観測域",
+      "targetRoute": "/observation",
+      "source": "PHASE 5 initial seed",
+      "content": "長く滞在した観測者へ表示する短文候補。",
+      "usage": "observation内の滞在反応候補。現時点では表示しない。",
+      "status": "候補",
+      "adopted": false,
+      "risk": "既存の観測UIやgenome挙動を邪魔する可能性がある。",
+      "notes": "実装前に観測UIへの影響確認が必要。"
+    }
+  ]
+}

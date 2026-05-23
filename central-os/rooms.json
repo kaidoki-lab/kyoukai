@@ -1,0 +1,231 @@
+{
+  "version": "1.0",
+  "items": [
+    {
+      "id": "room_01",
+      "name": "祭壇域",
+      "route": "/",
+      "status": "実装済み",
+      "priority": "高",
+      "role": "KYOUKAIの中枢。メインの入口・象徴的な部屋。",
+      "monetization": [],
+      "sns": [],
+      "issues": [
+        "トップページとしての役割と祭壇域としての世界観の整合性を確認する必要がある"
+      ],
+      "nextActions": [
+        "祭壇域の演出・テキストが現在の世界観設定と合致しているか確認する"
+      ],
+      "codexMemo": "ルートは / で確定。home.html が対応テンプレート。"
+    },
+    {
+      "id": "room_02",
+      "name": "境界域",
+      "route": "未確定",
+      "status": "実装済み",
+      "priority": "最優先",
+      "role": "プロジェクト全体のコア空間。",
+      "monetization": [],
+      "sns": [],
+      "issues": [
+        "対応するルートが未確定。どのページが境界域に相当するか要確認。"
+      ],
+      "nextActions": [
+        "境界域に対応するテンプレート・ルートを特定し、rooms.json を更新する"
+      ],
+      "codexMemo": "ルート未確定。確認後に更新すること。"
+    },
+    {
+      "id": "room_03",
+      "name": "観測域",
+      "route": "/observation",
+      "status": "実装中",
+      "priority": "高",
+      "role": "データ・情報観測の部屋。",
+      "monetization": [],
+      "sns": [],
+      "issues": [
+        "実装中のため未完成部分がある。完成条件を明確化する必要がある。"
+      ],
+      "nextActions": [
+        "観測域として完成させる要件を整理する"
+      ],
+      "codexMemo": "ルートは /observation で確定。対応テンプレートは index.html。"
+    },
+    {
+      "id": "room_04",
+      "name": "崩壊域",
+      "route": "未確定",
+      "status": "制作中",
+      "priority": "中",
+      "role": "崩壊・エラー・混沌をテーマにした部屋。",
+      "monetization": [],
+      "sns": [],
+      "issues": [
+        "対応するルートが未確定。/exit が崩壊域に相当する可能性があるが要確認。"
+      ],
+      "nextActions": [
+        "崩壊域に相当するルート・テンプレートを確認し、rooms.json を更新する"
+      ],
+      "codexMemo": "ルート未確定。/exit との対応関係を確認すること。"
+    },
+    {
+      "id": "room_05",
+      "name": "受信域",
+      "route": "/signal",
+      "status": "実装済み",
+      "priority": "中",
+      "role": "外部からの信号・メッセージを受け取る部屋。",
+      "monetization": [],
+      "sns": [],
+      "issues": [
+        "signal.html の現在の内容が受信域としての世界観を十分に表現しているか未確認。"
+      ],
+      "nextActions": [
+        "受信域としての演出・テキストを整理する"
+      ],
+      "codexMemo": "ルートは /signal で確定。対応テンプレートは signal.html。"
+    },
+    {
+      "id": "room_06",
+      "name": "逆観測室",
+      "route": "/observer",
+      "status": "未着手",
+      "priority": "低",
+      "role": "観測する側が観測される逆転の空間。",
+      "monetization": [],
+      "sns": [],
+      "issues": [
+        "ルートは /observer で予定されているが、テンプレート・実装はまだ存在しない。",
+        "/observer は設計上の確定routeだが main.py には未実装"
+      ],
+      "nextActions": [
+        "逆観測室のコンセプトを固めてから制作に着手する"
+      ],
+      "codexMemo": "ルートは /observer で予定。テンプレート・実装は未着手。 / 実装前に route 追加とテンプレート作成が必要",
+      "implemented": false
+    },
+    {
+      "id": "room_07",
+      "name": "音声室",
+      "route": "未確定",
+      "status": "実装中",
+      "priority": "高",
+      "role": "BGM・音声・サウンドスケープを扱う部屋。",
+      "monetization": [],
+      "sns": [],
+      "issues": [
+        "音声室としての独立したルートが存在するか未確認。BGMシステムは別途実装中。"
+      ],
+      "nextActions": [
+        "音声室を独立した部屋とするか、他の部屋に統合するかを決定する"
+      ],
+      "codexMemo": "ルート未確定。BGMシステム（bgm.js）は別途実装中。"
+    },
+    {
+      "id": "room_08",
+      "name": "記録室",
+      "route": "未確定",
+      "status": "未着手",
+      "priority": "中",
+      "role": "KYOUKAI内の出来事・ログを記録する部屋。",
+      "monetization": [],
+      "sns": [],
+      "issues": [
+        "/archive が記録室に相当する可能性があるが、対応関係が未確認。"
+      ],
+      "nextActions": [
+        "/archive との対応関係を確認し、記録室のルートを確定させる"
+      ],
+      "codexMemo": "ルート未確定。/archive との関係を確認すること。"
+    },
+    {
+      "id": "room_09",
+      "name": "未確認接続",
+      "route": "/null",
+      "status": "保留",
+      "priority": "保留",
+      "role": "正体不明・未定義の接続先。",
+      "monetization": [],
+      "sns": [],
+      "issues": [
+        "null.html の現在の内容・演出が世界観と合致しているか未確認。"
+      ],
+      "nextActions": [
+        "未確認接続としての演出を検討する"
+      ],
+      "codexMemo": "ルートは /null で確定。対応テンプレートは null.html。"
+    },
+    {
+      "id": "room_10",
+      "name": "外部接続",
+      "route": "/outside",
+      "status": "実装済み",
+      "priority": "高",
+      "role": "外部サービス・アフィリエイト・収益導線へのゲートウェイ。",
+      "monetization": [
+        "OFUSE",
+        "Amazon",
+        "External"
+      ],
+      "sns": [],
+      "issues": [
+        "アフィリエイトリンクの配置・見せ方がKYOUKAIの世界観に溶け込んでいるか要確認。"
+      ],
+      "nextActions": [
+        "外部接続ページの導線・デザインを世界観に合わせて整理する"
+      ],
+      "codexMemo": "ルートは /outside で確定。/support も同テンプレートに対応。"
+    },
+    {
+      "id": "room_11",
+      "name": "賽銭箱",
+      "route": "未確定",
+      "status": "実装済み",
+      "priority": "高",
+      "role": "投げ銭・支援受付の部屋。",
+      "monetization": [
+        "OFUSE"
+      ],
+      "sns": [],
+      "issues": [
+        "賽銭箱専用のルートが存在するか未確認。外部接続ページと統合されている可能性がある。"
+      ],
+      "nextActions": [
+        "賽銭箱が独立したページを持つか、外部接続ページ内の要素かを確認する"
+      ],
+      "codexMemo": "ルート未確定。/support や /outside との関係を確認すること。"
+    },
+    {
+      "id": "room_12",
+      "name": "評議録",
+      "route": "/hyougi",
+      "status": "実装済み",
+      "priority": "中",
+      "role": "ランダム評議・記録の部屋。",
+      "monetization": [],
+      "sns": [],
+      "issues": [
+        "評議録のランダム表示ロジックにフィルタ・カテゴリ機能がなく、全件表示のみ。"
+      ],
+      "nextActions": [
+        "評議録のコンテンツ量が増えた際の表示設計を検討する"
+      ],
+      "codexMemo": "ルートは /hyougi で確定。対応テンプレートは hyougi.html。"
+    },
+    {
+      "id": "room_13",
+      "name": "境界セントラルOS",
+      "route": "/central",
+      "status": "実装済み",
+      "priority": "最優先",
+      "role": "KYOUKAI全体を観測・管理する内部OS画面",
+      "monetization": [],
+      "sns": [],
+      "issues": [],
+      "nextActions": [],
+      "implemented": true,
+      "codexMemo": "central-osを可視化する管理画面。一般導線ではなく内部確認用。"
+    }
+  ]
+}

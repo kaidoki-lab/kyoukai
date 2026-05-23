@@ -1,0 +1,783 @@
+/* ============================================================
+   KYOUKAI CENTRAL OS - 内部管理画面専用 CSS
+   黒背景・古い端末風・境界観測装置
+   既存ページには影響しない (.cos-* / .central-os スコープ)
+   ============================================================ */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #050607;
+  color: #c8d4ce;
+  font-family: "Consolas", "Menlo", "Courier New", "ＭＳ ゴシック", monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+body {
+  position: relative;
+  min-height: 100vh;
+}
+
+/* ── 雰囲気レイヤー ────────────────────────── */
+.scanline {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 255, 200, 0.025) 3px,
+    rgba(0, 0, 0, 0) 4px
+  );
+  z-index: 1;
+  mix-blend-mode: screen;
+}
+
+.noise {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.012) 1px, transparent 1px);
+  background-size: 3px 3px;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+/* ── 全体レイアウト ────────────────────────── */
+.central-os {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+}
+
+/* ── HEADER ───────────────────────────────── */
+.cos-header {
+  border: 1px solid #2a3a35;
+  padding: 18px 22px;
+  margin-bottom: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: linear-gradient(180deg, rgba(20,30,28,0.4) 0%, rgba(8,12,11,0.4) 100%);
+}
+
+.cos-title-en {
+  font-size: 22px;
+  letter-spacing: 0.18em;
+  color: #9ee5c6;
+  text-shadow: 0 0 6px rgba(120, 220, 180, 0.25);
+}
+
+.cos-title-jp {
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  color: #678478;
+  margin-top: 4px;
+}
+
+.cos-meta {
+  font-size: 11px;
+  text-align: right;
+}
+
+.cos-meta-row {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 2px 0;
+}
+
+.cos-label {
+  color: #5a7066;
+  letter-spacing: 0.2em;
+}
+
+.cos-value {
+  color: #b8d4c4;
+  letter-spacing: 0.1em;
+}
+
+.cos-blink {
+  animation: cos-blink 1.6s infinite;
+  color: #7be5b0;
+}
+
+@keyframes cos-blink {
+  0%, 60%, 100% { opacity: 1; }
+  70%, 85% { opacity: 0.35; }
+}
+
+/* ── SECTION ──────────────────────────────── */
+.cos-section {
+  border-left: 1px solid #2a3a35;
+  padding: 8px 0 22px 18px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.cos-section::before {
+  content: "";
+  position: absolute;
+  left: -3px;
+  top: 12px;
+  width: 5px;
+  height: 5px;
+  background: #5fa088;
+  box-shadow: 0 0 6px rgba(95, 160, 136, 0.6);
+}
+
+.cos-section-title {
+  font-size: 12px;
+  color: #7fbfa3;
+  letter-spacing: 0.25em;
+  margin: 0 0 14px;
+  font-weight: normal;
+}
+
+.cos-note {
+  font-size: 11px;
+  color: #6a8678;
+  background: rgba(20, 30, 28, 0.4);
+  border: 1px dashed #2a3a35;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+.cos-error {
+  font-size: 11px;
+  color: #e08070;
+  background: rgba(60, 20, 18, 0.3);
+  border: 1px solid #5a2a25;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+}
+
+/* ── PHASE GRID ───────────────────────────── */
+.cos-phase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.cos-phase-item {
+  border: 1px solid #2a3a35;
+  padding: 10px 12px;
+  background: rgba(15, 20, 18, 0.5);
+}
+
+.cos-phase-label {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: #5a7066;
+}
+
+.cos-phase-name {
+  font-size: 13px;
+  color: #b8d4c4;
+  margin-top: 2px;
+}
+
+.cos-phase-state {
+  font-size: 11px;
+  margin-top: 4px;
+  letter-spacing: 0.1em;
+}
+
+.cos-phase-done {
+  border-color: #2f4a40;
+}
+.cos-phase-done .cos-phase-state {
+  color: #7fbfa3;
+}
+
+.cos-phase-active {
+  border-color: #6a9080;
+  background: rgba(30, 50, 42, 0.4);
+}
+.cos-phase-active .cos-phase-state {
+  color: #9ee5c6;
+}
+
+.cos-phase-pending .cos-phase-state {
+  color: #5a7066;
+}
+
+/* ── ROUTE STATE ──────────────────────────── */
+.cos-route-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+@media (max-width: 640px) {
+  .cos-route-grid { grid-template-columns: 1fr; }
+}
+
+.cos-route-heading {
+  font-size: 11px;
+  margin: 0 0 8px;
+  letter-spacing: 0.2em;
+  font-weight: normal;
+}
+
+.cos-route-locked { color: #7fbfa3; }
+.cos-route-unlocked { color: #b09060; }
+
+.cos-route-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+}
+
+.cos-route-li {
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(40, 56, 50, 0.5);
+}
+
+.cos-route-li.cos-route-disabled {
+  color: #6a7a70;
+  text-decoration: none;
+  cursor: not-allowed;
+}
+
+.cos-route-link {
+  color: #9ee5c6;
+  text-decoration: none;
+  letter-spacing: 0.05em;
+}
+
+.cos-route-link:hover {
+  color: #ffffff;
+  text-shadow: 0 0 4px rgba(120, 220, 180, 0.5);
+}
+
+.cos-route-link-inline {
+  color: #9ee5c6;
+  text-decoration: none;
+}
+
+.cos-route-link-inline:hover { color: #ffffff; }
+
+.cos-cell-unlocked {
+  color: #80766a;
+  font-style: italic;
+}
+
+/* ── TABLE ───────────────────────────────── */
+.cos-rooms-table-wrap {
+  overflow-x: auto;
+}
+
+.cos-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+}
+
+.cos-table th {
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 1px solid #2a3a35;
+  color: #5a7066;
+  font-weight: normal;
+  letter-spacing: 0.15em;
+  font-size: 10px;
+  background: rgba(15, 22, 20, 0.5);
+}
+
+.cos-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(40, 56, 50, 0.4);
+  color: #c8d4ce;
+  vertical-align: top;
+}
+
+.cos-table tr:hover td {
+  background: rgba(30, 45, 40, 0.3);
+}
+
+.cos-cell-role {
+  font-size: 11px;
+  color: #9aaca0;
+  max-width: 280px;
+}
+
+.cos-cell-notes {
+  font-size: 11px;
+  color: #9aaca0;
+  max-width: 320px;
+}
+
+/* ── GOAL ────────────────────────────────── */
+.cos-goal-card {
+  border: 1px solid #2a3a35;
+  padding: 14px 18px;
+  background: rgba(15, 22, 20, 0.4);
+  margin-bottom: 10px;
+}
+
+.cos-goal-title {
+  font-size: 14px;
+  color: #9ee5c6;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+
+.cos-goal-rooms {
+  font-size: 11px;
+  color: #7a9080;
+  margin-bottom: 8px;
+}
+
+.cos-goal-cond {
+  margin: 6px 0;
+  padding-left: 18px;
+  font-size: 12px;
+}
+
+.cos-goal-cond li {
+  padding: 2px 0;
+  color: #b8d4c4;
+}
+
+.cos-goal-notes {
+  font-size: 11px;
+  color: #7a9080;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed #2a3a35;
+  line-height: 1.6;
+}
+
+/* ── IDEAS ───────────────────────────────── */
+.cos-ideas-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cos-idea-item {
+  border-left: 2px solid #2a3a35;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  background: rgba(15, 22, 20, 0.3);
+}
+
+.cos-idea-head {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.cos-idea-type {
+  color: #9ee5c6;
+  letter-spacing: 0.1em;
+}
+
+.cos-idea-room {
+  color: #7a9080;
+}
+
+.cos-idea-status {
+  color: #b09060;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 1px 6px;
+  border: 1px solid #4a4030;
+}
+
+.cos-idea-adopted {
+  color: #7fbfa3;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 1px 6px;
+  border: 1px solid #2f4a40;
+}
+
+.cos-idea-content {
+  font-size: 12px;
+  color: #c8d4ce;
+  line-height: 1.6;
+}
+
+/* ── GRAPH GRID ──────────────────────────── */
+.cos-graph-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+}
+
+.cos-graph-item {
+  border: 1px solid #2a3a35;
+  padding: 10px 14px;
+  background: rgba(15, 22, 20, 0.4);
+}
+
+.cos-graph-label {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: #5a7066;
+}
+
+.cos-graph-flow {
+  font-size: 12px;
+  color: #9ee5c6;
+  margin-top: 4px;
+  letter-spacing: 0.02em;
+}
+
+/* ── RULES LIST ──────────────────────────── */
+.cos-rules-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+}
+
+.cos-rules-list li {
+  padding: 4px 0 4px 18px;
+  position: relative;
+  color: #c8d4ce;
+}
+
+.cos-rules-list li::before {
+  content: "›";
+  position: absolute;
+  left: 0;
+  color: #5fa088;
+}
+
+.cos-rules-list strong {
+  color: #9ee5c6;
+  font-weight: normal;
+}
+
+/* ── COMPLETION CHECK ────────────────────── */
+.cos-check-table {
+  max-width: 480px;
+}
+
+.cos-check {
+  display: inline-block;
+  padding: 2px 10px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  border: 1px solid #2a3a35;
+}
+
+.cos-check-ok {
+  color: #7fbfa3;
+  border-color: #2f4a40;
+}
+
+.cos-check-pending {
+  color: #b09060;
+  border-color: #4a4030;
+}
+
+.cos-check-revise {
+  color: #d4c060;
+  border-color: #5a5030;
+}
+
+.cos-check-error {
+  color: #e08070;
+  border-color: #5a2a25;
+}
+
+/* ── AI SUPERVISOR ───────────────────────── */
+.cos-sv-status-bar {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border: 1px solid #2a3a35;
+  background: rgba(15, 22, 20, 0.4);
+}
+
+.cos-sv-status-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.cos-sv-mode {
+  color: #b8d4c4;
+  letter-spacing: 0.05em;
+}
+
+.cos-sv-active {
+  color: #9ee5c6;
+}
+
+.cos-sv-no-ai {
+  color: #80766a;
+  font-style: italic;
+}
+
+.cos-sv-note {
+  font-size: 11px;
+  color: #7a9080;
+  border-left: 2px solid #2a3a35;
+  padding: 6px 10px;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+.cos-sv-summary {
+  font-size: 11px;
+  color: #7a9080;
+  margin-bottom: 10px;
+  padding: 4px 0;
+  letter-spacing: 0.1em;
+}
+
+.cos-sv-summary-sep { color: #3a5046; }
+
+.cos-sv-codex-warn {
+  color: #e09060;
+}
+
+/* Proposal cards */
+.cos-proposal-card {
+  border: 1px solid #2a3a35;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  background: rgba(15, 22, 20, 0.4);
+}
+
+.cos-prop-保留 { opacity: 0.65; }
+.cos-prop-却下 { opacity: 0.45; border-color: #3a2a2a; }
+.cos-prop-採用 { border-color: #2f4a40; }
+
+.cos-prop-head {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 10px;
+  margin-bottom: 5px;
+}
+
+.cos-prop-id {
+  color: #5a7066;
+  letter-spacing: 0.1em;
+}
+
+.cos-prop-priority {
+  padding: 1px 6px;
+  font-size: 10px;
+  border: 1px solid #3a4a40;
+  letter-spacing: 0.1em;
+}
+
+.cos-prio-最優先 { color: #e08070; border-color: #6a3030; }
+.cos-prio-高     { color: #d4a060; border-color: #5a4020; }
+.cos-prio-中     { color: #9ee5c6; border-color: #2f4a40; }
+.cos-prio-低     { color: #6a8678; border-color: #2a3a35; }
+.cos-prio-保留   { color: #5a6a60; border-color: #2a3a35; }
+
+.cos-prop-type {
+  color: #7a9080;
+  letter-spacing: 0.05em;
+}
+
+.cos-prop-status {
+  color: #b09060;
+  font-size: 10px;
+  padding: 1px 6px;
+  border: 1px solid #4a4030;
+}
+
+.cos-prop-codex-ok {
+  font-size: 10px;
+  color: #7fbfa3;
+  padding: 1px 8px;
+  border: 1px solid #2f4a40;
+  letter-spacing: 0.05em;
+}
+
+.cos-prop-codex-no {
+  font-size: 10px;
+  color: #e08060;
+  padding: 1px 8px;
+  border: 1px solid #6a3020;
+  letter-spacing: 0.05em;
+  font-weight: bold;
+}
+
+.cos-prop-title {
+  font-size: 13px;
+  color: #c8d4ce;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.cos-prop-target {
+  font-size: 11px;
+  color: #9aaca0;
+  margin-bottom: 4px;
+}
+
+.cos-prop-row {
+  font-size: 11px;
+  color: #9aaca0;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.cos-prop-row-label {
+  color: #5a7066;
+  letter-spacing: 0.05em;
+}
+
+.cos-prop-row-val {
+  color: #b8d4c4;
+}
+
+.cos-prop-risk .cos-prop-row-val {
+  color: #c8a080;
+}
+
+/* PHASE 5 generation management */
+.cos-generation-summary {
+  font-size: 11px;
+  color: #7a9080;
+  margin-bottom: 10px;
+  padding: 4px 0;
+  letter-spacing: 0.08em;
+}
+
+.cos-generation-table td:nth-child(6) {
+  color: #9ee5c6;
+  letter-spacing: 0.08em;
+}
+
+.cos-generation-table td:nth-child(8) {
+  color: #c8a080;
+}
+
+/* PHASE 6 observation loop */
+.cos-observations-summary {
+  font-size: 11px;
+  color: #7a9080;
+  margin-bottom: 10px;
+  padding: 4px 0;
+  letter-spacing: 0.08em;
+}
+
+.cos-observations-table td:nth-child(5) {
+  color: #b8d4c4;
+}
+
+.cos-observations-table td:nth-child(6) {
+  color: #9ee5c6;
+  letter-spacing: 0.08em;
+}
+
+.cos-observations-table td:nth-child(8) {
+  max-width: 260px;
+  color: #aebdb5;
+}
+
+.cos-observations-table td:nth-child(9) {
+  color: #c8a080;
+}
+
+/* PHASE 7 cycle OS */
+.cos-cycle-summary,
+.cos-evolution-summary {
+  font-size: 11px;
+  color: #7a9080;
+  margin-bottom: 10px;
+  padding: 4px 0;
+  letter-spacing: 0.08em;
+}
+
+.cos-cycle-table td:nth-child(6),
+.cos-cycle-table td:nth-child(8),
+.cos-cycle-table td:nth-child(9),
+.cos-evolution-table td:nth-child(3),
+.cos-evolution-table td:nth-child(5),
+.cos-evolution-table td:nth-child(6) {
+  max-width: 260px;
+  color: #aebdb5;
+}
+
+.cos-cycle-table td:nth-child(7),
+.cos-evolution-table td:nth-child(7) {
+  color: #9ee5c6;
+  letter-spacing: 0.08em;
+}
+
+.cos-cycle-table td:nth-child(10) {
+  color: #c8a080;
+  letter-spacing: 0.08em;
+}
+
+/* ── FOOTER ──────────────────────────────── */
+.cos-footer {
+  margin-top: 40px;
+  padding-top: 16px;
+  border-top: 1px solid #2a3a35;
+  text-align: center;
+  font-size: 10px;
+  color: #5a7066;
+  letter-spacing: 0.3em;
+}
+
+.cos-footer-sub {
+  margin-top: 4px;
+  font-size: 9px;
+  color: #3a5046;
+  letter-spacing: 0.2em;
+}
+
+/* ── スマホ最適化 ────────────────────────── */
+@media (max-width: 640px) {
+  .central-os {
+    padding: 12px 10px 40px;
+  }
+  .cos-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px 14px;
+  }
+  .cos-meta {
+    text-align: left;
+    width: 100%;
+  }
+  .cos-meta-row {
+    justify-content: flex-start;
+  }
+  .cos-title-en {
+    font-size: 17px;
+  }
+  .cos-section {
+    padding-left: 12px;
+  }
+  .cos-section-title {
+    letter-spacing: 0.15em;
+  }
+  .cos-table {
+    font-size: 10.5px;
+  }
+  .cos-table th, .cos-table td {
+    padding: 4px 6px;
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "version": "1.0",
+  "items": [
+    {
+      "id": "mono_01",
+      "room": "賽銭箱",
+      "type": "OFUSE",
+      "status": "実装済み",
+      "notes": "OFUSEへの投げ銭リンクを賽銭箱として実装済み。"
+    },
+    {
+      "id": "mono_02",
+      "room": "外部接続",
+      "type": "OFUSE",
+      "status": "実装済み",
+      "notes": "外部接続ページにOFUSEリンクを設置済み。"
+    },
+    {
+      "id": "mono_03",
+      "room": "外部接続",
+      "type": "Amazon",
+      "status": "実装済み",
+      "notes": "Amazonアフィリエイトリンクを外部接続ページに配置。"
+    },
+    {
+      "id": "mono_04",
+      "room": "外部接続",
+      "type": "External",
+      "status": "実装済み",
+      "notes": "その他外部アフィリエイト導線を外部接続ページに設置。"
+    },
+    {
+      "id": "mono_05",
+      "room": "観測域",
+      "type": "AdSense",
+      "status": "保留",
+      "notes": "Google AdSenseの設置を検討中。世界観との親和性を確認してから判断する。"
+    },
+    {
+      "id": "mono_06",
+      "room": "記録室",
+      "type": "YouTube",
+      "status": "未着手",
+      "notes": "KYOUKAIのYouTubeチャンネルと連携した収益化を将来検討。"
+    },
+    {
+      "id": "mono_07",
+      "room": "記録室",
+      "type": "TikTok",
+      "status": "未着手",
+      "notes": "TikTokとの連携・TikTok経由の誘導を検討中。"
+    },
+    {
+      "id": "mono_08",
+      "room": "未確認接続",
+      "type": "Future",
+      "status": "保留",
+      "notes": "将来的な収益モデル（グッズ・有料コンテンツなど）の検討枠。"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "version": "1.0",
+  "items": [
+    {
+      "id": "idea_01",
+      "type": "コンテンツ",
+      "targetRoom": "崩壊域",
+      "content": "エラーログが流れ続けるビジュアル演出。ランダムなシステムメッセージが画面を侵食する。",
+      "status": "未着手",
+      "adopted": false
+    },
+    {
+      "id": "idea_02",
+      "type": "インタラクション",
+      "targetRoom": "逆観測室",
+      "content": "ユーザーが部屋を見ると、部屋側もユーザーのデータ（閲覧時間・動線）を「観測」して表示する。",
+      "status": "保留",
+      "adopted": false
+    },
+    {
+      "id": "idea_03",
+      "type": "音声",
+      "targetRoom": "音声室",
+      "content": "部屋ごとに異なるアンビエントBGMを持たせる。移動時にクロスフェードする。",
+      "status": "実装中",
+      "adopted": true
+    },
+    {
+      "id": "idea_04",
+      "type": "収益",
+      "targetRoom": "外部接続",
+      "content": "アフィリエイトリンクをKYOUKAIの世界観に溶け込む形で配置する（「外部への扉」として）。",
+      "status": "実装済み",
+      "adopted": true
+    },
+    {
+      "id": "idea_05",
+      "type": "SNS",
+      "targetRoom": "記録室",
+      "content": "KYOUKAIの更新ログをTikTok・YouTubeショートで「記録の断片」として投稿する。",
+      "status": "未着手",
+      "adopted": false
+    }
+  ]
+}
