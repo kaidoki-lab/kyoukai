@@ -1,0 +1,165 @@
+{
+  "version": "1.0",
+  "target": "KYOUKAI /outside vending machine",
+  "template": "assets/vending/vending_machine_template.png",
+  "black_slots_preview": "assets/vending/vending_machine_black_slots.png",
+  "template_size": {
+    "width": 1055,
+    "height": 1024
+  },
+  "recommended_icon_size": {
+    "width": 178,
+    "height": 169
+  },
+  "slots": [
+    {
+      "index": 1,
+      "id": "r1c1",
+      "x": 66,
+      "y": 78,
+      "width": 178,
+      "height": 169,
+      "icon": "assets/vending/icons/item_01.png"
+    },
+    {
+      "index": 2,
+      "id": "r1c2",
+      "x": 260,
+      "y": 78,
+      "width": 178,
+      "height": 169,
+      "icon": "assets/vending/icons/item_02.png"
+    },
+    {
+      "index": 3,
+      "id": "r1c3",
+      "x": 454,
+      "y": 78,
+      "width": 178,
+      "height": 169,
+      "icon": "assets/vending/icons/item_03.png"
+    },
+    {
+      "index": 4,
+      "id": "r1c4",
+      "x": 648,
+      "y": 78,
+      "width": 178,
+      "height": 169,
+      "icon": "assets/vending/icons/item_04.png"
+    },
+    {
+      "index": 5,
+      "id": "r2c1",
+      "x": 66,
+      "y": 313,
+      "width": 178,
+      "height": 169,
+      "icon": "assets/vending/icons/item_05.png"
+    },
+    {
+      "index": 6,
+      "id": "r2c2",
+      "x": 260,
+      "y": 313,
+      "width": 178,
+      "height": 169,
+      "icon": "assets/vending/icons/item_06.png"
+    },
+    {
+      "index": 7,
+      "id": "r2c3",
+      "x": 454,
+      "y": 313,
+      "width": 178,
+      "height": 169,
+      "icon": "assets/vending/icons/item_07.png"
+    },
+    {
+      "index": 8,
+      "id": "r2c4",
+      "x": 648,
+      "y": 313,
+      "width": 178,
+      "height": 169,
+      "icon": "assets/vending/icons/item_08.png"
+    },
+    {
+      "index": 9,
+      "id": "r3c1",
+      "x": 66,
+      "y": 548,
+      "width": 178,
+      "height": 169,
+      "icon": "assets/vending/icons/item_09.png"
+    },
+    {
+      "index": 10,
+      "id": "r3c2",
+      "x": 260,
+      "y": 548,
+      "width": 178,
+      "height": 169,
+      "icon": "assets/vending/icons/item_10.png"
+    },
+    {
+      "index": 11,
+      "id": "r3c3",
+      "x": 454,
+      "y": 548,
+      "width": 178,
+      "height": 169,
+      "icon": "assets/vending/icons/item_11.png"
+    },
+    {
+      "index": 12,
+      "id": "r3c4",
+      "x": 648,
+      "y": 548,
+      "width": 178,
+      "height": 169,
+      "icon": "assets/vending/icons/item_12.png"
+    },
+    {
+      "index": 13,
+      "id": "r4c1",
+      "x": 66,
+      "y": 783,
+      "width": 178,
+      "height": 169,
+      "icon": "assets/vending/icons/item_13.png"
+    },
+    {
+      "index": 14,
+      "id": "r4c2",
+      "x": 260,
+      "y": 783,
+      "width": 178,
+      "height": 169,
+      "icon": "assets/vending/icons/item_14.png"
+    },
+    {
+      "index": 15,
+      "id": "r4c3",
+      "x": 454,
+      "y": 783,
+      "width": 178,
+      "height": 169,
+      "icon": "assets/vending/icons/item_15.png"
+    },
+    {
+      "index": 16,
+      "id": "r4c4",
+      "x": 648,
+      "y": 783,
+      "width": 178,
+      "height": 169,
+      "icon": "assets/vending/icons/item_16.png"
+    }
+  ],
+  "notes": [
+    "Coordinates are for vending_machine_template.png, not the original full background image.",
+    "Do not rename or move image files unless all references are updated together.",
+    "Use the template PNG as the base image and place each icon inside its matching slot rectangle."
+  ]
+}
