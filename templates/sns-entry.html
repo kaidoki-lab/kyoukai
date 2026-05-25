@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KYOUKAI / SIGNAL ENTRY</title>
+  <link rel="stylesheet" href="/static/sns-entry.css" />
+  <script defer src="/static/analytics.js"></script>
+</head>
+<body class="sns-entry-body">
+  <main class="sns-entry" aria-live="polite">
+    <div class="sns-entry__noise" aria-hidden="true"></div>
+    <p class="sns-entry__route" data-sns-route>/sns</p>
+    <h1 class="sns-entry__message" data-sns-message>signal detected</h1>
+    <p class="sns-entry__sub">KYOUKAIへ接続中</p>
+  </main>
+
+  <script>
+    (function () {
+      const entries = {
+        "/tiktok": "signal detected",
+        "/shorts": "archive loading",
+        "/x": "log connected",
+        "/reels": "visual archive"
+      };
+      const path = window.location.pathname;
+      const message = entries[path] || "signal detected";
+      const route = document.querySelector("[data-sns-route]");
+      const target = document.querySelector("[data-sns-message]");
+
+      if (route) route.textContent = path;
+      if (target) target.textContent = message;
+
+      window.setTimeout(function () {
+        window.location.replace("/");
+      }, 1100);
+    })();
+  </script>
+</body>
+</html>

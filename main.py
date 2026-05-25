@@ -1254,6 +1254,10 @@ class KyoukaiHandler(BaseHTTPRequestHandler):
         "/outside": "outside.html",
         "/support": "outside.html",
         "/central": "central.html",
+        "/tiktok": "sns-entry.html",
+        "/shorts": "sns-entry.html",
+        "/x": "sns-entry.html",
+        "/reels": "sns-entry.html",
     }
 
     def do_GET(self) -> None:
@@ -1584,6 +1588,13 @@ if FASTAPI_AVAILABLE:
     @app.get("/central", response_class=HTMLResponse)
     async def central_os_page(request: Request) -> HTMLResponse:
         return render_template(request, "central.html")
+
+    @app.get("/tiktok", response_class=HTMLResponse)
+    @app.get("/shorts", response_class=HTMLResponse)
+    @app.get("/x", response_class=HTMLResponse)
+    @app.get("/reels", response_class=HTMLResponse)
+    async def sns_entry_page(request: Request) -> HTMLResponse:
+        return render_template(request, "sns-entry.html")
 
     # ─── API ────────────────────────────────────────────────
 
