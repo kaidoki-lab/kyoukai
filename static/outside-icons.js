@@ -7,6 +7,24 @@
     return Array.isArray(window.KYOUKAI_OUTSIDE_GRID) ? window.KYOUKAI_OUTSIDE_GRID : [];
   }
 
+  function amazonLinks() {
+    return Array.isArray(window.KYOUKAI_OUTSIDE_AMAZON_LINKS)
+      ? window.KYOUKAI_OUTSIDE_AMAZON_LINKS.filter(Boolean)
+      : [];
+  }
+
+  function randomOutsideLink() {
+    const links = amazonLinks();
+    if (!links.length) return "#";
+    return links[Math.floor(Math.random() * links.length)];
+  }
+
+  function prepareRandomLink(event) {
+    const link = event.currentTarget;
+    if (!link) return;
+    link.href = randomOutsideLink();
+  }
+
   function slotPercent(slot, axis, size) {
     const base = axis === "x" || axis === "width" ? 1055 : 1024;
     return `${(slot[axis] / (size || base)) * 100}%`;
@@ -28,7 +46,7 @@
 
   function createIcon(id, options) {
     const data = items()[id];
-    const element = document.createElement(data && data.href ? "a" : "span");
+    const element = document.createElement(data && (data.randomAmazon || data.href) ? "a" : "span");
     element.className = "outside-icon";
     element.dataset.outsideIconId = id || "";
 
@@ -38,7 +56,17 @@
       return element;
     }
 
-    if (element.tagName === "A") {
+    if (data.randomAmazon) {
+      element.dataset.outsideRandom = "amazon";
+      element.setAttribute("aria-label", (data.label || "OUTSIDE OBJECT") + " / random external connection");
+      element.href = "#outside-random";
+      element.rel = "sponsored";
+      element.addEventListener("pointerdown", prepareRandomLink);
+      element.addEventListener("mousedown", prepareRandomLink);
+      element.addEventListener("touchstart", prepareRandomLink, { passive: true });
+      element.addEventListener("focus", prepareRandomLink);
+      element.addEventListener("click", prepareRandomLink);
+    } else if (element.tagName === "A") {
       applyLinkAttributes(element, data);
     }
 

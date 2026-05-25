@@ -82,16 +82,11 @@
 }
 
 .outside-vending__cell::after {
-  content: attr(data-slot);
-  position: absolute;
-  right: 8px;
-  bottom: 7px;
-  color: rgba(255, 160, 180, 0.42);
-  font-size: 10px;
-  pointer-events: none;
+  display: none;
 }
 
 .outside-icon {
+  appearance: none;
   position: relative;
   display: grid;
   place-items: center;
@@ -103,14 +98,23 @@
   border-radius: 4px;
   background: transparent;
   color: #ffe8ef;
+  cursor: default;
+  font: inherit;
   text-align: center;
   text-decoration: none;
   box-shadow:
     0 0 12px rgba(255, 32, 72, 0.08);
 }
 
+.outside-icon[href],
+.outside-icon[data-outside-random] {
+  cursor: pointer;
+}
+
 .outside-icon[href]:hover,
-.outside-icon[href]:focus-visible {
+.outside-icon[href]:focus-visible,
+.outside-icon[data-outside-random]:hover,
+.outside-icon[data-outside-random]:focus-visible {
   outline: none;
   border-color: rgba(255, 126, 154, 0.86);
   box-shadow:
@@ -144,17 +148,7 @@
 }
 
 .outside-icon__label {
-  position: absolute;
-  left: 8px;
-  right: 8px;
-  bottom: 5px;
-  align-self: end;
-  max-width: 100%;
-  margin-top: 7px;
-  overflow-wrap: anywhere;
-  color: rgba(255, 230, 238, 0.86);
-  font-size: clamp(9px, 0.85vw, 12px);
-  line-height: 1.2;
+  display: none;
 }
 
 .outside-icon__disclosure {

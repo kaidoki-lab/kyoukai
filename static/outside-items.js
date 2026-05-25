@@ -1,40 +1,56 @@
 (function () {
   const iconBase = "/static/outside/icons/";
 
+  window.KYOUKAI_OUTSIDE_AMAZON_LINKS = [
+    "https://amzn.to/4urrBMw",
+    "https://amzn.to/4wUrif2",
+    "https://amzn.to/4dxEJKg",
+    "https://amzn.to/4v0SZAM",
+    "https://amzn.to/3RtEN4Z",
+    "https://amzn.to/3RtEN4Z",
+    "https://amzn.to/4x4ZG70",
+    "https://amzn.to/4wUrw5S",
+    "https://amzn.to/4usXoN5",
+    "https://amzn.to/4wQUJhN",
+    "https://amzn.to/4dJdrzj",
+    "https://amzn.to/4fqmasP",
+    "https://amzn.to/4v1yC6K"
+  ];
+
+  function randomAmazonItem(slot, label, shortLabel, body, icon) {
+    return {
+      slot,
+      label,
+      shortLabel,
+      body,
+      icon: iconBase + icon,
+      randomAmazon: true,
+      disclosure: "PR / Amazon Associate random link"
+    };
+  }
+
   window.KYOUKAI_OUTSIDE_ITEMS = {
-    "item-01": {
-      slot: 1,
-      label: "ALTAR ARTIFACT",
-      shortLabel: "ALTAR",
-      body: "An external object left near the entrance.",
-      icon: iconBase + "item_01.png",
-      href: "https://amzn.to/4nIXnSI",
-      rel: "sponsored noopener noreferrer",
-      target: "_blank",
-      disclosure: "PR / Amazon Associate link"
-    },
-    "item-02": {
-      slot: 2,
-      label: "FOUND OBJECT 02",
-      shortLabel: "OBJ 02",
-      body: "A second object recovered from outside.",
-      icon: iconBase + "item_02.png",
-      href: "https://amzn.to/4dnRLtB",
-      rel: "sponsored noopener noreferrer",
-      target: "_blank",
-      disclosure: "PR / Amazon Associate link"
-    },
-    "item-03": {
-      slot: 3,
-      label: "FOUND OBJECT 03",
-      shortLabel: "OBJ 03",
-      body: "A third object recovered from outside.",
-      icon: iconBase + "item_03.png",
-      href: "https://amzn.to/42OSmOR",
-      rel: "sponsored noopener noreferrer",
-      target: "_blank",
-      disclosure: "PR / Amazon Associate link"
-    },
+    "item-01": randomAmazonItem(
+      1,
+      "ALTAR ARTIFACT",
+      "ALTAR",
+      "An external object left near the entrance.",
+      "item_01.png"
+    ),
+    "item-02": randomAmazonItem(
+      2,
+      "FOUND OBJECT 02",
+      "OBJ 02",
+      "A second object recovered from outside.",
+      "item_02.png"
+    ),
+    "item-03": randomAmazonItem(
+      3,
+      "FOUND OBJECT 03",
+      "OBJ 03",
+      "A third object recovered from outside.",
+      "item_03.png"
+    ),
     "item-04": {
       slot: 4,
       label: "BOUNDARY BOX",
@@ -46,127 +62,83 @@
       rel: "noopener noreferrer",
       disclosure: "External offering box"
     },
-    "item-05": {
-      slot: 5,
-      label: "FOUND OBJECT 05",
-      shortLabel: "OBJ 05",
-      body: "Unassigned external object.",
-      icon: iconBase + "item_05.png",
-      href: "https://amzn.to/4nIXnSI",
-      rel: "sponsored noopener noreferrer",
-      target: "_blank",
-      disclosure: "PR / Amazon Associate link"
-    },
-    "item-06": {
-      slot: 6,
-      label: "FOUND OBJECT 06",
-      shortLabel: "OBJ 06",
-      body: "Unassigned external object.",
-      icon: iconBase + "item_06.png",
-      href: "https://amzn.to/4dnRLtB",
-      rel: "sponsored noopener noreferrer",
-      target: "_blank",
-      disclosure: "PR / Amazon Associate link"
-    },
-    "item-07": {
-      slot: 7,
-      label: "FOUND OBJECT 07",
-      shortLabel: "OBJ 07",
-      body: "Unassigned external object.",
-      icon: iconBase + "item_07.png",
-      href: "https://amzn.to/42OSmOR",
-      rel: "sponsored noopener noreferrer",
-      target: "_blank",
-      disclosure: "PR / Amazon Associate link"
-    },
-    "item-08": {
-      slot: 8,
-      label: "FOUND OBJECT 08",
-      shortLabel: "OBJ 08",
-      body: "Unassigned external object.",
-      icon: iconBase + "item_08.png",
-      href: "https://amzn.to/4nIXnSI",
-      rel: "sponsored noopener noreferrer",
-      target: "_blank",
-      disclosure: "PR / Amazon Associate link"
-    },
-    "item-09": {
-      slot: 9,
-      label: "FOUND OBJECT 09",
-      shortLabel: "OBJ 09",
-      body: "Unassigned external object.",
-      icon: iconBase + "item_09.png",
-      href: "https://amzn.to/4dnRLtB",
-      rel: "sponsored noopener noreferrer",
-      target: "_blank",
-      disclosure: "PR / Amazon Associate link"
-    },
-    "item-10": {
-      slot: 10,
-      label: "FOUND OBJECT 10",
-      shortLabel: "OBJ 10",
-      body: "Unassigned external object.",
-      icon: iconBase + "item_10.png",
-      href: "https://amzn.to/42OSmOR",
-      rel: "sponsored noopener noreferrer",
-      target: "_blank",
-      disclosure: "PR / Amazon Associate link"
-    },
-    "item-11": {
-      slot: 11,
-      label: "FOUND OBJECT 11",
-      shortLabel: "OBJ 11",
-      body: "Unassigned external object.",
-      icon: iconBase + "item_11.png",
-      href: "https://amzn.to/4nIXnSI",
-      rel: "sponsored noopener noreferrer",
-      target: "_blank",
-      disclosure: "PR / Amazon Associate link"
-    },
-    "item-12": {
-      slot: 12,
-      label: "FOUND OBJECT 12",
-      shortLabel: "OBJ 12",
-      body: "Unassigned external object.",
-      icon: iconBase + "item_12.png",
-      href: "https://amzn.to/4dnRLtB",
-      rel: "sponsored noopener noreferrer",
-      target: "_blank",
-      disclosure: "PR / Amazon Associate link"
-    },
-    "item-13": {
-      slot: 13,
-      label: "FOUND OBJECT 13",
-      shortLabel: "OBJ 13",
-      body: "Unassigned external object.",
-      icon: iconBase + "item_13.png",
-      href: "https://amzn.to/42OSmOR",
-      rel: "sponsored noopener noreferrer",
-      target: "_blank",
-      disclosure: "PR / Amazon Associate link"
-    },
-    "item-14": {
-      slot: 14,
-      label: "FOUND OBJECT 14",
-      shortLabel: "OBJ 14",
-      body: "Unassigned external object.",
-      icon: iconBase + "item_14.png",
-      href: "https://amzn.to/4nIXnSI",
-      rel: "sponsored noopener noreferrer",
-      target: "_blank",
-      disclosure: "PR / Amazon Associate link"
-    },
-    "item-15": {
-      slot: 15,
-      label: "FOUND OBJECT 15",
-      shortLabel: "OBJ 15",
-      body: "Unassigned external object.",
-      icon: iconBase + "item_15.png",
-      href: "https://amzn.to/4dnRLtB",
-      rel: "sponsored noopener noreferrer",
-      target: "_blank",
-      disclosure: "PR / Amazon Associate link"
-    },
+    "item-05": randomAmazonItem(
+      5,
+      "FOUND OBJECT 05",
+      "OBJ 05",
+      "Unassigned external object.",
+      "item_05.png"
+    ),
+    "item-06": randomAmazonItem(
+      6,
+      "FOUND OBJECT 06",
+      "OBJ 06",
+      "Unassigned external object.",
+      "item_06.png"
+    ),
+    "item-07": randomAmazonItem(
+      7,
+      "FOUND OBJECT 07",
+      "OBJ 07",
+      "Unassigned external object.",
+      "item_07.png"
+    ),
+    "item-08": randomAmazonItem(
+      8,
+      "FOUND OBJECT 08",
+      "OBJ 08",
+      "Unassigned external object.",
+      "item_08.png"
+    ),
+    "item-09": randomAmazonItem(
+      9,
+      "FOUND OBJECT 09",
+      "OBJ 09",
+      "Unassigned external object.",
+      "item_09.png"
+    ),
+    "item-10": randomAmazonItem(
+      10,
+      "FOUND OBJECT 10",
+      "OBJ 10",
+      "Unassigned external object.",
+      "item_10.png"
+    ),
+    "item-11": randomAmazonItem(
+      11,
+      "FOUND OBJECT 11",
+      "OBJ 11",
+      "Unassigned external object.",
+      "item_11.png"
+    ),
+    "item-12": randomAmazonItem(
+      12,
+      "FOUND OBJECT 12",
+      "OBJ 12",
+      "Unassigned external object.",
+      "item_12.png"
+    ),
+    "item-13": randomAmazonItem(
+      13,
+      "FOUND OBJECT 13",
+      "OBJ 13",
+      "Unassigned external object.",
+      "item_13.png"
+    ),
+    "item-14": randomAmazonItem(
+      14,
+      "FOUND OBJECT 14",
+      "OBJ 14",
+      "Unassigned external object.",
+      "item_14.png"
+    ),
+    "item-15": randomAmazonItem(
+      15,
+      "FOUND OBJECT 15",
+      "OBJ 15",
+      "Unassigned external object.",
+      "item_15.png"
+    ),
     "item-16": {
       slot: 16,
       label: "RETURN LINE",
