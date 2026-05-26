@@ -1890,3 +1890,217 @@ body:has(.observation-room) {
     transform: rotate(1deg);
   }
 }
+
+/* PC / mobile split: observation room */
+@media (min-width: 901px) {
+  .observation-room {
+    min-height: 100svh;
+  }
+
+  .room-bg-layer {
+    object-fit: cover;
+    object-position: center center;
+  }
+
+  .crt-stage {
+    left: 44.4%;
+    top: 29.4%;
+    width: 22.8%;
+    height: 29.2%;
+  }
+
+  .observation-room .creature-stage {
+    left: 50%;
+    top: 50%;
+    width: 66%;
+    height: 66%;
+  }
+
+  .observation-room .creature {
+    width: min(66%, 142px);
+    max-height: 76%;
+  }
+
+  .right-monitor {
+    right: 2.2%;
+    width: 21.4%;
+  }
+}
+
+@media (max-width: 768px) {
+  body:has(.observation-room) {
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: #050006;
+  }
+
+  .observation-room {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    min-height: 100svh;
+    padding: 12px 12px 86px;
+    overflow: visible;
+  }
+
+  .room-bg-layer {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100svh;
+    object-fit: cover;
+    object-position: 50% 50%;
+    opacity: 0.38;
+  }
+
+  .room-crt-noise {
+    position: fixed;
+  }
+
+  .left-terminal,
+  .crt-stage,
+  .right-monitor,
+  .room-signal-poster {
+    position: relative;
+    inset: auto;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    width: 100%;
+    height: auto;
+    transform: none;
+  }
+
+  .crt-stage {
+    order: 1;
+    min-height: clamp(300px, 72vw, 420px);
+    border-radius: 14px;
+  }
+
+  .left-terminal {
+    order: 2;
+    grid-template-rows: auto auto auto auto;
+    gap: 8px;
+    min-height: 0;
+  }
+
+  .right-monitor {
+    order: 3;
+    grid-template-rows: auto auto auto;
+    gap: 8px;
+    padding: 10px;
+    overflow: visible;
+  }
+
+  .room-signal-poster {
+    order: 4;
+    min-height: 66px;
+    padding: 10px 12px;
+  }
+
+  .observation-disconnect {
+    position: fixed;
+    left: 12px;
+    right: auto;
+    top: auto;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    z-index: 18;
+    width: 124px;
+    height: 48px;
+    transform: none;
+  }
+
+  .terminal-head {
+    min-height: auto;
+    padding: 9px 10px;
+  }
+
+  .terminal-head h1 {
+    font-size: 13px;
+  }
+
+  .terminal-box {
+    padding: 10px;
+    overflow: visible;
+  }
+
+  .observation-room .log-section,
+  .observation-room .signals-section,
+  .signal-slot-left,
+  .terminal-command {
+    display: none;
+  }
+
+  .status-terminal {
+    display: block;
+  }
+
+  .terminal-status-grid,
+  .creature-readout-grid,
+  .right-monitor .summary-band {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .terminal-status-grid div,
+  .creature-readout-grid div,
+  .right-monitor .summary-band div,
+  .right-monitor .stats div {
+    min-height: 34px;
+    padding: 7px 8px;
+  }
+
+  .observation-runtime {
+    padding: 8px;
+  }
+
+  .terminal-audio {
+    height: 44px;
+  }
+
+  .observation-room .creature-stage {
+    left: 50%;
+    top: 48%;
+    width: 76%;
+    height: 76%;
+  }
+
+  .observation-room .halo {
+    width: min(68%, 210px);
+  }
+
+  .observation-room .creature {
+    width: min(64%, 190px);
+    max-height: 78%;
+  }
+
+  .creature-id-readout {
+    bottom: 6%;
+    width: min(78%, 230px);
+  }
+
+  .right-monitor .stats {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .right-monitor .stats div {
+    grid-template-columns: minmax(0, 1fr) minmax(42px, auto);
+  }
+
+  .right-monitor .stats div::after {
+    display: none;
+  }
+
+  .room-signal-poster strong {
+    font-size: 13px;
+  }
+
+  .observation-room .contamination-overlay {
+    right: 12px;
+    bottom: 74px;
+    max-width: calc(100vw - 24px);
+  }
+}

@@ -2316,3 +2316,45 @@ a.sp-link:hover,
     font-size: 11px;
   }
 }
+
+/* PC / mobile split: entrance altar */
+@media (min-width: 769px) {
+  .altar-shell {
+    padding: 0;
+  }
+
+  .altar-frame {
+    width: 100vw;
+    height: 100svh;
+    max-height: none;
+    aspect-ratio: auto;
+    border-left: 0;
+    border-right: 0;
+  }
+
+  .altar-image {
+    object-fit: cover;
+    object-position: center center;
+  }
+}
+
+@media (max-width: 768px) {
+  .altar-shell {
+    align-items: start;
+    padding: 0;
+  }
+
+  .altar-frame {
+    width: 100vw;
+    height: 100svh;
+    max-height: none;
+    aspect-ratio: auto;
+    border-left: 0;
+    border-right: 0;
+  }
+
+  .altar-image {
+    object-fit: cover;
+    object-position: center center;
+  }
+}
