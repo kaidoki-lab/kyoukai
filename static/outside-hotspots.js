@@ -44,6 +44,16 @@
     ".collapse-dpad",
     ".exit-point"
   ].join(",");
+  const PLACEMENT_SELECTOR = [
+    ".altar-frame",
+    ".signal-chapel-frame",
+    ".archive-frame",
+    ".exit-frame",
+    ".hyougi-frame",
+    ".collapse-camera",
+    ".observation-room",
+    "main"
+  ].join(",");
 
   function links() {
     return Array.isArray(window.KYOUKAI_OUTSIDE_AMAZON_LINKS)
@@ -67,11 +77,35 @@
     return String(window.KYOUKAI_ROOM || document.body.className || location.pathname || "unknown");
   }
 
-  function hotspotCount() {
-    const width = window.innerWidth || 1024;
-    const height = window.innerHeight || 768;
-    if (width < 560 || height < 520) return Math.random() < 0.72 ? 1 : 2;
-    return 1 + Math.floor(Math.random() * 3);
+  function hotspotCount(bounds) {
+    const width = bounds ? bounds.width : window.innerWidth || 1024;
+    const height = bounds ? bounds.height : window.innerHeight || 768;
+    if (document.body.classList.contains("archive-room-body")) return 1;
+    if (width < 560 || height < 520) return 1;
+    return Math.random() < 0.68 ? 1 : 2;
+  }
+
+  function placementBounds() {
+    const root = Array.from(document.querySelectorAll(PLACEMENT_SELECTOR)).find((element) => {
+      const rect = element.getBoundingClientRect();
+      return rect.width > 120 && rect.height > 120;
+    });
+    const rect = root
+      ? root.getBoundingClientRect()
+      : { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight, width: window.innerWidth, height: window.innerHeight };
+
+    const left = clamp(rect.left, 0, window.innerWidth);
+    const top = clamp(rect.top, 0, window.innerHeight);
+    const right = clamp(rect.right, left, window.innerWidth);
+    const bottom = clamp(rect.bottom, top, window.innerHeight);
+    return {
+      left,
+      top,
+      right,
+      bottom,
+      width: Math.max(0, right - left),
+      height: Math.max(0, bottom - top)
+    };
   }
 
   function isBlockedAt(x, y) {
@@ -88,22 +122,24 @@
     });
   }
 
-  function pickPosition(existing) {
-    const width = window.innerWidth || 1024;
-    const height = window.innerHeight || 768;
-    const marginX = clamp(width * 0.08, 32, 96);
-    const marginY = clamp(height * 0.1, 42, 104);
+  function pickPosition(existing, bounds) {
+    const marginX = clamp(bounds.width * 0.08, 58, 104);
+    const marginY = clamp(bounds.height * 0.1, 58, 108);
+    const minX = bounds.left + marginX;
+    const maxX = bounds.right - marginX;
+    const minY = bounds.top + marginY;
+    const maxY = bounds.bottom - marginY;
 
     for (let attempt = 0; attempt < 70; attempt += 1) {
-      const x = rand(marginX, width - marginX);
-      const y = rand(marginY, height - marginY);
-      const tooClose = existing.some((spot) => Math.hypot(spot.x - x, spot.y - y) < 105);
+      const x = rand(minX, maxX);
+      const y = rand(minY, maxY);
+      const tooClose = existing.some((spot) => Math.hypot(spot.x - x, spot.y - y) < 128);
       if (!tooClose && !isBlockedAt(x, y)) return { x, y };
     }
 
     return {
-      x: rand(width * 0.14, width * 0.86),
-      y: rand(height * 0.18, height * 0.82)
+      x: rand(minX, maxX),
+      y: rand(minY, maxY)
     };
   }
 
@@ -167,11 +203,14 @@
 
     const layer = document.createElement("div");
     const positions = [];
+    const bounds = placementBounds();
+    if (bounds.width < 120 || bounds.height < 120) return;
+
     layer.className = "outside-hotspot-layer";
     layer.setAttribute("aria-hidden", "false");
 
-    for (let index = 0; index < hotspotCount(); index += 1) {
-      const position = pickPosition(positions);
+    for (let index = 0; index < hotspotCount(bounds); index += 1) {
+      const position = pickPosition(positions, bounds);
       positions.push(position);
       layer.appendChild(createHotspot(position));
     }

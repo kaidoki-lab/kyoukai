@@ -2320,16 +2320,14 @@ a.sp-link:hover,
 /* PC / mobile split: entrance altar */
 @media (min-width: 769px) {
   .altar-shell {
-    padding: 0;
+    padding: clamp(6px, 1.35vw, 18px);
   }
 
   .altar-frame {
-    width: 100vw;
-    height: 100svh;
-    max-height: none;
-    aspect-ratio: auto;
-    border-left: 0;
-    border-right: 0;
+    width: min(calc(100vw - clamp(12px, 2.7vw, 36px)), calc((100svh - clamp(12px, 2.7vw, 36px)) * 1.5), 1640px);
+    height: auto;
+    max-height: calc(100svh - clamp(12px, 2.7vw, 36px));
+    aspect-ratio: 3 / 2;
   }
 
   .altar-image {
@@ -2340,15 +2338,15 @@ a.sp-link:hover,
 
 @media (max-width: 768px) {
   .altar-shell {
-    align-items: start;
+    align-items: center;
     padding: 0;
   }
 
   .altar-frame {
     width: 100vw;
-    height: 100svh;
-    max-height: none;
-    aspect-ratio: auto;
+    height: auto;
+    max-height: 100svh;
+    aspect-ratio: 3 / 2;
     border-left: 0;
     border-right: 0;
   }
