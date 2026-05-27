@@ -726,6 +726,69 @@ a.sp-link:hover,
   padding: clamp(6px, 1.35vw, 18px);
 }
 
+.altar-side {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 260px);
+  height: auto;
+  padding: clamp(14px, 1.7vw, 24px);
+  border: 1px solid rgba(255, 236, 168, 0.16);
+  background:
+    linear-gradient(180deg, rgba(18, 3, 14, 0.68), rgba(4, 2, 8, 0.38)),
+    rgba(0, 0, 0, 0.42);
+  color: rgba(255, 248, 225, 0.74);
+  font-family: var(--sp-mono);
+  font-size: clamp(12px, 0.92vw, 13px);
+  line-height: 1.82;
+  text-shadow: 0 0 9px rgba(0, 210, 255, 0.22);
+  box-shadow:
+    0 0 18px rgba(255, 42, 174, 0.12),
+    inset 0 0 24px rgba(0, 0, 0, 0.58);
+}
+
+.altar-side::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 1px solid rgba(23, 241, 255, 0.08);
+  background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 6px);
+  mix-blend-mode: screen;
+}
+
+.altar-side__eyebrow {
+  display: block;
+  margin-bottom: 9px;
+  color: rgba(23, 241, 255, 0.76);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.altar-side h2 {
+  margin: 0 0 12px;
+  color: rgba(255, 239, 166, 0.88);
+  font-size: clamp(15px, 1.2vw, 18px);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.altar-side p {
+  margin: 0;
+}
+
+.altar-side p + p {
+  margin-top: 12px;
+  color: rgba(218, 241, 255, 0.66);
+}
+
+.altar-side--left {
+  justify-self: end;
+}
+
+.altar-side--right {
+  justify-self: start;
+}
+
 .altar-caption {
   display: flex;
   align-items: baseline;
@@ -2318,13 +2381,16 @@ a.sp-link:hover,
 }
 
 /* PC / mobile split: entrance altar */
-@media (min-width: 769px) {
+@media (min-width: 1100px) {
   .altar-shell {
+    grid-template-columns: minmax(140px, 1fr) auto minmax(140px, 1fr);
+    gap: clamp(12px, 1.5vw, 28px);
+    align-items: stretch;
     padding: clamp(6px, 1.35vw, 18px);
   }
 
   .altar-frame {
-    width: min(calc(100vw - clamp(12px, 2.7vw, 36px)), calc((100svh - clamp(12px, 2.7vw, 36px)) * 1.5), 1640px);
+    width: min(calc(100vw - clamp(320px, 33vw, 560px)), calc((100svh - clamp(12px, 2.7vw, 36px)) * 1.5), 1320px);
     height: auto;
     max-height: calc(100svh - clamp(12px, 2.7vw, 36px));
     aspect-ratio: 3 / 2;
@@ -2334,21 +2400,105 @@ a.sp-link:hover,
     object-fit: cover;
     object-position: center center;
   }
+
+  .altar-side {
+    height: 100%;
+    max-height: calc(100svh - clamp(12px, 2.7vw, 36px));
+    align-self: stretch;
+    overflow: hidden;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1099px) {
+  .altar-page {
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .altar-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+    padding: clamp(10px, 2vw, 18px);
+  }
+
+  .altar-frame {
+    order: 1;
+    width: min(calc(100vw - 28px), calc((100svh - 190px) * 1.5), 1040px);
+    height: auto;
+    max-height: calc(100svh - 190px);
+    aspect-ratio: 3 / 2;
+  }
+
+  .altar-side {
+    width: min(calc(100vw - 28px), 1040px);
+    max-width: none;
+    padding: 16px 18px;
+    font-size: 13px;
+  }
+
+  .altar-side--left {
+    order: 2;
+  }
+
+  .altar-side--right {
+    order: 3;
+  }
+
+  .altar-side--left,
+  .altar-side--right {
+    align-self: center;
+  }
+
+  .altar-image {
+    object-fit: cover;
+    object-position: center center;
+  }
 }
 
 @media (max-width: 768px) {
+  .altar-page {
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
   .altar-shell {
-    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: stretch;
     padding: 0;
   }
 
   .altar-frame {
+    order: 1;
     width: 100vw;
     height: auto;
     max-height: 100svh;
     aspect-ratio: 3 / 2;
     border-left: 0;
     border-right: 0;
+  }
+
+  .altar-side {
+    width: auto;
+    max-width: none;
+    margin: 0 14px 14px;
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .altar-side--left {
+    order: 2;
+    margin-top: 14px;
+  }
+
+  .altar-side--right {
+    order: 3;
   }
 
   .altar-image {
