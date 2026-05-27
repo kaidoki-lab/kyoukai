@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>KYOUKAI Observer Room</title>
+  <link rel="stylesheet" href="/static/observer.css?v=1">
+  <script defer src="/static/analytics.js"></script>
+</head>
+<body>
+  <main class="observer-room" data-genome="piko" aria-label="observer room">
+    <div class="room-backdrop" aria-hidden="true">
+      <div class="wall-shelf"></div>
+      <div class="window-glow"></div>
+      <div class="floor-rug"></div>
+      <div class="tiny-stars star-a"></div>
+      <div class="tiny-stars star-b"></div>
+      <div class="tiny-stars star-c"></div>
+    </div>
+
+    <section class="today-word" aria-label="today word">
+      <span>&#20170;&#26085;&#12398;&#12402;&#12392;&#12371;&#12392;</span>
+      <strong id="dailyWord">&#12365;&#12423;&#12358;&#12418;&#12289;&#37096;&#23627;&#12399;&#12402;&#12425;&#12356;&#12390;&#12427;</strong>
+    </section>
+
+    <a id="outsideBox" class="outside-box" href="/outside" aria-label="outside box"></a>
+
+    <button class="room-hotspot hotspot-chair" type="button" data-room-hotspot="chair" aria-label="chair"></button>
+    <button class="room-hotspot hotspot-table" type="button" data-room-hotspot="table" aria-label="small table"></button>
+    <button class="room-hotspot hotspot-left-cushion" type="button" data-room-hotspot="left-cushion" aria-label="left cushion"></button>
+    <button class="room-hotspot hotspot-right-cushion" type="button" data-room-hotspot="right-cushion" aria-label="right cushion"></button>
+
+    <section id="mascot" class="mascot phase-1 look-front" aria-label="magical girl mascot">
+      <div id="speechBubble" class="speech-bubble hidden">&#12415;&#12390;&#12427;&#65311;</div>
+      <div class="magic-shadow"></div>
+      <div class="pixel-girl use-sheet">
+        <img id="mascotSprite" class="sprite-girl" src="/static/observer/assets/sprites/piko_trimmed/idle_1.png" alt="">
+        <div class="hair back-hair"></div>
+        <div class="hair side-hair left"></div>
+        <div class="hair side-hair right"></div>
+        <div class="head">
+          <div class="eye eye-left"><span></span></div>
+          <div class="eye eye-right"><span></span></div>
+          <div class="cheek cheek-left"></div>
+          <div class="cheek cheek-right"></div>
+          <div class="mouth"></div>
+        </div>
+        <div class="hat">
+          <div class="hat-tip"></div>
+          <div class="hat-brim"></div>
+          <div class="hat-star"></div>
+        </div>
+        <div class="body">
+          <div class="collar"></div>
+          <div class="dress"></div>
+          <div class="arm arm-left"></div>
+          <div class="arm arm-right"></div>
+          <div class="wand"></div>
+        </div>
+        <div class="leg leg-left"></div>
+        <div class="leg leg-right"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>window.KYOUKAI_ROOM = 'observer';</script>
+  <script src="/static/observer.js?v=1"></script>
+</body>
+</html>

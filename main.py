@@ -1246,6 +1246,7 @@ class KyoukaiHandler(BaseHTTPRequestHandler):
         "/": "home.html",
         "/index.html": "home.html",
         "/observation": "index.html",
+        "/observer": "observer.html",
         "/archive": "archive.html",
         "/signal": "signal.html",
         "/hyougi": "hyougi.html",
@@ -1559,6 +1560,10 @@ if FASTAPI_AVAILABLE:
     @app.get("/observation", response_class=HTMLResponse)
     async def observation(request: Request) -> HTMLResponse:
         return render_template(request, "index.html")
+
+    @app.get("/observer", response_class=HTMLResponse)
+    async def observer_room(request: Request) -> HTMLResponse:
+        return render_template(request, "observer.html")
 
     @app.get("/archive", response_class=HTMLResponse)
     async def archive(request: Request) -> HTMLResponse:
