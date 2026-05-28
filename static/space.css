@@ -388,6 +388,44 @@ a.sp-link:hover,
   color: rgba(231, 220, 193, 0.9);
 }
 
+.signal-info {
+  position: absolute;
+  left: 3.6%;
+  bottom: 6.6%;
+  z-index: 5;
+  max-width: 420px;
+  padding: 18px 22px;
+  border: 1px solid rgba(180, 220, 255, 0.18);
+  background:
+    linear-gradient(180deg, rgba(4, 6, 12, 0.72), rgba(4, 6, 12, 0.36)),
+    rgba(0, 0, 0, 0.32);
+  color: rgba(255, 255, 255, 0.72);
+  font-family: var(--sp-mono);
+  font-size: 13px;
+  line-height: 1.9;
+  text-shadow: 0 0 9px rgba(80, 180, 255, 0.28);
+  box-shadow:
+    0 0 18px rgba(60, 170, 255, 0.14),
+    inset 0 0 24px rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(3px);
+}
+
+.signal-info h2 {
+  margin: 0 0 12px;
+  color: rgba(180, 220, 255, 0.86);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.signal-info p {
+  margin: 0;
+}
+
+.signal-info p + p {
+  margin-top: 8px;
+}
+
 .signal-room[data-phase="2"] .signal-chapel-image,
 .signal-room[data-phase="3"] .signal-chapel-image {
   filter: none;
@@ -411,6 +449,18 @@ a.sp-link:hover,
   .signal-chapel-frame {
     width: 100vw;
     margin-top: 7vh;
+  }
+
+  .signal-info {
+    left: 14px;
+    right: 14px;
+    bottom: 18px;
+    max-width: none;
+    max-height: 36vh;
+    overflow: auto;
+    padding: 18px;
+    font-size: 14px;
+    line-height: 2;
   }
 
 }
@@ -647,6 +697,65 @@ a.sp-link:hover,
   text-align: right;
 }
 
+.archive-info {
+  position: absolute;
+  left: 4%;
+  top: 7%;
+  z-index: 5;
+  max-width: 420px;
+  padding: 18px 22px;
+  border: 1px solid rgba(74, 70, 62, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(242, 240, 233, 0.32)),
+    rgba(0, 0, 0, 0.08);
+  color: rgba(34, 34, 30, 0.72);
+  font-family: var(--sp-mono);
+  font-size: 13px;
+  line-height: 1.9;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.54);
+  box-shadow:
+    0 18px 44px rgba(88, 84, 72, 0.12),
+    inset 0 0 28px rgba(255, 255, 255, 0.34);
+  backdrop-filter: blur(3px);
+}
+
+.archive-info h2 {
+  margin: 0 0 12px;
+  color: rgba(54, 48, 42, 0.82);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.archive-info p {
+  margin: 0;
+}
+
+.archive-info p + p {
+  margin-top: 8px;
+}
+
+.info-log-link {
+  display: inline-block;
+  margin-top: 12px;
+  color: rgba(180, 220, 255, 0.88);
+  font-family: var(--sp-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  border-bottom: 1px dotted currentColor;
+}
+
+.archive-info .info-log-link {
+  color: rgba(54, 48, 42, 0.72);
+}
+
+.info-log-link:hover,
+.info-log-link:focus-visible {
+  color: rgba(255, 238, 180, 0.96);
+  outline: none;
+}
+
 .archive-return {
   position: fixed;
   left: 18px;
@@ -681,6 +790,19 @@ a.sp-link:hover,
     top: 48%;
     width: 92vw;
     min-height: 72svh;
+  }
+
+  .archive-info {
+    left: 14px;
+    right: 14px;
+    top: auto;
+    bottom: 48px;
+    max-width: none;
+    max-height: 34vh;
+    overflow: auto;
+    padding: 18px;
+    font-size: 14px;
+    line-height: 2;
   }
 }
 
@@ -1370,6 +1492,172 @@ a.sp-link:hover,
   50% { opacity: 0.72; }
 }
 
+/* KYOUKAI archive observation logs */
+.archive-log-body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at 24% 18%, rgba(255, 42, 174, 0.16), transparent 28%),
+    radial-gradient(circle at 78% 72%, rgba(23, 241, 255, 0.12), transparent 32%),
+    #050407;
+  color: rgba(255, 255, 255, 0.78);
+  font-family: var(--sp-mono);
+}
+
+.archive-log-shell {
+  min-height: 100vh;
+  padding: clamp(18px, 4vw, 54px);
+  display: grid;
+  place-items: center;
+}
+
+.archive-log-panel {
+  width: min(980px, 100%);
+  padding: clamp(20px, 3vw, 38px);
+  border: 1px solid rgba(180, 220, 255, 0.16);
+  background:
+    linear-gradient(180deg, rgba(7, 7, 12, 0.84), rgba(7, 4, 10, 0.58)),
+    rgba(0, 0, 0, 0.32);
+  box-shadow:
+    0 0 28px rgba(23, 241, 255, 0.12),
+    inset 0 0 38px rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(3px);
+}
+
+.archive-log-kicker {
+  margin: 0 0 10px;
+  color: rgba(23, 241, 255, 0.72);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+}
+
+.archive-log-panel h1 {
+  margin: 0 0 18px;
+  color: rgba(255, 238, 190, 0.92);
+  font-size: clamp(24px, 4vw, 44px);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.archive-log-panel h2 {
+  margin: 0 0 10px;
+  color: rgba(210, 235, 255, 0.86);
+  font-size: 14px;
+  letter-spacing: 0.14em;
+}
+
+.archive-log-panel p {
+  margin: 0;
+  max-width: 760px;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.archive-log-panel p + p {
+  margin-top: 12px;
+}
+
+.archive-log-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.archive-log-item {
+  min-height: 148px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.archive-log-item a,
+.archive-log-nav a,
+.archive-log-related a {
+  color: rgba(180, 220, 255, 0.88);
+  text-decoration: none;
+  border-bottom: 1px dotted currentColor;
+}
+
+.archive-log-item a {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: rgba(255, 238, 190, 0.92);
+  font-size: 15px;
+}
+
+.archive-log-item span {
+  display: block;
+  color: rgba(23, 241, 255, 0.62);
+  font-size: 12px;
+}
+
+.archive-log-item p {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 13px;
+}
+
+.archive-log-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 22px;
+}
+
+.archive-log-meta div {
+  padding: 12px;
+  border: 1px solid rgba(23, 241, 255, 0.16);
+  background: rgba(23, 241, 255, 0.05);
+}
+
+.archive-log-meta dt {
+  color: rgba(23, 241, 255, 0.62);
+  font-size: 11px;
+}
+
+.archive-log-meta dd {
+  margin: 6px 0 0;
+  color: rgba(255, 238, 190, 0.9);
+}
+
+.archive-log-related {
+  margin-top: 24px;
+}
+
+.archive-log-related a {
+  display: inline-block;
+  margin: 0 12px 10px 0;
+}
+
+.archive-log-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+@media (max-width: 760px) {
+  .archive-log-shell {
+    place-items: start stretch;
+    padding: 14px;
+  }
+
+  .archive-log-panel {
+    padding: 18px;
+  }
+
+  .archive-log-list,
+  .archive-log-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .archive-log-panel p {
+    font-size: 14px;
+    line-height: 2;
+  }
+}
+
 @media (max-width: 720px) {
   .altar-shell {
     padding: 6px;
@@ -1958,6 +2246,59 @@ a.sp-link:hover,
     repeating-linear-gradient(90deg, transparent 0 9px, rgba(0, 0, 0, 0.48) 9px 11px);
 }
 
+.boundary-info {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  z-index: 26;
+  width: min(420px, calc(100% - 340px));
+  max-height: min(42vh, 300px);
+  overflow: auto;
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 220, 220, 0.22);
+  background:
+    linear-gradient(180deg, rgba(8, 0, 12, 0.72), rgba(8, 0, 12, 0.38)),
+    rgba(0, 0, 0, 0.28);
+  color: rgba(255, 255, 255, 0.74);
+  font-family: var(--sp-mono);
+  font-size: 13px;
+  line-height: 1.9;
+  text-shadow: 0 0 8px rgba(255, 46, 229, 0.26);
+  box-shadow:
+    0 0 16px rgba(255, 46, 229, 0.2),
+    inset 0 0 24px rgba(0, 0, 0, 0.46);
+  backdrop-filter: blur(2px);
+}
+
+.boundary-info h2 {
+  margin: 0 0 12px;
+  color: rgba(255, 220, 220, 0.88);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.boundary-info p {
+  margin: 0;
+}
+
+.boundary-info p + p {
+  margin-top: 8px;
+}
+
+@media (max-width: 780px) {
+  .boundary-info {
+    left: 14px;
+    right: 14px;
+    bottom: 92px;
+    width: auto;
+    max-height: 30vh;
+    padding: 18px;
+    font-size: 14px;
+    line-height: 2;
+  }
+}
+
 .collapse-room[data-collapse-level="0"] .collapse-mosaic,
 .collapse-room[data-collapse-level="1"] .collapse-mosaic,
 .collapse-room[data-collapse-level="2"] .collapse-mosaic {
@@ -2504,5 +2845,112 @@ a.sp-link:hover,
   .altar-image {
     object-fit: cover;
     object-position: center center;
+  }
+}
+
+/* Shared crawlable footer navigation */
+.kyoukai-footer {
+  position: relative;
+  z-index: 30;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 28px 20px calc(28px + env(safe-area-inset-bottom, 0px));
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.9)),
+    rgba(0, 0, 0, 0.86);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.kyoukai-footer nav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.footer-group h2 {
+  margin: 0 0 10px;
+  color: rgba(255, 220, 180, 0.78);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+}
+
+.footer-group a {
+  display: block;
+  margin: 4px 0;
+  color: rgba(255, 255, 255, 0.68);
+  text-decoration: none;
+}
+
+.footer-group a:hover,
+.footer-group a:focus-visible {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.kyoukai-info-body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at 50% 15%, rgba(96, 20, 34, 0.2), transparent 34%),
+    linear-gradient(180deg, #09070a, #020203 72%);
+  color: rgba(255, 255, 255, 0.78);
+  font-family: "Yu Gothic", "Hiragino Sans", system-ui, sans-serif;
+}
+
+.kyoukai-info-main {
+  box-sizing: border-box;
+  min-height: calc(100vh - 220px);
+  padding: clamp(28px, 8vw, 86px) 20px;
+}
+
+.kyoukai-info-panel {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: clamp(22px, 5vw, 42px);
+  border: 1px solid rgba(255, 220, 180, 0.16);
+  background: rgba(0, 0, 0, 0.42);
+  box-shadow: 0 0 28px rgba(0, 0, 0, 0.42);
+}
+
+.kyoukai-info-panel h1 {
+  margin: 0 0 18px;
+  color: rgba(255, 232, 205, 0.9);
+  font-size: clamp(22px, 5vw, 34px);
+  letter-spacing: 0.08em;
+}
+
+.kyoukai-info-panel h2 {
+  margin: 26px 0 8px;
+  color: rgba(180, 220, 255, 0.84);
+  font-size: 15px;
+  letter-spacing: 0.1em;
+}
+
+.kyoukai-info-panel p,
+.kyoukai-info-panel li {
+  font-size: 14px;
+  line-height: 1.95;
+}
+
+.kyoukai-info-panel a {
+  color: rgba(180, 220, 255, 0.9);
+}
+
+.kyoukai-info-list {
+  padding-left: 1.2em;
+}
+
+@media (max-width: 768px) {
+  .kyoukai-footer nav {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .kyoukai-footer {
+    padding: 24px 18px calc(24px + env(safe-area-inset-bottom, 0px));
+    font-size: 14px;
   }
 }

@@ -1582,6 +1582,47 @@ body:has(.observation-room) {
   overflow: auto;
 }
 
+.observation-info {
+  position: absolute;
+  right: 2.2%;
+  bottom: 2.8%;
+  z-index: 4;
+  width: 21.4%;
+  max-width: 440px;
+  max-height: 28vh;
+  overflow: auto;
+  padding: 18px 22px;
+  border: 1px solid rgba(210, 235, 255, 0.18);
+  background:
+    linear-gradient(180deg, rgba(4, 0, 8, 0.74), rgba(4, 0, 8, 0.36)),
+    rgba(0, 0, 0, 0.32);
+  color: rgba(255, 255, 255, 0.72);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.9;
+  text-shadow: 0 0 9px rgba(35, 247, 255, 0.24);
+  box-shadow:
+    0 0 18px rgba(35, 247, 255, 0.13),
+    inset 0 0 24px rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(3px);
+}
+
+.observation-info h2 {
+  margin: 0 0 12px;
+  color: rgba(210, 235, 255, 0.86);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.observation-info p {
+  margin: 0;
+}
+
+.observation-info p + p {
+  margin-top: 8px;
+}
+
 .signal-slot {
   position: relative;
   z-index: 5;
@@ -1925,6 +1966,11 @@ body:has(.observation-room) {
     right: 2.2%;
     width: 21.4%;
   }
+
+  .observation-info {
+    right: 2.2%;
+    width: 21.4%;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1961,6 +2007,7 @@ body:has(.observation-room) {
   .left-terminal,
   .crt-stage,
   .right-monitor,
+  .observation-info,
   .room-signal-poster {
     position: relative;
     inset: auto;
@@ -1994,8 +2041,19 @@ body:has(.observation-room) {
     overflow: visible;
   }
 
-  .room-signal-poster {
+  .observation-info {
     order: 4;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    overflow: visible;
+    padding: 18px;
+    font-size: 14px;
+    line-height: 2;
+  }
+
+  .room-signal-poster {
+    order: 5;
     min-height: 66px;
     padding: 10px 12px;
   }
@@ -2102,5 +2160,59 @@ body:has(.observation-room) {
     right: 12px;
     bottom: 74px;
     max-width: calc(100vw - 24px);
+  }
+}
+
+/* Shared crawlable footer navigation */
+.kyoukai-footer {
+  position: relative;
+  z-index: 30;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 28px 20px calc(28px + env(safe-area-inset-bottom, 0px));
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.9)),
+    rgba(0, 0, 0, 0.86);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.kyoukai-footer nav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.footer-group h2 {
+  margin: 0 0 10px;
+  color: rgba(255, 220, 180, 0.78);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+}
+
+.footer-group a {
+  display: block;
+  margin: 4px 0;
+  color: rgba(255, 255, 255, 0.68);
+  text-decoration: none;
+}
+
+.footer-group a:hover,
+.footer-group a:focus-visible {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+@media (max-width: 768px) {
+  .kyoukai-footer nav {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .kyoukai-footer {
+    padding: 24px 18px calc(24px + env(safe-area-inset-bottom, 0px));
+    font-size: 14px;
   }
 }

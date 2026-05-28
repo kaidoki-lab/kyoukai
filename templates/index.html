@@ -167,6 +167,19 @@
         </aside>
       </aside>
 
+      <section class="observation-info" aria-labelledby="observation-info-title">
+        <h2 id="observation-info-title">OBSERVATION AREA</h2>
+        <p>
+          OBSERVATIONは、KYOUKAI内のsignal、node、archive fragmentを継続的に確認する観測領域です。
+        </p>
+        <p>
+          この領域では、接続状態、観測ログ、route response、observer record などが記録対象になります。
+        </p>
+        <p>観測された情報は、archiveや各nodeの記録へ反映される場合があります。</p>
+        <p>KYOUKAIでは、これらの観測記録を継続的に追加・更新しています。</p>
+        <a class="info-log-link" href="/archive/logs">観測ログ一覧</a>
+      </section>
+
       <div id="contaminationOverlay" class="contamination-overlay" aria-hidden="true">
         <div class="contamination-inner">
           <p class="contamination-label">外部信号混入</p>
@@ -175,6 +188,14 @@
         </div>
       </div>
     </main>
+
+    <footer class="kyoukai-footer">
+      <nav aria-label="KYOUKAI footer navigation">
+        <div class="footer-group"><h2>MAIN</h2><a href="/">Top</a><a href="/observation">Observation</a><a href="/archive">Archive</a><a href="/signal">Signal</a><a href="/null">Boundary</a><a href="/exit">Exit</a><a href="/outside">Outside</a></div>
+        <div class="footer-group"><h2>RECORD</h2><a href="/archive/logs">Observation Logs</a></div>
+        <div class="footer-group"><h2>INFO</h2><a href="/about">About</a><a href="/privacy-policy">Privacy Policy</a><a href="/contact">Contact</a><a href="/terms">Terms</a><a href="/sitemap">Site Map</a></div>
+      </nav>
+    </footer>
 
     <script src="/static/app.js"></script>
     <script>window.KYOUKAI_ROOM = 'observation';</script>

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OBSERVATION LOGS / KYOUKAI</title>
+  <link rel="stylesheet" href="/static/space.css" />
+  <script defer src="/static/analytics.js"></script>
+</head>
+<body class="archive-log-body">
+  <main class="archive-log-shell" data-log-view="logs">
+    <section class="archive-log-panel archive-log-panel--index">
+      <p class="archive-log-kicker">KYOUKAI ARCHIVE</p>
+      <h1>OBSERVATION LOGS</h1>
+      <p>OBSERVATION LOGSは、KYOUKAI内で検出されたsignal、node、archive fragment、route responseを記録する領域です。記録は継続的に追加され、archiveへ保存されます。</p>
+      <div class="archive-log-list">
+        <article class="archive-log-item">
+          <a href="/archive/logs/001">観測記録 #001｜signal drift</a>
+          <span>2026-05-27 / SIGNAL-09 / UNSTABLE</span>
+          <p>SIGNAL-09で軽度のsignal driftを検出。</p>
+        </article>
+        <article class="archive-log-item">
+          <a href="/archive/logs/002">観測記録 #002｜archive fragment</a>
+          <span>2026-05-27 / ARCHIVE-01 / STABLE</span>
+          <p>ARCHIVE-01で新しいarchive fragmentを確認。</p>
+        </article>
+        <article class="archive-log-item">
+          <a href="/archive/logs/003">観測記録 #003｜route response</a>
+          <span>2026-05-27 / ROUTE-04 / UNSTABLE</span>
+          <p>ROUTE-04で不規則なroute responseを検出。</p>
+        </article>
+        <article class="archive-log-item">
+          <a href="/archive/logs/004">観測記録 #004｜observer record</a>
+          <span>2026-05-27 / OBSERVER-02 / STABLE</span>
+          <p>OBSERVER-02から継続的なobserver recordを受信。</p>
+        </article>
+        <article class="archive-log-item">
+          <a href="/archive/logs/005">観測記録 #005｜boundary instability</a>
+          <span>2026-05-27 / BOUNDARY-07 / UNSTABLE</span>
+          <p>BOUNDARY-07で接続不安定化を確認。</p>
+        </article>
+        <article class="archive-log-item">
+          <a href="/archive/logs/006">観測記録 #006｜lost signal</a>
+          <span>2026-05-27 / NULL-ROOM-03 / LOST</span>
+          <p>NULL-ROOM-03で短時間のlost signalを検出。</p>
+        </article>
+        <article class="archive-log-item">
+          <a href="/archive/logs/007">観測記録 #007｜stable archive</a>
+          <span>2026-05-27 / ARCHIVE-01 / STABLE</span>
+          <p>ARCHIVE-01の記録状態は安定。</p>
+        </article>
+        <article class="archive-log-item">
+          <a href="/archive/logs/008">観測記録 #008｜node delay</a>
+          <span>2026-05-27 / NODE-08 / UNSTABLE</span>
+          <p>NODE-08で観測遅延を確認。</p>
+        </article>
+        <article class="archive-log-item">
+          <a href="/archive/logs/009">観測記録 #009｜critical pulse</a>
+          <span>2026-05-27 / SIGNAL-CRITICAL-01 / CRITICAL</span>
+          <p>SIGNAL-CRITICAL-01で短いcritical pulseを検出。</p>
+        </article>
+        <article class="archive-log-item">
+          <a href="/archive/logs/010">観測記録 #010｜record restored</a>
+          <span>2026-05-27 / ARCHIVE-RESTORE-02 / STABLE</span>
+          <p>ARCHIVE-RESTORE-02でrecord restoredを確認。</p>
+        </article>
+      </div>
+      <nav class="archive-log-nav" aria-label="archive log navigation">
+        <a href="/archive">archiveへ戻る</a>
+        <a href="/signal">signalを見る</a>
+        <a href="/observation">observationを見る</a>
+      </nav>
+    </section>
+  </main>
+  <footer class="kyoukai-footer">
+    <nav aria-label="KYOUKAI footer navigation">
+      <div class="footer-group"><h2>MAIN</h2><a href="/">Top</a><a href="/observation">Observation</a><a href="/archive">Archive</a><a href="/signal">Signal</a><a href="/null">Boundary</a><a href="/exit">Exit</a><a href="/outside">Outside</a></div>
+      <div class="footer-group"><h2>RECORD</h2><a href="/archive/logs">Observation Logs</a></div>
+      <div class="footer-group"><h2>INFO</h2><a href="/about">About</a><a href="/privacy-policy">Privacy Policy</a><a href="/contact">Contact</a><a href="/terms">Terms</a><a href="/sitemap">Site Map</a></div>
+    </nav>
+  </footer>
+</body>
+</html>

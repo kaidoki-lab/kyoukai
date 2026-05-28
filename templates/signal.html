@@ -36,10 +36,29 @@
         <span class="ky-monetize-route__label">OUTSIDE</span>
         <span class="ky-monetize-route__sub">OFFERING</span>
       </a>
+
+      <section class="signal-info" aria-labelledby="signal-info-title">
+        <h2 id="signal-info-title">SIGNAL STATUS</h2>
+        <p>SIGNALは、KYOUKAI内部で検出された接続状態や観測変動を示す記録です。</p>
+        <p>
+          signal drift、unstable connection、route response、archive fragment などが観測対象として記録されます。
+        </p>
+        <p>signal状態は、STABLE、UNSTABLE、LOST、CRITICAL などに分類されます。</p>
+        <p>観測されたsignalは、archiveや各nodeの記録へ反映される場合があります。</p>
+        <a class="info-log-link" href="/archive/logs">観測ログ一覧</a>
+      </section>
     </figure>
 
     <a class="signal-return" href="/" aria-label="Return to entrance">000 / return</a>
   </main>
+
+  <footer class="kyoukai-footer">
+    <nav aria-label="KYOUKAI footer navigation">
+      <div class="footer-group"><h2>MAIN</h2><a href="/">Top</a><a href="/observation">Observation</a><a href="/archive">Archive</a><a href="/signal">Signal</a><a href="/null">Boundary</a><a href="/exit">Exit</a><a href="/outside">Outside</a></div>
+      <div class="footer-group"><h2>RECORD</h2><a href="/archive/logs">Observation Logs</a></div>
+      <div class="footer-group"><h2>INFO</h2><a href="/about">About</a><a href="/privacy-policy">Privacy Policy</a><a href="/contact">Contact</a><a href="/terms">Terms</a><a href="/sitemap">Site Map</a></div>
+    </nav>
+  </footer>
 
   <script>
     const room = document.querySelector(".signal-room");

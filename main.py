@@ -1248,6 +1248,17 @@ class KyoukaiHandler(BaseHTTPRequestHandler):
         "/observation": "index.html",
         "/observer": "observer.html",
         "/archive": "archive.html",
+        "/archive/logs": "archive-logs.html",
+        "/archive/logs/001": "archive-log-001.html",
+        "/archive/logs/002": "archive-log-002.html",
+        "/archive/logs/003": "archive-log-003.html",
+        "/archive/logs/004": "archive-log-004.html",
+        "/archive/logs/005": "archive-log-005.html",
+        "/archive/logs/006": "archive-log-006.html",
+        "/archive/logs/007": "archive-log-007.html",
+        "/archive/logs/008": "archive-log-008.html",
+        "/archive/logs/009": "archive-log-009.html",
+        "/archive/logs/010": "archive-log-010.html",
         "/signal": "signal.html",
         "/hyougi": "hyougi.html",
         "/exit": "exit.html",
@@ -1255,6 +1266,11 @@ class KyoukaiHandler(BaseHTTPRequestHandler):
         "/outside": "outside.html",
         "/support": "outside.html",
         "/central": "central.html",
+        "/about": "about.html",
+        "/privacy-policy": "privacy-policy.html",
+        "/contact": "contact.html",
+        "/terms": "terms.html",
+        "/sitemap": "sitemap.html",
         "/tiktok": "sns-entry.html",
         "/shorts": "sns-entry.html",
         "/x": "sns-entry.html",
@@ -1569,6 +1585,16 @@ if FASTAPI_AVAILABLE:
     async def archive(request: Request) -> HTMLResponse:
         return render_template(request, "archive.html")
 
+    @app.get("/archive/logs", response_class=HTMLResponse)
+    async def archive_logs(request: Request) -> HTMLResponse:
+        return render_template(request, "archive-logs.html")
+
+    @app.get("/archive/logs/{log_id}", response_class=HTMLResponse)
+    async def archive_log_detail(request: Request, log_id: str) -> HTMLResponse:
+        if log_id not in {f"{index:03d}" for index in range(1, 11)}:
+            return HTMLResponse("archive log not found", status_code=404)
+        return render_template(request, f"archive-log-{log_id}.html")
+
     @app.get("/signal", response_class=HTMLResponse)
     async def signal_room(request: Request) -> HTMLResponse:
         return render_template(request, "signal.html")
@@ -1593,6 +1619,26 @@ if FASTAPI_AVAILABLE:
     @app.get("/central", response_class=HTMLResponse)
     async def central_os_page(request: Request) -> HTMLResponse:
         return render_template(request, "central.html")
+
+    @app.get("/about", response_class=HTMLResponse)
+    async def about_page(request: Request) -> HTMLResponse:
+        return render_template(request, "about.html")
+
+    @app.get("/privacy-policy", response_class=HTMLResponse)
+    async def privacy_policy_page(request: Request) -> HTMLResponse:
+        return render_template(request, "privacy-policy.html")
+
+    @app.get("/contact", response_class=HTMLResponse)
+    async def contact_page(request: Request) -> HTMLResponse:
+        return render_template(request, "contact.html")
+
+    @app.get("/terms", response_class=HTMLResponse)
+    async def terms_page(request: Request) -> HTMLResponse:
+        return render_template(request, "terms.html")
+
+    @app.get("/sitemap", response_class=HTMLResponse)
+    async def sitemap_page(request: Request) -> HTMLResponse:
+        return render_template(request, "sitemap.html")
 
     @app.get("/tiktok", response_class=HTMLResponse)
     @app.get("/shorts", response_class=HTMLResponse)

@@ -78,6 +78,17 @@
         <small id="nullStageText">STAGE 0 / stable</small>
         <i></i>
       </div>
+
+      <section class="boundary-info" aria-labelledby="boundary-info-title">
+        <h2 id="boundary-info-title">BOUNDARY NODE</h2>
+        <p>接続が不安定な観測領域。</p>
+        <p>現在もsignal driftが継続検出されています。</p>
+        <p>
+          この領域では、route fragment、archive signal、observer recordなどが継続的に記録されています。
+        </p>
+        <p>観測状態は接続状況によって変動する場合があります。</p>
+        <p>最新の観測記録はarchiveへ追加されます。</p>
+      </section>
     </section>
 
     <nav class="collapse-dpad" aria-label="監視カメラ方向キー">
@@ -90,6 +101,14 @@
 
     <a class="collapse-return" href="/">000 / return</a>
   </main>
+
+  <footer class="kyoukai-footer">
+    <nav aria-label="KYOUKAI footer navigation">
+      <div class="footer-group"><h2>MAIN</h2><a href="/">Top</a><a href="/observation">Observation</a><a href="/archive">Archive</a><a href="/signal">Signal</a><a href="/null">Boundary</a><a href="/exit">Exit</a><a href="/outside">Outside</a></div>
+      <div class="footer-group"><h2>RECORD</h2><a href="/archive/logs">Observation Logs</a></div>
+      <div class="footer-group"><h2>INFO</h2><a href="/about">About</a><a href="/privacy-policy">Privacy Policy</a><a href="/contact">Contact</a><a href="/terms">Terms</a><a href="/sitemap">Site Map</a></div>
+    </nav>
+  </footer>
 
   <script>
     (() => {
