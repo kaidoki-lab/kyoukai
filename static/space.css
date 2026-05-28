@@ -4049,3 +4049,122 @@ a.sp-link:hover,
     font-size: 7px;
   }
 }
+
+/* /null display tuning: keep the arcade image readable on desktop and free the mobile center. */
+.collapse-arcade-image {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255, 46, 214, 0.34), transparent 28%),
+    radial-gradient(circle at 86% 26%, rgba(0, 247, 255, 0.3), transparent 26%),
+    linear-gradient(90deg, rgba(255, 0, 172, 0.12), rgba(0, 255, 231, 0.1)),
+    url("/static/kyoukai_null_arcade_v4.png") center / contain no-repeat;
+  background-color: #160012;
+}
+
+.boundary-info {
+  background:
+    radial-gradient(circle at 92% 16%, rgba(57, 255, 20, 0.72) 0 9%, transparent 10%),
+    repeating-linear-gradient(0deg, rgba(255, 246, 0, 0.14) 0 4px, transparent 4px 10px),
+    linear-gradient(135deg, #fff600 0%, #ff2ed6 42%, #00f7ff 100%);
+  color: #fff;
+  box-shadow:
+    8px 8px 0 #39ff14,
+    -5px -5px 0 #00f7ff,
+    0 0 28px rgba(255, 46, 214, 0.82);
+}
+
+.boundary-info::after {
+  background:
+    linear-gradient(180deg, #39ff14 0%, #fff600 50%, #ff2ed6 100%);
+}
+
+@media (min-width: 769px) {
+  .collapse-start-panel {
+    grid-template-columns: minmax(150px, 17vw) minmax(150px, 14vw);
+    right: 28px;
+    bottom: 28px;
+  }
+
+  .collapse-start-button span {
+    padding: 5px 8px;
+    border-width: 2px;
+    font-size: clamp(11px, 1.45vw, 17px);
+  }
+
+  .collapse-status-card {
+    min-height: 230px;
+    padding: 13px 14px 15px;
+  }
+
+  .collapse-status-card span {
+    margin-top: 7px;
+    font-size: clamp(10px, 1.05vw, 14px);
+  }
+
+  .collapse-status-card strong {
+    padding: 6px 8px;
+    font-size: clamp(13px, 1.45vw, 20px);
+  }
+
+  .boundary-info {
+    background:
+      radial-gradient(circle at 92% 16%, rgba(57, 255, 20, 0.78) 0 9%, transparent 10%),
+      repeating-linear-gradient(0deg, rgba(255, 246, 0, 0.16) 0 4px, transparent 4px 10px),
+      linear-gradient(135deg, #fff600 0%, #ff2ed6 45%, #00f7ff 100%);
+  }
+}
+
+@media (max-width: 768px) {
+  .collapse-arcade-image {
+    background-size: cover;
+    background-position: center top;
+  }
+
+  .collapse-start-panel {
+    left: 0;
+    right: 0;
+    bottom: 8px;
+    width: 100%;
+    display: block;
+    transform: none;
+  }
+
+  .collapse-start-button {
+    width: min(42vw, 164px);
+    margin: 0 auto;
+  }
+
+  .collapse-start-button span {
+    padding: 4px 7px;
+    border-width: 2px;
+    font-size: clamp(10px, 3vw, 13px);
+  }
+
+  .collapse-status-card {
+    position: fixed;
+    left: 8px;
+    bottom: 54px;
+    width: min(36vw, 138px);
+    padding: 7px 8px;
+    border-width: 2px;
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2px;
+    opacity: 0.93;
+  }
+
+  .collapse-status-card span {
+    margin-top: 2px;
+    font-size: clamp(7px, 2vw, 9px);
+  }
+
+  .collapse-status-card strong {
+    padding: 2px 5px;
+    font-size: clamp(10px, 2.8vw, 13px);
+    text-align: left;
+  }
+
+  .collapse-meter {
+    display: none;
+  }
+}
