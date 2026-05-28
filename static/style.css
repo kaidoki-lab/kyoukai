@@ -2319,3 +2319,439 @@ body:has(.observation-room) {
     line-height: 1.72;
   }
 }
+
+/* Smartphone observation terminal: the phone becomes the observation device. */
+@media (max-width: 768px) {
+  body:has(.observation-room) {
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(255, 42, 168, 0.14), transparent 36%),
+      #050006;
+  }
+
+  .observation-room {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100vw;
+    min-height: auto;
+    padding: 10px;
+    overflow: visible;
+  }
+
+  .room-bg-layer {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    object-fit: cover;
+    object-position: 52% 50%;
+    opacity: 0.28;
+    filter: saturate(1.08) contrast(1.08) brightness(0.58);
+  }
+
+  .room-crt-noise,
+  .observation-room::before {
+    position: fixed;
+  }
+
+  .left-terminal,
+  .crt-stage,
+  .right-monitor,
+  .observation-info,
+  .ky-monetize-route--observation {
+    position: relative;
+    inset: auto;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    transform: none;
+  }
+
+  .crt-stage {
+    order: 1;
+    min-height: 0;
+    aspect-ratio: 1 / 1;
+    padding: 10px;
+    border-radius: 18px;
+    border: 1px solid rgba(35, 247, 255, 0.32);
+    background:
+      radial-gradient(circle at 50% 42%, rgba(35, 247, 255, 0.14), transparent 48%),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.9), rgba(18, 0, 20, 0.86));
+    box-shadow:
+      0 0 24px rgba(35, 247, 255, 0.12),
+      inset 0 0 44px rgba(0, 0, 0, 0.9),
+      inset 0 0 22px rgba(255, 42, 168, 0.12);
+  }
+
+  .crt-stage::before {
+    content: "OBSERVATION WINDOW";
+    inset: 10px 10px auto;
+    z-index: 5;
+    display: block;
+    padding: 7px 9px;
+    border: 1px solid rgba(35, 247, 255, 0.18);
+    border-radius: 10px;
+    background:
+      repeating-linear-gradient(90deg, rgba(35, 247, 255, 0.05) 0 1px, transparent 1px 7px),
+      rgba(0, 0, 0, 0.58);
+    color: rgba(193, 255, 252, 0.78);
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-align: center;
+    mix-blend-mode: normal;
+    animation: none;
+  }
+
+  .crt-stage::after {
+    opacity: 0.24;
+  }
+
+  .crt-glass {
+    border-radius: inherit;
+  }
+
+  .observation-room .creature-stage {
+    left: 50%;
+    top: 54%;
+    width: 82%;
+    height: 82%;
+  }
+
+  .observation-room .halo {
+    width: min(72%, 260px);
+  }
+
+  .observation-room .creature {
+    width: min(70%, 236px);
+    max-height: 80%;
+  }
+
+  .creature-id-readout {
+    bottom: 7%;
+    width: min(84%, 280px);
+    padding: 6px 9px;
+  }
+
+  .signal-slot-crt {
+    display: none;
+  }
+
+  .left-terminal {
+    order: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+    color: var(--room-pink);
+  }
+
+  .terminal-head,
+  .terminal-box,
+  .terminal-command,
+  .terminal-audio,
+  .right-monitor,
+  .observation-info,
+  .ky-monetize-route--observation {
+    border-radius: 12px;
+    background:
+      repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.026) 0 1px, transparent 1px 6px),
+      rgba(2, 0, 6, 0.82);
+    backdrop-filter: blur(2px);
+  }
+
+  .terminal-head {
+    order: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 7px;
+    padding: 11px 12px;
+  }
+
+  .terminal-head h1 {
+    font-size: 14px;
+    line-height: 1.25;
+  }
+
+  .observation-room .signal {
+    width: fit-content;
+    min-width: 0;
+    min-height: 32px;
+    padding: 7px 10px;
+  }
+
+  .status-terminal {
+    order: 2;
+    display: block;
+  }
+
+  .observation-room .signals-section {
+    order: 3;
+    display: block;
+  }
+
+  .observation-room .log-section {
+    order: 4;
+    display: block;
+  }
+
+  .signal-slot-left {
+    order: 5;
+    display: block;
+  }
+
+  .terminal-command {
+    order: 6;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(64px, auto);
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .terminal-audio {
+    order: 7;
+    display: grid;
+    place-items: center;
+  }
+
+  .terminal-box {
+    padding: 12px;
+    overflow: visible;
+  }
+
+  .terminal-box h2,
+  .right-monitor .panel-head {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+  }
+
+  .observation-runtime {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+    margin-bottom: 10px;
+    padding: 10px;
+  }
+
+  .observation-runtime strong,
+  .observation-runtime em {
+    text-align: left;
+  }
+
+  .terminal-status-grid,
+  .creature-readout-grid,
+  .right-monitor .summary-band,
+  .right-monitor .stats {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  .terminal-status-grid div,
+  .creature-readout-grid div,
+  .right-monitor .summary-band div,
+  .right-monitor .stats div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3px;
+    min-height: 44px;
+    padding: 9px 10px;
+    overflow: visible;
+  }
+
+  .terminal-status-grid span,
+  .terminal-status-grid strong,
+  .creature-readout span,
+  .creature-readout strong,
+  .right-monitor .summary-band span,
+  .right-monitor .summary-band strong,
+  .right-monitor .stats span,
+  .right-monitor .stats strong {
+    min-width: 0;
+    overflow: visible;
+    text-align: left;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .terminal-status-grid span,
+  .creature-readout span,
+  .right-monitor .summary-band span,
+  .right-monitor .stats span {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+
+  .terminal-status-grid strong,
+  .creature-readout strong,
+  .right-monitor .summary-band strong,
+  .right-monitor .stats strong {
+    font-size: 13px;
+    line-height: 1.25;
+  }
+
+  .right-monitor .stats div::after {
+    display: inline-block;
+    min-height: 14px;
+    color: #49cfff;
+    font-size: 9px;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .observation-room #logList {
+    height: auto;
+    max-height: 42dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-right: 3px;
+  }
+
+  .observation-room #logList li,
+  .observation-room .signal-entry,
+  .signal-slot-left {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .observation-room .signals-list {
+    max-height: 34dvh;
+    overflow-x: hidden;
+  }
+
+  .terminal-command input,
+  .terminal-command button,
+  .terminal-audio {
+    min-height: 44px;
+    height: auto;
+    font-size: 13px;
+    touch-action: manipulation;
+  }
+
+  .terminal-command input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .right-monitor {
+    order: 4;
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+    overflow: visible;
+    border-color: rgba(35, 247, 255, 0.34);
+  }
+
+  .right-monitor::before {
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  .creature-readout,
+  .right-monitor .summary-band div,
+  .right-monitor .stats div {
+    padding: 10px;
+  }
+
+  .ky-monetize-route--observation {
+    order: 5;
+    display: grid;
+    min-height: 54px;
+    padding: 10px 12px;
+    clip-path: none;
+    border-color: rgba(255, 224, 238, 0.28);
+    background:
+      linear-gradient(90deg, rgba(255, 42, 168, 0.1), rgba(35, 247, 255, 0.07)),
+      rgba(0, 0, 0, 0.76);
+    color: rgba(255, 238, 248, 0.76);
+    font-size: 12px;
+    text-shadow: 0 0 8px rgba(255, 42, 168, 0.38);
+    opacity: 0.82;
+  }
+
+  .ky-monetize-route--observation::before {
+    display: none;
+  }
+
+  body:has(.observation-room) .ky-monetize-route--observation {
+    position: relative;
+    inset: auto;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    width: 100%;
+    min-height: 54px;
+    transform: none;
+    clip-path: none;
+  }
+
+  body:has(.observation-room) .ky-monetize-route--observation::before {
+    display: none;
+  }
+
+  .observation-info {
+    order: 6;
+    width: 100%;
+    max-height: none;
+    padding: 16px;
+    overflow: visible;
+    font-size: 13px;
+    line-height: 1.86;
+  }
+
+  .observation-disconnect {
+    position: relative;
+    order: 7;
+    align-self: flex-start;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    z-index: 18;
+    width: 112px;
+    min-height: 44px;
+    transform: none;
+  }
+
+  .observation-room .contamination-overlay {
+    right: 10px;
+    bottom: 66px;
+    max-width: calc(100vw - 20px);
+  }
+}
+
+@media (max-width: 480px) {
+  .observation-room {
+    padding-inline: 8px;
+  }
+
+  .crt-stage {
+    aspect-ratio: 1 / 1.08;
+  }
+
+  .observation-room .creature-stage {
+    width: 88%;
+    height: 78%;
+  }
+
+  .terminal-command {
+    grid-template-columns: 1fr;
+  }
+
+  .observation-info {
+    font-size: 12.5px;
+    line-height: 1.78;
+  }
+}
