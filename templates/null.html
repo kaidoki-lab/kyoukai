@@ -91,13 +91,22 @@
       </section>
     </section>
 
-    <nav class="collapse-dpad" aria-label="監視カメラ方向キー">
-      <button type="button" data-move="up" aria-label="上へ動かす">↑</button>
-      <button type="button" data-move="left" aria-label="左へ動かす">←</button>
-      <span class="collapse-dpad-core" aria-hidden="true">MOVE</span>
-      <button type="button" data-move="right" aria-label="右へ動かす">→</button>
-      <button type="button" data-move="down" aria-label="下へ動かす">↓</button>
-    </nav>
+    <section class="collapse-start-panel" aria-label="連打START">
+      <button id="nullStartButton" class="collapse-start-button" type="button" aria-label="連打START">
+        <img src="/static/kyoukai_null_start_button.png" alt="" />
+        <span>連打 START</span>
+      </button>
+      <aside class="collapse-status-card" aria-live="polite">
+        <span>COUNTDOWN</span>
+        <strong id="nullCountdown">10.0</strong>
+        <span>NOW STATUS</span>
+        <strong id="nullNowStatus">NORMAL</strong>
+        <span>CORRUPTION</span>
+        <strong id="nullStatusPercent">0%</strong>
+        <span>SIGNAL-DRIFT</span>
+        <strong id="nullDriftPercent">0%</strong>
+      </aside>
+    </section>
 
     <a class="collapse-return" href="/">000 / return</a>
   </main>
@@ -118,7 +127,11 @@
       const signalNode = document.getElementById("nullSignal");
       const percentNode = document.getElementById("nullPercent");
       const stageNode = document.getElementById("nullStageText");
-      const buttons = [...document.querySelectorAll("[data-move]")];
+      const startButton = document.getElementById("nullStartButton");
+      const statusNode = document.getElementById("nullNowStatus");
+      const statusPercentNode = document.getElementById("nullStatusPercent");
+      const driftPercentNode = document.getElementById("nullDriftPercent");
+      const countdownNode = document.getElementById("nullCountdown");
 
       const state = {
         cameraX: 0,
@@ -127,12 +140,16 @@
         corruption: 0,
         phase: 0,
         lastObservers: null,
-        locked: false
+        locked: false,
+        challengeStarted: false,
+        challengeEnded: false,
+        challengeStartedAt: 0,
+        challengeTimer: null,
+        countdownTimer: null
       };
 
-      const moveStep = 24;
-      const maxOffsetX = 120;
-      const maxOffsetY = 76;
+      const challengeDuration = 10000;
+      const impossibleTarget = 96;
 
       function clamp(value, min, max) {
         return Math.max(min, Math.min(max, value));
@@ -171,13 +188,30 @@
         return "connection unstable";
       }
 
+      function statusLabel(stage) {
+        if (state.challengeEnded && !state.locked) return "FAILED";
+        return [
+          "NORMAL",
+          "COLOR SHIFT",
+          "SIGNBOARD RUSH",
+          "MOSAIC FEVER",
+          "INFORMATION FLOOD",
+          "PHASE FIXED"
+        ][stage] || "UNREADABLE";
+      }
+
       function render() {
         const stage = stageFromCorruption(state.corruption);
         const cssLevel = cssLevelFromStage(stage);
+        const drift = clamp(Math.round(state.corruption * 0.7 + state.touches * 1.8), 0, 100);
+        const remaining = state.challengeStarted
+          ? Math.max(0, challengeDuration - (Date.now() - state.challengeStartedAt))
+          : challengeDuration;
 
         room.dataset.stage = String(stage);
         room.dataset.collapseLevel = String(cssLevel);
         room.dataset.phase = String(state.phase);
+        room.dataset.challenge = state.challengeEnded && !state.locked ? "failed" : state.challengeStarted ? "active" : "idle";
         room.style.setProperty("--cam-x", `${state.cameraX}px`);
         room.style.setProperty("--cam-y", `${state.cameraY}px`);
         room.style.setProperty("--collapse", String(cssLevel));
@@ -186,6 +220,10 @@
 
         opsNode.textContent = `${String(state.touches).padStart(2, "0")} touches`;
         percentNode.textContent = `${state.corruption}%`;
+        if (statusNode) statusNode.textContent = statusLabel(stage);
+        if (statusPercentNode) statusPercentNode.textContent = `${state.corruption}%`;
+        if (driftPercentNode) driftPercentNode.textContent = `${drift}%`;
+        if (countdownNode) countdownNode.textContent = (remaining / 1000).toFixed(1);
         stageNode.textContent = stageLabel(stage);
         signalNode.textContent = signalLabel(stage);
         phaseNode.textContent = `phase ${state.phase}`;
@@ -201,23 +239,51 @@
         render();
       }
 
-      function moveCamera(direction) {
-        if (state.locked) return;
+      function endChallenge() {
+        if (state.locked || state.challengeEnded) return;
+        state.challengeEnded = true;
+        startButton?.setAttribute("disabled", "disabled");
+        startButton?.setAttribute("aria-label", "失敗");
+        if (state.countdownTimer) window.clearInterval(state.countdownTimer);
+        if (statusNode) statusNode.textContent = "FAILED";
+        if (countdownNode) countdownNode.textContent = "0.0";
+        stageNode.textContent = "FAILED / ぜんぜん足りません";
+        signalNode.textContent = "ざんねんでした";
+        render();
+      }
 
-        if (direction === "up") state.cameraY -= moveStep;
-        if (direction === "down") state.cameraY += moveStep;
-        if (direction === "left") state.cameraX -= moveStep;
-        if (direction === "right") state.cameraX += moveStep;
+      function startChallenge() {
+        if (state.challengeStarted) return;
+        state.challengeStarted = true;
+        state.challengeStartedAt = Date.now();
+        state.challengeTimer = window.setTimeout(endChallenge, challengeDuration);
+        state.countdownTimer = window.setInterval(render, 100);
+      }
 
-        state.cameraX = clamp(state.cameraX, -maxOffsetX, maxOffsetX);
-        state.cameraY = clamp(state.cameraY, -maxOffsetY, maxOffsetY);
+      function smashStart() {
+        if (state.locked || state.challengeEnded) return;
+
+        startChallenge();
+        state.cameraX = clamp(state.cameraX + (Math.random() - 0.5) * 42, -36, 36);
+        state.cameraY = clamp(state.cameraY + (Math.random() - 0.5) * 30, -28, 28);
         state.touches += 1;
 
         room.classList.remove("is-jolting");
         void room.offsetWidth;
         room.classList.add("is-jolting");
+        startButton?.classList.remove("is-pressed");
+        void startButton?.offsetWidth;
+        startButton?.classList.add("is-pressed");
 
-        addCorruption(4);
+        const progress = Math.min(99, Math.floor((state.touches / impossibleTarget) * 100));
+        state.corruption = Math.max(state.corruption, progress);
+        if (state.touches >= impossibleTarget) {
+          state.corruption = 100;
+          state.locked = true;
+          if (state.challengeTimer) window.clearTimeout(state.challengeTimer);
+          if (state.countdownTimer) window.clearInterval(state.countdownTimer);
+        }
+        render();
       }
 
       async function readGenome() {
@@ -238,20 +304,16 @@
         render();
       }
 
-      buttons.forEach((button) => {
-        button.addEventListener("click", () => moveCamera(button.dataset.move));
-      });
+      startButton?.addEventListener("click", smashStart);
 
       document.addEventListener("keydown", (event) => {
-        const map = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" };
-        if (!map[event.key]) return;
+        if (event.key !== " " && event.key !== "Enter") return;
         event.preventDefault();
-        moveCamera(map[event.key]);
+        smashStart();
       });
 
       render();
       readGenome();
-      setInterval(() => addCorruption(1), 10000);
       setInterval(readGenome, 8000);
     })();
 
