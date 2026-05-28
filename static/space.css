@@ -4246,3 +4246,63 @@ a.sp-link:hover,
     bottom: 8px;
   }
 }
+
+/* /null desktop control cleanup: mirror the mobile black status + compact START layout. */
+@media (min-width: 769px) {
+  .collapse-start-panel {
+    right: clamp(22px, 3vw, 54px);
+    bottom: clamp(22px, 3vw, 48px);
+    grid-template-columns: minmax(128px, 158px) minmax(150px, 190px);
+    align-items: end;
+    gap: 14px;
+  }
+
+  .collapse-status-card {
+    order: 1;
+    min-height: 176px;
+    margin-bottom: 10px;
+    padding: 10px 11px;
+    border: 3px solid #fff600;
+    border-radius: 13px;
+    background: rgba(0, 0, 0, 0.9);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+    box-shadow:
+      0 0 0 3px #24002f,
+      0 0 17px rgba(255, 46, 214, 0.72);
+  }
+
+  .collapse-status-card span {
+    margin: 0;
+    color: #fff600;
+    font-size: clamp(8px, 0.8vw, 11px);
+    line-height: 1;
+  }
+
+  .collapse-status-card strong {
+    margin: 0 0 3px;
+    padding: 4px 6px;
+    min-height: 21px;
+    border: 1px solid #ff2ed6;
+    background: rgba(0, 0, 0, 0.78);
+    color: #39ff14;
+    font-size: clamp(12px, 1vw, 16px);
+    line-height: 1;
+    text-align: right;
+  }
+
+  .collapse-start-button {
+    order: 2;
+  }
+
+  .collapse-start-button span {
+    min-width: 66%;
+    padding: 4px 7px;
+    font-size: clamp(10px, 1.1vw, 14px);
+  }
+
+  .collapse-meter {
+    display: none;
+  }
+}
