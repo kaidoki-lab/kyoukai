@@ -2946,11 +2946,256 @@ a.sp-link:hover,
 @media (max-width: 768px) {
   .kyoukai-footer nav {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 12px;
   }
 
   .kyoukai-footer {
-    padding: 24px 18px calc(24px + env(safe-area-inset-bottom, 0px));
-    font-size: 14px;
+    padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+    font-size: 13px;
+    line-height: 1.65;
+  }
+
+  .footer-group h2 {
+    margin-bottom: 6px;
+    font-size: 11px;
+  }
+
+  .footer-group a {
+    min-height: 32px;
+    margin: 0;
+    padding: 3px 0;
+  }
+}
+
+/* Smartphone stability pass: keep rooms readable without changing routes or PC layout. */
+@media (max-width: 768px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .signal-room-body,
+  .archive-room-body,
+  .collapse-room-body,
+  .altar-page {
+    width: 100%;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .signal-room {
+    display: flex;
+    min-height: auto;
+    padding: 12px 0 0;
+  }
+
+  .signal-chapel-frame {
+    width: min(100vw, 720px);
+    margin: 0 auto;
+    flex: 0 0 auto;
+  }
+
+  .signal-channel-hit {
+    min-width: 36px;
+  }
+
+  .signal-info {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: calc(100% - 28px);
+    max-width: 640px;
+    max-height: none;
+    margin: 12px auto 18px;
+    overflow: visible;
+    padding: 14px 16px;
+    font-size: 13px;
+    line-height: 1.82;
+  }
+
+  .signal-return,
+  .archive-return,
+  .collapse-return {
+    min-height: 36px;
+    padding: 8px 10px;
+    touch-action: manipulation;
+  }
+
+  .archive-room {
+    width: 100%;
+    min-height: auto;
+  }
+
+  .archive-frame {
+    width: 100%;
+    height: min(100svh, 720px);
+    min-height: 520px;
+  }
+
+  .archive-rack-hit {
+    min-width: 64px;
+    min-height: 96px;
+  }
+
+  .archive-card {
+    top: 50%;
+    width: calc(100vw - 24px);
+    min-height: min(68svh, 560px);
+    max-height: calc(100svh - 58px);
+    overflow: auto;
+  }
+
+  .archive-card-body {
+    min-height: min(48svh, 420px);
+  }
+
+  .archive-card-body img {
+    max-height: min(52svh, 460px);
+  }
+
+  .archive-info {
+    left: 10px;
+    right: 10px;
+    bottom: 42px;
+    max-height: min(30vh, 230px);
+    padding: 14px 16px;
+    font-size: 13px;
+    line-height: 1.82;
+  }
+
+  .archive-room-status {
+    right: 12px;
+    bottom: 12px;
+    max-width: 44vw;
+    font-size: 9px;
+  }
+
+  .collapse-room {
+    width: 100%;
+    height: 100svh;
+    min-height: 620px;
+    overflow: hidden;
+  }
+
+  .collapse-camera {
+    inset: 10px 10px 122px 10px;
+    border-width: 3px;
+  }
+
+  .collapse-feed {
+    transform:
+      translate(
+        clamp(-28px, var(--cam-x), 28px),
+        clamp(-24px, var(--cam-y), 24px)
+      );
+  }
+
+  .collapse-hud {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .collapse-hud div {
+    padding: 6px 8px;
+    border-width: 2px;
+  }
+
+  .collapse-hud strong {
+    font-size: 10px;
+  }
+
+  .collapse-hud span {
+    font-size: 10px;
+  }
+
+  .collapse-meter {
+    left: 10px;
+    bottom: 10px;
+    width: min(220px, calc(100vw - 178px));
+    padding: 8px 10px;
+  }
+
+  .collapse-meter strong {
+    font-size: 20px;
+  }
+
+  .collapse-dpad {
+    top: auto;
+    right: 10px;
+    bottom: 12px;
+    width: 132px;
+    grid-template-columns: repeat(3, 40px);
+    gap: 6px;
+    transform: none;
+  }
+
+  .collapse-dpad button,
+  .collapse-dpad-core {
+    width: 40px;
+    height: 40px;
+  }
+
+  .collapse-dpad button {
+    font-size: 22px;
+  }
+
+  .collapse-dpad-core {
+    font-size: 21px;
+  }
+
+  .boundary-info {
+    left: 10px;
+    right: 10px;
+    bottom: 132px;
+    width: auto;
+    max-height: min(24vh, 180px);
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.78;
+  }
+
+  .boundary-info h2,
+  .signal-info h2,
+  .archive-info h2 {
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+
+  .altar-frame {
+    min-height: auto;
+  }
+
+  .altar-side {
+    margin: 0 12px 12px;
+    padding: 14px;
+    font-size: 13px;
+    line-height: 1.72;
+  }
+}
+
+@media (max-width: 420px) {
+  .archive-frame {
+    min-height: 470px;
+  }
+
+  .archive-info,
+  .signal-info,
+  .boundary-info {
+    font-size: 12px;
+    line-height: 1.72;
+  }
+
+  .collapse-meter {
+    width: min(176px, calc(100vw - 154px));
+  }
+
+  .collapse-meter span {
+    display: none;
   }
 }
