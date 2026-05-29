@@ -100,6 +100,11 @@
       </aside>
     </section>
 
+    <button id="nullExtendIcon" class="collapse-extend-icon" type="button" aria-label="collapse extension icon">
+      <span>COLLAPSE</span>
+      <small>+10 SEC</small>
+    </button>
+
     <a class="collapse-return" href="/">000 / return</a>
     <section class="collapse-max-screen" aria-label="COLLAPSE">
       <h2>崩壊</h2>
@@ -126,6 +131,7 @@
       const statusNode = document.getElementById("nullNowStatus");
       const noticeNode = document.getElementById("nullNotice");
       const countdownNode = document.getElementById("nullCountdown");
+      const extendIcon = document.getElementById("nullExtendIcon");
       const storageKey = "kyoukai_null_state";
 
       const state = {
@@ -140,11 +146,18 @@
         challengeStarted: false,
         challengeEnded: false,
         challengeStartedAt: 0,
+        challengeEndsAt: 0,
+        challengeExtraTime: 0,
+        challengeExtensionCount: 0,
         challengeTimer: null,
-        countdownTimer: null
+        countdownTimer: null,
+        extendMoveTimer: null
       };
 
       const challengeDuration = 10000;
+      const challengeExtensionPerHit = 10000;
+      const maxChallengeExtensions = 5;
+      const maxChallengeExtension = challengeExtensionPerHit * maxChallengeExtensions;
       const impossibleTarget = 96;
       const maxGainPerPlay = 8;
 
@@ -266,13 +279,14 @@
         const stage = stageFromCorruption(state.corruption);
         const cssLevel = cssLevelFromStage(stage);
         const remaining = state.challengeStarted
-          ? Math.max(0, challengeDuration - (Date.now() - state.challengeStartedAt))
+          ? Math.max(0, state.challengeEndsAt - Date.now())
           : challengeDuration;
 
         room.dataset.stage = String(stage);
         room.dataset.collapseLevel = String(cssLevel);
         room.dataset.phase = String(state.phase);
         room.dataset.challenge = state.challengeEnded && !state.locked ? "failed" : state.challengeStarted ? "active" : "idle";
+        room.dataset.extended = state.challengeExtensionCount >= maxChallengeExtensions ? "used" : "ready";
         room.style.setProperty("--cam-x", `${state.cameraX}px`);
         room.style.setProperty("--cam-y", `${state.cameraY}px`);
         room.style.setProperty("--collapse", String(cssLevel));
@@ -286,6 +300,46 @@
         if (countdownNode) countdownNode.textContent = (remaining / 1000).toFixed(1);
         signalNode.textContent = signalLabel(stage);
         phaseNode.textContent = `phase ${state.phase}`;
+      }
+
+      function scheduleChallengeEnd() {
+        if (state.challengeTimer) window.clearTimeout(state.challengeTimer);
+        state.challengeTimer = window.setTimeout(endChallenge, Math.max(0, state.challengeEndsAt - Date.now()));
+      }
+
+      function moveExtendIcon() {
+        if (!extendIcon || !state.challengeStarted || state.challengeEnded || state.locked) return;
+        const isMobile = window.matchMedia("(max-width: 768px)").matches;
+        const x = isMobile
+          ? 10 + Math.random() * 54
+          : 5 + Math.random() * 78;
+        const y = isMobile
+          ? 18 + Math.random() * 36
+          : 18 + Math.random() * 58;
+        const rotation = -14 + Math.random() * 28;
+        extendIcon.style.setProperty("--extend-x", `${x}vw`);
+        extendIcon.style.setProperty("--extend-y", `${y}vh`);
+        extendIcon.style.setProperty("--extend-rot", `${rotation}deg`);
+      }
+
+      function extendChallengeTime() {
+        if (!state.challengeStarted || state.challengeEnded || state.locked) return;
+        if (state.challengeExtensionCount >= maxChallengeExtensions) return;
+        const nextExtra = Math.min(maxChallengeExtension, state.challengeExtraTime + challengeExtensionPerHit);
+        const added = nextExtra - state.challengeExtraTime;
+        if (added <= 0) return;
+        state.challengeExtraTime = nextExtra;
+        state.challengeExtensionCount += 1;
+        state.challengeEndsAt += added;
+        persistentState = writeNullState({
+          ...persistentState,
+          extensionCount: (Number(persistentState.extensionCount) || 0) + 1,
+          lastPlayedAt: new Date().toISOString()
+        });
+        if (noticeNode) noticeNode.textContent = "TIME +10 SEC";
+        scheduleChallengeEnd();
+        moveExtendIcon();
+        render();
       }
 
       function addCorruption(amount) {
@@ -309,6 +363,7 @@
         startButton?.setAttribute("disabled", "disabled");
         startButton?.setAttribute("aria-label", "失敗");
         if (state.countdownTimer) window.clearInterval(state.countdownTimer);
+        if (state.extendMoveTimer) window.clearInterval(state.extendMoveTimer);
         if (statusNode) statusNode.textContent = "FAILED";
         if (countdownNode) countdownNode.textContent = "0.0";
         signalNode.textContent = "ざんねんでした";
@@ -319,8 +374,14 @@
         if (state.challengeStarted) return;
         state.challengeStarted = true;
         state.challengeStartedAt = Date.now();
-        state.challengeTimer = window.setTimeout(endChallenge, challengeDuration);
+        state.challengeEndsAt = state.challengeStartedAt + challengeDuration;
+        state.challengeExtraTime = 0;
+        state.challengeExtensionCount = 0;
+        scheduleChallengeEnd();
         state.countdownTimer = window.setInterval(render, 100);
+        moveExtendIcon();
+        window.setTimeout(moveExtendIcon, 80);
+        state.extendMoveTimer = window.setInterval(moveExtendIcon, 1650);
       }
 
       function smashStart() {
@@ -345,6 +406,7 @@
           state.locked = true;
           if (state.challengeTimer) window.clearTimeout(state.challengeTimer);
           if (state.countdownTimer) window.clearInterval(state.countdownTimer);
+          if (state.extendMoveTimer) window.clearInterval(state.extendMoveTimer);
         }
         render();
       }
@@ -368,6 +430,7 @@
       }
 
       startButton?.addEventListener("click", smashStart);
+      extendIcon?.addEventListener("click", extendChallengeTime);
 
       document.addEventListener("keydown", (event) => {
         if (persistentState.collapsed) {
