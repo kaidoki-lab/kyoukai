@@ -4169,6 +4169,119 @@ a.sp-link:hover,
   }
 }
 
+/* /null v2.1: hidden numeric collapse, failure poop, and persistent infection. */
+.collapse-max-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: none;
+  place-items: center;
+  padding: 28px;
+  background: #000;
+  color: #fff;
+  text-align: center;
+}
+
+.collapse-max-screen h2 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(44px, 13vw, 130px);
+  letter-spacing: 0.12em;
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.45);
+}
+
+.collapse-max-screen p {
+  margin: 18px 0 32px;
+  color: rgba(255, 255, 255, 0.72);
+  font: 900 clamp(20px, 5vw, 48px) / 1 var(--sp-mono);
+  letter-spacing: 0.18em;
+}
+
+.collapse-max-screen a {
+  display: inline-block;
+  min-width: 150px;
+  padding: 12px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  color: #fff;
+  font: 900 14px / 1 var(--sp-mono);
+  letter-spacing: 0.18em;
+  text-decoration: none;
+}
+
+.collapse-room.is-max-collapsed .collapse-max-screen {
+  display: grid;
+}
+
+.collapse-room.is-max-collapsed .collapse-start-panel,
+.collapse-room.is-max-collapsed .collapse-camera,
+.collapse-room.is-max-collapsed .kyoukai-footer {
+  pointer-events: none;
+}
+
+.collapse-room.is-max-collapsed .collapse-final {
+  opacity: 0;
+}
+
+.ky-null-infected-light body::before,
+.ky-null-infected-medium body::before,
+.ky-null-infected-heavy body::before,
+.ky-null-collapsed body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 0, 153, 0.12) 0 2px, transparent 2px 24px),
+    repeating-linear-gradient(0deg, rgba(0, 247, 255, 0.1) 0 1px, transparent 1px 17px);
+  mix-blend-mode: screen;
+  opacity: 0.18;
+}
+
+.ky-null-infected-medium body::before {
+  opacity: 0.28;
+}
+
+.ky-null-infected-heavy body::before,
+.ky-null-collapsed body::before {
+  opacity: 0.42;
+  animation: nullGlobalJitter 0.38s steps(2, end) infinite;
+}
+
+.ky-null-infected-medium body::after,
+.ky-null-infected-heavy body::after,
+.ky-null-collapsed body::after {
+  content: "NO REFUND / SIGNAL LOST / 表示が保てません";
+  position: fixed;
+  z-index: 9991;
+  right: 14px;
+  top: 14px;
+  max-width: min(330px, calc(100vw - 28px));
+  padding: 9px 12px;
+  border: 3px solid #24002f;
+  background: #fff600;
+  color: #ff006a;
+  font: 900 12px / 1.3 var(--sp-mono);
+  text-shadow: 1px 1px 0 #fff;
+  box-shadow: 5px 5px 0 #00f7ff;
+  transform: rotate(2deg);
+  pointer-events: none;
+}
+
+.ky-null-infected-heavy body {
+  filter: saturate(1.35) contrast(1.08);
+}
+
+.ky-null-collapsed body {
+  filter: saturate(1.8) contrast(1.28) hue-rotate(24deg);
+}
+
+@keyframes nullGlobalJitter {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(3px, -2px); }
+  100% { transform: translate(-2px, 2px); }
+}
+
 /* /null mobile control cleanup: compact black status board beside a smaller START button. */
 .collapse-status-card {
   background: rgba(0, 0, 0, 0.86);

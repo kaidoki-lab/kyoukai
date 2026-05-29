@@ -10,6 +10,7 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1522978966321203" crossorigin="anonymous"></script>
   <script defer src="/static/analytics.js"></script>
   <script defer src="/static/kyoukai-guide.js"></script>
+  <script defer src="/static/null-infection.js"></script>
   <link rel="stylesheet" href="/static/monetize-core.css" />
   <script defer src="/static/monetize-links.js"></script>
   <script defer src="/static/monetize-core.js"></script>
@@ -72,13 +73,6 @@
         </div>
       </div>
 
-      <div class="collapse-meter" aria-live="polite">
-        <span>CORRUPTION</span>
-        <strong id="nullPercent">0%</strong>
-        <small id="nullStageText">STAGE 0 / stable</small>
-        <i></i>
-      </div>
-
       <section class="boundary-info" aria-labelledby="boundary-info-title">
         <h2 id="boundary-info-title">BOUNDARY NODE</h2>
         <p>接続が不安定な観測領域。</p>
@@ -99,16 +93,19 @@
       <aside class="collapse-status-card" aria-live="polite">
         <span>COUNTDOWN</span>
         <strong id="nullCountdown">10.0</strong>
-        <span>NOW STATUS</span>
+        <span>CONNECT</span>
         <strong id="nullNowStatus">NORMAL</strong>
-        <span>CORRUPTION</span>
-        <strong id="nullStatusPercent">0%</strong>
-        <span>SIGNAL-DRIFT</span>
-        <strong id="nullDriftPercent">0%</strong>
+        <span>NOTICE</span>
+        <strong id="nullNotice">まだ戻れます</strong>
       </aside>
     </section>
 
     <a class="collapse-return" href="/">000 / return</a>
+    <section class="collapse-max-screen" aria-label="COLLAPSE">
+      <h2>崩壊</h2>
+      <p>COLLAPSE</p>
+      <a href="/">RETURN</a>
+    </section>
   </main>
 
   <footer class="kyoukai-footer">
@@ -125,19 +122,18 @@
       const opsNode = document.getElementById("nullOps");
       const phaseNode = document.getElementById("nullPhase");
       const signalNode = document.getElementById("nullSignal");
-      const percentNode = document.getElementById("nullPercent");
-      const stageNode = document.getElementById("nullStageText");
       const startButton = document.getElementById("nullStartButton");
       const statusNode = document.getElementById("nullNowStatus");
-      const statusPercentNode = document.getElementById("nullStatusPercent");
-      const driftPercentNode = document.getElementById("nullDriftPercent");
+      const noticeNode = document.getElementById("nullNotice");
       const countdownNode = document.getElementById("nullCountdown");
+      const storageKey = "kyoukai_null_state";
 
       const state = {
         cameraX: 0,
         cameraY: 0,
         touches: 0,
         corruption: 0,
+        playGain: 0,
         phase: 0,
         lastObservers: null,
         locked: false,
@@ -150,9 +146,76 @@
 
       const challengeDuration = 10000;
       const impossibleTarget = 96;
+      const maxGainPerPlay = 8;
+
+      const defaultNullState = {
+        globalInfection: 0,
+        collapseLevel: 0,
+        extensionCount: 0,
+        failedCount: 0,
+        maxReached: false,
+        collapsed: false,
+        lastPlayedAt: null
+      };
 
       function clamp(value, min, max) {
         return Math.max(min, Math.min(max, value));
+      }
+
+      function readNullState() {
+        const params = new URLSearchParams(location.search);
+        if (params.get("reset_null") === "1") {
+          localStorage.removeItem(storageKey);
+          history.replaceState(null, "", location.pathname);
+        }
+
+        try {
+          return { ...defaultNullState, ...JSON.parse(localStorage.getItem(storageKey) || "{}") };
+        } catch {
+          return { ...defaultNullState };
+        }
+      }
+
+      function writeNullState(next) {
+        const clean = {
+          ...defaultNullState,
+          ...next,
+          globalInfection: clamp(Number(next.globalInfection) || 0, 0, 100),
+          collapseLevel: clamp(Number(next.collapseLevel) || 0, 0, 100),
+          extensionCount: Math.max(0, Number(next.extensionCount) || 0),
+          failedCount: Math.max(0, Number(next.failedCount) || 0),
+          maxReached: Boolean(next.maxReached),
+          collapsed: Boolean(next.collapsed),
+          lastPlayedAt: next.lastPlayedAt || new Date().toISOString()
+        };
+        localStorage.setItem(storageKey, JSON.stringify(clean));
+        window.KYOUKAI_NULL_STATE = clean;
+        window.dispatchEvent(new CustomEvent("kyoukai:null-state", { detail: clean }));
+        return clean;
+      }
+
+      let persistentState = readNullState();
+
+      function applyPersistentState() {
+        const collapsed = Boolean(persistentState.collapsed);
+        room.classList.toggle("is-max-collapsed", collapsed);
+        document.documentElement.classList.toggle("ky-null-collapsed", collapsed);
+      }
+
+      function addGlobalInfection(amount) {
+        const gain = Math.min(amount, maxGainPerPlay - state.playGain);
+        if (gain <= 0 || persistentState.collapsed) return;
+        state.playGain += gain;
+        const nextValue = clamp((Number(persistentState.globalInfection) || 0) + gain, 0, 100);
+        persistentState = writeNullState({
+          ...persistentState,
+          globalInfection: nextValue,
+          collapseLevel: nextValue,
+          maxReached: nextValue >= 100,
+          collapsed: nextValue >= 100,
+          lastPlayedAt: new Date().toISOString()
+        });
+        applyPersistentState();
       }
 
       function stageFromCorruption(value) {
@@ -168,19 +231,8 @@
         return stage >= 5 ? 9 : stage * 2;
       }
 
-      function stageLabel(stage) {
-        return [
-          "STAGE 0 / stable",
-          "STAGE 1 / color shift",
-          "STAGE 2 / mosaic",
-          "STAGE 3 / signal drift",
-          "STAGE 4 / information overload",
-          "STAGE 5 / phase fixed"
-        ][stage] || "STAGE ? / unreadable";
-      }
-
       function signalLabel(stage) {
-        if (stage >= 5) return "MAX CORRUPTION";
+        if (stage >= 5) return "表示が保てません";
         if (stage >= 4) return "signal lost";
         if (stage >= 3) return "connection poor";
         if (stage >= 2) return "connection unstable";
@@ -190,20 +242,29 @@
 
       function statusLabel(stage) {
         if (state.challengeEnded && !state.locked) return "FAILED";
+        if (persistentState.collapsed) return "RETURN ONLY";
         return [
-          "NORMAL",
-          "COLOR SHIFT",
-          "SIGNBOARD RUSH",
-          "MOSAIC FEVER",
-          "INFORMATION FLOOD",
-          "PHASE FIXED"
+          "接続が不安定です",
+          "表示が保てません",
+          "処理が追いついていません",
+          "まだ戻れます",
+          "もう戻れません",
+          "RETURN ONLY"
         ][stage] || "UNREADABLE";
+      }
+
+      function noticeLabel(stage) {
+        if (persistentState.collapsed) return "RETURN ONLY";
+        if (state.challengeEnded && !state.locked) return "おまえくそだな";
+        if (!state.challengeStarted) return "まだ戻れます";
+        if (stage >= 4) return "もう戻れません";
+        if (stage >= 2) return "表示が保てません";
+        return "処理が追いついていません";
       }
 
       function render() {
         const stage = stageFromCorruption(state.corruption);
         const cssLevel = cssLevelFromStage(stage);
-        const drift = clamp(Math.round(state.corruption * 0.7 + state.touches * 1.8), 0, 100);
         const remaining = state.challengeStarted
           ? Math.max(0, challengeDuration - (Date.now() - state.challengeStartedAt))
           : challengeDuration;
@@ -217,23 +278,20 @@
         room.style.setProperty("--collapse", String(cssLevel));
         room.style.setProperty("--corruption", `${state.corruption}%`);
         room.classList.toggle("is-final", stage >= 5);
+        applyPersistentState();
 
         opsNode.textContent = `${String(state.touches).padStart(2, "0")} touches`;
-        percentNode.textContent = `${state.corruption}%`;
         if (statusNode) statusNode.textContent = statusLabel(stage);
-        if (statusPercentNode) statusPercentNode.textContent = `${state.corruption}%`;
-        if (driftPercentNode) driftPercentNode.textContent = `${drift}%`;
+        if (noticeNode) noticeNode.textContent = noticeLabel(stage);
         if (countdownNode) countdownNode.textContent = (remaining / 1000).toFixed(1);
-        stageNode.textContent = stageLabel(stage);
         signalNode.textContent = signalLabel(stage);
         phaseNode.textContent = `phase ${state.phase}`;
       }
 
       function addCorruption(amount) {
         if (state.locked) return;
-        state.corruption = clamp(state.corruption + amount, 0, 100);
-        if (state.corruption >= 100) {
-          state.corruption = 100;
+        state.corruption = clamp(state.corruption + amount, 0, 99);
+        if (persistentState.collapsed) {
           state.locked = true;
         }
         render();
@@ -242,12 +300,17 @@
       function endChallenge() {
         if (state.locked || state.challengeEnded) return;
         state.challengeEnded = true;
+        persistentState = writeNullState({
+          ...persistentState,
+          failedCount: (Number(persistentState.failedCount) || 0) + 1,
+          lastPlayedAt: new Date().toISOString()
+        });
+        addGlobalInfection(0.5);
         startButton?.setAttribute("disabled", "disabled");
         startButton?.setAttribute("aria-label", "失敗");
         if (state.countdownTimer) window.clearInterval(state.countdownTimer);
         if (statusNode) statusNode.textContent = "FAILED";
         if (countdownNode) countdownNode.textContent = "0.0";
-        stageNode.textContent = "FAILED / ぜんぜん足りません";
         signalNode.textContent = "ざんねんでした";
         render();
       }
@@ -275,10 +338,10 @@
         void startButton?.offsetWidth;
         startButton?.classList.add("is-pressed");
 
+        addGlobalInfection(0.03);
         const progress = Math.min(99, Math.floor((state.touches / impossibleTarget) * 100));
         state.corruption = Math.max(state.corruption, progress);
-        if (state.touches >= impossibleTarget) {
-          state.corruption = 100;
+        if (persistentState.collapsed) {
           state.locked = true;
           if (state.challengeTimer) window.clearTimeout(state.challengeTimer);
           if (state.countdownTimer) window.clearInterval(state.countdownTimer);
@@ -307,6 +370,12 @@
       startButton?.addEventListener("click", smashStart);
 
       document.addEventListener("keydown", (event) => {
+        if (persistentState.collapsed) {
+          event.preventDefault();
+          if (event.key !== "Enter") return;
+          location.href = "/";
+          return;
+        }
         if (event.key !== " " && event.key !== "Enter") return;
         event.preventDefault();
         smashStart();
