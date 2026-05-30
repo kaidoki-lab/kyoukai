@@ -3819,7 +3819,7 @@ a.sp-link:hover,
 }
 
 .collapse-room[data-challenge="failed"] .collapse-camera::after {
-  content: "FAILED!! ZANNEN!! NOT ENOUGH!!";
+  content: "FAILED!! KUSO!!";
 }
 
 .collapse-room[data-challenge="failed"] .collapse-final .poop-symbol {
@@ -3830,7 +3830,7 @@ a.sp-link:hover,
 }
 
 .collapse-room[data-challenge="failed"] .collapse-final::before {
-  content: "FAILED / ZANNEN";
+  content: attr(data-fail-taunt);
   position: absolute;
   top: 17%;
   left: 50%;

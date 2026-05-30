@@ -94,9 +94,9 @@
         <span>COUNTDOWN</span>
         <strong id="nullCountdown">10.0</strong>
         <span>CONNECT</span>
-        <strong id="nullNowStatus">NORMAL</strong>
+        <strong id="nullNowStatus">00</strong>
         <span>NOTICE</span>
-        <strong id="nullNotice">まだ戻れます</strong>
+        <strong id="nullNotice">0%</strong>
       </aside>
     </section>
 
@@ -132,6 +132,7 @@
       const noticeNode = document.getElementById("nullNotice");
       const countdownNode = document.getElementById("nullCountdown");
       const extendIcon = document.getElementById("nullExtendIcon");
+      const finalNode = document.querySelector(".collapse-final");
       const storageKey = "kyoukai_null_state";
 
       const state = {
@@ -149,6 +150,7 @@
         challengeEndsAt: 0,
         challengeExtraTime: 0,
         challengeExtensionCount: 0,
+        failureTaunt: "",
         challengeTimer: null,
         countdownTimer: null,
         extendMoveTimer: null
@@ -160,6 +162,11 @@
       const maxChallengeExtension = challengeExtensionPerHit * maxChallengeExtensions;
       const impossibleTarget = 67;
       const maxGainPerPlay = 8;
+      const failureTaunts = [
+        "お前くそだな",
+        "くそ野郎",
+        "くその方がまし"
+      ];
 
       const defaultNullState = {
         globalInfection: 0,
@@ -253,26 +260,19 @@
         return "connection unstable";
       }
 
-      function statusLabel(stage) {
-        if (state.challengeEnded && !state.locked) return "FAILED";
-        if (persistentState.collapsed) return "RETURN ONLY";
-        return [
-          "接続が不安定です",
-          "表示が保てません",
-          "処理が追いついていません",
-          "まだ戻れます",
-          "もう戻れません",
-          "RETURN ONLY"
-        ][stage] || "UNREADABLE";
+      function pickFailureTaunt() {
+        return failureTaunts[Math.floor(Math.random() * failureTaunts.length)];
+      }
+
+      function statusLabel() {
+        if (persistentState.collapsed) return "100";
+        return String(state.touches).padStart(2, "0");
       }
 
       function noticeLabel(stage) {
-        if (persistentState.collapsed) return "RETURN ONLY";
-        if (state.challengeEnded && !state.locked) return "おまえくそだな";
-        if (!state.challengeStarted) return "まだ戻れます";
-        if (stage >= 4) return "もう戻れません";
-        if (stage >= 2) return "表示が保てません";
-        return "処理が追いついていません";
+        if (persistentState.collapsed) return "100%";
+        if (state.challengeEnded && !state.locked) return state.failureTaunt || failureTaunts[0];
+        return `${Math.floor(state.corruption)}%`;
       }
 
       function render() {
@@ -287,6 +287,7 @@
         room.dataset.phase = String(state.phase);
         room.dataset.challenge = state.challengeEnded && !state.locked ? "failed" : state.challengeStarted ? "active" : "idle";
         room.dataset.extended = state.challengeExtensionCount >= maxChallengeExtensions ? "used" : "ready";
+        finalNode?.setAttribute("data-fail-taunt", state.failureTaunt || failureTaunts[0]);
         room.style.setProperty("--cam-x", `${state.cameraX}px`);
         room.style.setProperty("--cam-y", `${state.cameraY}px`);
         room.style.setProperty("--collapse", String(cssLevel));
@@ -295,7 +296,7 @@
         applyPersistentState();
 
         opsNode.textContent = `${String(state.touches).padStart(2, "0")} touches`;
-        if (statusNode) statusNode.textContent = statusLabel(stage);
+        if (statusNode) statusNode.textContent = statusLabel();
         if (noticeNode) noticeNode.textContent = noticeLabel(stage);
         if (countdownNode) countdownNode.textContent = (remaining / 1000).toFixed(1);
         signalNode.textContent = signalLabel(stage);
@@ -336,7 +337,6 @@
           extensionCount: (Number(persistentState.extensionCount) || 0) + 1,
           lastPlayedAt: new Date().toISOString()
         });
-        if (noticeNode) noticeNode.textContent = "TIME +10 SEC";
         scheduleChallengeEnd();
         moveExtendIcon();
         render();
@@ -354,6 +354,7 @@
       function endChallenge() {
         if (state.locked || state.challengeEnded) return;
         state.challengeEnded = true;
+        state.failureTaunt = pickFailureTaunt();
         persistentState = writeNullState({
           ...persistentState,
           failedCount: (Number(persistentState.failedCount) || 0) + 1,
