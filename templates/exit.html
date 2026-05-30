@@ -2,108 +2,48 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>脱出室 / KYOUKAI</title>
-  <link rel="stylesheet" href="/static/space.css" />
-  <link rel="stylesheet" href="/static/kyoukai-guide.css" />
-  <link rel="stylesheet" href="/static/outside-hotspots.css?v=3" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>境界域 / exit / KYOUKAI</title>
+  <link rel="stylesheet" href="/static/exit.css" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1522978966321203" crossorigin="anonymous"></script>
   <script defer src="/static/analytics.js"></script>
-  <script defer src="/static/kyoukai-guide.js"></script>
-  <script defer src="/static/null-infection.js"></script>
-  <link rel="stylesheet" href="/static/monetize-core.css" />
-  <script defer src="/static/monetize-links.js"></script>
-  <script defer src="/static/monetize-core.js"></script>
+  <script defer src="/static/exit.js"></script>
 </head>
-<body class="exit-realm-body">
-  <main class="exit-realm" data-scene="emergency" data-attempt="0">
-    <section class="exit-frame" aria-label="脱出室">
-      <div class="exit-image" aria-hidden="true"></div>
-      <div class="exit-vignette" aria-hidden="true"></div>
-
-      <button class="exit-point exit-point-x" type="button" data-choice="x" aria-label="調べる"></button>
-      <button class="exit-point exit-point-y" type="button" data-choice="y" aria-label="調べる"></button>
-      <button class="exit-point exit-point-z" type="button" data-choice="z" aria-label="調べる"></button>
-
-      <div class="exit-message" id="exitMessage" aria-live="polite">戻れそうな場所があります。</div>
+<body class="exit-boundary-body">
+  <main class="exit-boundary" aria-label="境界域">
+    <section class="exit-stage" aria-label="接続中の出口">
+      <img class="exit-scene" alt="" aria-hidden="true" />
+      <div class="exit-fade" aria-hidden="true"></div>
+      <div class="exit-touch-layer" aria-label="調べる場所">
+        <button class="exit-hotspot" type="button" data-hotspot="a" aria-label="調べる"></button>
+        <button class="exit-hotspot" type="button" data-hotspot="b" aria-label="調べる"></button>
+        <button class="exit-hotspot" type="button" data-hotspot="c" aria-label="調べる"></button>
+      </div>
+      <a class="exit-return" href="/" aria-label="入口へ戻る">000</a>
     </section>
 
-    <aside class="exit-side" aria-label="脱出室の記録">
-      <div class="exit-side-title">soft corridor protocol</div>
-      <p id="exitHint">どこかが薄く接続されています。確かな出口とは限りません。</p>
-      <div class="exit-route" id="exitRoute">route: emergency</div>
-      <a href="/" class="exit-return">入口へ戻る</a>
-    </aside>
+    <section class="exit-loader" aria-live="polite" aria-hidden="true">
+      <div class="exit-loader__noise" aria-hidden="true"></div>
+      <div class="exit-loader__girl" aria-hidden="true">
+        <span class="exit-loader__head"></span>
+        <span class="exit-loader__body"></span>
+        <span class="exit-loader__leg exit-loader__leg--one"></span>
+        <span class="exit-loader__leg exit-loader__leg--two"></span>
+      </div>
+      <div class="exit-loader__bubble"></div>
+      <div class="exit-loader__text">
+        <span>LOADING...</span>
+        <span>signal unstable...</span>
+        <span>connecting...</span>
+      </div>
+    </section>
+
+    <section class="exit-ending" aria-live="polite" aria-hidden="true">
+      <p class="exit-ending__label">connection result</p>
+      <h1 class="exit-ending__title"></h1>
+      <button class="exit-ending__continue" type="button">もう一度つなぐ</button>
+      <a class="exit-ending__return" href="/">入口へ戻る</a>
+    </section>
   </main>
-
-  <script>
-    const scenes = {
-      emergency: {
-        message: "出口の形だけが残っています。",
-        next: { x: "hall", y: "window", z: "corner" },
-      },
-      hall: {
-        message: "足音だけが、少し遅れて戻ってきます。",
-        next: { x: "window", y: "emergency", z: "corner" },
-      },
-      corner: {
-        message: "曲がった先に、さっき見た扉があります。",
-        next: { x: "emergency", y: "hall", z: "window" },
-      },
-      window: {
-        message: "外はあります。出口とは限りません。",
-        next: { x: "emergency", y: "corner", z: "hall" },
-      },
-    };
-
-    const realm = document.querySelector(".exit-realm");
-    const messageNode = document.getElementById("exitMessage");
-    const hintNode = document.getElementById("exitHint");
-    const routeNode = document.getElementById("exitRoute");
-    const params = new URLSearchParams(window.location.search);
-    let scene = scenes[params.get("scene")] ? params.get("scene") : "emergency";
-    let attempt = Number.parseInt(params.get("n") || "0", 10);
-
-    function renderScene() {
-      const current = scenes[scene];
-      realm.dataset.scene = scene;
-      realm.dataset.attempt = String(attempt);
-      messageNode.textContent = attempt > 0 ? current.message : "戻れそうな場所があります。";
-      routeNode.textContent = `route: ${scene} / n=${attempt}`;
-      hintNode.textContent = attempt >= 6
-        ? "同じ場所が何度も違う顔で戻ってきます。"
-        : "どこかが薄く接続されています。確かな出口とは限りません。";
-    }
-
-    document.querySelectorAll("[data-choice]").forEach((button) => {
-      button.addEventListener("click", () => {
-        const current = scenes[scene];
-        scene = current.next[button.dataset.choice] || "emergency";
-        attempt += 1;
-        const nextUrl = new URL(window.location.href);
-        nextUrl.searchParams.set("scene", scene);
-        nextUrl.searchParams.set("n", String(attempt));
-        window.history.replaceState({}, "", nextUrl);
-        realm.classList.remove("exit-shift");
-        void realm.offsetWidth;
-        realm.classList.add("exit-shift");
-        renderScene();
-      });
-    });
-
-    window.KYOUKAI_ROOM = 'exit';
-
-    fetch("/api/genome")
-      .then((response) => response.json())
-      .then((data) => {
-        realm.dataset.phase = String(data.phase || 0);
-      })
-      .catch(() => {});
-
-    renderScene();
-  </script>
-  <script src="/static/bgm.js"></script>
-  <script src="/static/outside-items.js"></script>
-  <script src="/static/outside-hotspots.js?v=3"></script>
 </body>
 </html>
