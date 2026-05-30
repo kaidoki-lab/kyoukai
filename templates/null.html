@@ -160,7 +160,7 @@
       const challengeExtensionPerHit = 10000;
       const maxChallengeExtensions = 5;
       const maxChallengeExtension = challengeExtensionPerHit * maxChallengeExtensions;
-      const impossibleTarget = 67;
+      const impossibleTarget = 240;
       const maxGainPerPlay = 8;
       const failureTaunts = [
         "お前くそだな",
@@ -344,10 +344,30 @@
 
       function addCorruption(amount) {
         if (state.locked) return;
-        state.corruption = clamp(state.corruption + amount, 0, 99);
+        state.corruption = clamp(state.corruption + amount, 0, 100);
         if (persistentState.collapsed) {
           state.locked = true;
         }
+        render();
+      }
+
+      function enterCollapseEnding() {
+        if (persistentState.collapsed) return;
+        state.corruption = 100;
+        state.locked = true;
+        state.challengeEnded = true;
+        if (state.challengeTimer) window.clearTimeout(state.challengeTimer);
+        if (state.countdownTimer) window.clearInterval(state.countdownTimer);
+        if (state.extendMoveTimer) window.clearInterval(state.extendMoveTimer);
+        persistentState = writeNullState({
+          ...persistentState,
+          globalInfection: 100,
+          collapseLevel: 100,
+          maxReached: true,
+          collapsed: true,
+          lastPlayedAt: new Date().toISOString()
+        });
+        applyPersistentState();
         render();
       }
 
@@ -401,8 +421,12 @@
         startButton?.classList.add("is-pressed");
 
         addGlobalInfection(0.03);
-        const progress = Math.min(99, Math.floor((state.touches / impossibleTarget) * 100));
+        const progress = Math.min(100, Math.floor((state.touches / impossibleTarget) * 100));
         state.corruption = Math.max(state.corruption, progress);
+        if (state.corruption >= 100) {
+          enterCollapseEnding();
+          return;
+        }
         if (persistentState.collapsed) {
           state.locked = true;
           if (state.challengeTimer) window.clearTimeout(state.challengeTimer);
