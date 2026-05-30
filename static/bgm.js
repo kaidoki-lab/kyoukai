@@ -20,11 +20,18 @@
   var ctx         = null;
   var audioBuf    = null;
   var source      = null;
+  var fallbackOsc = [];
+  var noiseSource = null;
+  var noiseGain   = null;
+  var preloadData = null;
+  var preloadTask = null;
   var isPlaying   = false;
   var isMuted     = false;
+  var usingFallback = false;
   var pauseOffset = 0;
   var startedAt   = 0;
   var initialized = false;
+  var graphConnected = false;
 
   /* ── ノード (initAudio後に確定) ─────────── */
   var masterGain   = null;
@@ -40,11 +47,18 @@
 
   /* ── UI ───────────────────────────────── */
   var btn = null;
+  var gate = null;
 
   /* ======================================================
    *  ユーティリティ
    * ==================================================== */
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function normalizeTrait(value) {
+    var n = Number(value);
+    if (!Number.isFinite(n)) return 0;
+    return clamp(n > 1 ? n / 100 : n, 0, 1);
+  }
 
   /** インパルスレスポンスをプログラムで生成（外部ファイル不要のリバーブ） */
   function makeImpulse(duration, decay) {
@@ -83,7 +97,7 @@
 
     /* マスターゲイン */
     masterGain = ctx.createGain();
-    masterGain.gain.value = 0.72;
+    masterGain.gain.value = ROOM === 'home' ? 0.9 : 0.72;
 
     /* ローパスフィルター（こもり・深度） */
     lpFilter = ctx.createBiquadFilter();
@@ -140,23 +154,89 @@
 
   /** 新しいsourceノードをグラフに接続 */
   function connectSource(src) {
+    if (!graphConnected) {
+      lpFilter.connect(hpFilter);
+      hpFilter.connect(waveshaper);
+      waveshaper.connect(tremoloGain);
+      tremoloGain.connect(dryGain);
+      tremoloGain.connect(reverbNode);
+      graphConnected = true;
+    }
     src.connect(lpFilter);
-    lpFilter.connect(hpFilter);
-    hpFilter.connect(waveshaper);
-    waveshaper.connect(tremoloGain);
-    tremoloGain.connect(dryGain);
-    tremoloGain.connect(reverbNode);
     src.loop = true;
+  }
+
+  function makeNoiseBuffer() {
+    var len = ctx.sampleRate * 2;
+    var buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    var data = buf.getChannelData(0);
+    for (var i = 0; i < len; i++) {
+      data[i] = (Math.random() * 2 - 1) * 0.18;
+    }
+    return buf;
+  }
+
+  function roomFrequencies() {
+    var map = {
+      home: [110, 164.81, 220],
+      observation: [82.41, 123.47, 185],
+      archive: [98, 146.83, 196],
+      exit: [73.42, 110, 164.81],
+      null: [61.74, 92.5, 138.59]
+    };
+    return map[ROOM] || map.home;
+  }
+
+  function startFallbackTone() {
+    var freqs = roomFrequencies();
+    usingFallback = true;
+    fallbackOsc = freqs.map(function (freq, index) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = index === 0 ? 'sine' : 'triangle';
+      osc.frequency.value = freq;
+      gain.gain.value = index === 0 ? 0.09 : 0.035;
+      osc.connect(gain);
+      connectSource(gain);
+      osc.start();
+      return { osc: osc, gain: gain };
+    });
+
+    noiseGain = ctx.createGain();
+    noiseGain.gain.value = 0.025;
+    noiseSource = ctx.createBufferSource();
+    noiseSource.buffer = makeNoiseBuffer();
+    noiseSource.loop = true;
+    noiseSource.connect(noiseGain);
+    connectSource(noiseGain);
+    noiseSource.start();
+  }
+
+  function preloadFile() {
+    if (preloadTask) return preloadTask;
+    preloadTask = fetch(BGM_SRC)
+      .then(function (res) {
+        if (!res.ok) return Promise.reject('not found');
+        return res.arrayBuffer();
+      })
+      .then(function (ab) {
+        preloadData = ab;
+        return true;
+      })
+      .catch(function () {
+        return false;
+      });
+    return preloadTask;
   }
 
   /* ======================================================
    *  BGMファイルの読み込み
    * ==================================================== */
   function loadBuffer() {
-    return fetch(BGM_SRC)
-      .then(function (res) {
-        if (!res.ok) return Promise.reject('not found');
-        return res.arrayBuffer();
+    return preloadFile()
+      .then(function (ok) {
+        if (!ok || !preloadData) return Promise.reject('not found');
+        return preloadData.slice(0);
       })
       .then(function (ab) {
         return ctx.decodeAudioData(ab);
@@ -179,13 +259,20 @@
     return resume.then(function () {
       if (isPlaying) return;
       var doPlay = function () {
-        var offset = audioBuf ? pauseOffset % audioBuf.duration : 0;
-        source = ctx.createBufferSource();
-        source.buffer = audioBuf;
-        connectSource(source);
-        source.start(0, offset);
-        startedAt = ctx.currentTime - offset;
+        if (audioBuf) {
+          usingFallback = false;
+          var offset = pauseOffset % audioBuf.duration;
+          source = ctx.createBufferSource();
+          source.buffer = audioBuf;
+          connectSource(source);
+          source.start(0, offset);
+          startedAt = ctx.currentTime - offset;
+        } else {
+          startFallbackTone();
+          startedAt = ctx.currentTime;
+        }
         isPlaying = true;
+        removeGate();
         updateUI();
       };
       if (audioBuf) {
@@ -193,17 +280,35 @@
         return;
       }
       loadBuffer().then(function (ok) {
-        if (ok) doPlay();
+        doPlay();
       });
     });
   }
 
   function pause() {
-    if (!isPlaying || !source) return;
+    if (!isPlaying) return;
     pauseOffset = ctx.currentTime - startedAt;
-    source.stop();
-    source.disconnect();
+    if (source) {
+      source.stop();
+      source.disconnect();
+    }
+    fallbackOsc.forEach(function (item) {
+      item.osc.stop();
+      item.osc.disconnect();
+      item.gain.disconnect();
+    });
+    fallbackOsc = [];
+    if (noiseSource) {
+      noiseSource.stop();
+      noiseSource.disconnect();
+      noiseSource = null;
+    }
+    if (noiseGain) {
+      noiseGain.disconnect();
+      noiseGain = null;
+    }
     source = null;
+    usingFallback = false;
     isPlaying = false;
     updateUI();
   }
@@ -217,14 +322,14 @@
     var T    = ctx.currentTime;
     var RAMP = 3.0; // 3秒スムーズ遷移
 
-    var phase  = clamp(Number(g.phase)              || 0, 0, 3);
-    var soft   = clamp(Number(g.trait_softness)     || 0, 0, 1);
-    var aggr   = clamp(Number(g.trait_aggression)   || 0, 0, 1);
-    var corr   = clamp(Number(g.trait_corruption)   || 0, 0, 1);
-    var gaze   = clamp(Number(g.trait_gaze)         || 0, 0, 1);
-    var dist   = clamp(Number(g.trait_distance)     || 0, 0, 1);
-    var instab = clamp(Number(g.audio_instability)  || 0, 0, 1);
-    var drift  = clamp(Number(g.phase_drift)        || 0, 0, 1);
+    var phase  = clamp(Number(g.phase) || 0, 0, 3);
+    var soft   = normalizeTrait(g.trait_softness);
+    var aggr   = normalizeTrait(g.trait_aggression);
+    var corr   = normalizeTrait(g.trait_corruption);
+    var gaze   = normalizeTrait(g.trait_gaze);
+    var dist   = normalizeTrait(g.trait_distance);
+    var instab = normalizeTrait(g.audio_instability);
+    var drift  = normalizeTrait(g.phase_drift);
 
     /* ── ローパス: phase↑ / distance↑ でこもる ─── */
     var lpFreq = clamp(18000 - phase * 2400 - dist * 5000 + aggr * 1400, 250, 20000);
@@ -254,6 +359,16 @@
       var sign   = Math.random() < 0.5 ? 1 : -1;
       var cents  = sign * (instab * 55 + drift * 28);
       source.detune.linearRampToValueAtTime(cents, T + RAMP);
+    }
+    if (usingFallback) {
+      fallbackOsc.forEach(function (item, index) {
+        var wobble = 1 + (drift * 0.018 * (index + 1));
+        item.osc.frequency.linearRampToValueAtTime(roomFrequencies()[index] * wobble, T + RAMP);
+        item.gain.gain.linearRampToValueAtTime((index === 0 ? 0.09 : 0.035) * (1 - corr * 0.25), T + RAMP);
+      });
+      if (noiseGain) {
+        noiseGain.gain.linearRampToValueAtTime(0.018 + instab * 0.055, T + RAMP);
+      }
     }
 
     /* ── グリッチ: 瞬間的な音量ブリップ ────────── */
@@ -292,9 +407,9 @@
       'border:1px solid rgba(94,207,173,0.22)',
       'border-radius:2px',
       'font-family:monospace',
-      'font-size:10px',
+      'font-size:' + (ROOM === 'home' ? '13px' : '10px'),
       'letter-spacing:0.1em',
-      'padding:4px 9px',
+      'padding:' + (ROOM === 'home' ? '7px 12px' : '4px 9px'),
       'cursor:pointer',
       'opacity:0.38',
       'transition:opacity 0.2s, color 0.2s',
@@ -307,6 +422,54 @@
     b.addEventListener('click', onBtnClick);
     document.body.appendChild(b);
     return b;
+  }
+
+  function createHomeGate() {
+    if (ROOM !== 'home') return null;
+    var g = document.createElement('button');
+    g.id = 'kyoukai-bgm-gate';
+    g.setAttribute('type', 'button');
+    g.setAttribute('aria-label', 'BGMを開始');
+    g.textContent = '音を開く';
+    g.style.cssText = [
+      'position:fixed',
+      'left:50%',
+      'bottom:28px',
+      'z-index:9999',
+      'transform:translateX(-50%)',
+      'background:rgba(0,0,0,0.58)',
+      'color:#a8e8cb',
+      'border:1px solid rgba(168,232,203,0.25)',
+      'border-radius:2px',
+      'font-family:monospace',
+      'font-size:12px',
+      'letter-spacing:0.12em',
+      'padding:8px 14px',
+      'cursor:pointer',
+      'opacity:0.68',
+      'transition:opacity 0.35s, transform 0.35s',
+      'pointer-events:auto'
+    ].join(';');
+    g.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      g.textContent = '開いています';
+      g.disabled = true;
+      isMuted = false;
+      play();
+    });
+    document.body.appendChild(g);
+    return g;
+  }
+
+  function removeGate() {
+    if (!gate || !gate.parentNode) return;
+    gate.style.opacity = '0';
+    gate.style.transform = 'translateX(-50%) translateY(6px)';
+    window.setTimeout(function () {
+      if (gate && gate.parentNode) gate.parentNode.removeChild(gate);
+      gate = null;
+    }, 420);
   }
 
   function updateUI() {
@@ -329,7 +492,7 @@
       play();
     } else {
       isMuted = !isMuted;
-      var target = isMuted ? 0 : 0.72;
+      var target = isMuted ? 0 : (ROOM === 'home' ? 0.9 : 0.72);
       masterGain.gain.linearRampToValueAtTime(target, ctx.currentTime + 0.55);
       updateUI();
     }
@@ -339,7 +502,9 @@
    *  ブート
    * ==================================================== */
   function boot() {
+    preloadFile();
     btn = createButton();
+    gate = createHomeGate();
     updateUI();
 
     /* 最初のユーザーインタラクションで自動再生（ブラウザポリシー対策） */

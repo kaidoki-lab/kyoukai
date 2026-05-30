@@ -1,0 +1,27 @@
+# Vercel デプロイ除外設定
+# ローカル専用ファイルをデプロイに含めない
+
+# SQLiteデータベース（Vercel環境では tempdir を使用）
+kyoukai.db
+*.db
+
+# 動画ファイル（Vercelの容量制限対策）
+videos/
+
+# Pythonキャッシュ
+__pycache__/
+*.pyc
+*.pyo
+
+# 大容量静的ファイル（Vercelのストレージに入れない）
+static/archive/
+static/bgm/
+
+# ローカル開発用
+.claude/
+*.local
+
+# 引継ぎ・メモ類
+*引継ぎ*.md
+*仕様書*.md
+BGM追加方法.md

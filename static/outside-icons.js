@@ -19,6 +19,49 @@
     return links[Math.floor(Math.random() * links.length)];
   }
 
+  function normalizeSlotId(value, fallback) {
+    return String(value || fallback || "outside_slot")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "") || "outside_slot";
+  }
+
+  function destinationType(item) {
+    if (!item) return "unknown";
+    if (item.randomAmazon) return "amazon";
+    const href = String(item.href || "").toLowerCase();
+    if (href.includes("ofuse.me")) return "ofuse";
+    if (href.startsWith("http")) return "external";
+    return "internal";
+  }
+
+  function slotType(item) {
+    const destination = destinationType(item);
+    if (destination === "amazon") return "amazon";
+    if (destination === "ofuse") return "support";
+    return destination;
+  }
+
+  function applyTrackingAttributes(link, item, id) {
+    link.dataset.kyoukaiEvent = "outside_slot_click";
+    link.dataset.slotId = normalizeSlotId(item && item.label, id);
+    link.dataset.slotType = slotType(item);
+    link.dataset.slotLabel = item && item.label || id || "OUTSIDE OBJECT";
+    link.dataset.destinationType = destinationType(item);
+  }
+
+  function trackOutsideSlotClick(event) {
+    const link = event.currentTarget;
+    if (!link || typeof window.gtag !== "function") return;
+    window.gtag("event", "outside_slot_click", {
+      slot_id: link.dataset.slotId || "",
+      slot_type: link.dataset.slotType || "",
+      slot_label: link.dataset.slotLabel || "",
+      destination_type: link.dataset.destinationType || ""
+    });
+  }
+
   function prepareRandomLink(event) {
     const link = event.currentTarget;
     if (!link) return;
@@ -61,13 +104,17 @@
       element.setAttribute("aria-label", (data.label || "OUTSIDE OBJECT") + " / random external connection");
       element.href = "#outside-random";
       element.rel = "sponsored";
+      applyTrackingAttributes(element, data, id);
       element.addEventListener("pointerdown", prepareRandomLink);
       element.addEventListener("mousedown", prepareRandomLink);
       element.addEventListener("touchstart", prepareRandomLink, { passive: true });
       element.addEventListener("focus", prepareRandomLink);
       element.addEventListener("click", prepareRandomLink);
+      element.addEventListener("click", trackOutsideSlotClick);
     } else if (element.tagName === "A") {
       applyLinkAttributes(element, data);
+      applyTrackingAttributes(element, data, id);
+      element.addEventListener("click", trackOutsideSlotClick);
     }
 
     const image = document.createElement("img");
