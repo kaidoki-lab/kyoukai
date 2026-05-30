@@ -1,0 +1,5 @@
+{
+  "version": "1.0",
+  "description": "KYOUKAI OS同期履歴。diff-log.jsonのsyncStatus=synced になったエントリを転記する。",
+  "items": []
+}

@@ -1,0 +1,5 @@
+{
+  "version": "1.0",
+  "description": "Codex同期タスクキュー。codexReady=true のタスクのみ実行可能。人間がレビュー後に渡す。",
+  "items": []
+}

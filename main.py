@@ -755,6 +755,11 @@ EVOLUTION_FILES = [
     "evolution-log.json",
     "evolution-schema.md",
 ]
+WATCH_DIR = CENTRAL_OS_DIR / "watch"
+DIFF_LOG_FILE = WATCH_DIR / "diff-log.json"
+WATCH_TARGETS_FILE = WATCH_DIR / "watch-targets.json"
+WATCH_GENERATED_DIR = WATCH_DIR / "generated"
+WATCH_HISTORY_DIR = WATCH_DIR / "history"
 
 
 def central_os_payload() -> dict[str, Any]:
@@ -877,6 +882,41 @@ def central_os_payload() -> dict[str, Any]:
     result["data"]["evolution"] = {
         "exists": EVOLUTION_DIR.is_dir(),
         "files": {f: (EVOLUTION_DIR / f).is_file() for f in EVOLUTION_FILES},
+    }
+
+    # watch: diff-log.json
+    try:
+        with open(DIFF_LOG_FILE, encoding="utf-8") as f:
+            result["data"]["diffLog"] = json.load(f)
+    except FileNotFoundError:
+        result["errors"]["diffLog"] = "file not found"
+        result["data"]["diffLog"] = None
+    except json.JSONDecodeError as exc:
+        result["errors"]["diffLog"] = f"json parse error: {exc}"
+        result["data"]["diffLog"] = None
+    except Exception as exc:
+        result["errors"]["diffLog"] = f"read error: {exc}"
+        result["data"]["diffLog"] = None
+
+    # watch: watch-targets.json
+    try:
+        with open(WATCH_TARGETS_FILE, encoding="utf-8") as f:
+            result["data"]["watchTargets"] = json.load(f)
+    except FileNotFoundError:
+        result["errors"]["watchTargets"] = "file not found"
+        result["data"]["watchTargets"] = None
+    except json.JSONDecodeError as exc:
+        result["errors"]["watchTargets"] = f"json parse error: {exc}"
+        result["data"]["watchTargets"] = None
+    except Exception as exc:
+        result["errors"]["watchTargets"] = f"read error: {exc}"
+        result["data"]["watchTargets"] = None
+
+    # watch system metadata
+    result["data"]["watch"] = {
+        "exists": WATCH_DIR.is_dir(),
+        "generatedExists": WATCH_GENERATED_DIR.is_dir(),
+        "historyExists": WATCH_HISTORY_DIR.is_dir(),
     }
 
     return result

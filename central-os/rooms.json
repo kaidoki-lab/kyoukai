@@ -16,7 +16,9 @@
       "nextActions": [
         "祭壇域の演出・テキストが現在の世界観設定と合致しているか確認する"
       ],
-      "codexMemo": "ルートは / で確定。home.html が対応テンプレート。"
+      "codexMemo": "ルートは / で確定。home.html が対応テンプレート。",
+      "syncStatus": "synced",
+      "lastSynced": "2026-05-26"
     },
     {
       "id": "room_02",
@@ -33,7 +35,9 @@
       "nextActions": [
         "境界域に対応するテンプレート・ルートを特定し、rooms.json を更新する"
       ],
-      "codexMemo": "ルート未確定。確認後に更新すること。"
+      "codexMemo": "ルート未確定。確認後に更新すること。",
+      "syncStatus": "pending",
+      "lastSynced": null
     },
     {
       "id": "room_03",
@@ -50,7 +54,9 @@
       "nextActions": [
         "観測域として完成させる要件を整理する"
       ],
-      "codexMemo": "ルートは /observation で確定。対応テンプレートは index.html。"
+      "codexMemo": "ルートは /observation で確定。対応テンプレートは index.html。",
+      "syncStatus": "synced",
+      "lastSynced": "2026-05-26"
     },
     {
       "id": "room_04",
@@ -67,7 +73,9 @@
       "nextActions": [
         "崩壊域に相当するルート・テンプレートを確認し、rooms.json を更新する"
       ],
-      "codexMemo": "ルート未確定。/exit との対応関係を確認すること。"
+      "codexMemo": "ルート未確定。/exit との対応関係を確認すること。",
+      "syncStatus": "pending",
+      "lastSynced": null
     },
     {
       "id": "room_05",
@@ -84,7 +92,9 @@
       "nextActions": [
         "受信域としての演出・テキストを整理する"
       ],
-      "codexMemo": "ルートは /signal で確定。対応テンプレートは signal.html。"
+      "codexMemo": "ルートは /signal で確定。対応テンプレートは signal.html。",
+      "syncStatus": "synced",
+      "lastSynced": "2026-05-26"
     },
     {
       "id": "room_06",
@@ -103,7 +113,9 @@
         "逆観測室のコンセプトを固めてから制作に着手する"
       ],
       "codexMemo": "ルートは /observer で予定。テンプレート・実装は未着手。 / 実装前に route 追加とテンプレート作成が必要",
-      "implemented": false
+      "implemented": false,
+      "syncStatus": "pending",
+      "lastSynced": null
     },
     {
       "id": "room_07",
@@ -120,7 +132,9 @@
       "nextActions": [
         "音声室を独立した部屋とするか、他の部屋に統合するかを決定する"
       ],
-      "codexMemo": "ルート未確定。BGMシステム（bgm.js）は別途実装中。"
+      "codexMemo": "ルート未確定。BGMシステム（bgm.js）は別途実装中。",
+      "syncStatus": "pending",
+      "lastSynced": null
     },
     {
       "id": "room_08",
@@ -137,7 +151,9 @@
       "nextActions": [
         "/archive との対応関係を確認し、記録室のルートを確定させる"
       ],
-      "codexMemo": "ルート未確定。/archive との関係を確認すること。"
+      "codexMemo": "ルート未確定。/archive との関係を確認すること。",
+      "syncStatus": "pending",
+      "lastSynced": null
     },
     {
       "id": "room_09",
@@ -154,7 +170,9 @@
       "nextActions": [
         "未確認接続としての演出を検討する"
       ],
-      "codexMemo": "ルートは /null で確定。対応テンプレートは null.html。"
+      "codexMemo": "ルートは /null で確定。対応テンプレートは null.html。",
+      "syncStatus": "synced",
+      "lastSynced": "2026-05-26"
     },
     {
       "id": "room_10",
@@ -175,7 +193,9 @@
       "nextActions": [
         "外部接続ページの導線・デザインを世界観に合わせて整理する"
       ],
-      "codexMemo": "ルートは /outside で確定。/support も同テンプレートに対応。"
+      "codexMemo": "ルートは /outside で確定。/support も同テンプレートに対応。",
+      "syncStatus": "synced",
+      "lastSynced": "2026-05-26"
     },
     {
       "id": "room_11",
@@ -194,7 +214,9 @@
       "nextActions": [
         "賽銭箱が独立したページを持つか、外部接続ページ内の要素かを確認する"
       ],
-      "codexMemo": "ルート未確定。/support や /outside との関係を確認すること。"
+      "codexMemo": "ルート未確定。/support や /outside との関係を確認すること。",
+      "syncStatus": "pending",
+      "lastSynced": null
     },
     {
       "id": "room_12",
@@ -211,7 +233,9 @@
       "nextActions": [
         "評議録のコンテンツ量が増えた際の表示設計を検討する"
       ],
-      "codexMemo": "ルートは /hyougi で確定。対応テンプレートは hyougi.html。"
+      "codexMemo": "ルートは /hyougi で確定。対応テンプレートは hyougi.html。",
+      "syncStatus": "synced",
+      "lastSynced": "2026-05-26"
     },
     {
       "id": "room_13",
@@ -225,7 +249,9 @@
       "issues": [],
       "nextActions": [],
       "implemented": true,
-      "codexMemo": "central-osを可視化する管理画面。一般導線ではなく内部確認用。"
+      "codexMemo": "central-osを可視化する管理画面。一般導線ではなく内部確認用。",
+      "syncStatus": "synced",
+      "lastSynced": "2026-05-26"
     }
   ]
 }

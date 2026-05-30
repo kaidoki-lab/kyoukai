@@ -47,17 +47,37 @@
         <div class="cos-phase-item cos-phase-done">
           <div class="cos-phase-label">PHASE 2</div>
           <div class="cos-phase-name">導線OS化</div>
-          <div class="cos-phase-state">実質完了</div>
+          <div class="cos-phase-state">完了</div>
         </div>
-        <div class="cos-phase-item cos-phase-active">
+        <div class="cos-phase-item cos-phase-done">
           <div class="cos-phase-label">PHASE 3</div>
           <div class="cos-phase-name">central UI</div>
-          <div class="cos-phase-state">実装中</div>
+          <div class="cos-phase-state">完了</div>
         </div>
-        <div class="cos-phase-item cos-phase-pending">
+        <div class="cos-phase-item cos-phase-done">
           <div class="cos-phase-label">PHASE 4</div>
           <div class="cos-phase-name">AI監督化</div>
-          <div class="cos-phase-state">未開始</div>
+          <div class="cos-phase-state">完了</div>
+        </div>
+        <div class="cos-phase-item cos-phase-done">
+          <div class="cos-phase-label">PHASE 5</div>
+          <div class="cos-phase-name">生成物管理</div>
+          <div class="cos-phase-state">完了</div>
+        </div>
+        <div class="cos-phase-item cos-phase-done">
+          <div class="cos-phase-label">PHASE 6</div>
+          <div class="cos-phase-name">観測ループ</div>
+          <div class="cos-phase-state">完了</div>
+        </div>
+        <div class="cos-phase-item cos-phase-done">
+          <div class="cos-phase-label">PHASE 7</div>
+          <div class="cos-phase-name">循環OS化</div>
+          <div class="cos-phase-state">完了</div>
+        </div>
+        <div class="cos-phase-item cos-phase-active">
+          <div class="cos-phase-label">PHASE 8</div>
+          <div class="cos-phase-name">同期システム</div>
+          <div class="cos-phase-state">実装中</div>
         </div>
       </div>
     </section>
@@ -298,6 +318,73 @@
             </tr>
           </thead>
           <tbody id="cos-evolution-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- WATCH SYSTEM / SYNC STATE (PHASE 8) -->
+    <section class="cos-section" id="cos-watch">
+      <h2 class="cos-section-title">[ 差分監視 / 同期状態 ]</h2>
+      <div class="cos-note">PHASE 8 / watch system / 差分検知・OS同期・Codex同期生成 / 自動実行なし</div>
+      <div class="cos-error" id="cos-watch-error" hidden></div>
+
+      <div class="cos-watch-summary">
+        <div class="cos-watch-stat">
+          <span class="cos-label">WATCH対象</span>
+          <span class="cos-value" id="cos-watch-target-count">—</span>
+        </div>
+        <div class="cos-watch-stat">
+          <span class="cos-label">LAST SCAN</span>
+          <span class="cos-value" id="cos-watch-last-scan">—</span>
+        </div>
+        <div class="cos-watch-stat">
+          <span class="cos-label">UNSYNCED</span>
+          <span class="cos-value" id="cos-watch-unsynced">—</span>
+        </div>
+        <div class="cos-watch-stat">
+          <span class="cos-label">SYNC STATE</span>
+          <span class="cos-value" id="cos-watch-sync-state">—</span>
+        </div>
+        <div class="cos-watch-stat">
+          <span class="cos-label">generated/</span>
+          <span class="cos-value" id="cos-watch-generated-state">—</span>
+        </div>
+        <div class="cos-watch-stat">
+          <span class="cos-label">history/</span>
+          <span class="cos-value" id="cos-watch-history-state">—</span>
+        </div>
+      </div>
+
+      <h3 class="cos-subsection-title">diff-log</h3>
+      <div class="cos-rooms-table-wrap">
+        <table class="cos-table cos-watch-difflog-table">
+          <thead>
+            <tr>
+              <th>date</th>
+              <th>target</th>
+              <th>changeType</th>
+              <th>summary</th>
+              <th>osUpdated</th>
+              <th>syncStatus</th>
+            </tr>
+          </thead>
+          <tbody id="cos-watch-difflog-body"></tbody>
+        </table>
+      </div>
+
+      <h3 class="cos-subsection-title">部屋別同期状態</h3>
+      <div class="cos-rooms-table-wrap">
+        <table class="cos-table cos-watch-sync-table">
+          <thead>
+            <tr>
+              <th>id</th>
+              <th>name</th>
+              <th>route</th>
+              <th>syncStatus</th>
+              <th>lastSynced</th>
+            </tr>
+          </thead>
+          <tbody id="cos-watch-sync-body"></tbody>
         </table>
       </div>
     </section>
@@ -870,6 +957,120 @@
         });
       }
 
+      // PHASE 8: watch system
+      function renderWatch(watchData, diffLogData, watchTargetsData, roomsData) {
+        var targetCountEl = document.getElementById("cos-watch-target-count");
+        var lastScanEl    = document.getElementById("cos-watch-last-scan");
+        var unsyncedEl    = document.getElementById("cos-watch-unsynced");
+        var syncStateEl   = document.getElementById("cos-watch-sync-state");
+        var genStateEl    = document.getElementById("cos-watch-generated-state");
+        var histStateEl   = document.getElementById("cos-watch-history-state");
+
+        // watch-targets count
+        var targets = (watchTargetsData && watchTargetsData.items) || [];
+        if (targetCountEl) targetCountEl.textContent = String(targets.length);
+
+        // watch metadata
+        if (genStateEl) {
+          genStateEl.textContent = (watchData && watchData.generatedExists) ? "found" : "missing";
+          genStateEl.className = "cos-value " + ((watchData && watchData.generatedExists) ? "cos-watch-ok" : "cos-watch-warn");
+        }
+        if (histStateEl) {
+          histStateEl.textContent = (watchData && watchData.historyExists) ? "found" : "missing";
+          histStateEl.className = "cos-value " + ((watchData && watchData.historyExists) ? "cos-watch-ok" : "cos-watch-warn");
+        }
+
+        // diff-log items
+        var diffItems = (diffLogData && diffLogData.items) || [];
+
+        // last scan date
+        var lastDate = "未スキャン";
+        if (diffItems.length > 0) {
+          var dates = diffItems.map(function(i) { return i.date || ""; }).filter(Boolean).sort();
+          if (dates.length > 0) lastDate = dates[dates.length - 1];
+        }
+        if (lastScanEl) lastScanEl.textContent = lastDate;
+
+        // unsynced count (osUpdated === false)
+        var unsyncedCount = diffItems.filter(function(i) { return i.osUpdated === false; }).length;
+        if (unsyncedEl) {
+          unsyncedEl.textContent = String(unsyncedCount);
+          unsyncedEl.className = "cos-value " + (unsyncedCount > 0 ? "cos-watch-warn" : "cos-watch-ok");
+        }
+
+        // sync state
+        if (syncStateEl) {
+          if (diffItems.length === 0) {
+            syncStateEl.textContent = "CLEAN";
+            syncStateEl.className = "cos-value cos-watch-clean";
+          } else if (unsyncedCount > 0) {
+            syncStateEl.textContent = "PENDING (" + unsyncedCount + ")";
+            syncStateEl.className = "cos-value cos-watch-pending-text";
+          } else {
+            syncStateEl.textContent = "SYNCED";
+            syncStateEl.className = "cos-value cos-watch-ok";
+          }
+        }
+
+        // diff-log table
+        var tbody = document.getElementById("cos-watch-difflog-body");
+        if (tbody) {
+          tbody.innerHTML = "";
+          if (diffItems.length === 0) {
+            var emptyTr = document.createElement("tr");
+            emptyTr.appendChild(el("td", { text: "(差分記録なし — diff-log.json は空)", colspan: "6" }));
+            tbody.appendChild(emptyTr);
+          } else {
+            diffItems.slice().reverse().forEach(function(item) {
+              var tr = document.createElement("tr");
+              tr.appendChild(el("td", { text: safeText(item.date) }));
+              tr.appendChild(el("td", { text: safeText(item.targetPath || item.targetId) }));
+              tr.appendChild(el("td", { text: safeText(item.changeType) }));
+              tr.appendChild(el("td", { text: safeText(item.summary) }));
+              var osTd = document.createElement("td");
+              if (item.osUpdated === true) {
+                osTd.textContent = "✓";
+                osTd.className = "cos-watch-updated";
+              } else if (item.osUpdated === false) {
+                osTd.textContent = "—";
+                osTd.className = "cos-watch-pending-cell";
+              } else {
+                osTd.textContent = safeText(item.osUpdated);
+              }
+              tr.appendChild(osTd);
+              tr.appendChild(el("td", { text: safeText(item.syncStatus || "—") }));
+              tbody.appendChild(tr);
+            });
+          }
+        }
+
+        // 部屋別同期状態 table (PHASE 8-7)
+        var syncBody = document.getElementById("cos-watch-sync-body");
+        if (syncBody) {
+          syncBody.innerHTML = "";
+          var rooms = (roomsData && roomsData.items) || [];
+          if (rooms.length === 0) {
+            var emptyTr2 = document.createElement("tr");
+            emptyTr2.appendChild(el("td", { text: "(部屋データなし)", colspan: "5" }));
+            syncBody.appendChild(emptyTr2);
+          } else {
+            rooms.forEach(function(room) {
+              var tr = document.createElement("tr");
+              tr.appendChild(el("td", { text: safeText(room.id) }));
+              tr.appendChild(el("td", { text: safeText(room.name) }));
+              tr.appendChild(el("td", { text: safeText(room.route) }));
+              var ssTd = document.createElement("td");
+              var ss = room.syncStatus || "未設定";
+              ssTd.textContent = ss;
+              ssTd.className = "cos-watch-sync-" + ss;
+              tr.appendChild(ssTd);
+              tr.appendChild(el("td", { text: safeText(room.lastSynced || "—") }));
+              syncBody.appendChild(tr);
+            });
+          }
+        }
+      }
+
       function renderAll(result) {
         const data = result && result.data ? result.data : {};
         const errors = result && result.errors ? result.errors : {};
@@ -884,6 +1085,8 @@
         if (errors.observations) showError("cos-observations-error", "observations.json: " + errors.observations);
         if (errors.cycleMap) showError("cos-cycle-error", "cycle-map.json: " + errors.cycleMap);
         if (errors.evolutionLog) showError("cos-evolution-error", "evolution-log.json: " + errors.evolutionLog);
+        if (errors.diffLog) showError("cos-watch-error", "diff-log.json: " + errors.diffLog);
+        if (errors.watchTargets) showError("cos-watch-error", "watch-targets.json: " + errors.watchTargets);
 
         try { renderRouteState(data.rooms); } catch (e) { showError("cos-rooms-error", String(e)); }
         try { renderRooms(data.rooms); } catch (e) { showError("cos-rooms-error", String(e)); }
@@ -895,6 +1098,7 @@
         try { renderObservations(data.metrics, data.observations); } catch (e) { showError("cos-observations-error", String(e)); }
         try { renderCycle(data.cycle, data.cycleMap); } catch (e) { showError("cos-cycle-error", String(e)); }
         try { renderEvolution(data.evolution, data.evolutionLog); } catch (e) { showError("cos-evolution-error", String(e)); }
+        try { renderWatch(data.watch, data.diffLog, data.watchTargets, data.rooms); } catch (e) { showError("cos-watch-error", String(e)); }
         try { renderProposals(data.supervisor, data.proposals); } catch (e) { showError("cos-sv-error", String(e)); }
 
         updateCompletion(result);

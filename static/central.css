@@ -730,6 +730,60 @@ body {
   letter-spacing: 0.08em;
 }
 
+/* ── PHASE 8 watch system ────────────────── */
+.cos-subsection-title {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: #5a7066;
+  margin: 18px 0 8px;
+  font-weight: normal;
+  text-transform: uppercase;
+  border-bottom: 1px solid #1e2e2a;
+  padding-bottom: 4px;
+}
+
+.cos-watch-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border: 1px solid #2a3a35;
+  background: rgba(15, 22, 20, 0.4);
+}
+
+.cos-watch-stat {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 11px;
+}
+
+/* State colors */
+.cos-watch-ok       { color: #7fbfa3; }
+.cos-watch-warn     { color: #d4a060; }
+.cos-watch-clean    { color: #7fbfa3; letter-spacing: 0.1em; }
+.cos-watch-ok       { color: #7fbfa3; }
+.cos-watch-pending-text { color: #d4a060; letter-spacing: 0.05em; }
+
+/* diff-log table cells */
+.cos-watch-updated      { color: #7fbfa3; text-align: center; }
+.cos-watch-pending-cell { color: #d4a060; text-align: center; }
+
+/* 部屋別同期状態 */
+.cos-watch-sync-synced  { color: #7fbfa3; letter-spacing: 0.05em; }
+.cos-watch-sync-pending { color: #d4a060; letter-spacing: 0.05em; }
+.cos-watch-sync-outdated { color: #e08070; letter-spacing: 0.05em; }
+.cos-watch-sync-missing  { color: #e05050; letter-spacing: 0.05em; }
+.cos-watch-sync-未設定  { color: #5a7066; }
+
+/* watch tables */
+.cos-watch-difflog-table td:nth-child(4),
+.cos-watch-sync-table td:nth-child(3) {
+  max-width: 240px;
+  color: #aebdb5;
+}
+
 /* ── FOOTER ──────────────────────────────── */
 .cos-footer {
   margin-top: 40px;
