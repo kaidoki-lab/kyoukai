@@ -31,15 +31,39 @@ body {
   height: 100vh;
   min-width: 320px;
   overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(20, 10, 32, 0.04), rgba(20, 10, 32, 0.02)),
-    url("/static/observer/assets/backgrounds/room_magic.png") center center / cover no-repeat,
-    #21142d;
+  background: #000;
+  isolation: isolate;
+  --observer-frame-width: min(100vw, calc(100vh * 9 / 16));
+  --observer-frame-left: calc((100vw - var(--observer-frame-width)) / 2);
+}
+
+.observer-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-size: auto 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+.observer-bg-morning {
+  background-color: #000;
+  background-image: url("/static/images/observer/observer_bg_morning.png");
+}
+
+.observer-bg-night {
+  z-index: 1;
+  background-image: url("/static/images/observer/observer_bg_night.png");
+  opacity: 0;
+  animation: observerDayNightLoop 180s infinite ease-in-out;
 }
 
 .room-backdrop {
   position: absolute;
   inset: 0;
+  z-index: 2;
   pointer-events: none;
   display: none;
 }
@@ -265,11 +289,11 @@ body {
 
 .outside-box {
   position: absolute;
-  left: 63.5vw;
-  top: 65vh;
+  left: calc(var(--observer-frame-left) + var(--observer-frame-width) * 0.56);
+  top: 72vh;
   z-index: 38;
   display: block;
-  width: clamp(64px, 6vw, 112px);
+  width: clamp(54px, calc(var(--observer-frame-width) * 0.13), 82px);
   aspect-ratio: 190 / 159;
   background: url("/static/observer/assets/sprites/piko_trimmed/box.png") center / contain no-repeat;
   image-rendering: pixelated;
@@ -335,7 +359,7 @@ body {
   position: absolute;
   left: 50%;
   top: 48%;
-  z-index: 4;
+  z-index: 6;
   width: 180px;
   height: 250px;
   --mascot-scale: 1;
@@ -698,6 +722,15 @@ body {
   50% { translate: 0 -1px; }
 }
 
+@keyframes observerDayNightLoop {
+  0% { opacity: 0; }
+  22% { opacity: 0; }
+  48% { opacity: .86; }
+  68% { opacity: .86; }
+  94% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
 @media (max-width: 780px) {
   .external-panel {
     top: auto;
@@ -712,9 +745,9 @@ body {
   }
 
   .outside-box {
-    left: 69vw;
-    top: 65vh;
-    width: 66px;
+    left: calc(var(--observer-frame-left) + var(--observer-frame-width) * 0.56);
+    top: 71vh;
+    width: clamp(52px, calc(var(--observer-frame-width) * 0.14), 68px);
   }
 
   .room-hotspot {

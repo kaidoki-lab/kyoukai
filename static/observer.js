@@ -6,17 +6,19 @@
   const dailyWord = document.getElementById("dailyWord");
   const outsideBox = document.getElementById("outsideBox");
   const roomHotspots = [...document.querySelectorAll("[data-room-hotspot]")];
-  const floorBackY = () => window.innerHeight * 0.595;
-  const floorFrontY = () => window.innerHeight * 0.9;
-  const homeY = () => window.innerHeight * 0.72;
-  const floorLeft = (y) => {
-    const t = depthT(y);
-    return window.innerWidth * (0.36 - t * 0.32);
-  };
-  const floorRight = (y) => {
-    const t = depthT(y);
-    return window.innerWidth * (0.64 + t * 0.32);
-  };
+  const bgWidth = () => window.innerHeight * 9 / 16;
+  const bgLeft = () => (window.innerWidth - bgWidth()) / 2;
+  const imageX = (ratio) => bgLeft() + bgWidth() * ratio;
+  const imageY = (ratio) => window.innerHeight * ratio;
+  const floorBackY = () => imageY(0.56);
+  const floorFrontY = () => imageY(0.84);
+  const homeY = () => imageY(0.69);
+  const walkZones = [
+    { x1: 0.43, x2: 0.57, y1: 0.55, y2: 0.64 },
+    { x1: 0.36, x2: 0.64, y1: 0.64, y2: 0.76 },
+    { x1: 0.42, x2: 0.60, y1: 0.76, y2: 0.84 },
+    { x1: 0.54, x2: 0.65, y1: 0.61, y2: 0.73 },
+  ];
 
   const idleLines = [
     "\u307f\u3066\u308b\uff1f",
@@ -115,37 +117,48 @@
   }
 
   function scaleForY(y) {
-    return 0.56 + depthT(y) * 0.58;
+    return 0.5 + depthT(y) * 0.18;
   }
 
-  function boundaryYForX(x) {
-    const points = [
-      [0.00, 0.58],
-      [0.18, 0.54],
-      [0.32, 0.55],
-      [0.43, 0.45],
-      [0.54, 0.55],
-      [0.72, 0.60],
-      [1.00, 0.62],
-    ];
-    const nx = clamp(x / window.innerWidth, 0, 1);
-    for (let i = 0; i < points.length - 1; i += 1) {
-      const [x1, y1] = points[i];
-      const [x2, y2] = points[i + 1];
-      if (nx >= x1 && nx <= x2) {
-        const t = (nx - x1) / (x2 - x1);
-        return window.innerHeight * (y1 + (y2 - y1) * t);
+  function toImagePoint(point) {
+    return {
+      x: clamp((point.x - bgLeft()) / bgWidth(), 0, 1),
+      y: clamp(point.y / window.innerHeight, 0, 1),
+    };
+  }
+
+  function fromImagePoint(point) {
+    return {
+      x: imageX(point.x),
+      y: imageY(point.y),
+    };
+  }
+
+  function nearestWalkZone(point) {
+    const ip = toImagePoint(point);
+    let nearest = null;
+    let nearestDistance = Infinity;
+    for (const zone of walkZones) {
+      const candidate = {
+        x: clamp(ip.x, zone.x1, zone.x2),
+        y: clamp(ip.y, zone.y1, zone.y2),
+      };
+      const dx = candidate.x - ip.x;
+      const dy = candidate.y - ip.y;
+      const distance = dx * dx + dy * dy;
+      if (distance < nearestDistance) {
+        nearest = candidate;
+        nearestDistance = distance;
       }
     }
-    return window.innerHeight * 0.62;
+    return nearest || { x: 0.5, y: 0.7 };
   }
 
   function clampToFloor(point) {
-    const minY = Math.max(floorBackY(), boundaryYForX(point.x));
-    const y = clamp(point.y, minY, floorFrontY());
+    const next = fromImagePoint(nearestWalkZone(point));
     return {
-      x: clamp(point.x, floorLeft(y), floorRight(y)),
-      y,
+      x: clamp(next.x, 12, window.innerWidth - 12),
+      y: clamp(next.y, floorBackY(), floorFrontY()),
     };
   }
 
@@ -237,10 +250,10 @@
   }
 
   function randomFloorTarget() {
-    const y = window.innerHeight * (0.62 + Math.random() * 0.24);
-    return clampToFloor({
-      x: window.innerWidth * (0.22 + Math.random() * 0.58),
-      y,
+    const zone = pick(walkZones);
+    return fromImagePoint({
+      x: zone.x1 + Math.random() * (zone.x2 - zone.x1),
+      y: zone.y1 + Math.random() * (zone.y2 - zone.y1),
     });
   }
 
@@ -276,8 +289,8 @@
     if (!outsideBox) return { x: window.innerWidth * 0.64, y: homeY() };
     const rect = outsideBox.getBoundingClientRect();
     return clampToFloor({
-      x: rect.left - 54,
-      y: rect.bottom + 40,
+      x: rect.left - 30,
+      y: rect.bottom + 28,
     });
   }
 

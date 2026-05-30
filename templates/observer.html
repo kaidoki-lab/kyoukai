@@ -4,11 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>KYOUKAI Observer Room</title>
-  <link rel="stylesheet" href="/static/observer.css?v=1">
+  <link rel="stylesheet" href="/static/observer.css?v=3">
   <script defer src="/static/analytics.js"></script>
 </head>
 <body>
   <main class="observer-room" data-genome="piko" aria-label="observer room">
+    <div class="observer-bg observer-bg-morning" aria-hidden="true"></div>
+    <div class="observer-bg observer-bg-night" aria-hidden="true"></div>
+
     <div class="room-backdrop" aria-hidden="true">
       <div class="wall-shelf"></div>
       <div class="window-glow"></div>
@@ -64,6 +67,6 @@
   </main>
 
   <script>window.KYOUKAI_ROOM = 'observer';</script>
-  <script src="/static/observer.js?v=1"></script>
+  <script src="/static/observer.js?v=3"></script>
 </body>
 </html>
