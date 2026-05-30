@@ -17,65 +17,81 @@
   const GUIDE_STORAGE_KEYS = Object.values(STORAGE_KEYS);
 
   const KYOUKAI_ROOMS = [
-    { id: "observation", path: "/observation", label: "観測室", hint: "見てるだけじゃない場所もある" },
-    { id: "archive", path: "/archive", label: "残留域", hint: "残ってるものを見てもいいよ" },
-    { id: "signal", path: "/signal", label: "音声室", hint: "音がする場所がある" },
-    { id: "hyougi", path: "/hyougi", label: "評議", hint: "声が集まる場所がある" },
-    { id: "exit", path: "/exit", label: "脱出室", hint: "外に出る道があるよ" },
-    { id: "null", path: "/null", label: "崩落域", hint: "崩れてる場所も残ってる" },
-    { id: "outside", path: "/outside", label: "外部接続", hint: "外につながる場所もあるよ" },
-    { id: "support", path: "/support", label: "小さな箱", hint: "小さな箱が置いてある" }
+    { id: "observation", path: "/observation", label: "観測室", hint: "未ダ見テイナイ場所" },
+    { id: "archive", path: "/archive", label: "残留域", hint: "記録反応アリ" },
+    { id: "signal", path: "/signal", label: "音声室", hint: "音ノ反応" },
+    { id: "hyougi", path: "/hyougi", label: "評議", hint: "声ノ反応" },
+    { id: "exit", path: "/exit", label: "脱出室", hint: "出口反応" },
+    { id: "null", path: "/null", label: "崩落域", hint: "崩レ反応" },
+    { id: "outside", path: "/outside", label: "外部接続", hint: "外ノ気配ガアル" },
+    { id: "support", path: "/support", label: "小さな箱", hint: "箱、アルネ" }
   ];
 
   const GUIDE_TARGET_ROOM_IDS = KYOUKAI_ROOMS.map((room) => room.id);
 
   const BASE_MESSAGES = [
-    "また来たんだ",
-    "ここ、少しずつ変わるよ",
-    "見えるところだけが全部じゃない",
-    "まだ見てない場所があるかも"
+    "微弱反応",
+    "此処、鳴ル",
+    "気配ガアル",
+    "ソコ、見タヨ",
+    "未確認"
   ];
 
   const RETURN_MESSAGES = [
-    "戻ってきたんだ",
-    "そこ、見てきたんだ",
-    "次は別の場所も見えるかも",
-    "ここに戻ると、少しだけ変わるよ"
+    "戻レルヨ",
+    "戻ッタネ",
+    "帰還反応",
+    "記録アリ"
   ];
 
   const VISITED_MESSAGES = [
-    "そこ、見たんだ",
-    "だいぶ歩いたね",
-    "気配が少し増えた"
+    "ソコ、見タヨ",
+    "歩行記録アリ",
+    "気配ガ増エタ"
   ];
 
   const UNVISITED_MESSAGES = [
-    "まだ見てない場所がある",
-    "光ってるところ、残ってるよ",
-    "別の入口も、たぶんある"
+    "未ダ見テイナイ場所",
+    "反応、薄イ",
+    "奥ニアル",
+    "未確認"
   ];
 
   const OUTSIDE_HINT_MESSAGES = [
-    "外につながる場所もあるよ",
-    "外の棚を見てもいいよ",
-    "ここから外のものが少し入ってくる"
+    "外ノ気配ガアル",
+    "外ニツナガル",
+    "棚ノ気配",
+    "外部接続"
   ];
 
   const SUPPORT_HINT_MESSAGES = [
-    "小さな箱が置いてある",
-    "見るだけでもいい箱がある",
-    "見た人の気配が、少し残る"
+    "箱、アルネ",
+    "置ケル場所",
+    "小サナ反応",
+    "気配ガ残ル"
   ];
 
   const COMPLETE_MESSAGES = [
-    "ひととおり見たみたい",
-    "だいたい覚えたよ",
-    "まだ変わるかもしれない"
+    "巡回済み",
+    "記録あり",
+    "まだ変わる"
   ];
 
-  const MESSAGE_HIDE_MS = 3800;
+  const DETECTION_MESSAGES = {
+    default: ["反応アリ", "此処、触レル", "接続点", "開ク場所"],
+    outside: ["外ノ気配ガアル", "外ニツナガル", "棚ノ気配", "外部接続"],
+    support: ["箱、アルネ", "置ケル場所", "小サナ反応", "気配ガ残ル"],
+    room: ["部屋反応", "奥ニアル", "入口反応", "未確認"],
+    home: ["戻レルヨ", "帰還点", "記録地点"],
+    external: ["外部接続", "外ノ気配", "遠イ反応"]
+  };
+
+  const MESSAGE_HIDE_MS = 3000;
   const AUTO_MESSAGE_DELAY_MS = 850;
-  const MAX_MESSAGE_LENGTH = 34;
+  const MAX_MESSAGE_LENGTH = 18;
+  const DETECTION_COOLDOWN_MS = 1600;
+  const DESKTOP_OFFSET_X = 18;
+  const DESKTOP_OFFSET_Y = 14;
 
   const storage = (() => {
     try {
@@ -89,6 +105,7 @@
   })();
 
   let messageTimer = 0;
+  let detectTimer = 0;
 
   function getSearchParams() {
     try {
@@ -289,13 +306,17 @@
     return messages;
   }
 
+  function pickFromList(messages, key = STORAGE_KEYS.messageIndex) {
+    const safeMessages = messages.map(truncateMessage);
+    if (!safeMessages.length) return BASE_MESSAGES[0];
+    const currentIndex = getNumber(key);
+    const nextIndex = currentIndex % safeMessages.length;
+    setNumber(key, currentIndex + 1);
+    return safeMessages[nextIndex];
+  }
+
   function pickGuideMessage(state, options = {}) {
-    const messages = getGuideMessagesByState(state, options).map(truncateMessage);
-    if (!messages.length) return BASE_MESSAGES[0];
-    const currentIndex = getNumber(STORAGE_KEYS.messageIndex);
-    const nextIndex = currentIndex % messages.length;
-    setNumber(STORAGE_KEYS.messageIndex, currentIndex + 1);
-    return messages[nextIndex];
+    return pickFromList(getGuideMessagesByState(state, options));
   }
 
   function markHintSeen(message) {
@@ -303,27 +324,33 @@
     if (SUPPORT_HINT_MESSAGES.includes(message)) setBoolean(STORAGE_KEYS.supportHintSeen, true);
   }
 
-  function createGuideElement(state) {
+  function isDesktopPointer() {
+    try {
+      return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function createGuideElement(state, desktopPointer) {
     const guide = document.createElement("aside");
-    guide.className = "kyoukai-guide";
-    guide.setAttribute("aria-label", "小さな案内人");
+    guide.className = `kyoukai-guide${desktopPointer ? " kyoukai-guide--cursor" : " kyoukai-guide--dock"}`;
+    guide.setAttribute("aria-label", "境界探知機");
 
     const button = document.createElement("button");
     button.className = "kyoukai-guide__body";
     button.type = "button";
-    button.setAttribute("aria-label", "案内人に触れる");
+    button.setAttribute("aria-label", "境界探知機に触れる");
     button.innerHTML = `
-      <svg viewBox="0 0 64 64" role="img" aria-hidden="true" focusable="false">
-        <path class="kyoukai-guide__aura" d="M32 3 C47 3 61 16 61 32 C61 49 47 61 32 61 C15 61 3 48 3 32 C3 15 16 3 32 3 Z" />
-        <path class="kyoukai-guide__glow" d="M32 5 C45 5 58 17 58 32 C58 48 46 58 32 58 C17 58 6 47 6 32 C6 17 19 5 32 5 Z" />
-        <path class="kyoukai-guide__shell" d="M32 10 C43 10 52 20 52 32 C52 45 43 53 32 53 C20 53 12 45 12 32 C12 20 21 10 32 10 Z" />
-        <path class="kyoukai-guide__wing kyoukai-guide__wing--left" d="M17 27 C7 23 7 13 18 12 C23 17 23 23 17 27 Z" />
-        <path class="kyoukai-guide__wing kyoukai-guide__wing--right" d="M47 27 C57 23 57 13 46 12 C41 17 41 23 47 27 Z" />
-        <path class="kyoukai-guide__line" d="M20 24 C24 18 40 18 44 24" />
-        <circle class="kyoukai-guide__eye" cx="25" cy="33" r="3.2" />
-        <circle class="kyoukai-guide__eye" cx="39" cy="33" r="3.2" />
-        <path class="kyoukai-guide__line" d="M26 43 C30 46 35 46 39 43" />
-      </svg>
+      <span class="kyoukai-guide__probe" aria-hidden="true">
+        <span class="kyoukai-guide__tail"></span>
+        <span class="kyoukai-guide__ring"></span>
+        <span class="kyoukai-guide__head">
+          <span class="kyoukai-guide__core"></span>
+          <span class="kyoukai-guide__needle"></span>
+        </span>
+        <span class="kyoukai-guide__charm"></span>
+      </span>
     `;
 
     const bubble = document.createElement("div");
@@ -349,11 +376,118 @@
 
   function showGuideMessage(guide, bubble, state, options = {}) {
     window.clearTimeout(messageTimer);
-    const message = pickGuideMessage(state, options);
+    const message = options.message || pickGuideMessage(state, options);
     bubble.textContent = message;
     markHintSeen(message);
     guide.classList.add("kyoukai-guide--speaking");
     messageTimer = window.setTimeout(() => hideGuideMessage(guide), MESSAGE_HIDE_MS);
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  function classifyTarget(element) {
+    if (!element) return { type: "", key: "" };
+    const target = element.closest?.("a, button, [data-guide-hint]");
+    if (!target || target.classList?.contains("kyoukai-guide__body")) return { type: "", key: "" };
+
+    const hint = target.getAttribute("data-guide-hint") || "";
+    const rawHref = target.getAttribute("href") || target.getAttribute("data-href") || "";
+    let href = rawHref;
+    try {
+      href = rawHref ? new URL(rawHref, window.location.href).href : "";
+    } catch (_) {}
+
+    const textKey = `${hint} ${rawHref} ${target.textContent || ""}`.toLowerCase();
+    const hrefKey = String(href || rawHref).toLowerCase();
+    let pathname = "";
+    try {
+      pathname = href ? new URL(href, window.location.href).pathname.replace(/\/+$/g, "") || "/" : "";
+    } catch (_) {}
+    const key = `${target.tagName}:${rawHref}:${hint}:${(target.textContent || "").trim().slice(0, 24)}`;
+
+    if (textKey.includes("outside") || hrefKey.includes("/outside")) return { type: "outside", key };
+    if (textKey.includes("support") || textKey.includes("ofuse") || hrefKey.includes("/support") || hrefKey.includes("ofuse.me")) {
+      return { type: "support", key };
+    }
+    if (hrefKey.startsWith("http") && !hrefKey.includes(window.location.host.toLowerCase())) return { type: "external", key };
+    if (pathname === "/" || hrefKey.includes("/index") || hrefKey.includes("/home")) return { type: "home", key };
+    if (/(exit|observer|record|voice|archive|signal|observation|hyougi|null)/.test(textKey) || /(exit|observer|record|voice|archive|signal|observation|hyougi|null)/.test(hrefKey)) {
+      return { type: "room", key };
+    }
+    return { type: "default", key };
+  }
+
+  function setReactionClass(guide, type) {
+    ["react", "outside", "support", "room", "external", "home"].forEach((name) => {
+      guide.classList.remove(`kyoukai-guide--${name}`);
+    });
+    if (!type) return;
+    guide.classList.add("kyoukai-guide--react");
+    if (type !== "default") guide.classList.add(`kyoukai-guide--${type}`);
+  }
+
+  function getDetectionMessage(type) {
+    return pickFromList(DETECTION_MESSAGES[type] || DETECTION_MESSAGES.default);
+  }
+
+  function setupCursorGuide(guide, bubble, state) {
+    let targetX = window.innerWidth * 0.5;
+    let targetY = window.innerHeight * 0.5;
+    let currentX = targetX;
+    let currentY = targetY;
+    let lastTargetKey = "";
+    let lastDetectionAt = 0;
+    let frameId = 0;
+
+    function moveGuide() {
+      const guideWidth = guide.offsetWidth || 56;
+      const guideHeight = guide.offsetHeight || 56;
+      const maxX = Math.max(8, window.innerWidth - guideWidth - 8);
+      const maxY = Math.max(8, window.innerHeight - guideHeight - 8);
+      currentX += (targetX - currentX) * 0.18;
+      currentY += (targetY - currentY) * 0.18;
+      const nextLeft = clamp(currentX + DESKTOP_OFFSET_X, 8, maxX);
+      const nextTop = clamp(currentY + DESKTOP_OFFSET_Y, 8, maxY);
+      guide.style.left = `${nextLeft}px`;
+      guide.style.top = `${nextTop}px`;
+      guide.classList.toggle("kyoukai-guide--bubble-left", nextLeft > window.innerWidth - 250);
+      guide.classList.toggle("kyoukai-guide--bubble-up", nextTop > window.innerHeight - 92);
+      frameId = window.requestAnimationFrame(moveGuide);
+    }
+
+    function updateDetection(event) {
+      const element = document.elementFromPoint(event.clientX, event.clientY);
+      const detected = classifyTarget(element);
+      setReactionClass(guide, detected.type);
+
+      if (!detected.type) {
+        lastTargetKey = "";
+        return;
+      }
+
+      const now = Date.now();
+      if (detected.key !== lastTargetKey && now - lastDetectionAt > DETECTION_COOLDOWN_MS) {
+        lastTargetKey = detected.key;
+        lastDetectionAt = now;
+        showGuideMessage(guide, bubble, state, { message: getDetectionMessage(detected.type) });
+      }
+    }
+
+    function onMouseMove(event) {
+      targetX = event.clientX;
+      targetY = event.clientY;
+      window.clearTimeout(detectTimer);
+      detectTimer = window.setTimeout(() => updateDetection(event), 24);
+    }
+
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
+    window.addEventListener("pagehide", () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("mousemove", onMouseMove);
+    }, { once: true });
+    moveGuide();
   }
 
   function logGuideState(state) {
@@ -378,8 +512,13 @@
 
     if (!shouldShowGuide(state.visitCount)) return;
 
-    const elements = createGuideElement(state);
+    const desktopPointer = isDesktopPointer();
+    const elements = createGuideElement(state, desktopPointer);
     showGuide(elements.guide);
+
+    if (desktopPointer) {
+      setupCursorGuide(elements.guide, elements.bubble, state);
+    }
 
     if (state.returnedToTop) {
       window.setTimeout(() => showGuideMessage(elements.guide, elements.bubble, state, { auto: true }), AUTO_MESSAGE_DELAY_MS);
