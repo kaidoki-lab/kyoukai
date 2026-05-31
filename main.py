@@ -1590,8 +1590,12 @@ if FASTAPI_AVAILABLE:
     app = FastAPI(title="KYOUKAI alpha", lifespan=lifespan)
     app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
     videos_dir = VIDEOS_DIR
-    videos_dir.mkdir(exist_ok=True)
-    app.mount("/videos", StaticFiles(directory=videos_dir), name="videos")
+    try:
+        videos_dir.mkdir(exist_ok=True)
+    except OSError:
+        pass  # Vercel 読み取り専用ファイルシステム対策
+    if videos_dir.exists():
+        app.mount("/videos", StaticFiles(directory=videos_dir), name="videos")
     templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
     from fastapi import Body
