@@ -15,7 +15,8 @@ __pycache__/
 
 # 大容量静的ファイル（Vercelのストレージに入れない）
 static/archive/
-static/bgm/
+static/bgm/*
+!static/bgm/bgm_exit.mp3
 
 # ローカル開発用
 .claude/
