@@ -1,10 +1,12 @@
 # Vercel デプロイ除外設定
 
-# Pythonキャッシュ（不要バイナリ）
+# SQLiteデータベース（ローカル2GB・本番では/tmpに自動生成）
+kyoukai.db
+
+# Pythonキャッシュ
 __pycache__/
 *.pyc
 *.pyo
 
 # ローカル開発用
 .claude/
-*.local
