@@ -1110,8 +1110,9 @@ a.sp-link:hover,
 
 .hyougi-frame {
   position: relative;
-  width: min(100vw, calc(100svh * 1.7778));
-  aspect-ratio: 16 / 9;
+  width: min(100vw, calc(100svh * 9 / 16));
+  max-height: 100svh;
+  aspect-ratio: 9 / 16;
   margin: 0;
   overflow: hidden;
   background: #020202;
@@ -1131,11 +1132,8 @@ a.sp-link:hover,
 
 .hyougi-void {
   position: absolute;
-  left: 40.3%;
-  top: 12.9%;
-  width: 20.6%;
-  height: 65%;
-  border-radius: 1.2% / 0.8%;
+  inset: 0;
+  border-radius: 0;
   z-index: 1;
   overflow: hidden;
   background:
