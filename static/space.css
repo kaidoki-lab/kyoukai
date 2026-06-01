@@ -3066,12 +3066,15 @@ a.sp-link:hover,
   .archive-room {
     width: 100%;
     min-height: auto;
+    padding-bottom: min(34vh, 260px);
   }
 
   .archive-frame {
     width: 100%;
     height: min(100svh, 720px);
     min-height: 520px;
+    margin-bottom: min(34vh, 260px);
+    overflow: visible;
   }
 
   .archive-rack-hit {
@@ -3098,8 +3101,9 @@ a.sp-link:hover,
   .archive-info {
     left: 10px;
     right: 10px;
-    bottom: 42px;
-    max-height: min(30vh, 230px);
+    top: calc(100% + 14px);
+    bottom: auto;
+    max-height: none;
     padding: 14px 16px;
     font-size: 13px;
     line-height: 1.82;
