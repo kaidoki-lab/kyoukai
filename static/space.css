@@ -1132,8 +1132,11 @@ a.sp-link:hover,
 
 .hyougi-void {
   position: absolute;
-  inset: 0;
-  border-radius: 0;
+  left: 19.4%;
+  top: 12.9%;
+  width: 65.1%;
+  height: 65%;
+  border-radius: 1.2% / 0.8%;
   z-index: 1;
   overflow: hidden;
   background:
