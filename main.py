@@ -35,6 +35,7 @@ except ModuleNotFoundError:
 
 BASE_DIR = Path(__file__).resolve().parent
 VIDEOS_DIR = BASE_DIR / "videos"
+VIDEOS_MANIFEST_PATH = BASE_DIR / "static" / "videos-manifest.json"
 DB_PATH = Path(os.environ.get("KYOUKAI_DB_PATH") or (Path(tempfile.gettempdir()) / "kyoukai.db" if os.environ.get("VERCEL") else BASE_DIR / "kyoukai.db"))
 TICK_SECONDS = 3
 SILENCE_THRESHOLD_SECONDS = 12
@@ -685,12 +686,24 @@ def display_signal(row: dict[str, Any]) -> dict[str, Any]:
 def list_signal_videos() -> list[str]:
     """Return local video files that can be played inside the /signal TV screen."""
     if not VIDEOS_DIR.exists():
-        return []
+        return load_video_manifest()
     videos: list[str] = []
     for path in sorted(VIDEOS_DIR.iterdir(), key=lambda item: item.name.lower()):
         if path.is_file() and path.suffix.lower() in {".mp4", ".webm", ".m4v"}:
             videos.append("/videos/" + quote(path.name))
     return videos
+
+
+def load_video_manifest() -> list[str]:
+    """Read the deploy-time video list when videos are served by Vercel's CDN."""
+    try:
+        data = json.loads(VIDEOS_MANIFEST_PATH.read_text(encoding="utf-8-sig"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    videos = data.get("videos", [])
+    if not isinstance(videos, list):
+        return []
+    return [item for item in videos if isinstance(item, str)]
 
 
 def site_config_payload() -> dict[str, Any]:
