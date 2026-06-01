@@ -82,6 +82,7 @@
   const whispers = ["みえてる？", "そこ？", "まだいる？", "でれない", "きこえる？", "こないで", "どこ？", "はやく"];
   const girlStates = ["run-a", "run-b", "look-back", "tired", "still", "stumble", "small", "far"];
   const SEGMENT_TOUCH_LIMIT = 5;
+  const FULL_LOADER_FROM_STEP = 4;
   const loadingProgression = [0, 1, 3, 5, 7];
   const loadingImages = [
     "/static/exit/loading/loading_01.png",
@@ -131,6 +132,11 @@
 
   function randomDelay() {
     return Math.floor(1200 + Math.random() * 1600);
+  }
+
+  function sceneDelay(useFullLoader) {
+    if (useFullLoader) return randomDelay();
+    return Math.floor(320 + Math.random() * 260);
   }
 
   function randomBetween(min, max) {
@@ -265,15 +271,27 @@
     connectionScore += choice.value;
     stepCount += 1;
     segmentStep += 1;
-    showLoader();
+    const useFullLoader = segmentStep >= FULL_LOADER_FROM_STEP;
+    loading = true;
+    if (useFullLoader) {
+      showLoader();
+    } else {
+      boundary.classList.remove("is-shifting");
+      void boundary.offsetWidth;
+      boundary.classList.add("is-shifting");
+    }
 
     window.setTimeout(() => {
       currentScene = randomNextScene();
       renderScene();
-      hideLoader();
+      if (useFullLoader) {
+        hideLoader();
+      } else {
+        loading = false;
+      }
       const result = decideEnding();
       if (result) showEnding(result);
-    }, randomDelay());
+    }, sceneDelay(useFullLoader));
   }
 
   function randomNextScene() {
