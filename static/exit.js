@@ -82,7 +82,7 @@
   const whispers = ["みえてる？", "そこ？", "まだいる？", "でれない", "きこえる？", "こないで", "どこ？", "はやく"];
   const girlStates = ["run-a", "run-b", "look-back", "tired", "still", "stumble", "small", "far"];
   const SEGMENT_TOUCH_LIMIT = 5;
-  const FULL_LOADER_FROM_STEP = 4;
+  const FULL_LOADER_FROM_STEP = 5;
   const loadingProgression = [0, 1, 3, 5, 7];
   const loadingImages = [
     "/static/exit/loading/loading_01.png",
@@ -221,6 +221,9 @@
     loading = false;
     boundary.classList.remove("is-loading");
     loader.setAttribute("aria-hidden", "true");
+    loaderArt?.classList.remove("is-visible");
+    loaderArt?.removeAttribute("src");
+    bubble.classList.remove("is-visible");
   }
 
   function renderScene() {
@@ -301,9 +304,14 @@
 
   function restart() {
     currentScene = fragments[Math.floor(Math.random() * 4)];
+    connectionScore = 0;
+    stepCount = 0;
     segmentStep = 0;
+    loading = false;
     boundary.classList.remove("is-ended");
+    boundary.classList.remove("is-loading");
     ending.setAttribute("aria-hidden", "true");
+    loader.setAttribute("aria-hidden", "true");
     renderScene();
   }
 
