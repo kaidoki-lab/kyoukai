@@ -163,7 +163,6 @@ body {
 .star-b { left: 62vw; top: 33vh; scale: .8; }
 .star-c { left: 18vw; top: 45vh; scale: .65; }
 
-.today-word,
 .external-panel {
   position: absolute;
   z-index: 5;
@@ -171,29 +170,6 @@ body {
   background: var(--panel);
   box-shadow: 0 12px 24px rgba(113, 92, 132, 0.12);
   backdrop-filter: blur(8px);
-}
-
-.today-word span {
-  display: block;
-  color: var(--soft-ink);
-  font-size: 12px;
-}
-
-.today-word {
-  left: 50%;
-  bottom: 25px;
-  width: min(430px, calc(100vw - 48px));
-  padding: 12px 18px;
-  border-radius: 8px;
-  text-align: center;
-  transform: translateX(-50%);
-}
-
-.today-word strong {
-  display: block;
-  margin-top: 4px;
-  font-size: 16px;
-  font-weight: 700;
 }
 
 .external-panel {

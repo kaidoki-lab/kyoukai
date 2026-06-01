@@ -3,7 +3,6 @@
   const bubble = document.getElementById("speechBubble");
   const room = document.querySelector(".observer-room");
   const sprite = document.getElementById("mascotSprite");
-  const dailyWord = document.getElementById("dailyWord");
   const outsideBox = document.getElementById("outsideBox");
   const roomHotspots = [...document.querySelectorAll("[data-room-hotspot]")];
   const bgWidth = () => window.innerHeight * 9 / 16;
@@ -38,15 +37,6 @@
     "\u304d\u3087\u3046\u306f\u958b\u3044\u305F",
     "\u5916\u306b\u3064\u306a\u304C\u308B\u304B\u3082",
     "\u7bb1\u304c\u5c11\u3057\u3060\u3051\u958b\u3044\u305F"
-  ];
-  const dailyWords = [
-    "\u304d\u3087\u3046\u3082\u3001\u90e8\u5c4b\u306f\u3072\u3089\u3044\u3066\u308b",
-    "\u307e\u305F\u6765\u305f\uff1f",
-    "\u3053\u3053\u3001\u3042\u3063\u305f\u304b\u3044\u306d",
-    "\u898b\u3066\u308b\u306e\u3001\u3053\u3063\u3061\u304b\u3082",
-    "\u7bb1\u306f\u307e\u3060\u5bdd\u3066\u308b",
-    "\u304d\u3087\u3046\u306f\u9759\u304b\u306a\u65e5",
-    "\u3042\u3057\u305f\u3082\u3001\u3044\u308b\u304b\u3082"
   ];
   const reverseLines = [
     "\u305d\u3063\u3061\uff1f",
@@ -435,7 +425,6 @@
   });
 
   setInterval(tick, 100);
-  if (dailyWord) dailyWord.textContent = pick(dailyWords);
   setSpriteFrame("idle");
   setTimeout(spriteIdleLoop, 520);
   setTimeout(blinkLoop, 700);
