@@ -307,6 +307,7 @@ body[data-creature-branch="chaos"] .eye.extra {
 }
 
 input,
+select,
 button {
   height: 44px;
   border: 1px solid var(--line);
@@ -314,7 +315,8 @@ button {
   font: inherit;
 }
 
-input {
+input,
+select {
   width: 100%;
   background: rgba(7, 16, 19, 0.92);
   color: var(--text);
@@ -1078,9 +1080,10 @@ body:has(.observation-room) {
   left: 1.45%;
   top: 2.8%;
   width: 26.8%;
-  height: 94.4%;
+  height: auto;
+  min-height: 0;
   display: grid;
-  grid-template-rows: auto minmax(0, 1.08fr) minmax(126px, 0.78fr) minmax(150px, 0.9fr) auto auto;
+  grid-template-rows: auto;
   gap: 0.55vh;
   color: var(--room-pink);
   font-family: Consolas, "Courier New", monospace;
@@ -1229,6 +1232,7 @@ body:has(.observation-room) {
 }
 
 .terminal-command input,
+.terminal-command select,
 .terminal-command button,
 .terminal-audio {
   height: clamp(32px, 4vh, 42px);
@@ -2630,6 +2634,7 @@ body:has(.observation-room) {
   }
 
   .terminal-command input,
+  .terminal-command select,
   .terminal-command button,
   .terminal-audio {
     min-height: 44px;
@@ -2638,7 +2643,8 @@ body:has(.observation-room) {
     touch-action: manipulation;
   }
 
-  .terminal-command input {
+  .terminal-command input,
+  .terminal-command select {
     width: 100%;
     min-width: 0;
     box-sizing: border-box;

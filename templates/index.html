@@ -3,81 +3,32 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>異常観測部屋 / KYOUKAI</title>
+    <title>Observation / KYOUKAI</title>
     <link rel="stylesheet" href="/static/style.css" />
     <link rel="stylesheet" href="/static/kyoukai-guide.css" />
-    <link rel="stylesheet" href="/static/outside-hotspots.css?v=3" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1522978966321203" crossorigin="anonymous"></script>
     <script defer src="/static/analytics.js"></script>
     <script defer src="/static/kyoukai-guide.js"></script>
     <script defer src="/static/null-infection.js"></script>
-    <link rel="stylesheet" href="/static/monetize-core.css" />
-    <script defer src="/static/monetize-links.js"></script>
-    <script defer src="/static/monetize-core.js"></script>
   </head>
   <body>
     <main class="facility observation-room" id="facility">
-      <img class="room-bg-layer" src="/static/kyoukai_observation_room.png" alt="KYOUKAI異常観測部屋" />
+      <img class="room-bg-layer" src="/static/kyoukai_observation_room.png" alt="KYOUKAI observation room" />
       <div class="room-crt-noise" aria-hidden="true"></div>
-      <a class="observation-disconnect" href="/" aria-label="観測終了">
-        <span class="disconnect-core">OFF</span>
-        <span class="disconnect-sub">DISCONNECT</span>
-      </a>
-      <a class="ky-monetize-route ky-monetize-route--observation" href="/outside" aria-label="外部接続">
-        <span class="ky-monetize-route__label">OUTSIDE</span>
-        <span class="ky-monetize-route__sub">MEMO</span>
-      </a>
-      <section class="left-terminal" aria-label="深夜の観測端末">
-        <header class="terminal-head">
-          <div>
-            <p class="eyebrow">観測ログ</p>
-            <h1>異常観測部屋</h1>
-          </div>
-          <div class="signal" id="connectionStatus">接続待ち</div>
-        </header>
 
-        <section class="terminal-box log-section">
-          <h2>観測ログ / LOG</h2>
-          <ol id="logList"></ol>
-        </section>
-
-        <section class="terminal-box status-terminal">
-          <h2>観測ステータス / STATUS</h2>
-          <div class="observation-runtime">
-            <span>OBSERVATION ACTIVE</span>
-            <strong id="observationActive">000:00:00</strong>
-            <em id="signalPing">ping --</em>
-          </div>
-          <div class="terminal-status-grid">
-            <div><span>気分</span><strong id="mood">quiet</strong></div>
-            <div><span>位相</span><strong id="phase">0</strong></div>
-            <div><span>最終入力</span><strong id="lastAction">-</strong></div>
-            <div><span>観測音</span><strong id="audioParams">tempo 60 / noise 0</strong></div>
-            <div><span>観測者</span><strong id="observerCountInline">0</strong></div>
-            <div><span>変異回数</span><strong id="mutationCountInline">0</strong></div>
-          </div>
-        </section>
-
-        <section class="terminal-box signals-section" id="signalsSection" aria-label="外部信号">
-          <h2>外部信号 / SIGNAL INCOMING</h2>
-          <p class="signal-note">広告コード未挿入 / Genome状態に反応する空枠</p>
-          <div id="signalsList" class="signals-list"></div>
-        </section>
-
-        <aside class="signal-slot signal-slot-left" data-signal-slot="left_terminal_bottom">
-          <span>SIGNAL DETECTED</span>
-          <strong>--- --- ---</strong>
-        </aside>
-
+      <section class="left-terminal" aria-label="Observation command">
         <form id="actionForm" class="input-row terminal-command">
-          <input id="actionInput" name="action" autocomplete="off" placeholder="コマンド入力 / みつめる / よぶ / なでる" />
+          <select id="actionInput" name="action" aria-label="Command">
+            <option value="">COMMAND</option>
+            <option value="みつめる">見つめる</option>
+            <option value="よぶ">呼ぶ</option>
+            <option value="なでる">撫でる</option>
+          </select>
           <button type="submit">SEND</button>
         </form>
-
-        <button id="audioToggle" class="terminal-audio" type="button">観測補助AI</button>
       </section>
 
-      <section class="crt-stage" aria-label="中央CRT生命体">
+      <section class="crt-stage" aria-label="Observation window">
         <div class="crt-glass" aria-hidden="true"></div>
         <div class="creature-stage">
           <div class="halo" aria-hidden="true"></div>
@@ -116,92 +67,11 @@
             <span id="creatureSpecies">U-00000000</span>
           </div>
         </div>
-        <aside class="signal-slot signal-slot-crt" data-signal-slot="crt_bottom">
-          <span>NO CARRIER</span>
-        </aside>
       </section>
-
-      <aside class="panel right-monitor" aria-label="Genome監視札">
-        <div class="panel-head">
-          <span>GENOME MONITOR</span>
-          <strong>STATUS BOARD</strong>
-        </div>
-
-        <section class="creature-readout" aria-label="Creature genome monitor">
-          <div>
-            <span>CREATURE</span>
-            <strong id="creaturePanelName">Unknown Organism</strong>
-          </div>
-          <div class="creature-readout-grid">
-            <div><span>BRANCH</span><strong id="creatureBranch">none</strong></div>
-            <div><span>VARIANT</span><strong id="creatureVariant">normal</strong></div>
-            <div><span>CORE</span><strong id="creatureCore">unknown</strong></div>
-            <div><span>SHELL</span><strong id="creatureShell">unknown</strong></div>
-            <div><span>ORGANS</span><strong id="creatureOrgansText">none</strong></div>
-            <div><span>DANGER</span><strong id="creatureDanger">0</strong></div>
-          </div>
-        </section>
-
-        <div class="summary-band" id="eventBand">
-          <div><span>主傾向</span><strong id="dominantTrait">none</strong></div>
-          <div><span>直近変異</span><strong id="lastMutation">none</strong></div>
-        </div>
-
-        <div class="stats">
-          <div><span>観測者数</span><strong id="observerCount">0</strong></div>
-          <div><span>位相漂流</span><strong id="phaseDrift">0</strong></div>
-          <div><span>ゲノム安定性</span><strong id="stability">100</strong></div>
-          <div><span>変異レベル</span><strong id="mutationLevel">0</strong></div>
-          <div><span>変異回数</span><strong id="mutationCount">0</strong></div>
-          <div><span>ノイズレベル</span><strong id="noiseLevel">0</strong></div>
-          <div><span>不安定値</span><strong id="instability">0</strong></div>
-          <div><span>テンポ</span><strong id="tempo">60</strong></div>
-          <div><span>沈黙観測</span><strong id="silentObservation">0</strong></div>
-          <div><span>境界圧</span><strong id="boundaryPressure">0</strong></div>
-          <div><span>オーディオ不安定</span><strong id="audioInstability">0</strong></div>
-          <div><span>視覚不安定</span><strong id="visualInstability">0</strong></div>
-        </div>
-
-        <aside class="signal-slot signal-slot-right" data-signal-slot="right_monitor_inner">
-          <span>観測補助装置</span>
-          <strong>slot empty</strong>
-        </aside>
-      </aside>
-
-      <section class="observation-info" aria-labelledby="observation-info-title">
-        <h2 id="observation-info-title">OBSERVATION AREA</h2>
-        <p>
-          OBSERVATIONは、KYOUKAI内のsignal、node、archive fragmentを継続的に確認する観測領域です。
-        </p>
-        <p>
-          この領域では、接続状態、観測ログ、route response、observer record などが記録対象になります。
-        </p>
-        <p>観測された情報は、archiveや各nodeの記録へ反映される場合があります。</p>
-        <p>KYOUKAIでは、これらの観測記録を継続的に追加・更新しています。</p>
-        <a class="info-log-link" href="/archive/logs">観測ログ一覧</a>
-      </section>
-
-      <div id="contaminationOverlay" class="contamination-overlay" aria-hidden="true">
-        <div class="contamination-inner">
-          <p class="contamination-label">外部信号混入</p>
-          <p id="contaminationText" class="contamination-text"></p>
-          <a id="contaminationLink" class="contamination-link" href="#external-signal">未確認接続</a>
-        </div>
-      </div>
     </main>
-
-    <footer class="kyoukai-footer">
-      <nav aria-label="KYOUKAI footer navigation">
-        <div class="footer-group"><h2>MAIN</h2><a href="/">Top</a><a href="/observation">Observation</a><a href="/archive">Archive</a><a href="/signal">Signal</a><a href="/null">Boundary</a><a href="/exit">Exit</a><a href="/outside">Outside</a></div>
-        <div class="footer-group"><h2>RECORD</h2><a href="/archive/logs">Observation Logs</a></div>
-        <div class="footer-group"><h2>INFO</h2><a href="/about">About</a><a href="/privacy-policy">Privacy Policy</a><a href="/contact">Contact</a><a href="/terms">Terms</a><a href="/sitemap">Site Map</a></div>
-      </nav>
-    </footer>
 
     <script src="/static/app.js"></script>
     <script>window.KYOUKAI_ROOM = 'observation';</script>
     <script src="/static/bgm.js"></script>
-    <script src="/static/outside-items.js"></script>
-    <script src="/static/outside-hotspots.js?v=3"></script>
   </body>
 </html>
