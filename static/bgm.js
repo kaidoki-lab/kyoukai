@@ -16,6 +16,12 @@
   var BGM_SRC   = '/static/bgm/bgm_' + ROOM + '.mp3';
   var POLL_MS   = 8000; // Genome取得間隔
 
+  function roomVolume() {
+    if (ROOM === 'home') return 0.9;
+    if (ROOM === 'exit') return 0.18;
+    return 0.72;
+  }
+
   /* ── 状態 ─────────────────────────────── */
   var ctx         = null;
   var audioBuf    = null;
@@ -97,7 +103,7 @@
 
     /* マスターゲイン */
     masterGain = ctx.createGain();
-    masterGain.gain.value = ROOM === 'home' ? 0.9 : 0.72;
+    masterGain.gain.value = roomVolume();
 
     /* ローパスフィルター（こもり・深度） */
     lpFilter = ctx.createBiquadFilter();
@@ -492,7 +498,7 @@
       play();
     } else {
       isMuted = !isMuted;
-      var target = isMuted ? 0 : (ROOM === 'home' ? 0.9 : 0.72);
+      var target = isMuted ? 0 : roomVolume();
       masterGain.gain.linearRampToValueAtTime(target, ctx.currentTime + 0.55);
       updateUI();
     }
