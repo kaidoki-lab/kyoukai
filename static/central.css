@@ -835,3 +835,105 @@ body {
     padding: 4px 6px;
   }
 }
+
+/* ── Dashboard ─────────────────────────────────────────────────── */
+.cos-dash-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.cos-dash-run-btn {
+  background: rgba(60, 220, 180, 0.15);
+  border: 1px solid rgba(60, 220, 180, 0.5);
+  color: #7effd8;
+  padding: 5px 14px;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+.cos-dash-run-btn:hover { background: rgba(60, 220, 180, 0.28); }
+.cos-dash-run-btn:disabled { opacity: 0.4; cursor: default; }
+.cos-dash-status { font-size: 11px; color: #6a8a80; }
+.cos-dash-status.running { color: #f0d060; }
+.cos-dash-status.ok { color: #7effd8; }
+.cos-dash-status.error { color: #ff6b6b; }
+.cos-dash-filter-label { font-size: 11px; color: #556; margin-left: 8px; }
+.cos-dash-filter {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #6a8a80;
+  padding: 3px 10px;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+.cos-dash-filter.active, .cos-dash-filter:hover { border-color: rgba(60,220,180,0.4); color: #adf0de; }
+.cos-dash-empty { color: #4a6a60; font-size: 12px; padding: 12px 0; }
+
+.cos-proposal-card {
+  border: 1px solid rgba(255,255,255,0.08);
+  border-left: 3px solid rgba(100,180,160,0.4);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 3px;
+}
+.cos-proposal-adopted { border-left-color: rgba(60,220,140,0.7); }
+.cos-proposal-held    { border-left-color: rgba(240,200,80,0.6); }
+.cos-proposal-rejected { border-left-color: rgba(180,80,80,0.4); opacity: 0.55; }
+
+.cos-proposal-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.cos-proposal-room { font-size: 13px; color: #b0e8d8; font-weight: bold; }
+.cos-proposal-tag { font-size: 10px; padding: 2px 7px; border-radius: 2px; }
+.dash-pending  { background: rgba(200,160,60,0.25); color: #f0d080; }
+.dash-adopted  { background: rgba(60,200,120,0.25); color: #80f0b0; }
+.dash-held     { background: rgba(200,200,60,0.2);  color: #e8e060; }
+.dash-rejected { background: rgba(200,60,60,0.2);   color: #f09090; }
+.cos-proposal-priority { font-size: 10px; color: #5a7a70; }
+.cos-proposal-change-type { font-size: 10px; color: #4a6a80; }
+
+.cos-proposal-observation { font-size: 11px; color: #6a9a88; margin-bottom: 4px; }
+.cos-proposal-judgment { font-size: 12px; color: #c0e8d8; margin-bottom: 8px; }
+
+.cos-proposal-candidates {
+  list-style: none;
+  margin: 0 0 10px 0;
+  padding: 0;
+  border-left: 2px solid rgba(100,200,160,0.2);
+  padding-left: 10px;
+}
+.cos-proposal-candidates li { font-size: 12px; color: #a0c8b8; padding: 2px 0; }
+.cos-proposal-candidates li::before { content: "→ "; color: #5a8a78; }
+
+.cos-proposal-codex {
+  font-size: 10px;
+  color: #4a7a68;
+  background: rgba(0,0,0,0.4);
+  padding: 8px;
+  border-radius: 2px;
+  white-space: pre-wrap;
+  margin-bottom: 8px;
+}
+
+.cos-proposal-actions { display: flex; gap: 8px; margin-top: 8px; }
+.cos-dash-action-btn {
+  font-family: inherit;
+  font-size: 11px;
+  padding: 3px 12px;
+  border-radius: 2px;
+  cursor: pointer;
+  border: 1px solid;
+}
+.cos-dash-adopt  { background: rgba(60,200,120,0.15); border-color: rgba(60,200,120,0.5); color: #80f0b0; }
+.cos-dash-hold   { background: rgba(200,200,60,0.12); border-color: rgba(200,200,60,0.4);  color: #e8e060; }
+.cos-dash-reject { background: rgba(200,60,60,0.12);  border-color: rgba(200,60,60,0.4);   color: #f09090; }

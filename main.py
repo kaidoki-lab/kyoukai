@@ -411,6 +411,26 @@ class GenomeStore:
                 )
                 """
             )
+            connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS proposals (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    batch_id TEXT NOT NULL,
+                    target_room TEXT NOT NULL,
+                    observation TEXT NOT NULL,
+                    judgment TEXT NOT NULL,
+                    change_type TEXT NOT NULL,
+                    candidates_json TEXT NOT NULL,
+                    reason TEXT NOT NULL,
+                    priority TEXT NOT NULL DEFAULT 'medium',
+                    status TEXT NOT NULL DEFAULT 'pending',
+                    codex_ready INTEGER NOT NULL DEFAULT 0,
+                    codex_instruction TEXT,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                )
+                """
+            )
             if connection.execute("SELECT COUNT(*) FROM affiliate_signals").fetchone()[0] == 0:
                 seed_signals = [
                     ("観測支援物資 TYPE-A", "#external-signal", "外部物質 TYPE-A 境界侵食中 / 広告コード未挿入", 0, "any", "panel"),
@@ -777,6 +797,274 @@ DIFF_LOG_FILE = WATCH_DIR / "diff-log.json"
 WATCH_TARGETS_FILE = WATCH_DIR / "watch-targets.json"
 WATCH_GENERATED_DIR = WATCH_DIR / "generated"
 WATCH_HISTORY_DIR = WATCH_DIR / "history"
+
+GA4_PROPERTY_ID = os.environ.get("KYOUKAI_GA4_PROPERTY_ID", "538546349")
+GA4_CREDENTIALS_FILE = BASE_DIR / "ga4-credentials.json"
+
+# ─── GA4 analysis ──────────────────────────────────────────────────────────────
+
+def _fetch_ga4_data() -> dict[str, Any]:
+    """Fetch page metrics from GA4 Data API. Returns empty dict if unavailable."""
+    if not GA4_CREDENTIALS_FILE.exists():
+        return {}
+    try:
+        from google.analytics.data_v1beta import BetaAnalyticsDataClient
+        from google.analytics.data_v1beta.types import (
+            DateRange, Dimension, Metric, RunReportRequest,
+        )
+        from google.oauth2 import service_account
+
+        creds = service_account.Credentials.from_service_account_file(
+            str(GA4_CREDENTIALS_FILE),
+            scopes=["https://www.googleapis.com/auth/analytics.readonly"],
+        )
+        client = BetaAnalyticsDataClient(credentials=creds)
+        request = RunReportRequest(
+            property=f"properties/{GA4_PROPERTY_ID}",
+            dimensions=[Dimension(name="pagePath")],
+            metrics=[
+                Metric(name="screenPageViews"),
+                Metric(name="averageSessionDuration"),
+                Metric(name="bounceRate"),
+                Metric(name="sessions"),
+            ],
+            date_ranges=[DateRange(start_date="30daysAgo", end_date="today")],
+            limit=50,
+        )
+        response = client.run_report(request)
+        rows = []
+        for row in response.rows:
+            rows.append({
+                "path": row.dimension_values[0].value,
+                "pageviews": int(row.metric_values[0].value),
+                "avg_duration": float(row.metric_values[1].value),
+                "bounce_rate": float(row.metric_values[2].value),
+                "sessions": int(row.metric_values[3].value),
+            })
+        return {"rows": rows, "source": "ga4", "fetched_at": now_iso()}
+    except Exception as exc:
+        return {"error": str(exc), "source": "ga4_error"}
+
+
+def _analyze_rooms(ga4_data: dict[str, Any]) -> list[dict[str, Any]]:
+    """Score each room based on GA4 metrics. Falls back to mock data if GA4 unavailable."""
+    known_rooms = [
+        {"path": "/", "name": "祭壇域"},
+        {"path": "/observation", "name": "観測域"},
+        {"path": "/observer", "name": "逆観測室"},
+        {"path": "/signal", "name": "受信域"},
+        {"path": "/hyougi", "name": "評議録"},
+        {"path": "/exit", "name": "崩壊域"},
+        {"path": "/null", "name": "未確認接続"},
+        {"path": "/outside", "name": "外部接続"},
+        {"path": "/archive", "name": "記録室"},
+    ]
+    rows = ga4_data.get("rows", [])
+    row_map = {r["path"]: r for r in rows}
+
+    results = []
+    for room in known_rooms:
+        row = row_map.get(room["path"], {})
+        pv = row.get("pageviews", 0)
+        dur = row.get("avg_duration", 0.0)
+        bounce = row.get("bounce_rate", 1.0)
+        sessions = row.get("sessions", 0)
+
+        # score: high pv + long duration + low bounce = strong
+        if pv == 0 and not rows:
+            score = "no_data"
+            label = "データなし"
+        elif pv == 0:
+            score = "dead"
+            label = "死んだ接続"
+        elif pv >= 50 and dur >= 30:
+            score = "strong"
+            label = "反応強"
+        elif pv >= 20:
+            score = "active"
+            label = "反応あり"
+        elif bounce >= 0.8:
+            score = "weak"
+            label = "反応弱"
+        else:
+            score = "normal"
+            label = "通常"
+
+        results.append({
+            "path": room["path"],
+            "name": room["name"],
+            "pageviews": pv,
+            "avg_duration": round(dur, 1),
+            "bounce_rate": round(bounce, 3),
+            "sessions": sessions,
+            "score": score,
+            "label": label,
+        })
+    return results
+
+
+def _generate_proposal_candidates(room: dict[str, Any]) -> list[str]:
+    """Use Ollama to generate change candidates for a room. Falls back to rules."""
+    score = room["score"]
+    name = room["name"]
+    path = room["path"]
+
+    fallbacks = {
+        "strong": [
+            f"{name}の生命体ログを1件追加する",
+            f"{name}の背景ノイズを微強化する",
+            f"{name}から別の部屋への導線を薄く追加する",
+            f"{name}に異常断片テキストを1件追加する",
+        ],
+        "dead": [
+            f"{name}（{path}）を「死んだ接続」として変質候補にする",
+            f"{name}のリンクを一時的に隠蔽する",
+            f"{name}に崩壊テキストを追加して消失感を演出する",
+        ],
+        "weak": [
+            f"{name}の導線配置を変更する",
+            f"{name}のビジュアルに軽い変化を加える",
+            f"{name}から強い部屋への接続を追加する",
+        ],
+        "active": [
+            f"{name}に小さな変化を1つ加える",
+            f"{name}の異常断片を更新する",
+        ],
+    }
+
+    prompt = (
+        f"KYOUKAIというウェブサイトの「{name}」（{path}）に関する変化候補を3つ生成してください。"
+        f"このページの状態：{room['label']}（PV:{room['pageviews']} 滞在:{room['avg_duration']}秒）。"
+        "KYOUKAIは自己増殖する狂ったウェブサイトで、ゲームではありません。"
+        "各候補は20文字以内の日本語で、具体的な変更内容のみ。箇条書き不要。1行1候補。"
+    )
+    payload = json.dumps({
+        "model": OLLAMA_MODEL,
+        "prompt": prompt,
+        "stream": False,
+        "options": {"temperature": 0.85, "num_predict": 120},
+    }).encode("utf-8")
+    try:
+        request = UrlRequest(
+            OLLAMA_URL, data=payload,
+            headers={"Content-Type": "application/json"}, method="POST",
+        )
+        with urlopen(request, timeout=5.0) as response:
+            data = json.loads(response.read().decode("utf-8"))
+        text = str(data.get("response", "")).strip()
+        lines = [l.strip("・- 　") for l in text.splitlines() if l.strip()]
+        if lines:
+            return lines[:4]
+    except (OSError, URLError, TimeoutError, json.JSONDecodeError):
+        pass
+    return fallbacks.get(score, fallbacks["active"])
+
+
+def run_analysis() -> dict[str, Any]:
+    """Run full analysis: fetch GA4, score rooms, generate proposals, save to DB."""
+    batch_id = f"batch_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
+    ga4_data = _fetch_ga4_data()
+    room_scores = _analyze_rooms(ga4_data)
+
+    proposals = []
+    for room in room_scores:
+        score = room["score"]
+        if score in ("no_data", "normal"):
+            continue
+
+        judgment_map = {
+            "strong": f"{room['name']}への反応が強い。増殖候補に入れる。",
+            "active": f"{room['name']}に反応あり。小さな変化を加える。",
+            "weak": f"{room['name']}の反応が弱い。導線または変質候補にする。",
+            "dead": f"{room['name']}が死んでいる。変質または隠蔽候補にする。",
+        }
+        priority_map = {"strong": "high", "dead": "high", "weak": "medium", "active": "low"}
+
+        candidates = _generate_proposal_candidates(room)
+        observation = (
+            f"{room['name']} — PV:{room['pageviews']} / "
+            f"滞在:{room['avg_duration']}秒 / 直帰率:{room['bounce_rate']}"
+        )
+
+        with store._connect() as conn:
+            conn.execute(
+                """INSERT INTO proposals
+                   (batch_id, target_room, observation, judgment, change_type,
+                    candidates_json, reason, priority, status, codex_ready,
+                    created_at, updated_at)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
+                (
+                    batch_id,
+                    room["path"],
+                    observation,
+                    judgment_map.get(score, ""),
+                    score,
+                    json.dumps(candidates, ensure_ascii=False),
+                    f"{room['label']}のため変化候補を生成した。",
+                    priority_map.get(score, "medium"),
+                    "pending",
+                    0,
+                    now_iso(),
+                    now_iso(),
+                ),
+            )
+        proposals.append({
+            "room": room["name"],
+            "score": score,
+            "candidates_count": len(candidates),
+        })
+
+    return {
+        "batch_id": batch_id,
+        "ga4_source": ga4_data.get("source", "no_data"),
+        "rooms_analyzed": len(room_scores),
+        "proposals_generated": len(proposals),
+        "proposals": proposals,
+    }
+
+
+def get_proposals(status: str | None = None) -> list[dict[str, Any]]:
+    """Fetch proposals from DB, optionally filtered by status."""
+    with store._connect() as conn:
+        if status:
+            rows = conn.execute(
+                "SELECT * FROM proposals WHERE status = ? ORDER BY created_at DESC",
+                (status,),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM proposals ORDER BY created_at DESC LIMIT 100"
+            ).fetchall()
+    result = []
+    for row in rows:
+        d = dict(row)
+        d["candidates"] = json.loads(d.get("candidates_json", "[]"))
+        result.append(d)
+    return result
+
+
+def update_proposal_status(proposal_id: int, status: str, codex_instruction: str | None = None) -> dict[str, Any]:
+    """Update proposal status to adopted/held/rejected."""
+    valid = {"pending", "adopted", "held", "rejected"}
+    if status not in valid:
+        raise ValueError(f"invalid status: {status}")
+    with store._connect() as conn:
+        conn.execute(
+            "UPDATE proposals SET status=?, codex_ready=?, codex_instruction=?, updated_at=? WHERE id=?",
+            (
+                status,
+                1 if (status == "adopted" and codex_instruction) else 0,
+                codex_instruction,
+                now_iso(),
+                proposal_id,
+            ),
+        )
+        row = conn.execute("SELECT * FROM proposals WHERE id=?", (proposal_id,)).fetchone()
+    if not row:
+        raise ValueError(f"proposal {proposal_id} not found")
+    d = dict(row)
+    d["candidates"] = json.loads(d.get("candidates_json", "[]"))
+    return d
 
 
 def central_os_payload() -> dict[str, Any]:
@@ -1469,6 +1757,36 @@ async def api_site_config() -> JSONResponse:
 @app.get("/api/central-os")
 async def api_central_os() -> JSONResponse:
     return JSONResponse(central_os_payload(), headers={"Cache-Control": "no-store"})
+
+@app.post("/api/analysis/run")
+async def api_run_analysis() -> JSONResponse:
+    try:
+        result = await asyncio.get_event_loop().run_in_executor(None, run_analysis)
+        return JSONResponse({"ok": True, **result})
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
+
+@app.get("/api/proposals")
+async def api_get_proposals(status: str | None = None) -> JSONResponse:
+    try:
+        proposals = get_proposals(status)
+        return JSONResponse({"ok": True, "proposals": proposals})
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
+
+@app.post("/api/proposals/{proposal_id}/status")
+async def api_update_proposal(proposal_id: int, body: dict = Body(...)) -> JSONResponse:
+    try:
+        updated = update_proposal_status(
+            proposal_id,
+            str(body.get("status", "pending")),
+            body.get("codex_instruction"),
+        )
+        return JSONResponse({"ok": True, "proposal": updated})
+    except ValueError as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
 
 @app.post("/api/signals")
 async def api_post_signal(body: dict = Body(...)) -> JSONResponse:

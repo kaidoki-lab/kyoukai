@@ -374,32 +374,23 @@
 
     </section>
 
-    <!-- AI SUPERVISOR -->
-    <section class="cos-section" id="cos-supervisor">
-      <h2 class="cos-section-title">[ AI監督レイヤー ]</h2>
-      <div class="cos-sv-status-bar">
-        <div class="cos-sv-status-item">
-          <span class="cos-label">MODE</span>
-          <span class="cos-sv-mode">提案専用 / 実装なし</span>
-        </div>
-        <div class="cos-sv-status-item">
-          <span class="cos-label">SUPERVISOR</span>
-          <span class="cos-value" id="cos-sv-exists">確認中…</span>
-        </div>
-        <div class="cos-sv-status-item">
-          <span class="cos-label">AI接続</span>
-          <span class="cos-sv-no-ai">なし（PHASE 5スコープ）</span>
-        </div>
+    <!-- DASHBOARD -->
+    <section class="cos-section" id="cos-dashboard">
+      <h2 class="cos-section-title">[ 増殖管理ダッシュボード ]</h2>
+
+      <div class="cos-dash-toolbar">
+        <button class="cos-dash-run-btn" id="cos-dash-run">分析実行</button>
+        <span class="cos-dash-status" id="cos-dash-status">待機中</span>
+        <span class="cos-dash-filter-label">表示：</span>
+        <button class="cos-dash-filter active" data-filter="all">すべて</button>
+        <button class="cos-dash-filter" data-filter="pending">未承認</button>
+        <button class="cos-dash-filter" data-filter="adopted">採用</button>
+        <button class="cos-dash-filter" data-filter="held">保留</button>
+        <button class="cos-dash-filter" data-filter="rejected">却下</button>
       </div>
 
-      <div class="cos-sv-note">
-        提案は確認のみ。採用・実装は人間が判断する。<br />
-        codexReady=false の提案はCodexへ渡さない。
-      </div>
-
-      <div class="cos-error" id="cos-sv-error" hidden></div>
-
-      <div id="cos-proposals-body"></div>
+      <div class="cos-error" id="cos-dash-error" hidden></div>
+      <div id="cos-proposals-list"><div class="cos-dash-empty">提案なし — 「分析実行」で生成する</div></div>
     </section>
 
     <!-- PHASE 3 COMPLETION CHECK -->
@@ -1089,6 +1080,146 @@
       } else {
         load();
       }
+    })();
+
+    // ── Dashboard ──────────────────────────────────────────────────────────
+    (function () {
+      var currentFilter = "all";
+
+      var STATUS_LABEL = { pending: "未承認", adopted: "採用", held: "保留", rejected: "却下" };
+      var STATUS_CLASS = { pending: "dash-pending", adopted: "dash-adopted", held: "dash-held", rejected: "dash-rejected" };
+      var PRIORITY_LABEL = { high: "高", medium: "中", low: "低" };
+      var CHANGE_LABEL = { strong: "反応強", active: "反応あり", weak: "反応弱", dead: "死んだ接続", no_data: "データなし" };
+
+      function setDashStatus(msg, cls) {
+        var el = document.getElementById("cos-dash-status");
+        if (el) { el.textContent = msg; el.className = "cos-dash-status " + (cls || ""); }
+      }
+
+      function renderProposals(proposals) {
+        var container = document.getElementById("cos-proposals-list");
+        if (!container) return;
+        var filtered = currentFilter === "all" ? proposals : proposals.filter(function(p) { return p.status === currentFilter; });
+        if (filtered.length === 0) {
+          container.innerHTML = "<div class='cos-dash-empty'>該当する提案なし</div>";
+          return;
+        }
+        container.innerHTML = "";
+        filtered.forEach(function(p) {
+          var card = document.createElement("div");
+          card.className = "cos-proposal-card cos-proposal-" + (p.status || "pending");
+
+          var header = document.createElement("div");
+          header.className = "cos-proposal-header";
+          header.innerHTML =
+            "<span class='cos-proposal-room'>" + safeText(p.target_room) + " — " + safeText(p.name || "") + "</span>" +
+            "<span class='cos-proposal-tag " + (STATUS_CLASS[p.status] || "") + "'>" + (STATUS_LABEL[p.status] || p.status) + "</span>" +
+            "<span class='cos-proposal-priority'>優先度: " + (PRIORITY_LABEL[p.priority] || p.priority) + "</span>" +
+            "<span class='cos-proposal-change-type'>" + (CHANGE_LABEL[p.change_type] || p.change_type) + "</span>";
+          card.appendChild(header);
+
+          var obs = document.createElement("div");
+          obs.className = "cos-proposal-observation";
+          obs.textContent = p.observation || "";
+          card.appendChild(obs);
+
+          var judgment = document.createElement("div");
+          judgment.className = "cos-proposal-judgment";
+          judgment.textContent = p.judgment || "";
+          card.appendChild(judgment);
+
+          var candidates = p.candidates || [];
+          if (candidates.length > 0) {
+            var ul = document.createElement("ul");
+            ul.className = "cos-proposal-candidates";
+            candidates.forEach(function(c) {
+              var li = document.createElement("li");
+              li.textContent = c;
+              ul.appendChild(li);
+            });
+            card.appendChild(ul);
+          }
+
+          if (p.codex_instruction) {
+            var codex = document.createElement("pre");
+            codex.className = "cos-proposal-codex";
+            codex.textContent = p.codex_instruction;
+            card.appendChild(codex);
+          }
+
+          if (p.status === "pending" || p.status === "adopted") {
+            var actions = document.createElement("div");
+            actions.className = "cos-proposal-actions";
+            [["adopt", "採用", "adopted"], ["hold", "保留", "held"], ["reject", "却下", "rejected"]].forEach(function(btn) {
+              if (p.status === "adopted" && btn[2] === "adopted") return;
+              var b = document.createElement("button");
+              b.className = "cos-dash-action-btn cos-dash-" + btn[0];
+              b.textContent = btn[1];
+              b.addEventListener("click", function() { updateStatus(p.id, btn[2]); });
+              actions.appendChild(b);
+            });
+            card.appendChild(actions);
+          }
+
+          container.appendChild(card);
+        });
+      }
+
+      function loadProposals() {
+        fetch("/api/proposals")
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (data.ok) renderProposals(data.proposals || []);
+            else showError("cos-dash-error", "proposals読込失敗: " + data.error);
+          })
+          .catch(function(e) { showError("cos-dash-error", e.message); });
+      }
+
+      function updateStatus(id, status) {
+        fetch("/api/proposals/" + id + "/status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: status }),
+        })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (data.ok) loadProposals();
+            else showError("cos-dash-error", "更新失敗: " + data.error);
+          })
+          .catch(function(e) { showError("cos-dash-error", e.message); });
+      }
+
+      var runBtn = document.getElementById("cos-dash-run");
+      if (runBtn) {
+        runBtn.addEventListener("click", function() {
+          setDashStatus("分析中…", "running");
+          runBtn.disabled = true;
+          fetch("/api/analysis/run", { method: "POST" })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+              if (data.ok) {
+                setDashStatus("生成完了 — " + data.proposals_generated + "件", "ok");
+                loadProposals();
+              } else {
+                setDashStatus("エラー", "error");
+                showError("cos-dash-error", data.error);
+              }
+            })
+            .catch(function(e) { setDashStatus("失敗", "error"); showError("cos-dash-error", e.message); })
+            .finally(function() { runBtn.disabled = false; });
+        });
+      }
+
+      document.querySelectorAll(".cos-dash-filter").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+          currentFilter = btn.dataset.filter || "all";
+          document.querySelectorAll(".cos-dash-filter").forEach(function(b) { b.classList.remove("active"); });
+          btn.classList.add("active");
+          loadProposals();
+        });
+      });
+
+      loadProposals();
     })();
   </script>
 </body>
