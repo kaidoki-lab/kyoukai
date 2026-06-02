@@ -5,6 +5,7 @@ const state = {
   summary: null,
   impulse: 0,
   lastMutationEventId: 0,
+  lastPhaseUpEventId: 0,
   contaminationTimer: null,
   observationStartedAt: Date.now(),
   audio: {
@@ -66,6 +67,7 @@ const elements = {
   creatureDanger: document.querySelector("#creatureDanger"),
   turbulence: document.querySelector("#turbulence"),
   displace: document.querySelector("#displace"),
+  totalVisits: document.querySelector("#totalVisits"),
 };
 
 function setText(element, value) {
@@ -156,6 +158,14 @@ function renderGenome(genome, summary) {
   } else if ((previousAction !== genome.last_action && genome.last_action) || previousMutation !== genome.last_mutation_type) {
     triggerMutationFlash(mutation, 520);
   }
+
+  const phaseUpId = genome.phase_up_event_id ?? 0;
+  if (phaseUpId !== state.lastPhaseUpEventId && phaseUpId > 0) {
+    state.lastPhaseUpEventId = phaseUpId;
+    triggerPhaseUpFlash();
+  }
+
+  setText(elements.totalVisits, genome.total_visits ?? 0);
 
   if (state.audio.enabled) scheduleBioSound();
 }
@@ -297,6 +307,15 @@ function triggerMutationFlash(mutationType, duration = 920) {
     elements.facility.style.setProperty("--impulse", "0");
     document.body.classList.remove("mutation-flash");
     elements.eventBand.classList.remove("event-active");
+  }, duration);
+}
+
+function triggerPhaseUpFlash(duration = 1400) {
+  document.body.classList.add("phase-up-flash");
+  if (elements.eventBand) elements.eventBand.classList.add("event-active");
+  window.setTimeout(() => {
+    document.body.classList.remove("phase-up-flash");
+    if (elements.eventBand) elements.eventBand.classList.remove("event-active");
   }, duration);
 }
 

@@ -100,6 +100,7 @@ GENOME_DEFAULTS: dict[str, Any] = {
     "last_mutation_type": "none",
     "last_mutation_at": "",
     "mutation_event_id": 0,
+    "phase_up_event_id": 0,
     "trait_softness": 0,
     "trait_aggression": 0,
     "trait_gaze": 0,
@@ -582,6 +583,7 @@ class GenomeStore:
         genome["visual_instability"] = clamp(int(genome["visual_instability"]), 0, 100)
         genome["mutation_count"] = max(0, int(genome["mutation_count"]))
         genome["mutation_event_id"] = max(0, int(genome["mutation_event_id"]))
+        genome["phase_up_event_id"] = max(0, int(genome.get("phase_up_event_id", 0)))
         for trait in TRAIT_KEYS:
             genome[trait] = clamp(int(genome[trait]), 0, 100)
 
@@ -1119,6 +1121,7 @@ def update_phase(genome: dict[str, Any]) -> None:
     if genome["phase"] > previous_phase:
         store.append_log(genome, "phase drift crossed threshold")
         store.append_log(genome, "phase drift 微増", "観測")
+        genome["phase_up_event_id"] = max(0, int(genome.get("phase_up_event_id", 0))) + 1
 
 
 def recalculate_genome(genome: dict[str, Any]) -> None:
