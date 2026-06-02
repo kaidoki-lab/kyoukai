@@ -98,22 +98,17 @@
       "id": "room_06",
       "name": "逆観測室",
       "route": "/observer",
-      "status": "未着手",
+      "status": "実装済み",
       "priority": "低",
       "role": "観測する側が観測される逆転の空間。",
       "monetization": [],
       "sns": [],
-      "issues": [
-        "ルートは /observer で予定されているが、テンプレート・実装はまだ存在しない。",
-        "/observer は設計上の確定routeだが main.py には未実装"
-      ],
-      "nextActions": [
-        "逆観測室のコンセプトを固めてから制作に着手する"
-      ],
-      "codexMemo": "ルートは /observer で予定。テンプレート・実装は未着手。 / 実装前に route 追加とテンプレート作成が必要",
-      "implemented": false,
-      "syncStatus": "pending",
-      "lastSynced": null
+      "issues": [],
+      "nextActions": [],
+      "codexMemo": "ルートは /observer で確定。対応テンプレートは observer.html。",
+      "implemented": true,
+      "syncStatus": "synced",
+      "lastSynced": "2026-06-02"
     },
     {
       "id": "room_07",
