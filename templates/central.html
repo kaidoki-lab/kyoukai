@@ -372,21 +372,6 @@
         </table>
       </div>
 
-      <h3 class="cos-subsection-title">部屋別同期状態</h3>
-      <div class="cos-rooms-table-wrap">
-        <table class="cos-table cos-watch-sync-table">
-          <thead>
-            <tr>
-              <th>id</th>
-              <th>name</th>
-              <th>route</th>
-              <th>syncStatus</th>
-              <th>lastSynced</th>
-            </tr>
-          </thead>
-          <tbody id="cos-watch-sync-body"></tbody>
-        </table>
-      </div>
     </section>
 
     <!-- AI SUPERVISOR -->
@@ -1044,31 +1029,6 @@
           }
         }
 
-        // 部屋別同期状態 table (PHASE 8-7)
-        var syncBody = document.getElementById("cos-watch-sync-body");
-        if (syncBody) {
-          syncBody.innerHTML = "";
-          var rooms = (roomsData && roomsData.items) || [];
-          if (rooms.length === 0) {
-            var emptyTr2 = document.createElement("tr");
-            emptyTr2.appendChild(el("td", { text: "(部屋データなし)", colspan: "5" }));
-            syncBody.appendChild(emptyTr2);
-          } else {
-            rooms.forEach(function(room) {
-              var tr = document.createElement("tr");
-              tr.appendChild(el("td", { text: safeText(room.id) }));
-              tr.appendChild(el("td", { text: safeText(room.name) }));
-              tr.appendChild(el("td", { text: safeText(room.route) }));
-              var ssTd = document.createElement("td");
-              var ss = room.syncStatus || "未設定";
-              ssTd.textContent = ss;
-              ssTd.className = "cos-watch-sync-" + ss;
-              tr.appendChild(ssTd);
-              tr.appendChild(el("td", { text: safeText(room.lastSynced || "—") }));
-              syncBody.appendChild(tr);
-            });
-          }
-        }
       }
 
       function renderAll(result) {
