@@ -1132,10 +1132,10 @@ a.sp-link:hover,
 
 .hyougi-void {
   position: absolute;
-  left: 13.2%;
-  top: 5.9%;
-  width: 74%;
-  height: 68.7%;
+  left: 28.9%;
+  top: 8.9%;
+  width: 42.5%;
+  height: 65.5%;
   border-radius: 1.2% / 0.8%;
   z-index: 1;
   overflow: hidden;
@@ -1149,13 +1149,13 @@ a.sp-link:hover,
 
 .hyougi-embed {
   position: absolute;
-  left: 0;
+  left: 50%;
   top: 0;
-  width: 100%;
+  width: 154%;
   height: 100%;
   border: 0;
   background: #000;
-  transform: none;
+  transform: translateX(-50%);
 }
 
 .hyougi-frame::before,
