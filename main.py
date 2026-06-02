@@ -801,6 +801,36 @@ WATCH_HISTORY_DIR = WATCH_DIR / "history"
 GA4_PROPERTY_ID = os.environ.get("KYOUKAI_GA4_PROPERTY_ID", "538546349")
 GA4_CREDENTIALS_FILE = BASE_DIR / "ga4-credentials.json"
 UPDATE_PROPOSALS_FILE = CENTRAL_OS_DIR / "update-proposals.json"
+AI_ANALYST_FILE = CENTRAL_OS_DIR / "analysis" / "ai_analyst.py"
+
+# ─── AI analyst module (importlib, handles hyphen in path) ─────────────────────
+
+def _load_ai_analyst():
+    """Load central-os/analysis/ai_analyst.py at runtime."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("ai_analyst", AI_ANALYST_FILE)
+    if spec is None or spec.loader is None:
+        return None
+    mod = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(mod)  # type: ignore[union-attr]
+        return mod
+    except Exception:
+        return None
+
+_ai_analyst_mod = _load_ai_analyst()
+
+def analyze_page_ai(page: str, pv: int, avg_duration: float, bounce_rate: float, priority: str) -> dict:
+    """Call ai_analyst.analyze_page, fall back to empty dict on any error."""
+    if _ai_analyst_mod is None:
+        return {}
+    try:
+        return _ai_analyst_mod.analyze_page(
+            page=page, pv=pv, avg_duration=avg_duration,
+            bounce_rate=bounce_rate, priority=priority,
+        )
+    except Exception:
+        return {}
 
 # ─── GA4 analysis ──────────────────────────────────────────────────────────────
 
@@ -1155,6 +1185,10 @@ def generate_update_proposals() -> dict[str, Any]:
         prev = existing.get(path, {})
         status = prev.get("status", "pending")
         codex_ready = prev.get("codexReady", False)
+        priority_val = _priority(path, pv)
+
+        # AI analysis layer
+        ai = analyze_page_ai(path, pv, dur, bounce, priority_val)
 
         proposals.append({
             "id": prop_id,
@@ -1163,11 +1197,14 @@ def generate_update_proposals() -> dict[str, Any]:
             "observedPage": path,
             "observation": f"{rule['name']}（{path}）— PV:{pv} / 滞在:{round(dur,1)}秒 / 直帰率:{round(bounce*100,1)}%",
             "judgement": _build_judgement(path, pv, rank, row),
+            "analysis": ai.get("analysis", ""),
+            "hypothesis": ai.get("hypothesis", ""),
+            "recommendations": ai.get("recommendations", []),
             "proposalType": rule["proposalType"],
             "targets": [path],
             "changes": rule["changes"],
             "reason": rule["reason"],
-            "priority": _priority(path, pv),
+            "priority": priority_val,
             "status": status,
             "codexReady": codex_ready,
         })
@@ -1179,6 +1216,7 @@ def generate_update_proposals() -> dict[str, Any]:
         prev = existing.get(path, {})
         status = prev.get("status", "pending")
         prop_id = f"proposal-{abs(hash(path + 'nodata')) % 900 + 100:03d}"
+        ai = analyze_page_ai(path, 0, 0.0, 0.0, "watch")
         proposals.append({
             "id": prop_id,
             "createdAt": today,
@@ -1186,6 +1224,9 @@ def generate_update_proposals() -> dict[str, Any]:
             "observedPage": path,
             "observation": f"{rule['name']}（{path}）— データなし / 反応未確認",
             "judgement": f"{rule['name']}への反応が確認できない。導線見直しを検討する。",
+            "analysis": ai.get("analysis", ""),
+            "hypothesis": ai.get("hypothesis", ""),
+            "recommendations": ai.get("recommendations", []),
             "proposalType": "route_change",
             "targets": [path],
             "changes": [f"{rule['name']}への導線を強化する", f"{rule['name']}への入口を再検討する"],

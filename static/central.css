@@ -1002,3 +1002,26 @@ body {
 .cos-up-act-approved { background: rgba(80,200,120,0.15); border-color: rgba(80,200,120,0.5);  color: #80f0b0; }
 .cos-up-act-hold     { background: rgba(240,200,80,0.12);  border-color: rgba(240,200,80,0.4);  color: #f0e080; }
 .cos-up-act-rejected { background: rgba(200,80,80,0.12);   border-color: rgba(200,80,80,0.4);   color: #f09090; }
+
+/* AI分析官 追加スタイル */
+.cos-up-ai-block {
+  background: rgba(60,40,80,0.4); border: 1px solid rgba(140,100,220,0.2);
+  border-radius: 3px; padding: 8px 10px; margin-bottom: 8px;
+}
+.cos-up-ai-label {
+  display: inline-block; font-size: 9px; color: #a080d0; letter-spacing: 0.08em;
+  text-transform: uppercase; margin-bottom: 4px; background: rgba(140,100,220,0.15);
+  padding: 1px 6px; border-radius: 2px;
+}
+.cos-up-ai-analysis  { font-size: 12px; color: #d0b8f8; line-height: 1.55; margin-bottom: 4px; }
+.cos-up-ai-hypothesis { font-size: 11px; color: #9070b8; font-style: italic; }
+.cos-up-rec-label {
+  font-size: 9px; color: #8060b0; letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 4px; margin-top: 6px;
+}
+.cos-up-recommendations {
+  list-style: none; margin: 0 0 8px 0; padding: 0;
+  border-left: 2px solid rgba(180,140,255,0.3); padding-left: 10px;
+}
+.cos-up-recommendations li { font-size: 12px; color: #c8a8ff; padding: 2px 0; }
+.cos-up-recommendations li::before { content: "◆ "; color: #7050a0; font-size: 9px; }

@@ -1294,6 +1294,42 @@
           jdg.textContent = p.judgement || "";
           card.appendChild(jdg);
 
+          // AI analysis
+          if (p.analysis) {
+            var aiBlock = document.createElement("div");
+            aiBlock.className = "cos-up-ai-block";
+            var aiLabel = document.createElement("span");
+            aiLabel.className = "cos-up-ai-label";
+            aiLabel.textContent = "AI考察";
+            aiBlock.appendChild(aiLabel);
+            var aiText = document.createElement("div");
+            aiText.className = "cos-up-ai-analysis";
+            aiText.textContent = p.analysis;
+            aiBlock.appendChild(aiText);
+            if (p.hypothesis) {
+              var hyp = document.createElement("div");
+              hyp.className = "cos-up-ai-hypothesis";
+              hyp.textContent = "仮説：" + p.hypothesis;
+              aiBlock.appendChild(hyp);
+            }
+            card.appendChild(aiBlock);
+          }
+
+          // AI recommendations
+          var recs = p.recommendations || [];
+          if (recs.length) {
+            var recLabel = document.createElement("div");
+            recLabel.className = "cos-up-rec-label";
+            recLabel.textContent = "推奨更新案";
+            card.appendChild(recLabel);
+            var recUl = document.createElement("ul");
+            recUl.className = "cos-up-recommendations";
+            recs.forEach(function(r) {
+              var li = document.createElement("li"); li.textContent = r; recUl.appendChild(li);
+            });
+            card.appendChild(recUl);
+          }
+
           // changes
           var changes = p.changes || [];
           if (changes.length) {
