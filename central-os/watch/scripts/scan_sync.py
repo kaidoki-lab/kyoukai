@@ -1,197 +1,180 @@
 """
-scan_sync.py — KYOUKAI 総合同期確認スクリプト
-PHASE 8-2
+scan_sync.py - KYOUKAI Central OS integrated sync scan.
 
-scan_routes / scan_templates / scan_static を統合実行し、
-全体の同期状態レポートを生成する。
-実行専用。自動commit・push は行わない。
-
-使い方:
-    python central-os/watch/scripts/scan_sync.py
-    python central-os/watch/scripts/scan_sync.py --write-log  # diff-log.json に追記
-
-オプション:
-    --write-log    差分があった場合、diff-log.json にサマリーエントリを追記する
-                   （ただし人間による確認後に手動でレビュー必須）
+Runs route, template, and static checks in one report. With --write-log it
+appends a pending diff-log entry, unless the latest entry already has the same
+summary for the same day.
 """
+
+from __future__ import annotations
 
 import json
 import re
 import sys
+from datetime import date
+from pathlib import Path
 
-# Windows cp932対策
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
-from datetime import date
-from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
-SCRIPTS_DIR = Path(__file__).resolve().parent
-DIFF_LOG_FILE = BASE_DIR / "central-os" / "watch" / "diff-log.json"
+BASE_DIR = Path(__file__).resolve().parents[3]
 MAIN_PY = BASE_DIR / "main.py"
 TEMPLATES_DIR = BASE_DIR / "templates"
+STATIC_DIR = BASE_DIR / "static"
 ROOMS_JSON = BASE_DIR / "central-os" / "rooms.json"
+DIFF_LOG_FILE = BASE_DIR / "central-os" / "watch" / "diff-log.json"
 
+TECHNICAL_ROUTES = {"/index.html", "/ws"}
 EXCLUDED_TEMPLATES = {"central.html"}
 
-# ─────────────────────────────────────────
-# Inline helpers (重複インポートを避けるため)
-# ─────────────────────────────────────────
 
 def extract_impl_routes(source: str) -> list[str]:
-    routes = []
-    for pattern in [r'"(\/[^"]*?)"\s*:', r'@app\.get\(\s*"(/[^"]*?)"']:
-        for m in re.finditer(pattern, source):
-            r = m.group(1)
-            if r not in routes:
-                routes.append(r)
-    return [r for r in routes if not r.startswith("/api/")]
+    routes: set[str] = set()
+    page_map = re.search(r"_PAGE_MAP\s*:\s*dict\[.*?\]\s*=\s*\{(.*?)\n\s*\}", source, re.S)
+    if page_map:
+        routes.update(match.group(1) for match in re.finditer(r'"(/[^"]*?)"\s*:', page_map.group(1)))
+    routes.update(match.group(1) for match in re.finditer(r'@app\.get\(\s*"(/[^"]*?)"', source))
+    return sorted(route for route in routes if not route.startswith("/api/") and route not in TECHNICAL_ROUTES)
+
 
 def extract_os_routes(rooms_data: dict) -> dict[str, str]:
-    result = {}
+    result: dict[str, str] = {}
     for room in rooms_data.get("items", []):
-        name = room.get("name", room.get("id", "?"))
-        result[name] = room.get("route", "未確定")
+        result[str(room.get("name") or room.get("id") or "?")] = str(room.get("route") or "未確定")
     return result
 
-def extract_template_names(rooms_data: dict) -> set[str]:
-    result = set()
+
+def registered_templates_from_rooms(rooms_data: dict) -> set[str]:
+    result: set[str] = set()
     for room in rooms_data.get("items", []):
-        m = re.search(r'(\w+\.html)', room.get("codexMemo", ""))
-        if m:
-            result.add(m.group(1))
+        memo = str(room.get("codexMemo") or "")
+        result.update(match.group(1) for match in re.finditer(r"([A-Za-z0-9_-]+\.html)", memo))
     return result
 
-# ─────────────────────────────────────────
-# 実行
-# ─────────────────────────────────────────
 
-def run_scan(write_log: bool = False):
+def notable_static_files() -> list[str]:
+    if not STATIC_DIR.exists():
+        return []
+    result: list[str] = []
+    for path in STATIC_DIR.rglob("*"):
+        if not path.is_file():
+            continue
+        rel = str(path.relative_to(STATIC_DIR))
+        lower = rel.replace("\\", "/").lower()
+        if lower.startswith("bgm/"):
+            continue
+        if any(keyword in path.name.lower() for keyword in ("page", "room", "template", "route")):
+            result.append(rel)
+    return sorted(result)
+
+
+def run_scan(write_log: bool = False) -> int:
     print("=" * 60)
-    print("KYOUKAI scan_sync.py — 総合同期確認")
+    print("KYOUKAI scan_sync.py - integrated sync scan")
     print("=" * 60)
-    print(f"スキャン日: {date.today().isoformat()}")
+    print(f"scan date: {date.today().isoformat()}")
 
     issues: list[str] = []
 
-    # ── ROUTES ────────────────────────────
-    print("\n[1/3] route 差分チェック")
-    if not MAIN_PY.exists():
-        print("  [SKIP] main.py が見つかりません")
-        issues.append("main.py not found")
+    print("\n[1/3] route diff check")
+    if not MAIN_PY.exists() or not ROOMS_JSON.exists():
+        msg = "main.py or rooms.json not found"
+        print(f"  [ERROR] {msg}")
+        issues.append(msg)
     else:
         source = MAIN_PY.read_text(encoding="utf-8")
-        impl_routes = set(extract_impl_routes(source))
-
-        if not ROOMS_JSON.exists():
-            print("  [SKIP] rooms.json が見つかりません")
-            issues.append("rooms.json not found")
-        else:
-            rooms_data = json.loads(ROOMS_JSON.read_text(encoding="utf-8"))
-            os_routes_map = extract_os_routes(rooms_data)
-            confirmed_os = {r for r in os_routes_map.values() if r != "未確定"}
-
-            not_in_os = impl_routes - confirmed_os
-            not_in_impl = confirmed_os - impl_routes
-
-            if not not_in_os and not not_in_impl:
-                print("  OK — route 差分なし")
-            else:
-                if not_in_os:
-                    msg = f"main.py にあるが rooms.json 未登録: {sorted(not_in_os)}"
-                    print(f"  WARN — {msg}")
-                    issues.append(msg)
-                if not_in_impl:
-                    msg = f"rooms.json にあるが main.py 未実装: {sorted(not_in_impl)}"
-                    print(f"  WARN — {msg}")
-                    issues.append(msg)
-
-    # ── TEMPLATES ─────────────────────────
-    print("\n[2/3] テンプレート差分チェック")
-    if not TEMPLATES_DIR.exists():
-        print("  [SKIP] templates/ が見つかりません")
-    elif not ROOMS_JSON.exists():
-        print("  [SKIP] rooms.json が見つかりません")
-    else:
-        template_files = {f.name for f in TEMPLATES_DIR.glob("*.html")} - EXCLUDED_TEMPLATES
         rooms_data = json.loads(ROOMS_JSON.read_text(encoding="utf-8"))
-        registered = extract_template_names(rooms_data)
+        impl_routes = set(extract_impl_routes(source))
+        os_routes = {route for route in extract_os_routes(rooms_data).values() if route != "未確定"}
+        not_in_os = sorted(impl_routes - os_routes)
+        not_in_impl = sorted(os_routes - impl_routes)
+        if not not_in_os and not not_in_impl:
+            print("  OK: route diff none")
+        else:
+            if not_in_os:
+                msg = f"main.py route not reflected in rooms.json: {not_in_os}"
+                print(f"  WARN: {msg}")
+                issues.append(msg)
+            if not_in_impl:
+                msg = f"rooms.json route not implemented in main.py: {not_in_impl}"
+                print(f"  WARN: {msg}")
+                issues.append(msg)
 
-        unregistered = template_files - registered
+    print("\n[2/3] template diff check")
+    if not TEMPLATES_DIR.exists() or not ROOMS_JSON.exists():
+        msg = "templates/ or rooms.json not found"
+        print(f"  [ERROR] {msg}")
+        issues.append(msg)
+    else:
+        rooms_data = json.loads(ROOMS_JSON.read_text(encoding="utf-8"))
+        template_files = {path.name for path in TEMPLATES_DIR.glob("*.html")} - EXCLUDED_TEMPLATES
+        registered = registered_templates_from_rooms(rooms_data)
+        unregistered = sorted(template_files - registered)
         if unregistered:
-            msg = f"未登録テンプレート: {sorted(unregistered)}"
-            print(f"  WARN — {msg}")
+            msg = f"template not referenced from rooms.json: {unregistered}"
+            print(f"  WARN: {msg}")
             issues.append(msg)
         else:
-            print("  OK — テンプレート差分なし")
+            print("  OK: template diff none")
 
-    # ── STATIC ────────────────────────────
-    print("\n[3/3] 静的ファイルチェック（概略）")
-    if not (BASE_DIR / "static").exists():
-        print("  [SKIP] static/ が見つかりません")
+    print("\n[3/3] static attention check")
+    static_notable = notable_static_files()
+    if static_notable:
+        print(f"  INFO: attention files: {static_notable}")
     else:
-        notable = [
-            f.relative_to(BASE_DIR / "static")
-            for f in (BASE_DIR / "static").rglob("*")
-            if f.is_file() and any(kw in f.name.lower() for kw in ["page", "room", "template", "route"])
-        ]
-        if notable:
-            msg = f"注意ファイル: {[str(f) for f in notable]}"
-            print(f"  INFO — {msg}")
-        else:
-            print("  OK — 注意ファイルなし")
+        print("  OK: attention files none")
 
-    # ── SUMMARY ───────────────────────────
-    print("\n" + "─" * 60)
-    if not issues:
-        print("[RESULT] 差分なし — Central OS は最新状態です。")
+    print("\n" + "-" * 60)
+    if issues:
+        print(f"[RESULT] {len(issues)} sync issue groups found.")
+        print("         Review update-decision-rules.md before editing Central OS.")
     else:
-        print(f"[RESULT] {len(issues)} 件の差分・注意事項があります。")
-        print("         update-decision-rules.md で OS更新要否を判断してください。")
+        print("[RESULT] Central OS appears synchronized.")
 
-    # ── diff-log.json への追記（オプション）
     if write_log and issues:
-        _append_diff_log(issues)
+        append_diff_log(issues)
 
-    print("\n自動commit・push は行いません。")
+    print("\nNo commit or push was performed.")
+    return 0
 
-def _append_diff_log(issues: list[str]):
-    """差分を diff-log.json に追記する（人間の確認が前提）。"""
+
+def append_diff_log(issues: list[str]) -> None:
     if not DIFF_LOG_FILE.exists():
-        print("\n[WARN] diff-log.json が見つかりません。書き込みをスキップします。")
+        print("\n[WARN] diff-log.json not found. Skipped write.")
         return
 
     data = json.loads(DIFF_LOG_FILE.read_text(encoding="utf-8"))
-    items = data.get("items", [])
-    new_id = f"diff_{date.today().strftime('%Y%m%d')}_{len(items)+1:02d}"
+    items = data.setdefault("items", [])
+    summary = " / ".join(issues[:3]) + (" ..." if len(issues) > 3 else "")
+    today = date.today().isoformat()
 
-    entry = {
+    if items:
+        latest = items[-1]
+        if latest.get("date") == today and latest.get("summary") == summary:
+            print(f"\n[INFO] diff-log.json already contains the latest same-day scan: {latest.get('id')}")
+            return
+
+    new_id = f"diff_{date.today().strftime('%Y%m%d')}_{len(items) + 1:02d}"
+    items.append({
         "id": new_id,
-        "date": date.today().isoformat(),
+        "date": today,
         "targetId": "scan_sync",
         "targetPath": "multiple",
         "changeType": "sync_scan",
-        "summary": " / ".join(issues[:3]) + (" …" if len(issues) > 3 else ""),
+        "summary": summary,
         "osUpdateRequired": True,
         "syncStatus": "pending",
         "targetOsFiles": [],
         "detectedBy": "scan_sync",
         "osUpdated": False,
         "updatedFiles": [],
-        "memo": "scan_sync.py 自動生成エントリ。内容を人間が確認・修正してから使用すること。"
-    }
+        "memo": "Generated by scan_sync.py. Human review is required before use.",
+    })
+    DIFF_LOG_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"\n[INFO] diff-log.json appended: {new_id}")
 
-    items.append(entry)
-    data["items"] = items
-    DIFF_LOG_FILE.write_text(
-        json.dumps(data, ensure_ascii=False, indent=2),
-        encoding="utf-8"
-    )
-    print(f"\n[INFO] diff-log.json に追記しました: {new_id}")
-    print("       必ず内容を確認し、不要な場合は削除してください。")
 
 if __name__ == "__main__":
-    write_log = "--write-log" in sys.argv
-    run_scan(write_log=write_log)
+    raise SystemExit(run_scan(write_log="--write-log" in sys.argv))
