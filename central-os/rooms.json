@@ -132,21 +132,17 @@
     {
       "id": "room_08",
       "name": "記録室",
-      "route": "未確定",
-      "status": "未着手",
+      "route": "/archive",
+      "status": "実装済み",
       "priority": "中",
       "role": "KYOUKAI内の出来事・ログを記録する部屋。",
       "monetization": [],
       "sns": [],
-      "issues": [
-        "/archive が記録室に相当する可能性があるが、対応関係が未確認。"
-      ],
-      "nextActions": [
-        "/archive との対応関係を確認し、記録室のルートを確定させる"
-      ],
-      "codexMemo": "ルート未確定。/archive との関係を確認すること。",
-      "syncStatus": "pending",
-      "lastSynced": null
+      "issues": [],
+      "nextActions": [],
+      "codexMemo": "ルートは /archive で確定。対応テンプレートは archive.html。/archive/logs および /archive/logs/{id} も記録室の配下。",
+      "syncStatus": "synced",
+      "lastSynced": "2026-06-02"
     },
     {
       "id": "room_09",
