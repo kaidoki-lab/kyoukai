@@ -9,7 +9,7 @@ import struct
 import tempfile
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
@@ -560,6 +560,10 @@ class GenomeStore:
                 "INSERT INTO genome_state (created_at, snapshot_json) VALUES (?, ?)",
                 (genome["updated_at"], payload),
             )
+            # keep only the latest 1000 genome_state snapshots to prevent unbounded growth
+            connection.execute(
+                "DELETE FROM genome_state WHERE id NOT IN (SELECT id FROM genome_state ORDER BY id DESC LIMIT 1000)"
+            )
 
     def _normalize(self, genome: dict[str, Any]) -> None:
         genome["observer_count"] = clamp(int(genome["observer_count"]), 0, 999)
@@ -594,6 +598,10 @@ class GenomeStore:
                 "INSERT INTO observation_logs (message, created_at, snapshot_json) VALUES (?, ?, ?)",
                 (entry, now_iso(), snapshot),
             )
+            # retain only the last 30 days of log entries
+            cutoff = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
+            connection.execute("DELETE FROM logs WHERE created_at < ?", (cutoff,))
+            connection.execute("DELETE FROM observation_logs WHERE created_at < ?", (cutoff,))
 
     def append_mutation(self, genome: dict[str, Any], mutation_type: str) -> None:
         snapshot = json.dumps(genome, ensure_ascii=False)
@@ -900,16 +908,24 @@ def central_os_payload() -> dict[str, Any]:
     # watch: diff-log.json
     try:
         with open(DIFF_LOG_FILE, encoding="utf-8") as f:
-            result["data"]["diffLog"] = json.load(f)
+            diff_log = json.load(f)
+        result["data"]["diffLog"] = diff_log
+        items = diff_log.get("items") or []
+        result["data"]["pendingDiffItems"] = [
+            i for i in items if i.get("syncStatus") == "pending" or i.get("osUpdated") is False
+        ]
     except FileNotFoundError:
         result["errors"]["diffLog"] = "file not found"
         result["data"]["diffLog"] = None
+        result["data"]["pendingDiffItems"] = []
     except json.JSONDecodeError as exc:
         result["errors"]["diffLog"] = f"json parse error: {exc}"
         result["data"]["diffLog"] = None
+        result["data"]["pendingDiffItems"] = []
     except Exception as exc:
         result["errors"]["diffLog"] = f"read error: {exc}"
         result["data"]["diffLog"] = None
+        result["data"]["pendingDiffItems"] = []
 
     # watch: watch-targets.json
     try:
