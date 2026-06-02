@@ -61,21 +61,19 @@
     {
       "id": "room_04",
       "name": "崩壊域",
-      "route": "未確定",
+      "route": "/exit",
       "status": "制作中",
       "priority": "中",
       "role": "崩壊・エラー・混沌をテーマにした部屋。",
       "monetization": [],
       "sns": [],
-      "issues": [
-        "対応するルートが未確定。/exit が崩壊域に相当する可能性があるが要確認。"
-      ],
+      "issues": [],
       "nextActions": [
-        "崩壊域に相当するルート・テンプレートを確認し、rooms.json を更新する"
+        "崩壊域としての演出・世界観をさらに強化する"
       ],
-      "codexMemo": "ルート未確定。/exit との対応関係を確認すること。",
-      "syncStatus": "pending",
-      "lastSynced": null
+      "codexMemo": "ルートは /exit で確定。対応テンプレートは exit.html。",
+      "syncStatus": "synced",
+      "lastSynced": "2026-06-02"
     },
     {
       "id": "room_05",
