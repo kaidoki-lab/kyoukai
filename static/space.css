@@ -1149,11 +1149,13 @@ a.sp-link:hover,
 
 .hyougi-embed {
   position: absolute;
-  inset: 0;
-  width: 100%;
+  left: 50%;
+  top: 0;
+  width: 128%;
   height: 100%;
   border: 0;
   background: #000;
+  transform: translateX(-50%);
 }
 
 .hyougi-frame::before,
