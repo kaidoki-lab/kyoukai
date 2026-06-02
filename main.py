@@ -1117,7 +1117,8 @@ def update_phase(genome: dict[str, Any]) -> None:
         next_phase = 2
     if genome["phase_drift"] >= 10 or genome["visual_instability"] >= 12:
         next_phase = 3
-    genome["phase"] = max(previous_phase, next_phase)
+    # allow phase to decrease when conditions drop (natural decay)
+    genome["phase"] = next_phase
     if genome["phase"] > previous_phase:
         store.append_log(genome, "phase drift crossed threshold")
         store.append_log(genome, "phase drift 微増", "観測")
@@ -1249,6 +1250,16 @@ def tick_once() -> dict[str, Any]:
     def mutate(genome: dict[str, Any]) -> None:
         if genome["observer_count"] <= 0:
             genome["observer_count"] = 0
+            # natural decay when no one is observing
+            genome["phase_drift"]         = max(0, genome["phase_drift"] - 2)
+            genome["visual_instability"]  = max(0, genome["visual_instability"] - 2)
+            genome["audio_instability"]   = max(0, genome["audio_instability"] - 1)
+            genome["noise_level"]         = max(0, genome["noise_level"] - 2)
+            genome["boundary_pressure"]   = max(0, genome["boundary_pressure"] - 2)
+            genome["drift"]               = max(0, genome["drift"] - 1)
+            genome["trait_gaze"]          = max(0, genome["trait_gaze"] - 1)
+            genome["silent_observation"]  = max(0, genome["silent_observation"] - 1)
+            update_phase(genome)
             return
         genome["stay_time"] += genome["observer_count"] * TICK_SECONDS
         genome["boundary_pressure"] += genome["observer_count"]
