@@ -10,27 +10,21 @@ import tempfile
 import threading
 import time
 from datetime import datetime, timedelta, timezone
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote, unquote, urlparse
 from urllib.error import URLError
 from urllib.request import Request as UrlRequest, urlopen
 
-try:
-    import asyncio
-    from contextlib import asynccontextmanager
+import asyncio
+from contextlib import asynccontextmanager
 
-    import uvicorn
-    from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-    from fastapi.responses import HTMLResponse
-    from fastapi.staticfiles import StaticFiles
-    from fastapi.templating import Jinja2Templates
-    from starlette.requests import Request
-
-    FASTAPI_AVAILABLE = True
-except ModuleNotFoundError:
-    FASTAPI_AVAILABLE = False
+import uvicorn
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from starlette.requests import Request
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -1219,32 +1213,6 @@ def apply_action(raw_action: str) -> dict[str, Any]:
     return store.update(mutate)
 
 
-class StdlibWebSocketHub:
-    def __init__(self) -> None:
-        self.clients: set[Any] = set()
-        self.lock = threading.Lock()
-
-    def add(self, client: Any) -> None:
-        with self.lock:
-            self.clients.add(client)
-
-    def remove(self, client: Any) -> None:
-        with self.lock:
-            self.clients.discard(client)
-
-    def broadcast(self, genome: dict[str, Any]) -> None:
-        message = json.dumps(state_payload(genome), ensure_ascii=False)
-        with self.lock:
-            clients = list(self.clients)
-        for client in clients:
-            try:
-                client.send_ws_text(message)
-            except OSError:
-                self.remove(client)
-
-
-stdlib_hub = StdlibWebSocketHub()
-
 
 def tick_once() -> dict[str, Any]:
     def mutate(genome: dict[str, Any]) -> None:
@@ -1299,11 +1267,6 @@ def tick_once() -> dict[str, Any]:
     return store.update(mutate)
 
 
-def run_stdlib_clock() -> None:
-    while True:
-        time.sleep(TICK_SECONDS)
-        stdlib_hub.broadcast(tick_once())
-
 
 def state_payload(genome: dict[str, Any]) -> dict[str, Any]:
     summary = genome_summary(genome)
@@ -1322,526 +1285,246 @@ def state_payload(genome: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-class KyoukaiHandler(BaseHTTPRequestHandler):
-    protocol_version = "HTTP/1.1"
+class FastAPIConnectionManager:
+    def __init__(self) -> None:
+        self.connections: set[WebSocket] = set()
 
-    _PAGE_MAP: dict[str, str] = {
-        "/": "home.html",
-        "/index.html": "home.html",
-        "/observation": "index.html",
-        "/observer": "observer.html",
-        "/archive": "archive.html",
-        "/archive/logs": "archive-logs.html",
-        "/archive/logs/001": "archive-log-001.html",
-        "/archive/logs/002": "archive-log-002.html",
-        "/archive/logs/003": "archive-log-003.html",
-        "/archive/logs/004": "archive-log-004.html",
-        "/archive/logs/005": "archive-log-005.html",
-        "/archive/logs/006": "archive-log-006.html",
-        "/archive/logs/007": "archive-log-007.html",
-        "/archive/logs/008": "archive-log-008.html",
-        "/archive/logs/009": "archive-log-009.html",
-        "/archive/logs/010": "archive-log-010.html",
-        "/signal": "signal.html",
-        "/hyougi": "hyougi.html",
-        "/exit": "exit.html",
-        "/null": "null.html",
-        "/outside": "outside.html",
-        "/support": "outside.html",
-        "/central": "central.html",
-        "/about": "about.html",
-        "/privacy-policy": "privacy-policy.html",
-        "/contact": "contact.html",
-        "/terms": "terms.html",
-        "/sitemap": "sitemap.html",
-        "/tiktok": "sns-entry.html",
-        "/shorts": "sns-entry.html",
-        "/x": "sns-entry.html",
-        "/reels": "sns-entry.html",
-    }
+    async def connect(self, websocket: WebSocket) -> None:
+        await websocket.accept()
+        self.connections.add(websocket)
 
-    def do_GET(self) -> None:
-        if self.path == "/ws":
-            self.handle_websocket()
-            return
-        clean_path = self.path.split("?", 1)[0]
-        if clean_path in self._PAGE_MAP:
-            self.serve_file(
-                BASE_DIR / "templates" / self._PAGE_MAP[clean_path],
-                "text/html; charset=utf-8",
-            )
-            return
-        if clean_path.startswith("/static/"):
-            relative = clean_path.removeprefix("/static/")
-            self.serve_file(BASE_DIR / "static" / relative)
-            return
-        if clean_path.startswith("/videos/"):
-            relative = Path(unquote(clean_path.removeprefix("/videos/"))).name
-            self.serve_file(BASE_DIR / "videos" / relative)
-            return
-        if clean_path == "/api/genome":
-            genome = store.get()
-            summary = genome_summary(genome)
-            data = {
-                "phase": int(genome.get("phase", 0)),
-                "mutation_count": int(genome.get("mutation_count", 0)),
-                "last_mutation_type": str(genome.get("last_mutation_type", "none")),
-                "observer_count": int(genome.get("observer_count", 0)),
-                "stability": int(genome.get("stability", 100)),
-                "noise_level": int(genome.get("noise_level", 0)),
-                "mood": str(genome.get("mood", "quiet")),
-                "dominant_trait": summary.get("dominant_trait", "none"),
-                "instability": summary.get("instability", 0),
-                "updated_at": str(genome.get("updated_at", "")),
-            }
-            body = json.dumps(data, ensure_ascii=False).encode()
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
-            return
-        if clean_path == "/api/signals":
-            genome = store.get()
-            phase = int(genome.get("phase", 0))
-            mutation = str(genome.get("last_mutation_type", "none"))
-            signals = get_active_signals(phase, mutation)
-            body = json.dumps({"signals": signals}, ensure_ascii=False).encode()
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
-            return
-        if clean_path == "/api/creature":
-            genome = store.get()
-            body = json.dumps(public_creature_payload(genome), ensure_ascii=False).encode()
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json; charset=utf-8")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
-            return
-        if clean_path == "/api/central-os":
-            body = json.dumps(central_os_payload(), ensure_ascii=False).encode()
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json; charset=utf-8")
-            self.send_header("Cache-Control", "no-store")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
-            return
-        if clean_path == "/api/radio-line":
-            body = json.dumps(generate_radio_line(), ensure_ascii=False).encode()
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json; charset=utf-8")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
-            return
-        if clean_path == "/api/videos":
-            body = json.dumps({"videos": list_signal_videos()}, ensure_ascii=False).encode()
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json; charset=utf-8")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
-            return
-        if clean_path == "/api/site-config":
-            body = json.dumps(site_config_payload(), ensure_ascii=False).encode()
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json; charset=utf-8")
-            self.send_header("Cache-Control", "no-store")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
-            return
-        self.send_error(404)
+    def disconnect(self, websocket: WebSocket) -> None:
+        self.connections.discard(websocket)
 
-    def do_POST(self) -> None:
-        if self.path == "/api/action":
-            length = int(self.headers.get("Content-Length", 0))
-            raw = self.rfile.read(length)
+    async def broadcast(self, genome: dict[str, Any]) -> None:
+        message = json.dumps(state_payload(genome), ensure_ascii=False)
+        for websocket in list(self.connections):
             try:
-                body = json.loads(raw)
-                genome = apply_action(str(body.get("action", "")))
-                stdlib_hub.broadcast(genome)
-                resp = json.dumps(state_payload(genome), ensure_ascii=False).encode()
-                self.send_response(200)
-            except Exception as exc:
-                resp = json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False).encode()
-                self.send_response(400)
-            self.send_header("Content-Type", "application/json")
-            self.send_header("Content-Length", str(len(resp)))
-            self.end_headers()
-            self.wfile.write(resp)
-            return
-        if self.path == "/api/signal-click":
-            length = int(self.headers.get("Content-Length", 0))
-            raw = self.rfile.read(length)
-            try:
-                body = json.loads(raw)
-                log_signal_click(
-                    slot_name=str(body.get("slot_name", "unknown")),
-                    signal_id=int(body.get("signal_id", 0)),
-                    provider=str(body.get("provider", "none")),
-                )
-                resp = json.dumps({"ok": True}, ensure_ascii=False).encode()
-                self.send_response(200)
-            except Exception as exc:
-                resp = json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False).encode()
-                self.send_response(400)
-            self.send_header("Content-Type", "application/json")
-            self.send_header("Content-Length", str(len(resp)))
-            self.end_headers()
-            self.wfile.write(resp)
-            return
-        if self.path == "/api/signals":
-            length = int(self.headers.get("Content-Length", 0))
-            raw = self.rfile.read(length)
-            try:
-                body = json.loads(raw)
-                signal = add_affiliate_signal(
-                    label=str(body.get("label", "untitled")),
-                    url=str(body.get("url", "")),
-                    signal_text=str(body.get("signal_text", "")),
-                    trigger_phase=int(body.get("trigger_phase", 0)),
-                    trigger_mutation=str(body.get("trigger_mutation", "any")),
-                    display_mode=str(body.get("display_mode", "panel")),
-                )
-                resp = json.dumps({"ok": True, "signal": signal}, ensure_ascii=False).encode()
-                self.send_response(200)
-            except Exception as exc:
-                resp = json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False).encode()
-                self.send_response(400)
-            self.send_header("Content-Type", "application/json")
-            self.send_header("Content-Length", str(len(resp)))
-            self.end_headers()
-            self.wfile.write(resp)
-            return
-        self.send_error(404)
+                await websocket.send_text(message)
+            except RuntimeError:
+                self.disconnect(websocket)
 
-    def serve_file(self, path: Path, content_type: str | None = None) -> None:
-        if not path.exists() or not path.is_file():
-            self.send_error(404)
-            return
-        body = path.read_bytes()
-        guessed_type = content_type or mimetypes.guess_type(path.name)[0] or "application/octet-stream"
-        self.send_response(200)
-        self.send_header("Content-Type", guessed_type)
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
+fastapi_manager = FastAPIConnectionManager()
 
-    def handle_websocket(self) -> None:
-        key = self.headers.get("Sec-WebSocket-Key", "")
-        accept = base64.b64encode(
-            hashlib.sha1((key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11").encode()).digest()
-        ).decode()
-        self.send_response(101)
-        self.send_header("Upgrade", "websocket")
-        self.send_header("Connection", "Upgrade")
-        self.send_header("Sec-WebSocket-Accept", accept)
-        self.end_headers()
+async def genome_clock() -> None:
+    while True:
+        await asyncio.sleep(TICK_SECONDS)
+        await fastapi_manager.broadcast(tick_once())
 
-        stdlib_hub.add(self)
-        stdlib_hub.broadcast(apply_connection())
-        try:
-            while True:
-                message = self.read_ws_text()
-                if message is None:
-                    break
-                data = json.loads(message)
-                if data.get("type") == "action" or "action" in data:
-                    stdlib_hub.broadcast(apply_action(str(data.get("action", ""))))
-        except (OSError, json.JSONDecodeError):
-            pass
-        finally:
-            stdlib_hub.remove(self)
-            stdlib_hub.broadcast(apply_disconnection())
-
-    def read_ws_text(self) -> str | None:
-        header = self.rfile.read(2)
-        if len(header) < 2:
-            return None
-        first, second = header
-        opcode = first & 0x0F
-        if opcode == 8:
-            return None
-        length = second & 0x7F
-        if length == 126:
-            length = struct.unpack("!H", self.rfile.read(2))[0]
-        elif length == 127:
-            length = struct.unpack("!Q", self.rfile.read(8))[0]
-        mask = self.rfile.read(4)
-        payload = bytearray(self.rfile.read(length))
-        for index in range(length):
-            payload[index] ^= mask[index % 4]
-        return payload.decode("utf-8")
-
-    def send_ws_text(self, message: str) -> None:
-        payload = message.encode("utf-8")
-        header = bytearray([0x81])
-        if len(payload) < 126:
-            header.append(len(payload))
-        elif len(payload) < 65536:
-            header.extend([126, *struct.pack("!H", len(payload))])
-        else:
-            header.extend([127, *struct.pack("!Q", len(payload))])
-        self.wfile.write(header + payload)
-        self.wfile.flush()
-
-    def log_message(self, format: str, *args: Any) -> None:
-        return
-
-
-if FASTAPI_AVAILABLE:
-    class FastAPIConnectionManager:
-        def __init__(self) -> None:
-            self.connections: set[WebSocket] = set()
-
-        async def connect(self, websocket: WebSocket) -> None:
-            await websocket.accept()
-            self.connections.add(websocket)
-
-        def disconnect(self, websocket: WebSocket) -> None:
-            self.connections.discard(websocket)
-
-        async def broadcast(self, genome: dict[str, Any]) -> None:
-            message = json.dumps(state_payload(genome), ensure_ascii=False)
-            for websocket in list(self.connections):
-                try:
-                    await websocket.send_text(message)
-                except RuntimeError:
-                    self.disconnect(websocket)
-
-    fastapi_manager = FastAPIConnectionManager()
-
-    async def genome_clock() -> None:
-        while True:
-            await asyncio.sleep(TICK_SECONDS)
-            await fastapi_manager.broadcast(tick_once())
-
-    @asynccontextmanager
-    async def lifespan(_: FastAPI):
-        task = asyncio.create_task(genome_clock())
-        try:
-            yield
-        finally:
-            task.cancel()
-
-    app = FastAPI(title="KYOUKAI alpha", lifespan=lifespan)
-    app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
-    videos_dir = VIDEOS_DIR
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    task = asyncio.create_task(genome_clock())
     try:
-        videos_dir.mkdir(exist_ok=True)
-    except OSError:
-        pass  # Vercel 読み取り専用ファイルシステム対策
-    if videos_dir.exists():
-        app.mount("/videos", StaticFiles(directory=videos_dir), name="videos")
-    templates = Jinja2Templates(directory=BASE_DIR / "templates")
+        yield
+    finally:
+        task.cancel()
 
-    from fastapi import Body
-    from fastapi.responses import JSONResponse
+app = FastAPI(title="KYOUKAI alpha", lifespan=lifespan)
+app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+videos_dir = VIDEOS_DIR
+try:
+    videos_dir.mkdir(exist_ok=True)
+except OSError:
+    pass  # Vercel 読み取り専用ファイルシステム対策
+if videos_dir.exists():
+    app.mount("/videos", StaticFiles(directory=videos_dir), name="videos")
+templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
-    def render_template(request: Request, name: str) -> HTMLResponse:
-        try:
-            return templates.TemplateResponse(
-                request=request,
-                name=name,
-                context={"request": request},
-            )
-        except TypeError:
-            return templates.TemplateResponse(name, {"request": request})
+from fastapi import Body
+from fastapi.responses import JSONResponse
 
-    # ─── Pages ──────────────────────────────────────────────────────────────
+def render_template(request: Request, name: str) -> HTMLResponse:
+    try:
+        return templates.TemplateResponse(
+            request=request,
+            name=name,
+            context={"request": request},
+        )
+    except TypeError:
+        return templates.TemplateResponse(name, {"request": request})
 
-    @app.get("/", response_class=HTMLResponse)
-    async def entrance(request: Request) -> HTMLResponse:
-        return render_template(request, "home.html")
+# ─── Pages ──────────────────────────────────────────────────────────────
 
-    @app.get("/observation", response_class=HTMLResponse)
-    async def observation(request: Request) -> HTMLResponse:
-        return render_template(request, "index.html")
+@app.get("/", response_class=HTMLResponse)
+async def entrance(request: Request) -> HTMLResponse:
+    return render_template(request, "home.html")
 
-    @app.get("/observer", response_class=HTMLResponse)
-    async def observer_room(request: Request) -> HTMLResponse:
-        return render_template(request, "observer.html")
+@app.get("/observation", response_class=HTMLResponse)
+async def observation(request: Request) -> HTMLResponse:
+    return render_template(request, "index.html")
 
-    @app.get("/archive", response_class=HTMLResponse)
-    async def archive(request: Request) -> HTMLResponse:
-        return render_template(request, "archive.html")
+@app.get("/observer", response_class=HTMLResponse)
+async def observer_room(request: Request) -> HTMLResponse:
+    return render_template(request, "observer.html")
 
-    @app.get("/archive/logs", response_class=HTMLResponse)
-    async def archive_logs(request: Request) -> HTMLResponse:
-        return render_template(request, "archive-logs.html")
+@app.get("/archive", response_class=HTMLResponse)
+async def archive(request: Request) -> HTMLResponse:
+    return render_template(request, "archive.html")
 
-    @app.get("/archive/logs/{log_id}", response_class=HTMLResponse)
-    async def archive_log_detail(request: Request, log_id: str) -> HTMLResponse:
-        if log_id not in {f"{index:03d}" for index in range(1, 11)}:
-            return HTMLResponse("archive log not found", status_code=404)
-        return render_template(request, f"archive-log-{log_id}.html")
+@app.get("/archive/logs", response_class=HTMLResponse)
+async def archive_logs(request: Request) -> HTMLResponse:
+    return render_template(request, "archive-logs.html")
 
-    @app.get("/signal", response_class=HTMLResponse)
-    async def signal_room(request: Request) -> HTMLResponse:
-        return render_template(request, "signal.html")
+@app.get("/archive/logs/{log_id}", response_class=HTMLResponse)
+async def archive_log_detail(request: Request, log_id: str) -> HTMLResponse:
+    if log_id not in {f"{index:03d}" for index in range(1, 11)}:
+        return HTMLResponse("archive log not found", status_code=404)
+    return render_template(request, f"archive-log-{log_id}.html")
 
-    @app.get("/hyougi", response_class=HTMLResponse)
-    async def hyougi_room(request: Request) -> HTMLResponse:
-        return render_template(request, "hyougi.html")
+@app.get("/signal", response_class=HTMLResponse)
+async def signal_room(request: Request) -> HTMLResponse:
+    return render_template(request, "signal.html")
 
-    @app.get("/exit", response_class=HTMLResponse)
-    async def exit_room(request: Request) -> HTMLResponse:
-        return render_template(request, "exit.html")
+@app.get("/hyougi", response_class=HTMLResponse)
+async def hyougi_room(request: Request) -> HTMLResponse:
+    return render_template(request, "hyougi.html")
 
-    @app.get("/null", response_class=HTMLResponse)
-    async def null_room(request: Request) -> HTMLResponse:
-        return render_template(request, "null.html")
+@app.get("/exit", response_class=HTMLResponse)
+async def exit_room(request: Request) -> HTMLResponse:
+    return render_template(request, "exit.html")
 
-    @app.get("/outside", response_class=HTMLResponse)
-    @app.get("/support", response_class=HTMLResponse)
-    async def outside_core(request: Request) -> HTMLResponse:
-        return render_template(request, "outside.html")
+@app.get("/null", response_class=HTMLResponse)
+async def null_room(request: Request) -> HTMLResponse:
+    return render_template(request, "null.html")
 
-    @app.get("/central", response_class=HTMLResponse)
-    async def central_os_page(request: Request) -> HTMLResponse:
-        return render_template(request, "central.html")
+@app.get("/outside", response_class=HTMLResponse)
+@app.get("/support", response_class=HTMLResponse)
+async def outside_core(request: Request) -> HTMLResponse:
+    return render_template(request, "outside.html")
 
-    @app.get("/about", response_class=HTMLResponse)
-    async def about_page(request: Request) -> HTMLResponse:
-        return render_template(request, "about.html")
+@app.get("/central", response_class=HTMLResponse)
+async def central_os_page(request: Request) -> HTMLResponse:
+    return render_template(request, "central.html")
 
-    @app.get("/privacy-policy", response_class=HTMLResponse)
-    async def privacy_policy_page(request: Request) -> HTMLResponse:
-        return render_template(request, "privacy-policy.html")
+@app.get("/about", response_class=HTMLResponse)
+async def about_page(request: Request) -> HTMLResponse:
+    return render_template(request, "about.html")
 
-    @app.get("/contact", response_class=HTMLResponse)
-    async def contact_page(request: Request) -> HTMLResponse:
-        return render_template(request, "contact.html")
+@app.get("/privacy-policy", response_class=HTMLResponse)
+async def privacy_policy_page(request: Request) -> HTMLResponse:
+    return render_template(request, "privacy-policy.html")
 
-    @app.get("/terms", response_class=HTMLResponse)
-    async def terms_page(request: Request) -> HTMLResponse:
-        return render_template(request, "terms.html")
+@app.get("/contact", response_class=HTMLResponse)
+async def contact_page(request: Request) -> HTMLResponse:
+    return render_template(request, "contact.html")
 
-    @app.get("/sitemap", response_class=HTMLResponse)
-    async def sitemap_page(request: Request) -> HTMLResponse:
-        return render_template(request, "sitemap.html")
+@app.get("/terms", response_class=HTMLResponse)
+async def terms_page(request: Request) -> HTMLResponse:
+    return render_template(request, "terms.html")
 
-    @app.get("/tiktok", response_class=HTMLResponse)
-    @app.get("/shorts", response_class=HTMLResponse)
-    @app.get("/x", response_class=HTMLResponse)
-    @app.get("/reels", response_class=HTMLResponse)
-    async def sns_entry_page(request: Request) -> HTMLResponse:
-        return render_template(request, "sns-entry.html")
+@app.get("/sitemap", response_class=HTMLResponse)
+async def sitemap_page(request: Request) -> HTMLResponse:
+    return render_template(request, "sitemap.html")
 
-    # ─── API ────────────────────────────────────────────────
+@app.get("/tiktok", response_class=HTMLResponse)
+@app.get("/shorts", response_class=HTMLResponse)
+@app.get("/x", response_class=HTMLResponse)
+@app.get("/reels", response_class=HTMLResponse)
+async def sns_entry_page(request: Request) -> HTMLResponse:
+    return render_template(request, "sns-entry.html")
 
-    @app.get("/api/genome")
-    async def api_genome() -> JSONResponse:
-        genome = store.get()
-        summary = genome_summary(genome)
-        return JSONResponse({
-            "phase": int(genome.get("phase", 0)),
-            "mutation_count": int(genome.get("mutation_count", 0)),
-            "last_mutation_type": str(genome.get("last_mutation_type", "none")),
-            "observer_count": int(genome.get("observer_count", 0)),
-            "stability": int(genome.get("stability", 100)),
-            "noise_level": int(genome.get("noise_level", 0)),
-            "mood": str(genome.get("mood", "quiet")),
-            "dominant_trait": summary.get("dominant_trait", "none"),
-            "instability": summary.get("instability", 0),
-            "updated_at": str(genome.get("updated_at", "")),
-        })
+# ─── API ────────────────────────────────────────────────
 
-    @app.get("/api/signals")
-    async def api_get_signals() -> JSONResponse:
-        genome = store.get()
-        phase = int(genome.get("phase", 0))
-        mutation = str(genome.get("last_mutation_type", "none"))
-        signals = get_active_signals(phase, mutation)
-        return JSONResponse({"signals": signals})
+@app.get("/api/genome")
+async def api_genome() -> JSONResponse:
+    genome = store.get()
+    summary = genome_summary(genome)
+    return JSONResponse({
+        "phase": int(genome.get("phase", 0)),
+        "mutation_count": int(genome.get("mutation_count", 0)),
+        "last_mutation_type": str(genome.get("last_mutation_type", "none")),
+        "observer_count": int(genome.get("observer_count", 0)),
+        "stability": int(genome.get("stability", 100)),
+        "noise_level": int(genome.get("noise_level", 0)),
+        "mood": str(genome.get("mood", "quiet")),
+        "dominant_trait": summary.get("dominant_trait", "none"),
+        "instability": summary.get("instability", 0),
+        "updated_at": str(genome.get("updated_at", "")),
+    })
 
-    @app.get("/api/creature")
-    async def api_creature() -> JSONResponse:
-        return JSONResponse(public_creature_payload(store.get()))
+@app.get("/api/signals")
+async def api_get_signals() -> JSONResponse:
+    genome = store.get()
+    phase = int(genome.get("phase", 0))
+    mutation = str(genome.get("last_mutation_type", "none"))
+    signals = get_active_signals(phase, mutation)
+    return JSONResponse({"signals": signals})
 
-    @app.get("/api/radio-line")
-    async def api_radio_line() -> JSONResponse:
-        return JSONResponse(generate_radio_line())
+@app.get("/api/creature")
+async def api_creature() -> JSONResponse:
+    return JSONResponse(public_creature_payload(store.get()))
 
-    @app.get("/api/videos")
-    async def api_videos() -> JSONResponse:
-        return JSONResponse({"videos": list_signal_videos()})
+@app.get("/api/radio-line")
+async def api_radio_line() -> JSONResponse:
+    return JSONResponse(generate_radio_line())
 
-    @app.get("/api/site-config")
-    async def api_site_config() -> JSONResponse:
-        return JSONResponse(site_config_payload(), headers={"Cache-Control": "no-store"})
+@app.get("/api/videos")
+async def api_videos() -> JSONResponse:
+    return JSONResponse({"videos": list_signal_videos()})
 
-    @app.get("/api/central-os")
-    async def api_central_os() -> JSONResponse:
-        return JSONResponse(central_os_payload(), headers={"Cache-Control": "no-store"})
+@app.get("/api/site-config")
+async def api_site_config() -> JSONResponse:
+    return JSONResponse(site_config_payload(), headers={"Cache-Control": "no-store"})
 
-    @app.post("/api/signals")
-    async def api_post_signal(body: dict = Body(...)) -> JSONResponse:
-        try:
-            signal = add_affiliate_signal(
-                label=str(body.get("label", "untitled")),
-                url=str(body.get("url", "")),
-                signal_text=str(body.get("signal_text", "")),
-                trigger_phase=int(body.get("trigger_phase", 0)),
-                trigger_mutation=str(body.get("trigger_mutation", "any")),
-                display_mode=str(body.get("display_mode", "panel")),
-            )
-            return JSONResponse({"ok": True, "signal": signal})
-        except Exception as exc:
-            return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
+@app.get("/api/central-os")
+async def api_central_os() -> JSONResponse:
+    return JSONResponse(central_os_payload(), headers={"Cache-Control": "no-store"})
 
-    @app.post("/api/action")
-    async def api_action(body: dict = Body(...)) -> JSONResponse:
-        try:
-            genome = apply_action(str(body.get("action", "")))
-            await fastapi_manager.broadcast(genome)
-            return JSONResponse(state_payload(genome))
-        except Exception as exc:
-            return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
+@app.post("/api/signals")
+async def api_post_signal(body: dict = Body(...)) -> JSONResponse:
+    try:
+        signal = add_affiliate_signal(
+            label=str(body.get("label", "untitled")),
+            url=str(body.get("url", "")),
+            signal_text=str(body.get("signal_text", "")),
+            trigger_phase=int(body.get("trigger_phase", 0)),
+            trigger_mutation=str(body.get("trigger_mutation", "any")),
+            display_mode=str(body.get("display_mode", "panel")),
+        )
+        return JSONResponse({"ok": True, "signal": signal})
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
 
-    @app.post("/api/signal-click")
-    async def api_signal_click(body: dict = Body(...)) -> JSONResponse:
-        try:
-            log_signal_click(
-                slot_name=str(body.get("slot_name", "unknown")),
-                signal_id=int(body.get("signal_id", 0)),
-                provider=str(body.get("provider", "none")),
-            )
-            return JSONResponse({"ok": True})
-        except Exception as exc:
-            return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
+@app.post("/api/action")
+async def api_action(body: dict = Body(...)) -> JSONResponse:
+    try:
+        genome = apply_action(str(body.get("action", "")))
+        await fastapi_manager.broadcast(genome)
+        return JSONResponse(state_payload(genome))
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
 
-    @app.websocket("/ws")
-    async def websocket_endpoint(websocket: WebSocket) -> None:
-        await fastapi_manager.connect(websocket)
-        await fastapi_manager.broadcast(apply_connection())
-        try:
-            while True:
-                payload = await websocket.receive_text()
-                data = json.loads(payload)
-                if data.get("type") == "action" or "action" in data:
-                    await fastapi_manager.broadcast(apply_action(str(data.get("action", ""))))
-        except (WebSocketDisconnect, json.JSONDecodeError):
-            fastapi_manager.disconnect(websocket)
-            await fastapi_manager.broadcast(apply_disconnection())
+@app.post("/api/signal-click")
+async def api_signal_click(body: dict = Body(...)) -> JSONResponse:
+    try:
+        log_signal_click(
+            slot_name=str(body.get("slot_name", "unknown")),
+            signal_id=int(body.get("signal_id", 0)),
+            provider=str(body.get("provider", "none")),
+        )
+        return JSONResponse({"ok": True})
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket) -> None:
+    await fastapi_manager.connect(websocket)
+    await fastapi_manager.broadcast(apply_connection())
+    try:
+        while True:
+            payload = await websocket.receive_text()
+            data = json.loads(payload)
+            if data.get("type") == "action" or "action" in data:
+                await fastapi_manager.broadcast(apply_action(str(data.get("action", ""))))
+    except (WebSocketDisconnect, json.JSONDecodeError):
+        fastapi_manager.disconnect(websocket)
+        await fastapi_manager.broadcast(apply_disconnection())
 
 
 def main() -> None:
-    if FASTAPI_AVAILABLE:
-        host = os.environ.get("HOST", "127.0.0.1")
-        port = int(os.environ.get("PORT", "8000"))
-        uvicorn.run(app, host=host, port=port, reload=False)
-        return
-    threading.Thread(target=run_stdlib_clock, daemon=True).start()
-    server = ThreadingHTTPServer(("127.0.0.1", 8000), KyoukaiHandler)
-    print("KYOUKAI alpha running at http://127.0.0.1:8000")
-    server.serve_forever()
+    host = os.environ.get("HOST", "127.0.0.1")
+    port = int(os.environ.get("PORT", "8000"))
+    uvicorn.run(app, host=host, port=port, reload=False)
 
 
 if __name__ == "__main__":
