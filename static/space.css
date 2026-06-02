@@ -260,8 +260,9 @@ a.sp-link:hover,
 
 .signal-chapel-frame {
   position: relative;
-  width: min(100vw, calc(100vh * 1.5));
-  aspect-ratio: 3 / 2;
+  width: min(100vw, calc(100svh * 9 / 16));
+  max-height: 100svh;
+  aspect-ratio: 9 / 16;
   margin: 0;
   overflow: hidden;
   background: #070503;
@@ -281,10 +282,10 @@ a.sp-link:hover,
 
 .signal-tv-screen {
   position: absolute;
-  left: 36.55%;
-  top: 45.35%;
-  width: 33.85%;
-  height: 35.45%;
+  left: 16.1%;
+  top: 49.8%;
+  width: 63%;
+  height: 24.4%;
   z-index: 2;
   overflow: hidden;
   border-radius: 8% / 12%;
@@ -354,12 +355,12 @@ a.sp-link:hover,
 
 .signal-channel-hit {
   position: absolute;
-  left: 72.5%;
-  top: 42.2%;
+  left: 79.5%;
+  top: 48.6%;
   z-index: 6;
   display: block;
-  width: 6.9%;
-  height: 31.2%;
+  width: 10.4%;
+  height: 20.8%;
   border: 0;
   padding: 0;
   background: rgba(255, 255, 255, 0.001);
@@ -390,11 +391,14 @@ a.sp-link:hover,
 
 .signal-info {
   position: absolute;
-  left: 3.6%;
-  bottom: 6.6%;
+  left: calc(100% + clamp(14px, 2vw, 28px));
+  top: 50%;
   z-index: 5;
+  width: clamp(220px, calc((100vw - min(100vw, calc(100svh * 9 / 16))) / 2 - 32px), 330px);
   max-width: 420px;
-  padding: 18px 22px;
+  max-height: 76svh;
+  overflow: auto;
+  padding: 16px 18px;
   border: 1px solid rgba(180, 220, 255, 0.18);
   background:
     linear-gradient(180deg, rgba(4, 6, 12, 0.72), rgba(4, 6, 12, 0.36)),
@@ -408,6 +412,7 @@ a.sp-link:hover,
     0 0 18px rgba(60, 170, 255, 0.14),
     inset 0 0 24px rgba(0, 0, 0, 0.52);
   backdrop-filter: blur(3px);
+  transform: translateY(-50%);
 }
 
 .signal-info h2 {
@@ -3243,6 +3248,32 @@ a.sp-link:hover,
 
   .collapse-meter span {
     display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .signal-room {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: auto;
+    padding: 0 0 16px;
+  }
+
+  .signal-chapel-frame {
+    width: min(100vw, calc(100svh * 9 / 16));
+    margin: 0 auto;
+  }
+
+  .signal-info {
+    position: relative;
+    inset: auto;
+    width: calc(100% - 28px);
+    max-width: 640px;
+    max-height: none;
+    margin: 12px auto 18px;
+    overflow: visible;
+    transform: none;
   }
 }
 
