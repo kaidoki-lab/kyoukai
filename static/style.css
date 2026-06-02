@@ -2808,16 +2808,12 @@ body:has(.observation-room) {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(58px, auto);
   gap: clamp(5px, 0.6vw, 9px);
-  padding: clamp(5px, 0.55vw, 8px);
-  border: 1px solid rgba(255, 48, 79, 0.58);
-  border-radius: 8px;
-  background:
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 5px),
-    rgba(18, 0, 8, 0.74);
-  box-shadow:
-    0 0 14px rgba(255, 0, 120, 0.22),
-    inset 0 0 18px rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(1px);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
 .terminal-command select,
