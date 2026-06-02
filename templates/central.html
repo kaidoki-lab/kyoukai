@@ -393,6 +393,23 @@
       <div id="cos-proposals-list"><div class="cos-dash-empty">提案なし — 「分析実行」で生成する</div></div>
     </section>
 
+    <!-- UPDATE PROPOSALS -->
+    <section class="cos-section" id="cos-update-proposals">
+      <h2 class="cos-section-title">[ 定期更新提案 ]</h2>
+      <div class="cos-up-toolbar">
+        <button class="cos-up-run-btn" id="cos-up-run">提案を更新</button>
+        <span class="cos-up-status" id="cos-up-status">待機中</span>
+        <span class="cos-up-filter-label">表示：</span>
+        <button class="cos-up-filter active" data-upfilter="all">すべて</button>
+        <button class="cos-up-filter" data-upfilter="pending">未判断</button>
+        <button class="cos-up-filter" data-upfilter="approved">採用</button>
+        <button class="cos-up-filter" data-upfilter="hold">保留</button>
+        <button class="cos-up-filter" data-upfilter="rejected">却下</button>
+      </div>
+      <div class="cos-error" id="cos-up-error" hidden></div>
+      <div id="cos-up-list"><div class="cos-up-empty">提案なし — 「提案を更新」で生成する</div></div>
+    </section>
+
     <!-- PHASE 3 COMPLETION CHECK -->
     <section class="cos-section" id="cos-completion">
       <h2 class="cos-section-title">[ PHASE 3 完了判定 ]</h2>
@@ -1220,6 +1237,156 @@
       });
 
       loadProposals();
+    })();
+
+    // ── 定期更新提案 ──────────────────────────────────────────────────────────
+    (function () {
+      var upFilter = "all";
+      var UP_STATUS_LABEL = { pending: "未判断", approved: "採用", hold: "保留", rejected: "却下" };
+      var UP_STATUS_CLASS = { pending: "up-pending", approved: "up-approved", hold: "up-hold", rejected: "up-rejected" };
+      var UP_PRIORITY_LABEL = { high: "高", medium: "中", low: "低", watch: "観測" };
+      var UP_PRIORITY_CLASS = { high: "up-prio-high", medium: "up-prio-medium", low: "up-prio-low", watch: "up-prio-watch" };
+      var UP_TYPE_LABEL = {
+        page_growth: "増殖", visual_change: "ビジュアル", route_change: "導線",
+        scenario_change: "シナリオ", archive_addition: "記録追加",
+        outside_adjustment: "外部接続", signal_fragment: "受信断片",
+      };
+
+      function setUpStatus(msg, cls) {
+        var el = document.getElementById("cos-up-status");
+        if (el) { el.textContent = msg; el.className = "cos-up-status " + (cls || ""); }
+      }
+
+      function renderUpdateProposals(proposals) {
+        var container = document.getElementById("cos-up-list");
+        if (!container) return;
+        var filtered = upFilter === "all" ? proposals
+          : proposals.filter(function(p) { return p.status === upFilter; });
+        if (!filtered.length) {
+          container.innerHTML = "<div class='cos-up-empty'>該当する提案なし</div>";
+          return;
+        }
+        container.innerHTML = "";
+        filtered.forEach(function(p) {
+          var card = document.createElement("div");
+          card.className = "cos-up-card cos-up-" + (p.status || "pending");
+
+          // header
+          var hdr = document.createElement("div");
+          hdr.className = "cos-up-header";
+          hdr.innerHTML =
+            "<span class='cos-up-page'>" + safeText(p.observedPage) + "</span>" +
+            "<span class='cos-up-tag " + (UP_STATUS_CLASS[p.status] || "") + "'>" + (UP_STATUS_LABEL[p.status] || p.status) + "</span>" +
+            "<span class='cos-up-type'>" + (UP_TYPE_LABEL[p.proposalType] || p.proposalType) + "</span>" +
+            "<span class='cos-up-prio " + (UP_PRIORITY_CLASS[p.priority] || "") + "'>" + (UP_PRIORITY_LABEL[p.priority] || p.priority) + "</span>" +
+            "<span class='cos-up-date'>" + safeText(p.createdAt || "") + "</span>";
+          card.appendChild(hdr);
+
+          // observation
+          var obs = document.createElement("div");
+          obs.className = "cos-up-observation";
+          obs.textContent = p.observation || "";
+          card.appendChild(obs);
+
+          // judgement
+          var jdg = document.createElement("div");
+          jdg.className = "cos-up-judgement";
+          jdg.textContent = p.judgement || "";
+          card.appendChild(jdg);
+
+          // changes
+          var changes = p.changes || [];
+          if (changes.length) {
+            var ul = document.createElement("ul");
+            ul.className = "cos-up-changes";
+            changes.forEach(function(c) {
+              var li = document.createElement("li"); li.textContent = c; ul.appendChild(li);
+            });
+            card.appendChild(ul);
+          }
+
+          // reason
+          if (p.reason) {
+            var rsn = document.createElement("div");
+            rsn.className = "cos-up-reason";
+            rsn.textContent = p.reason;
+            card.appendChild(rsn);
+          }
+
+          // actions (pending/approved only)
+          if (p.status !== "rejected") {
+            var acts = document.createElement("div");
+            acts.className = "cos-up-actions";
+            [["approved","採用"], ["hold","保留"], ["rejected","却下"]].forEach(function(btn) {
+              if (p.status === btn[0]) return;
+              var b = document.createElement("button");
+              b.className = "cos-up-action-btn cos-up-act-" + btn[0];
+              b.textContent = btn[1];
+              b.addEventListener("click", function() { updateUpStatus(p.id, btn[0]); });
+              acts.appendChild(b);
+            });
+            card.appendChild(acts);
+          }
+
+          container.appendChild(card);
+        });
+      }
+
+      function loadUpdateProposals() {
+        fetch("/api/central-os")
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            var proposals = (data.data && data.data.updateProposals) || [];
+            renderUpdateProposals(proposals);
+          })
+          .catch(function(e) { showError("cos-up-error", e.message); });
+      }
+
+      function updateUpStatus(id, status) {
+        fetch("/api/update-proposals/" + id + "/status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: status }),
+        })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (data.ok) loadUpdateProposals();
+            else showError("cos-up-error", "更新失敗: " + data.error);
+          })
+          .catch(function(e) { showError("cos-up-error", e.message); });
+      }
+
+      var runBtn = document.getElementById("cos-up-run");
+      if (runBtn) {
+        runBtn.addEventListener("click", function() {
+          setUpStatus("生成中…", "running");
+          runBtn.disabled = true;
+          fetch("/api/update-proposals/run", { method: "POST" })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+              if (data.ok) {
+                setUpStatus(data.proposals_written + "件生成", "ok");
+                loadUpdateProposals();
+              } else {
+                setUpStatus("エラー", "error");
+                showError("cos-up-error", data.error);
+              }
+            })
+            .catch(function(e) { setUpStatus("失敗", "error"); showError("cos-up-error", e.message); })
+            .finally(function() { runBtn.disabled = false; });
+        });
+      }
+
+      document.querySelectorAll(".cos-up-filter").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+          upFilter = btn.dataset.upfilter || "all";
+          document.querySelectorAll(".cos-up-filter").forEach(function(b) { b.classList.remove("active"); });
+          btn.classList.add("active");
+          loadUpdateProposals();
+        });
+      });
+
+      loadUpdateProposals();
     })();
   </script>
 </body>

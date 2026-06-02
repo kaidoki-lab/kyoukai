@@ -800,6 +800,7 @@ WATCH_HISTORY_DIR = WATCH_DIR / "history"
 
 GA4_PROPERTY_ID = os.environ.get("KYOUKAI_GA4_PROPERTY_ID", "538546349")
 GA4_CREDENTIALS_FILE = BASE_DIR / "ga4-credentials.json"
+UPDATE_PROPOSALS_FILE = CENTRAL_OS_DIR / "update-proposals.json"
 
 # ─── GA4 analysis ──────────────────────────────────────────────────────────────
 
@@ -1023,6 +1024,211 @@ def run_analysis() -> dict[str, Any]:
     }
 
 
+def generate_update_proposals() -> dict[str, Any]:
+    """Fetch GA4 data, apply analysis rules v1, save update-proposals.json."""
+    ga4_data = _fetch_ga4_data()
+    rows: list[dict[str, Any]] = ga4_data.get("rows", [])
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    # sort by pageviews desc
+    sorted_rows = sorted(rows, key=lambda r: r.get("pageviews", 0), reverse=True)
+    pv_rank = {r["path"]: i for i, r in enumerate(sorted_rows)}
+
+    # rule table: path → (proposalType, changes_template, reason_template)
+    PAGE_RULES: dict[str, dict[str, Any]] = {
+        "/null": {
+            "proposalType": "page_growth",
+            "changes": [
+                "崩落域の追加断片テキストを1件生成する",
+                "崩壊演出の軽い差分を追加する",
+                "/archive へ残留ログを追加する",
+            ],
+            "reason": "GA4上で/nullへの反応が確認できるため、崩落域を増殖候補に入れる。",
+            "name": "未確認接続",
+        },
+        "/observation": {
+            "proposalType": "page_growth",
+            "changes": [
+                "観測域の生命体ログを1件追加する",
+                "背景ノイズの軽い強化を加える",
+                "/signal への導線を薄く追加する",
+                "観測者数に応じた微変化を追加する",
+            ],
+            "reason": "観測域が現在もっとも反応を得ているため、KYOUKAIの中核として増殖候補に入れる。",
+            "name": "観測域",
+        },
+        "/outside": {
+            "proposalType": "outside_adjustment",
+            "changes": [
+                "outsideアイコンの配置パターンを増やす",
+                "外部接続後に戻る導線を追加する",
+                "自販機型の隠しアイコンを1種類追加する",
+                "/signal に外部信号ログを1件追加する",
+            ],
+            "reason": "外部接続への反応が確認されているため、outside を異常導線として強化する。",
+            "name": "外部接続",
+        },
+        "/exit": {
+            "proposalType": "scenario_change",
+            "changes": [
+                "境界域の崩壊演出を1段階強化する",
+                "/observation への残留リンクを追加する",
+                "exitログに断片テキストを1件追加する",
+            ],
+            "reason": "/exit への反応があるため、境界導線を強化して世界観を深める。",
+            "name": "崩壊域",
+        },
+        "/archive": {
+            "proposalType": "archive_addition",
+            "changes": [
+                "archive-logsに新規ログ候補を1件生成する",
+                "記録室の断片テキストを更新する",
+                "/null へのリンクを記録の断片として追加する",
+            ],
+            "reason": "/archive への反応があるため、記録室への追記候補を生成する。",
+            "name": "記録室",
+        },
+        "/signal": {
+            "proposalType": "signal_fragment",
+            "changes": [
+                "受信域の信号断片テキストを1件追加する",
+                "ラジオ放送テキストの候補を生成する",
+                "/outside への接続信号を追加する",
+            ],
+            "reason": "/signal への反応があるため、受信断片を追加して世界観を強化する。",
+            "name": "受信域",
+        },
+        "/": {
+            "proposalType": "visual_change",
+            "changes": [
+                "祭壇域のビジュアル差分を1件生成する",
+                "メイン入口の導線テキストを更新する",
+                "/observation への導線を強化する",
+            ],
+            "reason": "メイン入口のPVが高いため、祭壇域のビジュアル更新を候補に入れる。",
+            "name": "祭壇域",
+        },
+    }
+
+    PRIORITY_RULES = {
+        0: "high",    # rank 1
+        1: "medium",  # rank 2
+        2: "medium",  # rank 3
+    }
+
+    def _priority(path: str, pv: int) -> str:
+        rank = pv_rank.get(path, 99)
+        if rank in PRIORITY_RULES:
+            return PRIORITY_RULES[rank]
+        if pv <= 0:
+            return "watch"
+        return "low"
+
+    proposals: list[dict[str, Any]] = []
+    used_ids: set[str] = set()
+
+    # load existing proposals to preserve status/codexReady
+    existing: dict[str, dict[str, Any]] = {}
+    try:
+        with open(UPDATE_PROPOSALS_FILE, encoding="utf-8") as f:
+            for item in json.load(f):
+                existing[item.get("observedPage", "")] = item
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
+
+    for rank, row in enumerate(sorted_rows[:12]):
+        path = row["path"]
+        if path not in PAGE_RULES:
+            continue
+        rule = PAGE_RULES[path]
+        pv = row.get("pageviews", 0)
+        dur = row.get("avg_duration", 0.0)
+        bounce = row.get("bounce_rate", 0.0)
+
+        # generate stable id
+        prop_id = f"proposal-{abs(hash(path)) % 900 + 100:03d}"
+        if prop_id in used_ids:
+            prop_id = f"proposal-{abs(hash(path + today)) % 900 + 100:03d}"
+        used_ids.add(prop_id)
+
+        # preserve existing status/codexReady if present
+        prev = existing.get(path, {})
+        status = prev.get("status", "pending")
+        codex_ready = prev.get("codexReady", False)
+
+        proposals.append({
+            "id": prop_id,
+            "createdAt": today,
+            "source": "ga4",
+            "observedPage": path,
+            "observation": f"{rule['name']}（{path}）— PV:{pv} / 滞在:{round(dur,1)}秒 / 直帰率:{round(bounce*100,1)}%",
+            "judgement": _build_judgement(path, pv, rank, row),
+            "proposalType": rule["proposalType"],
+            "targets": [path],
+            "changes": rule["changes"],
+            "reason": rule["reason"],
+            "priority": _priority(path, pv),
+            "status": status,
+            "codexReady": codex_ready,
+        })
+
+    # also surface known pages with no data as watch
+    for path, rule in PAGE_RULES.items():
+        if any(p["observedPage"] == path for p in proposals):
+            continue
+        prev = existing.get(path, {})
+        status = prev.get("status", "pending")
+        prop_id = f"proposal-{abs(hash(path + 'nodata')) % 900 + 100:03d}"
+        proposals.append({
+            "id": prop_id,
+            "createdAt": today,
+            "source": "ga4",
+            "observedPage": path,
+            "observation": f"{rule['name']}（{path}）— データなし / 反応未確認",
+            "judgement": f"{rule['name']}への反応が確認できない。導線見直しを検討する。",
+            "proposalType": "route_change",
+            "targets": [path],
+            "changes": [f"{rule['name']}への導線を強化する", f"{rule['name']}への入口を再検討する"],
+            "reason": "GA4上でこのページへの反応が確認できないため、導線変更候補とする。",
+            "priority": "watch",
+            "status": status,
+            "codexReady": prev.get("codexReady", False),
+        })
+
+    # sort: high → medium → low → watch
+    priority_order = {"high": 0, "medium": 1, "low": 2, "watch": 3}
+    proposals.sort(key=lambda p: priority_order.get(p["priority"], 9))
+
+    with open(UPDATE_PROPOSALS_FILE, "w", encoding="utf-8") as f:
+        json.dump(proposals, f, ensure_ascii=False, indent=2)
+
+    return {
+        "proposals_written": len(proposals),
+        "ga4_source": ga4_data.get("source", "no_data"),
+        "file": str(UPDATE_PROPOSALS_FILE),
+    }
+
+
+def _build_judgement(path: str, pv: int, rank: int, row: dict[str, Any]) -> str:
+    """Build a human-readable judgement string."""
+    name_map = {
+        "/null": "崩落域", "/observation": "観測域", "/outside": "外部接続",
+        "/exit": "崩壊域", "/archive": "記録室", "/signal": "受信域", "/": "祭壇域",
+    }
+    name = name_map.get(path, path)
+    if rank == 0:
+        return f"{name}のPVが最高。増殖最優先候補。"
+    if rank <= 2:
+        return f"{name}のPVが上位。増殖候補に入れる。"
+    dur = row.get("avg_duration", 0.0)
+    if dur >= 30:
+        return f"{name}への滞在時間が長い。深い閲覧が発生している。"
+    bounce = row.get("bounce_rate", 1.0)
+    if bounce >= 0.8:
+        return f"{name}の直帰率が高い。ページへの入口は機能しているが離脱も多い。"
+    return f"{name}に反応あり。変化候補に入れる。"
+
+
 def get_proposals(status: str | None = None) -> list[dict[str, Any]]:
     """Fetch proposals from DB, optionally filtered by status."""
     with store._connect() as conn:
@@ -1231,6 +1437,19 @@ def central_os_payload() -> dict[str, Any]:
         "generatedExists": WATCH_GENERATED_DIR.is_dir(),
         "historyExists": WATCH_HISTORY_DIR.is_dir(),
     }
+
+    # update-proposals.json
+    try:
+        with open(UPDATE_PROPOSALS_FILE, encoding="utf-8") as f:
+            result["data"]["updateProposals"] = json.load(f)
+    except FileNotFoundError:
+        result["data"]["updateProposals"] = []
+    except json.JSONDecodeError as exc:
+        result["errors"]["updateProposals"] = f"json parse error: {exc}"
+        result["data"]["updateProposals"] = []
+    except Exception as exc:
+        result["errors"]["updateProposals"] = f"read error: {exc}"
+        result["data"]["updateProposals"] = []
 
     return result
 
@@ -1762,7 +1981,47 @@ async def api_central_os() -> JSONResponse:
 async def api_run_analysis() -> JSONResponse:
     try:
         result = await asyncio.get_event_loop().run_in_executor(None, run_analysis)
+        # also regenerate update-proposals.json
+        try:
+            up_result = await asyncio.get_event_loop().run_in_executor(None, generate_update_proposals)
+            result["update_proposals"] = up_result
+        except Exception as up_exc:
+            result["update_proposals_error"] = str(up_exc)
         return JSONResponse({"ok": True, **result})
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
+
+@app.post("/api/update-proposals/run")
+async def api_run_update_proposals() -> JSONResponse:
+    try:
+        result = await asyncio.get_event_loop().run_in_executor(None, generate_update_proposals)
+        return JSONResponse({"ok": True, **result})
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
+
+@app.post("/api/update-proposals/{proposal_id}/status")
+async def api_update_proposal_status(proposal_id: str, body: dict = Body(...)) -> JSONResponse:
+    """Update status of an update-proposal by id."""
+    try:
+        new_status = str(body.get("status", "pending"))
+        if new_status not in {"pending", "approved", "hold", "rejected"}:
+            return JSONResponse({"ok": False, "error": f"invalid status: {new_status}"}, status_code=400)
+        try:
+            with open(UPDATE_PROPOSALS_FILE, encoding="utf-8") as f:
+                proposals = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            proposals = []
+        found = False
+        for p in proposals:
+            if p.get("id") == proposal_id:
+                p["status"] = new_status
+                found = True
+                break
+        if not found:
+            return JSONResponse({"ok": False, "error": f"proposal {proposal_id} not found"}, status_code=404)
+        with open(UPDATE_PROPOSALS_FILE, "w", encoding="utf-8") as f:
+            json.dump(proposals, f, ensure_ascii=False, indent=2)
+        return JSONResponse({"ok": True, "id": proposal_id, "status": new_status})
     except Exception as exc:
         return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
 

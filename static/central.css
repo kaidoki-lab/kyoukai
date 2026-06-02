@@ -937,3 +937,68 @@ body {
 .cos-dash-adopt  { background: rgba(60,200,120,0.15); border-color: rgba(60,200,120,0.5); color: #80f0b0; }
 .cos-dash-hold   { background: rgba(200,200,60,0.12); border-color: rgba(200,200,60,0.4);  color: #e8e060; }
 .cos-dash-reject { background: rgba(200,60,60,0.12);  border-color: rgba(200,60,60,0.4);   color: #f09090; }
+
+/* ── 定期更新提案 ──────────────────────────────────────────────────────── */
+.cos-up-toolbar {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;
+}
+.cos-up-run-btn {
+  background: rgba(140,100,220,0.15); border: 1px solid rgba(140,100,220,0.5);
+  color: #c8a8ff; padding: 5px 14px; font-family: inherit; font-size: 12px;
+  cursor: pointer; border-radius: 3px;
+}
+.cos-up-run-btn:hover { background: rgba(140,100,220,0.28); }
+.cos-up-run-btn:disabled { opacity: 0.4; cursor: default; }
+.cos-up-status { font-size: 11px; color: #6a5a80; }
+.cos-up-status.running { color: #f0d060; }
+.cos-up-status.ok { color: #c8a8ff; }
+.cos-up-status.error { color: #ff6b6b; }
+.cos-up-filter-label { font-size: 11px; color: #556; margin-left: 8px; }
+.cos-up-filter {
+  background: none; border: 1px solid rgba(255,255,255,0.12); color: #6a5a80;
+  padding: 3px 10px; font-family: inherit; font-size: 11px; cursor: pointer; border-radius: 2px;
+}
+.cos-up-filter.active, .cos-up-filter:hover { border-color: rgba(140,100,220,0.5); color: #c8a8ff; }
+.cos-up-empty { color: #4a3a60; font-size: 12px; padding: 12px 0; }
+
+.cos-up-card {
+  border: 1px solid rgba(255,255,255,0.08); border-left: 3px solid rgba(140,100,220,0.4);
+  padding: 12px 14px; margin-bottom: 10px; background: rgba(0,0,0,0.3); border-radius: 3px;
+}
+.cos-up-approved { border-left-color: rgba(80,200,120,0.7); }
+.cos-up-hold     { border-left-color: rgba(240,200,80,0.6); }
+.cos-up-rejected { border-left-color: rgba(180,80,80,0.4); opacity: 0.55; }
+
+.cos-up-header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 6px; }
+.cos-up-page { font-size: 14px; color: #d8b8ff; font-weight: bold; font-family: monospace; }
+.cos-up-tag  { font-size: 10px; padding: 2px 7px; border-radius: 2px; }
+.up-pending  { background: rgba(140,100,220,0.2); color: #c8a8ff; }
+.up-approved { background: rgba(80,200,120,0.2);  color: #80f0b0; }
+.up-hold     { background: rgba(240,200,80,0.2);  color: #f0e080; }
+.up-rejected { background: rgba(200,80,80,0.2);   color: #f09090; }
+.cos-up-type { font-size: 10px; color: #6a5a80; }
+.cos-up-prio { font-size: 10px; padding: 1px 6px; border-radius: 2px; }
+.up-prio-high   { background: rgba(255,100,100,0.2); color: #ffaaaa; }
+.up-prio-medium { background: rgba(255,200,60,0.18); color: #f0d080; }
+.up-prio-low    { background: rgba(100,180,255,0.15); color: #a0d0ff; }
+.up-prio-watch  { background: rgba(100,200,100,0.15); color: #a0e0a0; }
+.cos-up-date { font-size: 10px; color: #4a3a60; margin-left: auto; }
+
+.cos-up-observation { font-size: 11px; color: #7a6a90; margin-bottom: 4px; font-family: monospace; }
+.cos-up-judgement   { font-size: 13px; color: #d0b8f8; margin-bottom: 8px; }
+.cos-up-changes {
+  list-style: none; margin: 0 0 8px 0; padding: 0;
+  border-left: 2px solid rgba(140,100,220,0.2); padding-left: 10px;
+}
+.cos-up-changes li { font-size: 12px; color: #b8a0d8; padding: 2px 0; }
+.cos-up-changes li::before { content: "→ "; color: #7a5a90; }
+.cos-up-reason { font-size: 11px; color: #6a5a80; margin-bottom: 8px; font-style: italic; }
+
+.cos-up-actions { display: flex; gap: 8px; margin-top: 8px; }
+.cos-up-action-btn {
+  font-family: inherit; font-size: 11px; padding: 3px 12px;
+  border-radius: 2px; cursor: pointer; border: 1px solid;
+}
+.cos-up-act-approved { background: rgba(80,200,120,0.15); border-color: rgba(80,200,120,0.5);  color: #80f0b0; }
+.cos-up-act-hold     { background: rgba(240,200,80,0.12);  border-color: rgba(240,200,80,0.4);  color: #f0e080; }
+.cos-up-act-rejected { background: rgba(200,80,80,0.12);   border-color: rgba(200,80,80,0.4);   color: #f09090; }

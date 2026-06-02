@@ -1,0 +1,151 @@
+[
+  {
+    "id": "proposal-663",
+    "createdAt": "2026-06-02",
+    "source": "ga4",
+    "observedPage": "/",
+    "observation": "祭壇域（/）— PV:358 / 滞在:226.4秒 / 直帰率:50.0%",
+    "judgement": "祭壇域のPVが最高。増殖最優先候補。",
+    "proposalType": "visual_change",
+    "targets": [
+      "/"
+    ],
+    "changes": [
+      "祭壇域のビジュアル差分を1件生成する",
+      "メイン入口の導線テキストを更新する",
+      "/observation への導線を強化する"
+    ],
+    "reason": "メイン入口のPVが高いため、祭壇域のビジュアル更新を候補に入れる。",
+    "priority": "high",
+    "status": "pending",
+    "codexReady": false
+  },
+  {
+    "id": "proposal-454",
+    "createdAt": "2026-06-02",
+    "source": "ga4",
+    "observedPage": "/null",
+    "observation": "未確認接続（/null）— PV:112 / 滞在:218.0秒 / 直帰率:17.9%",
+    "judgement": "崩落域のPVが上位。増殖候補に入れる。",
+    "proposalType": "page_growth",
+    "targets": [
+      "/null"
+    ],
+    "changes": [
+      "崩落域の追加断片テキストを1件生成する",
+      "崩壊演出の軽い差分を追加する",
+      "/archive へ残留ログを追加する"
+    ],
+    "reason": "GA4上で/nullへの反応が確認できるため、崩落域を増殖候補に入れる。",
+    "priority": "medium",
+    "status": "pending",
+    "codexReady": false
+  },
+  {
+    "id": "proposal-441",
+    "createdAt": "2026-06-02",
+    "source": "ga4",
+    "observedPage": "/exit",
+    "observation": "崩壊域（/exit）— PV:88 / 滞在:195.5秒 / 直帰率:22.9%",
+    "judgement": "崩壊域のPVが上位。増殖候補に入れる。",
+    "proposalType": "scenario_change",
+    "targets": [
+      "/exit"
+    ],
+    "changes": [
+      "境界域の崩壊演出を1段階強化する",
+      "/observation への残留リンクを追加する",
+      "exitログに断片テキストを1件追加する"
+    ],
+    "reason": "/exit への反応があるため、境界導線を強化して世界観を深める。",
+    "priority": "medium",
+    "status": "pending",
+    "codexReady": false
+  },
+  {
+    "id": "proposal-622",
+    "createdAt": "2026-06-02",
+    "source": "ga4",
+    "observedPage": "/observation",
+    "observation": "観測域（/observation）— PV:87 / 滞在:300.0秒 / 直帰率:19.6%",
+    "judgement": "観測域への滞在時間が長い。深い閲覧が発生している。",
+    "proposalType": "page_growth",
+    "targets": [
+      "/observation"
+    ],
+    "changes": [
+      "観測域の生命体ログを1件追加する",
+      "背景ノイズの軽い強化を加える",
+      "/signal への導線を薄く追加する",
+      "観測者数に応じた微変化を追加する"
+    ],
+    "reason": "観測域が現在もっとも反応を得ているため、KYOUKAIの中核として増殖候補に入れる。",
+    "priority": "low",
+    "status": "pending",
+    "codexReady": false
+  },
+  {
+    "id": "proposal-574",
+    "createdAt": "2026-06-02",
+    "source": "ga4",
+    "observedPage": "/archive",
+    "observation": "記録室（/archive）— PV:80 / 滞在:103.9秒 / 直帰率:15.8%",
+    "judgement": "記録室への滞在時間が長い。深い閲覧が発生している。",
+    "proposalType": "archive_addition",
+    "targets": [
+      "/archive"
+    ],
+    "changes": [
+      "archive-logsに新規ログ候補を1件生成する",
+      "記録室の断片テキストを更新する",
+      "/null へのリンクを記録の断片として追加する"
+    ],
+    "reason": "/archive への反応があるため、記録室への追記候補を生成する。",
+    "priority": "low",
+    "status": "pending",
+    "codexReady": false
+  },
+  {
+    "id": "proposal-579",
+    "createdAt": "2026-06-02",
+    "source": "ga4",
+    "observedPage": "/outside",
+    "observation": "外部接続（/outside）— PV:71 / 滞在:270.4秒 / 直帰率:6.9%",
+    "judgement": "外部接続への滞在時間が長い。深い閲覧が発生している。",
+    "proposalType": "outside_adjustment",
+    "targets": [
+      "/outside"
+    ],
+    "changes": [
+      "outsideアイコンの配置パターンを増やす",
+      "外部接続後に戻る導線を追加する",
+      "自販機型の隠しアイコンを1種類追加する",
+      "/signal に外部信号ログを1件追加する"
+    ],
+    "reason": "外部接続への反応が確認されているため、outside を異常導線として強化する。",
+    "priority": "low",
+    "status": "pending",
+    "codexReady": false
+  },
+  {
+    "id": "proposal-211",
+    "createdAt": "2026-06-02",
+    "source": "ga4",
+    "observedPage": "/signal",
+    "observation": "受信域（/signal）— PV:67 / 滞在:450.4秒 / 直帰率:13.9%",
+    "judgement": "受信域への滞在時間が長い。深い閲覧が発生している。",
+    "proposalType": "signal_fragment",
+    "targets": [
+      "/signal"
+    ],
+    "changes": [
+      "受信域の信号断片テキストを1件追加する",
+      "ラジオ放送テキストの候補を生成する",
+      "/outside への接続信号を追加する"
+    ],
+    "reason": "/signal への反応があるため、受信断片を追加して世界観を強化する。",
+    "priority": "low",
+    "status": "pending",
+    "codexReady": false
+  }
+]
