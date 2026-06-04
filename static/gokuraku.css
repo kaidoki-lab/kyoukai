@@ -42,32 +42,32 @@
   object-fit: cover;
   opacity: 0;
   filter: contrast(1.08) saturate(1.08);
-  animation: gokurakuDance 1.18s steps(1, end) infinite;
-  transform-origin: 50% 37%;
+  animation: gokurakuDance 3.2s steps(1, end) infinite;
+  transform-origin: 50% 39%;
 }
 
 .gokuraku-frame--01 {
   object-position: 50% 50%;
-  transform: scale(1.012) translate(0.2%, -0.4%);
+  transform: scale(1.035) translate(0.2%, -1.2%);
   animation-delay: 0s;
 }
 
 .gokuraku-frame--02 {
-  object-position: 50% 50%;
-  transform: scale(1.022) translate(-0.6%, -1.1%);
-  animation-delay: -0.885s;
+  object-position: 50% 45%;
+  transform: scale(1.045) translate(-0.4%, -3.8%);
+  animation-delay: -2.4s;
 }
 
 .gokuraku-frame--03 {
-  object-position: 50% 50%;
-  transform: scale(1.018) translate(-0.5%, -0.9%);
-  animation-delay: -0.59s;
+  object-position: 50% 45%;
+  transform: scale(1.045) translate(-0.2%, -3.6%);
+  animation-delay: -1.6s;
 }
 
 .gokuraku-frame--04 {
-  object-position: 50% 0%;
-  transform: scale(1.26) translate(-1.2%, -13.7%);
-  animation-delay: -0.295s;
+  object-position: 50% 50%;
+  transform: scale(1.035) translate(-0.4%, -1%);
+  animation-delay: -0.8s;
 }
 
 .gokuraku-scan {
@@ -84,10 +84,14 @@
 
 .gokuraku-vault {
   position: absolute;
-  left: max(16px, calc(50vw - min(50vw, calc(100svh * 9 / 32)) + 18px));
-  bottom: 20px;
+  left: calc(50% + min(50vw, calc(100svh * 9 / 32)) + clamp(14px, 2vw, 28px));
+  right: clamp(14px, 2vw, 28px);
+  top: 50%;
   z-index: 6;
-  width: min(330px, 34vw);
+  width: auto;
+  max-width: 360px;
+  max-height: 78svh;
+  overflow: auto;
   padding: 14px 16px;
   border: 1px solid rgba(255, 69, 210, 0.32);
   background:
@@ -99,6 +103,7 @@
     0 0 24px rgba(255, 0, 200, 0.22),
     inset 0 0 28px rgba(0, 0, 0, 0.66);
   backdrop-filter: blur(4px);
+  transform: translateY(-50%);
 }
 
 .gokuraku-kicker,
@@ -181,10 +186,15 @@
   .gokuraku-vault {
     position: relative;
     left: auto;
+    right: auto;
+    top: auto;
     bottom: auto;
     width: calc(100% - 28px);
     max-width: 560px;
+    max-height: none;
     margin: 12px auto 18px;
+    overflow: visible;
+    transform: none;
   }
 
   .gokuraku-return {
