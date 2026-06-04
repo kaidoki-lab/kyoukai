@@ -4,8 +4,11 @@ import json
 import mimetypes
 import os
 import random
+import re
+import shutil
 import sqlite3
 import struct
+import subprocess
 import tempfile
 import threading
 import time
@@ -29,6 +32,7 @@ from starlette.requests import Request
 
 BASE_DIR = Path(__file__).resolve().parent
 VIDEOS_DIR = BASE_DIR / "videos"
+VIDEO_EDITS_DIR = VIDEOS_DIR / "edits"
 VIDEOS_MANIFEST_PATH = BASE_DIR / "static" / "videos-manifest.json"
 DB_PATH = Path(os.environ.get("KYOUKAI_DB_PATH") or (Path(tempfile.gettempdir()) / "kyoukai.db" if os.environ.get("VERCEL") else BASE_DIR / "kyoukai.db"))
 TICK_SECONDS = 3
@@ -802,6 +806,16 @@ GA4_PROPERTY_ID = os.environ.get("KYOUKAI_GA4_PROPERTY_ID", "538546349")
 GA4_CREDENTIALS_FILE = BASE_DIR / "ga4-credentials.json"
 UPDATE_PROPOSALS_FILE = CENTRAL_OS_DIR / "update-proposals.json"
 AI_ANALYST_FILE = CENTRAL_OS_DIR / "analysis" / "ai_analyst.py"
+PLANNING_DIR = CENTRAL_OS_DIR / "planning"
+AI_PLANNER_FILE = PLANNING_DIR / "ai_planner.py"
+PROPOSAL_PLANS_FILE = PLANNING_DIR / "proposal_plans.json"
+HISTORY_DIR = CENTRAL_OS_DIR / "history"
+ACCEPTED_PLANS_FILE = HISTORY_DIR / "accepted-plans.json"
+REJECTED_PLANS_FILE = HISTORY_DIR / "rejected-plans.json"
+EXECUTION_DIR = CENTRAL_OS_DIR / "execution"
+AI_EXECUTOR_FILE = EXECUTION_DIR / "ai_executor.py"
+IMPLEMENTATION_TASKS_FILE = EXECUTION_DIR / "implementation_tasks.json"
+EXECUTED_TASKS_FILE = HISTORY_DIR / "executed-tasks.json"
 
 # ─── AI analyst module (importlib, handles hyphen in path) ─────────────────────
 
@@ -819,6 +833,268 @@ def _load_ai_analyst():
         return None
 
 _ai_analyst_mod = _load_ai_analyst()
+
+# ─── AI planner module ────────────────────────────────────────────────────────
+
+def _load_ai_planner():
+    """Load central-os/planning/ai_planner.py at runtime."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("ai_planner", AI_PLANNER_FILE)
+    if spec is None or spec.loader is None:
+        return None
+    mod = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(mod)  # type: ignore[union-attr]
+        return mod
+    except Exception:
+        return None
+
+_ai_planner_mod = _load_ai_planner()
+
+# ─── AI executor module ───────────────────────────────────────────────────────
+
+def _load_ai_executor():
+    """Load central-os/execution/ai_executor.py at runtime."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("ai_executor", AI_EXECUTOR_FILE)
+    if spec is None or spec.loader is None:
+        return None
+    mod = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(mod)  # type: ignore[union-attr]
+        return mod
+    except Exception:
+        return None
+
+_ai_executor_mod = _load_ai_executor()
+
+
+def _read_json_list(path: Path) -> list:
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, list) else []
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+
+
+def run_ai_planner() -> dict[str, Any]:
+    """Assemble planner input, call ai_planner, save proposal_plans.json."""
+    # gather context
+    ga4_data = _fetch_ga4_data()
+    room_scores = _analyze_rooms(ga4_data)
+
+    recent_accepted = _read_json_list(ACCEPTED_PLANS_FILE)[-5:]
+    recent_rejected = _read_json_list(REJECTED_PLANS_FILE)[-5:]
+    recent_changes: list = []
+
+    try:
+        with open(UPDATE_PROPOSALS_FILE, encoding="utf-8") as f:
+            up = json.load(f)
+        recent_changes = [
+            {"page": p.get("observedPage", ""), "status": p.get("status", "")}
+            for p in (up if isinstance(up, list) else [])[:5]
+        ]
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
+
+    planner_input: dict[str, Any] = {
+        "ga4": ga4_data,
+        "analysis": {},
+        "rooms": room_scores,
+        "recentChanges": recent_changes,
+        "recentAccepted": recent_accepted,
+        "recentRejected": recent_rejected,
+    }
+
+    # save planner_input for inspection
+    PLANNING_DIR.mkdir(parents=True, exist_ok=True)
+
+    if _ai_planner_mod is not None:
+        try:
+            plans = _ai_planner_mod.generate_plans(planner_input)
+        except Exception:
+            plans = []
+    else:
+        plans = []
+
+    # fallback if module unavailable or returned empty
+    if not plans:
+        now = datetime.now(timezone.utc).isoformat()
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+        plans = [
+            {
+                "id": f"plan-{stamp}-01",
+                "title": "崩落域の記憶断片追加",
+                "summary": "/nullに断片化したテキストを追加し、「なにかがあった」という印象を与える。",
+                "reason": "崩落域への反応が確認されており、滞在時間が伸びる可能性がある。",
+                "targets": ["/null"],
+                "implementationSize": "small",
+                "status": "pending",
+                "createdAt": now,
+                "source": "fallback",
+            }
+        ]
+
+    with open(PROPOSAL_PLANS_FILE, "w", encoding="utf-8") as f:
+        json.dump(plans, f, ensure_ascii=False, indent=2)
+
+    return {
+        "plans_written": len(plans),
+        "source": plans[0].get("source", "unknown") if plans else "none",
+        "file": str(PROPOSAL_PLANS_FILE),
+    }
+
+
+def get_plan_proposals() -> list[dict[str, Any]]:
+    return _read_json_list(PROPOSAL_PLANS_FILE)
+
+
+def run_ai_executor() -> dict[str, Any]:
+    """Generate implementation tasks for all approved plans not yet processed."""
+    plans = _read_json_list(PROPOSAL_PLANS_FILE)
+    approved = [p for p in plans if p.get("status") == "approved"]
+
+    existing_tasks = _read_json_list(IMPLEMENTATION_TASKS_FILE)
+    processed_plan_ids = {t.get("sourcePlanId") for t in existing_tasks}
+
+    new_tasks = []
+    for plan in approved:
+        plan_id = plan.get("id")
+        if plan_id in processed_plan_ids:
+            continue
+
+        if _ai_executor_mod is not None:
+            try:
+                task = _ai_executor_mod.generate_task(plan)
+            except Exception:
+                task = None
+        else:
+            task = None
+
+        if task is None:
+            # minimal fallback without executor module
+            now = datetime.now(timezone.utc).isoformat()
+            stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+            task = {
+                "id": f"task-{stamp}",
+                "sourcePlanId": plan_id,
+                "createdAt": now,
+                "title": f"{plan.get('title', '企画')} 実装指示",
+                "targetPages": plan.get("targets", ["/null"]),
+                "objective": plan.get("summary", "")[:120],
+                "implementationBrief": (
+                    f"{plan.get('summary', '')} "
+                    "現行構造を確認してから実装方法を判断すること。"
+                )[:300],
+                "candidateFiles": ["main.py", "（現行構造を確認してから判断）"],
+                "mustKeep": [
+                    "KYOUKAIをゲーム化しない",
+                    "ユーザーにCentral OSの存在を見せない",
+                    "秘密情報やcredentials関連を変更しない",
+                ],
+                "doNotChange": [
+                    "GA4接続処理",
+                    "AI分析官",
+                    "AI企画官",
+                    "既存の採用/保留/却下API",
+                    "credentials関連",
+                ],
+                "steps": [
+                    "現行ルートとテンプレート構造を確認する",
+                    "対象ページに必要な最小変更を加える",
+                    "既存導線を壊さないか確認する",
+                    "ローカル表示を確認する",
+                ],
+                "acceptanceCriteria": [
+                    "対象ページが正常表示される",
+                    "既存ページが壊れていない",
+                    "git statusに秘密情報が含まれていない",
+                ],
+                "status": "pending",
+                "codexReady": False,
+                "source": "fallback",
+            }
+
+        new_tasks.append(task)
+        processed_plan_ids.add(plan_id)
+
+    EXECUTION_DIR.mkdir(parents=True, exist_ok=True)
+    all_tasks = existing_tasks + new_tasks
+    with open(IMPLEMENTATION_TASKS_FILE, "w", encoding="utf-8") as f:
+        json.dump(all_tasks, f, ensure_ascii=False, indent=2)
+
+    return {
+        "tasks_written": len(new_tasks),
+        "total_tasks": len(all_tasks),
+        "approved_plans": len(approved),
+        "file": str(IMPLEMENTATION_TASKS_FILE),
+    }
+
+
+def update_task_status(task_id: str, status: str) -> dict[str, Any]:
+    """Update implementation task status. Moves 'done' tasks to history."""
+    valid = {"pending", "ready", "sent", "done", "hold", "rejected"}
+    if status not in valid:
+        raise ValueError(f"invalid status: {status}")
+
+    tasks = _read_json_list(IMPLEMENTATION_TASKS_FILE)
+    found = None
+    for t in tasks:
+        if t.get("id") == task_id:
+            t["status"] = status
+            t["codexReady"] = status in {"ready", "sent", "done"}
+            found = t
+            break
+    if not found:
+        raise ValueError(f"task {task_id} not found")
+
+    with open(IMPLEMENTATION_TASKS_FILE, "w", encoding="utf-8") as f:
+        json.dump(tasks, f, ensure_ascii=False, indent=2)
+
+    if status == "done":
+        HISTORY_DIR.mkdir(parents=True, exist_ok=True)
+        history = _read_json_list(EXECUTED_TASKS_FILE)
+        history.append({**found, "decidedAt": now_iso()})
+        with open(EXECUTED_TASKS_FILE, "w", encoding="utf-8") as f:
+            json.dump(history[-100:], f, ensure_ascii=False, indent=2)
+
+    return found
+
+
+def update_plan_status(plan_id: str, status: str) -> dict[str, Any]:
+    """Update plan status. Moves approved/rejected plans to history files."""
+    valid = {"pending", "approved", "hold", "rejected"}
+    if status not in valid:
+        raise ValueError(f"invalid status: {status}")
+
+    plans = _read_json_list(PROPOSAL_PLANS_FILE)
+    found = None
+    for p in plans:
+        if p.get("id") == plan_id:
+            p["status"] = status
+            found = p
+            break
+    if not found:
+        raise ValueError(f"plan {plan_id} not found")
+
+    with open(PROPOSAL_PLANS_FILE, "w", encoding="utf-8") as f:
+        json.dump(plans, f, ensure_ascii=False, indent=2)
+
+    # append to history
+    HISTORY_DIR.mkdir(parents=True, exist_ok=True)
+    if status == "approved":
+        history = _read_json_list(ACCEPTED_PLANS_FILE)
+        history.append({**found, "decidedAt": now_iso()})
+        with open(ACCEPTED_PLANS_FILE, "w", encoding="utf-8") as f:
+            json.dump(history[-100:], f, ensure_ascii=False, indent=2)
+    elif status == "rejected":
+        history = _read_json_list(REJECTED_PLANS_FILE)
+        history.append({**found, "decidedAt": now_iso()})
+        with open(REJECTED_PLANS_FILE, "w", encoding="utf-8") as f:
+            json.dump(history[-100:], f, ensure_ascii=False, indent=2)
+
+    return found
 
 def analyze_page_ai(page: str, pv: int, avg_duration: float, bounce_rate: float, priority: str) -> dict:
     """Call ai_analyst.analyze_page, fall back to empty dict on any error."""
@@ -1492,6 +1768,12 @@ def central_os_payload() -> dict[str, Any]:
         result["errors"]["updateProposals"] = f"read error: {exc}"
         result["data"]["updateProposals"] = []
 
+    # planProposals (AI企画官)
+    result["data"]["planProposals"] = _read_json_list(PROPOSAL_PLANS_FILE)
+
+    # implementationTasks (AI実装監督)
+    result["data"]["implementationTasks"] = _read_json_list(IMPLEMENTATION_TASKS_FILE)
+
     return result
 
 
@@ -1927,6 +2209,12 @@ async def signal_room(request: Request) -> HTMLResponse:
 async def hyougi_room(request: Request) -> HTMLResponse:
     return render_template(request, "hyougi.html")
 
+@app.get("/gokuraku", response_class=HTMLResponse)
+@app.get("/gokurakuiki", response_class=HTMLResponse)
+@app.get("/gokugaku", response_class=HTMLResponse)
+async def gokuraku_room(request: Request) -> HTMLResponse:
+    return render_template(request, "gokuraku.html")
+
 @app.get("/exit", response_class=HTMLResponse)
 async def exit_room(request: Request) -> HTMLResponse:
     return render_template(request, "exit.html")
@@ -2065,6 +2353,48 @@ async def api_update_proposal_status(proposal_id: str, body: dict = Body(...)) -
         return JSONResponse({"ok": True, "id": proposal_id, "status": new_status})
     except Exception as exc:
         return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
+
+@app.post("/api/plan-proposals/run")
+async def api_run_plan_proposals() -> JSONResponse:
+    try:
+        result = await asyncio.get_event_loop().run_in_executor(None, run_ai_planner)
+        return JSONResponse({"ok": True, **result})
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
+
+
+@app.post("/api/plan-proposals/{plan_id}/status")
+async def api_update_plan_status(plan_id: str, body: dict = Body(...)) -> JSONResponse:
+    try:
+        new_status = str(body.get("status", "pending"))
+        updated = update_plan_status(plan_id, new_status)
+        return JSONResponse({"ok": True, "plan": updated})
+    except ValueError as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
+
+
+@app.post("/api/implementation-tasks/run")
+async def api_run_implementation_tasks() -> JSONResponse:
+    try:
+        result = await asyncio.get_event_loop().run_in_executor(None, run_ai_executor)
+        return JSONResponse({"ok": True, **result})
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
+
+
+@app.post("/api/implementation-tasks/{task_id}/status")
+async def api_update_task_status(task_id: str, body: dict = Body(...)) -> JSONResponse:
+    try:
+        new_status = str(body.get("status", "pending"))
+        updated = update_task_status(task_id, new_status)
+        return JSONResponse({"ok": True, "task": updated})
+    except ValueError as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
+
 
 @app.get("/api/proposals")
 async def api_get_proposals(status: str | None = None) -> JSONResponse:

@@ -410,6 +410,42 @@
       <div id="cos-up-list"><div class="cos-up-empty">提案なし — 「提案を更新」で生成する</div></div>
     </section>
 
+    <!-- AI IMPLEMENTATION TASKS -->
+    <section class="cos-section" id="cos-impl-tasks">
+      <h2 class="cos-section-title">[ AI実装指示 ]</h2>
+      <div class="cos-up-toolbar">
+        <button class="cos-up-run-btn" id="cos-impl-run">実装指示を生成</button>
+        <span class="cos-up-status" id="cos-impl-status">待機中</span>
+        <span class="cos-up-filter-label">表示：</span>
+        <button class="cos-impl-filter active" data-implfilter="all">すべて</button>
+        <button class="cos-impl-filter" data-implfilter="pending">未確認</button>
+        <button class="cos-impl-filter" data-implfilter="ready">Ready</button>
+        <button class="cos-impl-filter" data-implfilter="sent">Sent</button>
+        <button class="cos-impl-filter" data-implfilter="done">Done</button>
+        <button class="cos-impl-filter" data-implfilter="hold">保留</button>
+        <button class="cos-impl-filter" data-implfilter="rejected">却下</button>
+      </div>
+      <div class="cos-error" id="cos-impl-error" hidden></div>
+      <div id="cos-impl-list"><div class="cos-up-empty">実装指示なし — 企画案を採用後「実装指示を生成」する</div></div>
+    </section>
+
+    <!-- AI PLAN PROPOSALS -->
+    <section class="cos-section" id="cos-plan-proposals">
+      <h2 class="cos-section-title">[ AI企画案 ]</h2>
+      <div class="cos-up-toolbar">
+        <button class="cos-up-run-btn" id="cos-plan-run">企画を生成</button>
+        <span class="cos-up-status" id="cos-plan-status">待機中</span>
+        <span class="cos-up-filter-label">表示：</span>
+        <button class="cos-plan-filter active" data-planfilter="all">すべて</button>
+        <button class="cos-plan-filter" data-planfilter="pending">未判断</button>
+        <button class="cos-plan-filter" data-planfilter="approved">採用</button>
+        <button class="cos-plan-filter" data-planfilter="hold">保留</button>
+        <button class="cos-plan-filter" data-planfilter="rejected">却下</button>
+      </div>
+      <div class="cos-error" id="cos-plan-error" hidden></div>
+      <div id="cos-plan-list"><div class="cos-up-empty">企画案なし — 「企画を生成」でAIが提案する</div></div>
+    </section>
+
     <!-- PHASE 3 COMPLETION CHECK -->
     <section class="cos-section" id="cos-completion">
       <h2 class="cos-section-title">[ PHASE 3 完了判定 ]</h2>
@@ -1423,6 +1459,372 @@
       });
 
       loadUpdateProposals();
+    })();
+
+    // ─── AI実装指示 ─────────────────────────────────────────────────────────
+    (function() {
+      var implFilter = "all";
+
+      var STATUS_LABEL = {
+        pending: "未確認", ready: "Ready", sent: "Sent",
+        done: "Done", hold: "保留", rejected: "却下"
+      };
+
+      function setImplStatus(msg, cls) {
+        var el = document.getElementById("cos-impl-status");
+        if (el) { el.textContent = msg; el.className = "cos-up-status " + (cls || ""); }
+      }
+
+      function renderImplTasks(tasks) {
+        var container = document.getElementById("cos-impl-list");
+        if (!container) return;
+
+        var filtered = tasks.filter(function(t) {
+          return implFilter === "all" || t.status === implFilter;
+        });
+
+        if (!filtered.length) {
+          container.innerHTML = "<div class='cos-up-empty'>該当する実装指示なし</div>";
+          return;
+        }
+
+        container.innerHTML = "";
+        filtered.forEach(function(t) {
+          var card = document.createElement("div");
+          card.className = "cos-up-card cos-up-" + (t.status || "pending");
+
+          // header
+          var header = document.createElement("div");
+          header.className = "cos-up-header";
+          var title = document.createElement("span");
+          title.className = "cos-up-title";
+          title.textContent = t.title || "(無題)";
+          var badge = document.createElement("span");
+          badge.className = "cos-up-badge cos-up-badge-" + (t.status || "pending");
+          badge.textContent = STATUS_LABEL[t.status] || t.status;
+          header.appendChild(title);
+          header.appendChild(badge);
+          if (t.codexReady) {
+            var cr = document.createElement("span");
+            cr.className = "cos-up-badge cos-up-badge-approved";
+            cr.textContent = "Codex Ready";
+            header.appendChild(cr);
+          }
+          card.appendChild(header);
+
+          // meta
+          var meta = document.createElement("div");
+          meta.className = "cos-up-meta";
+          meta.innerHTML =
+            '<span class="cos-up-page">' + (t.targetPages || []).join(", ") + '</span>' +
+            '<span class="cos-up-priority">元企画: ' + (t.sourcePlanId || "-") + '</span>' +
+            '<span class="cos-up-date">' + (t.createdAt ? t.createdAt.slice(0,10) : "") + '</span>';
+          if (t.source === "fallback") {
+            var src = document.createElement("span");
+            src.className = "cos-up-priority"; src.textContent = "FB"; src.title = "フォールバック生成";
+            meta.appendChild(src);
+          }
+          card.appendChild(meta);
+
+          // objective
+          if (t.objective) {
+            var obj = document.createElement("div");
+            obj.className = "cos-up-observation";
+            obj.textContent = "目的：" + t.objective;
+            card.appendChild(obj);
+          }
+
+          // implementationBrief
+          if (t.implementationBrief) {
+            var brief = document.createElement("div");
+            brief.className = "cos-up-reason";
+            brief.textContent = "概要：" + t.implementationBrief;
+            card.appendChild(brief);
+          }
+
+          // candidateFiles
+          var files = t.candidateFiles || [];
+          if (files.length) {
+            var fLabel = document.createElement("div");
+            fLabel.className = "cos-up-rec-label"; fLabel.textContent = "対象ファイル候補";
+            card.appendChild(fLabel);
+            var fUl = document.createElement("ul");
+            fUl.className = "cos-up-recommendations";
+            files.forEach(function(f) { var li = document.createElement("li"); li.textContent = f; fUl.appendChild(li); });
+            card.appendChild(fUl);
+          }
+
+          // mustKeep
+          var mk = t.mustKeep || [];
+          if (mk.length) {
+            var mkLabel = document.createElement("div");
+            mkLabel.className = "cos-up-rec-label"; mkLabel.textContent = "保持すること";
+            card.appendChild(mkLabel);
+            var mkUl = document.createElement("ul");
+            mkUl.className = "cos-up-recommendations";
+            mk.forEach(function(m) { var li = document.createElement("li"); li.textContent = m; mkUl.appendChild(li); });
+            card.appendChild(mkUl);
+          }
+
+          // doNotChange
+          var dnc = t.doNotChange || [];
+          if (dnc.length) {
+            var dncLabel = document.createElement("div");
+            dncLabel.className = "cos-up-rec-label"; dncLabel.textContent = "変更してはいけない点";
+            card.appendChild(dncLabel);
+            var dncUl = document.createElement("ul");
+            dncUl.className = "cos-up-recommendations";
+            dnc.forEach(function(d) { var li = document.createElement("li"); li.textContent = d; dncUl.appendChild(li); });
+            card.appendChild(dncUl);
+          }
+
+          // steps
+          var steps = t.steps || [];
+          if (steps.length) {
+            var stLabel = document.createElement("div");
+            stLabel.className = "cos-up-rec-label"; stLabel.textContent = "作業手順";
+            card.appendChild(stLabel);
+            var stOl = document.createElement("ol");
+            stOl.className = "cos-up-changes";
+            steps.forEach(function(s) { var li = document.createElement("li"); li.textContent = s; stOl.appendChild(li); });
+            card.appendChild(stOl);
+          }
+
+          // acceptanceCriteria
+          var ac = t.acceptanceCriteria || [];
+          if (ac.length) {
+            var acLabel = document.createElement("div");
+            acLabel.className = "cos-up-rec-label"; acLabel.textContent = "完了条件";
+            card.appendChild(acLabel);
+            var acUl = document.createElement("ul");
+            acUl.className = "cos-up-recommendations";
+            ac.forEach(function(a) { var li = document.createElement("li"); li.textContent = a; acUl.appendChild(li); });
+            card.appendChild(acUl);
+          }
+
+          // actions
+          if (t.status !== "done" && t.status !== "rejected") {
+            var acts = document.createElement("div");
+            acts.className = "cos-up-actions";
+            [["ready","Ready"],["sent","Sent"],["done","Done"],["hold","保留"],["rejected","却下"]].forEach(function(btn) {
+              if (t.status === btn[0]) return;
+              var b = document.createElement("button");
+              b.className = "cos-up-action-btn cos-up-act-" + btn[0];
+              b.textContent = btn[1];
+              b.addEventListener("click", function() { updateImplStatus(t.id, btn[0]); });
+              acts.appendChild(b);
+            });
+            card.appendChild(acts);
+          }
+
+          container.appendChild(card);
+        });
+      }
+
+      function loadImplTasks() {
+        fetch("/api/central-os")
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            var tasks = (data.data && data.data.implementationTasks) || [];
+            renderImplTasks(tasks);
+          })
+          .catch(function(e) { showError("cos-impl-error", e.message); });
+      }
+
+      function updateImplStatus(id, status) {
+        fetch("/api/implementation-tasks/" + encodeURIComponent(id) + "/status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: status }),
+        })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (data.ok) loadImplTasks();
+            else showError("cos-impl-error", "更新失敗: " + data.error);
+          })
+          .catch(function(e) { showError("cos-impl-error", e.message); });
+      }
+
+      var implRunBtn = document.getElementById("cos-impl-run");
+      if (implRunBtn) {
+        implRunBtn.addEventListener("click", function() {
+          setImplStatus("生成中…", "running");
+          implRunBtn.disabled = true;
+          fetch("/api/implementation-tasks/run", { method: "POST" })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+              if (data.ok) {
+                setImplStatus(data.tasks_written + "件生成", "ok");
+                loadImplTasks();
+              } else {
+                setImplStatus("エラー", "error");
+                showError("cos-impl-error", data.error);
+              }
+            })
+            .catch(function(e) { setImplStatus("失敗", "error"); showError("cos-impl-error", e.message); })
+            .finally(function() { implRunBtn.disabled = false; });
+        });
+      }
+
+      document.querySelectorAll(".cos-impl-filter").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+          implFilter = btn.dataset.implfilter || "all";
+          document.querySelectorAll(".cos-impl-filter").forEach(function(b) { b.classList.remove("active"); });
+          btn.classList.add("active");
+          loadImplTasks();
+        });
+      });
+
+      loadImplTasks();
+    })();
+
+    // ─── AI企画案 ───────────────────────────────────────────────────────────
+    (function() {
+      var planFilter = "all";
+
+      function setPlanStatus(msg, cls) {
+        var el = document.getElementById("cos-plan-status");
+        if (el) { el.textContent = msg; el.className = "cos-up-status " + (cls || ""); }
+      }
+
+      function renderPlanProposals(plans) {
+        var container = document.getElementById("cos-plan-list");
+        if (!container) return;
+
+        var filtered = plans.filter(function(p) {
+          return planFilter === "all" || p.status === planFilter;
+        });
+
+        if (!filtered.length) {
+          container.innerHTML = "<div class='cos-up-empty'>該当する企画案なし</div>";
+          return;
+        }
+
+        container.innerHTML = "";
+        filtered.forEach(function(p) {
+          var card = document.createElement("div");
+          card.className = "cos-up-card cos-up-" + (p.status || "pending");
+
+          // header
+          var header = document.createElement("div");
+          header.className = "cos-up-header";
+          var title = document.createElement("span");
+          title.className = "cos-up-title";
+          title.textContent = p.title || "(無題)";
+          var badge = document.createElement("span");
+          badge.className = "cos-up-badge cos-up-badge-" + (p.status || "pending");
+          badge.textContent = { pending: "未判断", approved: "採用", hold: "保留", rejected: "却下" }[p.status] || p.status;
+          header.appendChild(title);
+          header.appendChild(badge);
+          card.appendChild(header);
+
+          // meta
+          var meta = document.createElement("div");
+          meta.className = "cos-up-meta";
+          var targets = (p.targets || []).join(", ") || "-";
+          var sizeLabel = { small: "小", medium: "中", large: "大" }[p.implementationSize] || p.implementationSize || "-";
+          meta.innerHTML = '<span class="cos-up-page">' + targets + '</span>'
+            + '<span class="cos-up-priority">' + sizeLabel + '</span>'
+            + '<span class="cos-up-date">' + (p.createdAt ? p.createdAt.slice(0, 10) : "") + '</span>';
+          if (p.source === "fallback") {
+            var src = document.createElement("span");
+            src.className = "cos-up-priority";
+            src.textContent = "FB";
+            src.title = "フォールバック生成";
+            meta.appendChild(src);
+          }
+          card.appendChild(meta);
+
+          // summary
+          if (p.summary) {
+            var sumEl = document.createElement("div");
+            sumEl.className = "cos-up-observation";
+            sumEl.textContent = p.summary;
+            card.appendChild(sumEl);
+          }
+
+          // reason
+          if (p.reason) {
+            var rsn = document.createElement("div");
+            rsn.className = "cos-up-reason";
+            rsn.textContent = p.reason;
+            card.appendChild(rsn);
+          }
+
+          // actions
+          if (p.status !== "rejected") {
+            var acts = document.createElement("div");
+            acts.className = "cos-up-actions";
+            [["approved", "採用"], ["hold", "保留"], ["rejected", "却下"]].forEach(function(btn) {
+              if (p.status === btn[0]) return;
+              var b = document.createElement("button");
+              b.className = "cos-up-action-btn cos-up-act-" + btn[0];
+              b.textContent = btn[1];
+              b.addEventListener("click", function() { updatePlanStatus(p.id, btn[0]); });
+              acts.appendChild(b);
+            });
+            card.appendChild(acts);
+          }
+
+          container.appendChild(card);
+        });
+      }
+
+      function loadPlanProposals() {
+        fetch("/api/central-os")
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            var plans = (data.data && data.data.planProposals) || [];
+            renderPlanProposals(plans);
+          })
+          .catch(function(e) { showError("cos-plan-error", e.message); });
+      }
+
+      function updatePlanStatus(id, status) {
+        fetch("/api/plan-proposals/" + encodeURIComponent(id) + "/status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: status }),
+        })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (data.ok) loadPlanProposals();
+            else showError("cos-plan-error", "更新失敗: " + data.error);
+          })
+          .catch(function(e) { showError("cos-plan-error", e.message); });
+      }
+
+      var planRunBtn = document.getElementById("cos-plan-run");
+      if (planRunBtn) {
+        planRunBtn.addEventListener("click", function() {
+          setPlanStatus("生成中…", "running");
+          planRunBtn.disabled = true;
+          fetch("/api/plan-proposals/run", { method: "POST" })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+              if (data.ok) {
+                setPlanStatus(data.plans_written + "件生成（" + (data.source || "-") + "）", "ok");
+                loadPlanProposals();
+              } else {
+                setPlanStatus("エラー", "error");
+                showError("cos-plan-error", data.error);
+              }
+            })
+            .catch(function(e) { setPlanStatus("失敗", "error"); showError("cos-plan-error", e.message); })
+            .finally(function() { planRunBtn.disabled = false; });
+        });
+      }
+
+      document.querySelectorAll(".cos-plan-filter").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+          planFilter = btn.dataset.planfilter || "all";
+          document.querySelectorAll(".cos-plan-filter").forEach(function(b) { b.classList.remove("active"); });
+          btn.classList.add("active");
+          loadPlanProposals();
+        });
+      });
+
+      loadPlanProposals();
     })();
   </script>
 </body>

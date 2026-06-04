@@ -1,10 +1,10 @@
 [
   {
-    "id": "proposal-634",
-    "createdAt": "2026-06-02",
+    "id": "proposal-964",
+    "createdAt": "2026-06-03",
     "source": "ga4",
     "observedPage": "/",
-    "observation": "祭壇域（/）— PV:359 / 滞在:223.4秒 / 直帰率:50.7%",
+    "observation": "祭壇域（/）— PV:361 / 滞在:224.0秒 / 直帰率:50.7%",
     "judgement": "祭壇域のPVが最高。増殖最優先候補。",
     "analysis": "メイン入口のPVが最高。多くの観測者が祭壇域から体験を始めており、入口体験が全体の印象を決定づけている。",
     "hypothesis": "祭壇域の第一印象がKYOUKAI全体の滞在意欲を左右している。",
@@ -28,8 +28,8 @@
     "codexReady": false
   },
   {
-    "id": "proposal-225",
-    "createdAt": "2026-06-02",
+    "id": "proposal-496",
+    "createdAt": "2026-06-03",
     "source": "ga4",
     "observedPage": "/null",
     "observation": "未確認接続（/null）— PV:113 / 滞在:214.4秒 / 直帰率:19.3%",
@@ -56,8 +56,8 @@
     "codexReady": false
   },
   {
-    "id": "proposal-557",
-    "createdAt": "2026-06-02",
+    "id": "proposal-104",
+    "createdAt": "2026-06-03",
     "source": "ga4",
     "observedPage": "/exit",
     "observation": "崩壊域（/exit）— PV:88 / 滞在:190.1秒 / 直帰率:25.0%",
@@ -84,8 +84,8 @@
     "codexReady": false
   },
   {
-    "id": "proposal-228",
-    "createdAt": "2026-06-02",
+    "id": "proposal-236",
+    "createdAt": "2026-06-03",
     "source": "ga4",
     "observedPage": "/observation",
     "observation": "観測域（/observation）— PV:88 / 滞在:293.8秒 / 直帰率:21.3%",
@@ -113,8 +113,8 @@
     "codexReady": false
   },
   {
-    "id": "proposal-296",
-    "createdAt": "2026-06-02",
+    "id": "proposal-710",
+    "createdAt": "2026-06-03",
     "source": "ga4",
     "observedPage": "/archive",
     "observation": "記録室（/archive）— PV:81 / 滞在:102.6秒 / 直帰率:17.9%",
@@ -141,11 +141,11 @@
     "codexReady": false
   },
   {
-    "id": "proposal-423",
-    "createdAt": "2026-06-02",
+    "id": "proposal-432",
+    "createdAt": "2026-06-03",
     "source": "ga4",
     "observedPage": "/outside",
-    "observation": "外部接続（/outside）— PV:72 / 滞在:276.2秒 / 直帰率:10.0%",
+    "observation": "外部接続（/outside）— PV:72 / 滞在:283.7秒 / 直帰率:10.0%",
     "judgement": "外部接続への滞在時間が長い。深い閲覧が発生している。",
     "analysis": "外部接続への興味が強い。outsideへの流入は意図的な探索の結果である可能性がある。",
     "hypothesis": "ユーザーは境界の外側を積極的に調べており、外部導線が機能している。",
@@ -170,11 +170,11 @@
     "codexReady": false
   },
   {
-    "id": "proposal-647",
-    "createdAt": "2026-06-02",
+    "id": "proposal-439",
+    "createdAt": "2026-06-03",
     "source": "ga4",
     "observedPage": "/signal",
-    "observation": "受信域（/signal）— PV:67 / 滞在:450.4秒 / 直帰率:13.9%",
+    "observation": "受信域（/signal）— PV:68 / 滞在:452.0秒 / 直帰率:16.2%",
     "judgement": "受信域への滞在時間が長い。深い閲覧が発生している。",
     "analysis": "受信域への反応がある。意味不明な信号テキストへの引力が機能している。",
     "hypothesis": "ノイズ的なテキストが体験の引力になっている。",
