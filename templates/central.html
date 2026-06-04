@@ -35,294 +35,7 @@
       </div>
     </header>
 
-    <!-- PHASE PROGRESS -->
-    <section class="cos-section" id="cos-phase">
-      <h2 class="cos-section-title">[ PHASE 進捗 ]</h2>
-      <div class="cos-phase-grid">
-        <div class="cos-phase-item cos-phase-done">
-          <div class="cos-phase-label">PHASE 1</div>
-          <div class="cos-phase-name">OS基盤構築</div>
-          <div class="cos-phase-state">完了</div>
-        </div>
-        <div class="cos-phase-item cos-phase-done">
-          <div class="cos-phase-label">PHASE 2</div>
-          <div class="cos-phase-name">導線OS化</div>
-          <div class="cos-phase-state">完了</div>
-        </div>
-        <div class="cos-phase-item cos-phase-done">
-          <div class="cos-phase-label">PHASE 3</div>
-          <div class="cos-phase-name">central UI</div>
-          <div class="cos-phase-state">完了</div>
-        </div>
-        <div class="cos-phase-item cos-phase-done">
-          <div class="cos-phase-label">PHASE 4</div>
-          <div class="cos-phase-name">AI監督化</div>
-          <div class="cos-phase-state">完了</div>
-        </div>
-        <div class="cos-phase-item cos-phase-done">
-          <div class="cos-phase-label">PHASE 5</div>
-          <div class="cos-phase-name">生成物管理</div>
-          <div class="cos-phase-state">完了</div>
-        </div>
-        <div class="cos-phase-item cos-phase-done">
-          <div class="cos-phase-label">PHASE 6</div>
-          <div class="cos-phase-name">観測ループ</div>
-          <div class="cos-phase-state">完了</div>
-        </div>
-        <div class="cos-phase-item cos-phase-done">
-          <div class="cos-phase-label">PHASE 7</div>
-          <div class="cos-phase-name">循環OS化</div>
-          <div class="cos-phase-state">完了</div>
-        </div>
-        <div class="cos-phase-item cos-phase-active">
-          <div class="cos-phase-label">PHASE 8</div>
-          <div class="cos-phase-name">同期システム</div>
-          <div class="cos-phase-state">実装中</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ROUTE STATE -->
-    <section class="cos-section" id="cos-routes">
-      <h2 class="cos-section-title">[ route 状態 ]</h2>
-      <div class="cos-route-grid">
-        <div class="cos-route-block">
-          <h3 class="cos-route-heading cos-route-locked">確定 route</h3>
-          <ul class="cos-route-list" id="cos-route-locked-list"></ul>
-        </div>
-        <div class="cos-route-block">
-          <h3 class="cos-route-heading cos-route-unlocked">未確定 route</h3>
-          <ul class="cos-route-list" id="cos-route-unlocked-list"></ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- ROOMS -->
-    <section class="cos-section" id="cos-rooms">
-      <h2 class="cos-section-title">[ 部屋一覧 ]</h2>
-      <div class="cos-error" id="cos-rooms-error" hidden></div>
-      <div class="cos-rooms-table-wrap">
-        <table class="cos-table">
-          <thead>
-            <tr>
-              <th>name</th>
-              <th>route</th>
-              <th>status</th>
-              <th>priority</th>
-              <th>role</th>
-              <th>monetization</th>
-            </tr>
-          </thead>
-          <tbody id="cos-rooms-body"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- MONTHLY GOAL -->
-    <section class="cos-section" id="cos-goal">
-      <h2 class="cos-section-title">[ 月間目標 ]</h2>
-      <div class="cos-error" id="cos-goal-error" hidden></div>
-      <div id="cos-goal-body"></div>
-    </section>
-
-    <!-- IDEAS -->
-    <section class="cos-section" id="cos-ideas">
-      <h2 class="cos-section-title">[ AIネタ ]</h2>
-      <div class="cos-error" id="cos-ideas-error" hidden></div>
-      <ul class="cos-ideas-list" id="cos-ideas-body"></ul>
-    </section>
-
-    <!-- MONETIZATION -->
-    <section class="cos-section" id="cos-monetization">
-      <h2 class="cos-section-title">[ 収益導線 ]</h2>
-      <div class="cos-note">
-        ※ 広告ではなく「世界観内オブジェクト」として扱う方針。<br />
-        賽銭箱 = KYOUKAIへ信号を送る行為。外部接続 = 境界の外への扉。
-      </div>
-      <div class="cos-error" id="cos-mone-error" hidden></div>
-      <div class="cos-rooms-table-wrap">
-        <table class="cos-table">
-          <thead>
-            <tr>
-              <th>room</th>
-              <th>type</th>
-              <th>status</th>
-              <th>notes</th>
-            </tr>
-          </thead>
-          <tbody id="cos-mone-body"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- SNS ROUTES -->
-    <section class="cos-section" id="cos-sns">
-      <h2 class="cos-section-title">[ SNS導線 ]</h2>
-      <div class="cos-error" id="cos-sns-error" hidden></div>
-      <div class="cos-rooms-table-wrap">
-        <table class="cos-table">
-          <thead>
-            <tr>
-              <th>platform</th>
-              <th>title</th>
-              <th>targetRoom</th>
-              <th>url</th>
-              <th>status</th>
-            </tr>
-          </thead>
-          <tbody id="cos-sns-body"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- GRAPH OVERVIEW -->
-    <section class="cos-section" id="cos-graph">
-      <h2 class="cos-section-title">[ 導線graph概要 ]</h2>
-      <div class="cos-graph-grid">
-        <div class="cos-graph-item">
-          <div class="cos-graph-label">初見導線</div>
-          <div class="cos-graph-flow">/ → /observation → /hyougi</div>
-        </div>
-        <div class="cos-graph-item">
-          <div class="cos-graph-label">再訪問導線</div>
-          <div class="cos-graph-flow">/ → /signal or /null → /observer</div>
-        </div>
-        <div class="cos-graph-item">
-          <div class="cos-graph-label">深層導線</div>
-          <div class="cos-graph-flow">/observation → /signal → /null → /observer</div>
-        </div>
-        <div class="cos-graph-item">
-          <div class="cos-graph-label">観測導線</div>
-          <div class="cos-graph-flow">観測域 → 受信域 → 未確認接続 → 逆観測室（円環）</div>
-        </div>
-        <div class="cos-graph-item">
-          <div class="cos-graph-label">収益導線</div>
-          <div class="cos-graph-flow">深度段階に応じて接触 / 広告化しない</div>
-        </div>
-        <div class="cos-graph-item">
-          <div class="cos-graph-label">SNS導線</div>
-          <div class="cos-graph-flow">YouTube・TikTok・X → 祭壇域 or 深層部屋</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CODEX RULES -->
-    <section class="cos-section" id="cos-codex">
-      <h2 class="cos-section-title">[ Codex接続ルール ]</h2>
-      <ul class="cos-rules-list">
-        <li>central-os は <strong>読み取り専用の正本</strong> として扱う</li>
-        <li>Codex は central-os を勝手に編集しない</li>
-        <li>未確定 route は実装しない（リンク化もしない）</li>
-        <li>graph/ から逸脱した導線は作らない</li>
-        <li>route の確定は <strong>ユーザー指定 / PAGE_MAP / @app.get()</strong> の3条件のみ</li>
-        <li>収益導線を勝手に増やさない</li>
-        <li>commit / PR作成 / git add . は禁止</li>
-      </ul>
-    </section>
-
-    <!-- GENERATION MANAGEMENT -->
-    <section class="cos-section" id="cos-generation">
-      <h2 class="cos-section-title">[ 生成物管理 ]</h2>
-      <div class="cos-note">PHASE 5 initial / AI接続なし / 自動生成なし / 人間確認後に採用</div>
-      <div class="cos-error" id="cos-generation-error" hidden></div>
-      <div id="cos-generation-meta"></div>
-      <div class="cos-rooms-table-wrap">
-        <table class="cos-table cos-generation-table">
-          <thead>
-            <tr>
-              <th>title</th>
-              <th>type</th>
-              <th>targetRoom</th>
-              <th>targetRoute</th>
-              <th>status</th>
-              <th>adopted</th>
-              <th>usage</th>
-              <th>risk</th>
-            </tr>
-          </thead>
-          <tbody id="cos-generation-body"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- OBSERVATION LOOP -->
-    <section class="cos-section" id="cos-observations">
-      <h2 class="cos-section-title">[ 観測ループ ]</h2>
-      <div class="cos-note">PHASE 6 initial / 本番計測なし / Cookieなし / IP保存なし / 手動・仮データ</div>
-      <div class="cos-error" id="cos-observations-error" hidden></div>
-      <div id="cos-metrics-meta"></div>
-      <div class="cos-rooms-table-wrap">
-        <table class="cos-table cos-observations-table">
-          <thead>
-            <tr>
-              <th>type</th>
-              <th>source</th>
-              <th>targetRoom</th>
-              <th>targetRoute</th>
-              <th>event</th>
-              <th>value</th>
-              <th>reflected</th>
-              <th>notes</th>
-              <th>risk</th>
-            </tr>
-          </thead>
-          <tbody id="cos-observations-body"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- CYCLE OS -->
-    <section class="cos-section" id="cos-cycle">
-      <h2 class="cos-section-title">[ 循環OS / 自己増殖化 ]</h2>
-      <div class="cos-note">PHASE 7 initial / 自動実装なし / 自動投稿なし / 自動反映なし / 人間確認必須</div>
-      <div class="cos-error" id="cos-cycle-error" hidden></div>
-      <div id="cos-cycle-meta"></div>
-      <div class="cos-rooms-table-wrap">
-        <table class="cos-table cos-cycle-table">
-          <thead>
-            <tr>
-              <th>observationId</th>
-              <th>proposalId</th>
-              <th>generatedId</th>
-              <th>targetRoom</th>
-              <th>targetRoute</th>
-              <th>flow</th>
-              <th>status</th>
-              <th>risk</th>
-              <th>nextAction</th>
-              <th>humanApprovalRequired</th>
-            </tr>
-          </thead>
-          <tbody id="cos-cycle-body"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- EVOLUTION LOG -->
-    <section class="cos-section" id="cos-evolution">
-      <h2 class="cos-section-title">[ 進化ログ ]</h2>
-      <div class="cos-note">PHASE 7 initial / 変更理由の記録 / 自己増殖は記録された改善循環として扱う</div>
-      <div class="cos-error" id="cos-evolution-error" hidden></div>
-      <div id="cos-evolution-meta"></div>
-      <div class="cos-rooms-table-wrap">
-        <table class="cos-table cos-evolution-table">
-          <thead>
-            <tr>
-              <th>date</th>
-              <th>title</th>
-              <th>trigger</th>
-              <th>changedArea</th>
-              <th>reason</th>
-              <th>result</th>
-              <th>status</th>
-            </tr>
-          </thead>
-          <tbody id="cos-evolution-body"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- WATCH SYSTEM / SYNC STATE (PHASE 8) -->
+    <!-- WATCH SYSTEM / SYNC STATE -->
     <section class="cos-section" id="cos-watch">
       <h2 class="cos-section-title">[ 差分監視 / 同期状態 ]</h2>
       <div class="cos-note">PHASE 8 / watch system / 差分検知・OS同期・Codex同期生成 / 自動実行なし</div>
@@ -371,7 +84,6 @@
           <tbody id="cos-watch-difflog-body"></tbody>
         </table>
       </div>
-
     </section>
 
     <!-- DASHBOARD -->
@@ -446,26 +158,6 @@
       <div id="cos-plan-list"><div class="cos-up-empty">企画案なし — 「企画を生成」でAIが提案する</div></div>
     </section>
 
-    <!-- PHASE 3 COMPLETION CHECK -->
-    <section class="cos-section" id="cos-completion">
-      <h2 class="cos-section-title">[ PHASE 3 完了判定 ]</h2>
-      <table class="cos-table cos-check-table">
-        <thead>
-          <tr>
-            <th>項目</th>
-            <th>状態</th>
-          </tr>
-        </thead>
-        <tbody id="cos-check-body">
-          <tr><td>central UI 表示</td><td><span class="cos-check cos-check-ok">完了</span></td></tr>
-          <tr><td>JSON 読込</td><td><span class="cos-check" id="cos-check-json">確認中…</span></td></tr>
-          <tr><td>未確定route非リンク化</td><td><span class="cos-check cos-check-ok">完了</span></td></tr>
-          <tr><td>既存サイト影響なし</td><td><span class="cos-check cos-check-ok">確認済</span></td></tr>
-          <tr><td>PHASE 4 進行可否</td><td><span class="cos-check cos-check-pending" id="cos-check-phase4">判定待ち</span></td></tr>
-        </tbody>
-      </table>
-    </section>
-
     <footer class="cos-footer">
       <div>— END OF OBSERVATION —</div>
       <div class="cos-footer-sub">central-os は読み取り専用</div>
@@ -474,12 +166,9 @@
   </main>
 
   <script>
+    // ── Watch + fetch ──────────────────────────────────────────────────────────
     (function () {
       "use strict";
-
-      const LOCKED_ROUTES = ["/", "/observation", "/signal", "/hyougi", "/null", "/outside", "/central"];
-      const DESIGN_CONFIRMED_UNIMPLEMENTED_ROUTES = ["/observer"];
-      const GENERATED_LINKABLE_ROUTES = ["/", "/observation", "/signal", "/hyougi", "/null", "/outside", "/central"];
 
       function el(tag, attrs, children) {
         const node = document.createElement(tag);
@@ -501,13 +190,6 @@
         return String(value);
       }
 
-      function routeDisplayText(route) {
-        if (DESIGN_CONFIRMED_UNIMPLEMENTED_ROUTES.indexOf(route) >= 0) {
-          return route + "（設計確定・未実装）";
-        }
-        return route || "未確定";
-      }
-
       function showError(id, message) {
         const node = document.getElementById(id);
         if (!node) return;
@@ -515,479 +197,10 @@
         node.textContent = "[ ERROR ] " + message;
       }
 
-      function renderRouteState(roomsData) {
-        const lockedList = document.getElementById("cos-route-locked-list");
-        const unlockedList = document.getElementById("cos-route-unlocked-list");
-        if (!lockedList || !unlockedList) return;
+      // expose showError globally for other IIFEs
+      window._cosShowError = showError;
 
-        lockedList.innerHTML = "";
-        unlockedList.innerHTML = "";
-
-        const items = (roomsData && roomsData.items) || [];
-
-        items.forEach(function (room) {
-          const route = safeText(room.route);
-          const name = safeText(room.name);
-          const isLocked = LOCKED_ROUTES.indexOf(route) >= 0;
-
-          if (isLocked) {
-            const li = el("li", { class: "cos-route-li" });
-            const a = el("a", { href: route, class: "cos-route-link", target: "_blank", rel: "noopener" });
-            a.textContent = route + "  ← " + name;
-            li.appendChild(a);
-            lockedList.appendChild(li);
-          } else if (DESIGN_CONFIRMED_UNIMPLEMENTED_ROUTES.indexOf(route) >= 0) {
-            const li = el("li", { class: "cos-route-li cos-route-disabled" });
-            li.textContent = routeDisplayText(route) + "  ← " + name;
-            lockedList.appendChild(li);
-          } else {
-            const li = el("li", { class: "cos-route-li cos-route-disabled" });
-            li.textContent = "未確定  ← " + name + "  (route確定後に有効化)";
-            unlockedList.appendChild(li);
-          }
-        });
-      }
-
-      function renderRooms(roomsData) {
-        const tbody = document.getElementById("cos-rooms-body");
-        if (!tbody) return;
-        tbody.innerHTML = "";
-
-        const items = (roomsData && roomsData.items) || [];
-
-        items.forEach(function (room) {
-          const tr = el("tr");
-          tr.appendChild(el("td", { text: safeText(room.name) }));
-
-          const routeTd = el("td");
-          const route = safeText(room.route);
-          if (LOCKED_ROUTES.indexOf(route) >= 0) {
-            const a = el("a", { href: route, class: "cos-route-link-inline", target: "_blank", rel: "noopener" });
-            a.textContent = route;
-            routeTd.appendChild(a);
-          } else {
-            routeTd.textContent = routeDisplayText(route);
-            routeTd.classList.add("cos-cell-unlocked");
-          }
-          tr.appendChild(routeTd);
-
-          tr.appendChild(el("td", { text: safeText(room.status) }));
-          tr.appendChild(el("td", { text: safeText(room.priority) }));
-          tr.appendChild(el("td", { class: "cos-cell-role", text: safeText(room.role) }));
-          const mono = Array.isArray(room.monetization) ? room.monetization.join(" / ") : "";
-          tr.appendChild(el("td", { text: mono }));
-          tbody.appendChild(tr);
-        });
-      }
-
-      function renderGoal(goalData) {
-        const body = document.getElementById("cos-goal-body");
-        if (!body) return;
-        body.innerHTML = "";
-        const items = (goalData && goalData.items) || [];
-        if (items.length === 0) {
-          body.textContent = "(目標未登録)";
-          return;
-        }
-        items.forEach(function (goal) {
-          const card = el("div", { class: "cos-goal-card" });
-          card.appendChild(el("div", { class: "cos-goal-title", text: safeText(goal.title) }));
-
-          if (Array.isArray(goal.targetRooms) && goal.targetRooms.length > 0) {
-            card.appendChild(el("div", { class: "cos-goal-rooms", text: "対象部屋： " + goal.targetRooms.join(" / ") }));
-          }
-
-          if (Array.isArray(goal.successCondition) && goal.successCondition.length > 0) {
-            const cond = el("ul", { class: "cos-goal-cond" });
-            goal.successCondition.forEach(function (c) {
-              cond.appendChild(el("li", { text: safeText(c) }));
-            });
-            card.appendChild(cond);
-          }
-
-          if (goal.notes) {
-            card.appendChild(el("div", { class: "cos-goal-notes", text: safeText(goal.notes) }));
-          }
-          body.appendChild(card);
-        });
-      }
-
-      function renderIdeas(ideasData) {
-        const ul = document.getElementById("cos-ideas-body");
-        if (!ul) return;
-        ul.innerHTML = "";
-        const items = (ideasData && ideasData.items) || [];
-        items.forEach(function (idea) {
-          const li = el("li", { class: "cos-idea-item" });
-          const head = el("div", { class: "cos-idea-head" });
-          head.appendChild(el("span", { class: "cos-idea-type", text: "[" + safeText(idea.type) + "]" }));
-          head.appendChild(el("span", { class: "cos-idea-room", text: safeText(idea.targetRoom) }));
-          head.appendChild(el("span", { class: "cos-idea-status cos-status-" + safeText(idea.status), text: safeText(idea.status) }));
-          if (idea.adopted) head.appendChild(el("span", { class: "cos-idea-adopted", text: "採用済" }));
-          li.appendChild(head);
-          li.appendChild(el("div", { class: "cos-idea-content", text: safeText(idea.content) }));
-          ul.appendChild(li);
-        });
-      }
-
-      function renderMonetization(moneData) {
-        const tbody = document.getElementById("cos-mone-body");
-        if (!tbody) return;
-        tbody.innerHTML = "";
-        const items = (moneData && moneData.items) || [];
-        items.forEach(function (mono) {
-          const tr = el("tr");
-          tr.appendChild(el("td", { text: safeText(mono.room) }));
-          tr.appendChild(el("td", { text: safeText(mono.type) }));
-          tr.appendChild(el("td", { text: safeText(mono.status) }));
-          tr.appendChild(el("td", { class: "cos-cell-notes", text: safeText(mono.notes) }));
-          tbody.appendChild(tr);
-        });
-      }
-
-      function renderSns(snsData) {
-        const tbody = document.getElementById("cos-sns-body");
-        if (!tbody) return;
-        tbody.innerHTML = "";
-        const items = (snsData && snsData.items) || [];
-        items.forEach(function (sns) {
-          const tr = el("tr");
-          tr.appendChild(el("td", { text: safeText(sns.platform) }));
-          tr.appendChild(el("td", { text: safeText(sns.title) }));
-          tr.appendChild(el("td", { text: safeText(sns.targetRoom) }));
-          const urlTd = el("td");
-          const url = safeText(sns.url);
-          if (url) {
-            const a = el("a", { href: url, class: "cos-route-link-inline", target: "_blank", rel: "noopener" });
-            a.textContent = url;
-            urlTd.appendChild(a);
-          } else {
-            urlTd.textContent = "(未開設)";
-            urlTd.classList.add("cos-cell-unlocked");
-          }
-          tr.appendChild(urlTd);
-          tr.appendChild(el("td", { text: safeText(sns.status) }));
-          tbody.appendChild(tr);
-        });
-      }
-
-      function renderGeneration(generationData, generatedData) {
-        const meta = document.getElementById("cos-generation-meta");
-        const tbody = document.getElementById("cos-generation-body");
-        if (!tbody) return;
-        tbody.innerHTML = "";
-
-        if (meta) {
-          meta.innerHTML = "";
-          const files = generationData && generationData.files ? generationData.files : {};
-          const readyCount = Object.keys(files).filter(function (key) { return files[key]; }).length;
-          const totalCount = Object.keys(files).length;
-          const summary = el("div", { class: "cos-generation-summary" });
-          summary.appendChild(el("span", { text: "generation files: " + readyCount + " / " + totalCount }));
-          summary.appendChild(el("span", { class: "cos-sv-summary-sep", text: " / " }));
-          summary.appendChild(el("span", { text: "generated-content: " + ((generationData && generationData.generatedFiles && generationData.generatedFiles["generated-content.json"]) ? "found" : "missing") }));
-          meta.appendChild(summary);
-        }
-
-        const items = (generatedData && generatedData.items) || [];
-        if (items.length === 0) {
-          const tr = el("tr");
-          tr.appendChild(el("td", { text: "(generated candidates not found)", colspan: "8" }));
-          tbody.appendChild(tr);
-          return;
-        }
-
-        items.forEach(function (item) {
-          const tr = el("tr");
-          tr.appendChild(el("td", { class: "cos-cell-role", text: safeText(item.title) }));
-          tr.appendChild(el("td", { text: safeText(item.type) }));
-          tr.appendChild(el("td", { text: safeText(item.targetRoom) }));
-
-          const routeTd = el("td");
-          const route = safeText(item.targetRoute);
-          if (GENERATED_LINKABLE_ROUTES.indexOf(route) >= 0) {
-            const a = el("a", { href: route, class: "cos-route-link-inline", target: "_blank", rel: "noopener" });
-            a.textContent = route;
-            routeTd.appendChild(a);
-          } else {
-            routeTd.textContent = route || "未確定";
-            routeTd.classList.add("cos-cell-unlocked");
-          }
-          tr.appendChild(routeTd);
-
-          tr.appendChild(el("td", { text: safeText(item.status) }));
-          tr.appendChild(el("td", { text: item.adopted ? "true" : "false" }));
-          tr.appendChild(el("td", { class: "cos-cell-notes", text: safeText(item.usage) }));
-          tr.appendChild(el("td", { class: "cos-cell-notes", text: safeText(item.risk) }));
-          tbody.appendChild(tr);
-        });
-      }
-
-      function renderObservations(metricsData, observationsData) {
-        const meta = document.getElementById("cos-metrics-meta");
-        const tbody = document.getElementById("cos-observations-body");
-        if (!tbody) return;
-        tbody.innerHTML = "";
-
-        if (meta) {
-          meta.innerHTML = "";
-          const files = metricsData && metricsData.files ? metricsData.files : {};
-          const readyCount = Object.keys(files).filter(function (key) { return files[key]; }).length;
-          const totalCount = Object.keys(files).length;
-          const summary = el("div", { class: "cos-metrics-summary" });
-          summary.appendChild(el("span", { text: "metrics files: " + readyCount + " / " + totalCount }));
-          summary.appendChild(el("span", { class: "cos-sv-summary-sep", text: " / " }));
-          summary.appendChild(el("span", { text: "observations: " + ((metricsData && metricsData.observationFiles && metricsData.observationFiles["observations.json"]) ? "found" : "missing") }));
-          meta.appendChild(summary);
-        }
-
-        const items = (observationsData && observationsData.items) || [];
-        if (items.length === 0) {
-          const tr = el("tr");
-          tr.appendChild(el("td", { text: "(observations not found)", colspan: "9" }));
-          tbody.appendChild(tr);
-          return;
-        }
-
-        items.forEach(function (item) {
-          const tr = el("tr");
-          tr.appendChild(el("td", { text: safeText(item.type) }));
-          tr.appendChild(el("td", { text: safeText(item.source) }));
-          tr.appendChild(el("td", { text: safeText(item.targetRoom) }));
-
-          const routeTd = el("td");
-          const route = safeText(item.targetRoute);
-          if (GENERATED_LINKABLE_ROUTES.indexOf(route) >= 0) {
-            const a = el("a", { href: route, class: "cos-route-link-inline", target: "_blank", rel: "noopener" });
-            a.textContent = route;
-            routeTd.appendChild(a);
-          } else {
-            routeTd.textContent = route || "未確定";
-            routeTd.classList.add("cos-cell-unlocked");
-          }
-          tr.appendChild(routeTd);
-
-          tr.appendChild(el("td", { class: "cos-cell-role", text: safeText(item.event) }));
-          tr.appendChild(el("td", { text: safeText(item.value) }));
-          tr.appendChild(el("td", { text: item.reflected ? "true" : "false" }));
-          tr.appendChild(el("td", { class: "cos-cell-notes", text: safeText(item.notes) }));
-          tr.appendChild(el("td", { class: "cos-cell-notes", text: safeText(item.risk) }));
-          tbody.appendChild(tr);
-        });
-      }
-
-      function renderCycle(cycleData, cycleMapData) {
-        const meta = document.getElementById("cos-cycle-meta");
-        const tbody = document.getElementById("cos-cycle-body");
-        if (!tbody) return;
-        tbody.innerHTML = "";
-
-        if (meta) {
-          meta.innerHTML = "";
-          const files = cycleData && cycleData.files ? cycleData.files : {};
-          const readyCount = Object.keys(files).filter(function (key) { return files[key]; }).length;
-          const totalCount = Object.keys(files).length;
-          const summary = el("div", { class: "cos-cycle-summary" });
-          summary.appendChild(el("span", { text: "cycle files: " + readyCount + " / " + totalCount }));
-          summary.appendChild(el("span", { class: "cos-sv-summary-sep", text: " / " }));
-          summary.appendChild(el("span", { text: "cycle-map: " + ((files && files["cycle-map.json"]) ? "found" : "missing") }));
-          meta.appendChild(summary);
-        }
-
-        const items = (cycleMapData && cycleMapData.items) || [];
-        if (items.length === 0) {
-          const tr = el("tr");
-          tr.appendChild(el("td", { text: "(cycle map not found)", colspan: "10" }));
-          tbody.appendChild(tr);
-          return;
-        }
-
-        items.forEach(function (item) {
-          const tr = el("tr");
-          tr.appendChild(el("td", { text: safeText(item.observationId) }));
-          tr.appendChild(el("td", { text: safeText(item.proposalId) }));
-          tr.appendChild(el("td", { text: safeText(item.generatedId) }));
-          tr.appendChild(el("td", { text: safeText(item.targetRoom) }));
-
-          const routeTd = el("td");
-          const route = safeText(item.targetRoute);
-          if (GENERATED_LINKABLE_ROUTES.indexOf(route) >= 0) {
-            const a = el("a", { href: route, class: "cos-route-link-inline", target: "_blank", rel: "noopener" });
-            a.textContent = route;
-            routeTd.appendChild(a);
-          } else {
-            routeTd.textContent = route || "未確定";
-            routeTd.classList.add("cos-cell-unlocked");
-          }
-          tr.appendChild(routeTd);
-
-          tr.appendChild(el("td", { class: "cos-cell-notes", text: safeText(item.flow) }));
-          tr.appendChild(el("td", { text: safeText(item.status) }));
-          tr.appendChild(el("td", { class: "cos-cell-notes", text: safeText(item.risk) }));
-          tr.appendChild(el("td", { class: "cos-cell-notes", text: safeText(item.nextAction) }));
-          tr.appendChild(el("td", { text: item.humanApprovalRequired ? "true" : "false" }));
-          tbody.appendChild(tr);
-        });
-      }
-
-      function renderEvolution(evolutionData, evolutionLogData) {
-        const meta = document.getElementById("cos-evolution-meta");
-        const tbody = document.getElementById("cos-evolution-body");
-        if (!tbody) return;
-        tbody.innerHTML = "";
-
-        if (meta) {
-          meta.innerHTML = "";
-          const files = evolutionData && evolutionData.files ? evolutionData.files : {};
-          const readyCount = Object.keys(files).filter(function (key) { return files[key]; }).length;
-          const totalCount = Object.keys(files).length;
-          const summary = el("div", { class: "cos-evolution-summary" });
-          summary.appendChild(el("span", { text: "evolution files: " + readyCount + " / " + totalCount }));
-          summary.appendChild(el("span", { class: "cos-sv-summary-sep", text: " / " }));
-          summary.appendChild(el("span", { text: "evolution-log: " + ((files && files["evolution-log.json"]) ? "found" : "missing") }));
-          meta.appendChild(summary);
-        }
-
-        const items = (evolutionLogData && evolutionLogData.items) || [];
-        if (items.length === 0) {
-          const tr = el("tr");
-          tr.appendChild(el("td", { text: "(evolution log not found)", colspan: "7" }));
-          tbody.appendChild(tr);
-          return;
-        }
-
-        items.forEach(function (item) {
-          const tr = el("tr");
-          tr.appendChild(el("td", { text: safeText(item.date) }));
-          tr.appendChild(el("td", { class: "cos-cell-role", text: safeText(item.title) }));
-          tr.appendChild(el("td", { class: "cos-cell-notes", text: safeText(item.trigger) }));
-          tr.appendChild(el("td", { text: safeText(item.changedArea) }));
-          tr.appendChild(el("td", { class: "cos-cell-notes", text: safeText(item.reason) }));
-          tr.appendChild(el("td", { class: "cos-cell-notes", text: safeText(item.result) }));
-          tr.appendChild(el("td", { text: safeText(item.status) }));
-          tbody.appendChild(tr);
-        });
-      }
-
-      function updateCompletion(result) {
-        const jsonCheck = document.getElementById("cos-check-json");
-        const phase4Check = document.getElementById("cos-check-phase4");
-        if (!jsonCheck || !phase4Check) return;
-
-        const errors = result && result.errors ? result.errors : {};
-        const errorKeys = Object.keys(errors).filter(function (k) { return errors[k]; });
-
-        if (errorKeys.length === 0) {
-          jsonCheck.textContent = "完了";
-          jsonCheck.className = "cos-check cos-check-ok";
-          phase4Check.textContent = "REVISE → GO";
-          phase4Check.className = "cos-check cos-check-revise";
-        } else {
-          jsonCheck.textContent = "部分エラー (" + errorKeys.length + "件)";
-          jsonCheck.className = "cos-check cos-check-error";
-          phase4Check.textContent = "HOLD";
-          phase4Check.className = "cos-check cos-check-error";
-        }
-      }
-
-      const PRIORITY_ORDER = { "最優先": 0, "高": 1, "中": 2, "低": 3, "保留": 4 };
-
-      function renderProposals(supervisorData, proposalsData) {
-        const svExists = document.getElementById("cos-sv-exists");
-        if (svExists) {
-          if (supervisorData && supervisorData.exists) {
-            svExists.textContent = "active";
-            svExists.className = "cos-value cos-sv-active";
-          } else {
-            svExists.textContent = "not found";
-            svExists.className = "cos-value";
-          }
-        }
-
-        const body = document.getElementById("cos-proposals-body");
-        if (!body) return;
-        body.innerHTML = "";
-
-        const items = (proposalsData && proposalsData.items) || [];
-        if (items.length === 0) {
-          body.textContent = "(提案なし)";
-          return;
-        }
-
-        // Sort by priority
-        const sorted = items.slice().sort(function (a, b) {
-          return (PRIORITY_ORDER[a.priority] || 9) - (PRIORITY_ORDER[b.priority] || 9);
-        });
-
-        // Summary bar
-        const codexFalse = sorted.filter(function (p) { return !p.codexReady; }).length;
-        const summary = el("div", { class: "cos-sv-summary" });
-        summary.appendChild(el("span", { text: "提案 " + sorted.length + "件" }));
-        summary.appendChild(el("span", { class: "cos-sv-summary-sep", text: " / " }));
-        summary.appendChild(el("span", { class: "cos-sv-codex-warn", text: "codexReady=false: " + codexFalse + "件" }));
-        body.appendChild(summary);
-
-        sorted.forEach(function (prop) {
-          const card = el("div", { class: "cos-proposal-card cos-prop-" + safeText(prop.status) });
-
-          // Header row
-          const head = el("div", { class: "cos-prop-head" });
-          head.appendChild(el("span", { class: "cos-prop-id", text: safeText(prop.id) }));
-          head.appendChild(el("span", {
-            class: "cos-prop-priority cos-prio-" + safeText(prop.priority),
-            text: safeText(prop.priority)
-          }));
-          head.appendChild(el("span", { class: "cos-prop-type", text: "[" + safeText(prop.type) + "]" }));
-          head.appendChild(el("span", { class: "cos-prop-status", text: safeText(prop.status) }));
-
-          const codexEl = el("span", {
-            class: prop.codexReady ? "cos-prop-codex-ok" : "cos-prop-codex-no",
-            text: "codexReady: " + (prop.codexReady ? "true" : "false")
-          });
-          head.appendChild(codexEl);
-          card.appendChild(head);
-
-          // Title
-          card.appendChild(el("div", { class: "cos-prop-title", text: safeText(prop.title) }));
-
-          // Target
-          const target = el("div", { class: "cos-prop-target" });
-          target.appendChild(el("span", { class: "cos-label", text: "対象：" }));
-          target.appendChild(el("span", { text: safeText(prop.targetRoom) + "  " }));
-          const route = safeText(prop.targetRoute);
-          if (route && route !== "未確定" && LOCKED_ROUTES.indexOf(route) >= 0) {
-            const a = el("a", { href: route, class: "cos-route-link-inline", target: "_blank", rel: "noopener" });
-            a.textContent = route;
-            target.appendChild(a);
-          } else if (route === "未確定") {
-            target.appendChild(el("span", { class: "cos-cell-unlocked", text: "route: 未確定" }));
-          } else {
-            target.appendChild(el("span", { text: routeDisplayText(route) }));
-          }
-          card.appendChild(target);
-
-          // Expected effect
-          if (prop.expectedEffect) {
-            const eff = el("div", { class: "cos-prop-row" });
-            eff.appendChild(el("span", { class: "cos-prop-row-label", text: "期待効果：" }));
-            eff.appendChild(el("span", { class: "cos-prop-row-val", text: safeText(prop.expectedEffect) }));
-            card.appendChild(eff);
-          }
-
-          // Risk
-          if (prop.risk) {
-            const risk = el("div", { class: "cos-prop-row cos-prop-risk" });
-            risk.appendChild(el("span", { class: "cos-prop-row-label", text: "リスク：" }));
-            risk.appendChild(el("span", { class: "cos-prop-row-val", text: safeText(prop.risk) }));
-            card.appendChild(risk);
-          }
-
-          body.appendChild(card);
-        });
-      }
-
-      // PHASE 8: watch system
-      function renderWatch(watchData, diffLogData, watchTargetsData, roomsData) {
+      function renderWatch(watchData, diffLogData, watchTargetsData) {
         var targetCountEl = document.getElementById("cos-watch-target-count");
         var lastScanEl    = document.getElementById("cos-watch-last-scan");
         var unsyncedEl    = document.getElementById("cos-watch-unsynced");
@@ -995,11 +208,9 @@
         var genStateEl    = document.getElementById("cos-watch-generated-state");
         var histStateEl   = document.getElementById("cos-watch-history-state");
 
-        // watch-targets count
         var targets = (watchTargetsData && watchTargetsData.items) || [];
         if (targetCountEl) targetCountEl.textContent = String(targets.length);
 
-        // watch metadata
         if (genStateEl) {
           genStateEl.textContent = (watchData && watchData.generatedExists) ? "found" : "missing";
           genStateEl.className = "cos-value " + ((watchData && watchData.generatedExists) ? "cos-watch-ok" : "cos-watch-warn");
@@ -1009,10 +220,8 @@
           histStateEl.className = "cos-value " + ((watchData && watchData.historyExists) ? "cos-watch-ok" : "cos-watch-warn");
         }
 
-        // diff-log items
         var diffItems = (diffLogData && diffLogData.items) || [];
 
-        // last scan date
         var lastDate = "未スキャン";
         if (diffItems.length > 0) {
           var dates = diffItems.map(function(i) { return i.date || ""; }).filter(Boolean).sort();
@@ -1020,14 +229,12 @@
         }
         if (lastScanEl) lastScanEl.textContent = lastDate;
 
-        // unsynced count (osUpdated === false)
         var unsyncedCount = diffItems.filter(function(i) { return i.osUpdated === false; }).length;
         if (unsyncedEl) {
           unsyncedEl.textContent = String(unsyncedCount);
           unsyncedEl.className = "cos-value " + (unsyncedCount > 0 ? "cos-watch-warn" : "cos-watch-ok");
         }
 
-        // sync state
         if (syncStateEl) {
           if (diffItems.length === 0) {
             syncStateEl.textContent = "CLEAN";
@@ -1041,7 +248,6 @@
           }
         }
 
-        // diff-log table
         var tbody = document.getElementById("cos-watch-difflog-body");
         if (tbody) {
           tbody.innerHTML = "";
@@ -1072,40 +278,16 @@
             });
           }
         }
-
       }
 
       function renderAll(result) {
         const data = result && result.data ? result.data : {};
         const errors = result && result.errors ? result.errors : {};
 
-        if (errors.rooms) showError("cos-rooms-error", "rooms.json: " + errors.rooms);
-        if (errors.monthly_goal) showError("cos-goal-error", "monthly-goal.json: " + errors.monthly_goal);
-        if (errors.ideas) showError("cos-ideas-error", "ideas.json: " + errors.ideas);
-        if (errors.monetization) showError("cos-mone-error", "monetization.json: " + errors.monetization);
-        if (errors.sns_routes) showError("cos-sns-error", "sns-routes.json: " + errors.sns_routes);
-        if (errors.proposals) showError("cos-sv-error", "proposals.json: " + errors.proposals);
-        if (errors.generated) showError("cos-generation-error", "generated-content.json: " + errors.generated);
-        if (errors.observations) showError("cos-observations-error", "observations.json: " + errors.observations);
-        if (errors.cycleMap) showError("cos-cycle-error", "cycle-map.json: " + errors.cycleMap);
-        if (errors.evolutionLog) showError("cos-evolution-error", "evolution-log.json: " + errors.evolutionLog);
         if (errors.diffLog) showError("cos-watch-error", "diff-log.json: " + errors.diffLog);
         if (errors.watchTargets) showError("cos-watch-error", "watch-targets.json: " + errors.watchTargets);
 
-        try { renderRouteState(data.rooms); } catch (e) { showError("cos-rooms-error", String(e)); }
-        try { renderRooms(data.rooms); } catch (e) { showError("cos-rooms-error", String(e)); }
-        try { renderGoal(data.monthly_goal); } catch (e) { showError("cos-goal-error", String(e)); }
-        try { renderIdeas(data.ideas); } catch (e) { showError("cos-ideas-error", String(e)); }
-        try { renderMonetization(data.monetization); } catch (e) { showError("cos-mone-error", String(e)); }
-        try { renderSns(data.sns_routes); } catch (e) { showError("cos-sns-error", String(e)); }
-        try { renderGeneration(data.generation, data.generated); } catch (e) { showError("cos-generation-error", String(e)); }
-        try { renderObservations(data.metrics, data.observations); } catch (e) { showError("cos-observations-error", String(e)); }
-        try { renderCycle(data.cycle, data.cycleMap); } catch (e) { showError("cos-cycle-error", String(e)); }
-        try { renderEvolution(data.evolution, data.evolutionLog); } catch (e) { showError("cos-evolution-error", String(e)); }
-        try { renderWatch(data.watch, data.diffLog, data.watchTargets, data.rooms); } catch (e) { showError("cos-watch-error", String(e)); }
-        try { renderProposals(data.supervisor, data.proposals); } catch (e) { showError("cos-sv-error", String(e)); }
-
-        updateCompletion(result);
+        try { renderWatch(data.watch, data.diffLog, data.watchTargets); } catch (e) { showError("cos-watch-error", String(e)); }
       }
 
       function load() {
@@ -1116,15 +298,7 @@
           })
           .then(renderAll)
           .catch(function (err) {
-            showError("cos-rooms-error", "central-os読込失敗: " + err.message);
-            showError("cos-goal-error", "central-os読込失敗");
-            showError("cos-ideas-error", "central-os読込失敗");
-            showError("cos-mone-error", "central-os読込失敗");
-            showError("cos-sns-error", "central-os読込失敗");
-            const jsonCheck = document.getElementById("cos-check-json");
-            const phase4Check = document.getElementById("cos-check-phase4");
-            if (jsonCheck) { jsonCheck.textContent = "失敗"; jsonCheck.className = "cos-check cos-check-error"; }
-            if (phase4Check) { phase4Check.textContent = "HOLD"; phase4Check.className = "cos-check cos-check-error"; }
+            showError("cos-watch-error", "central-os読込失敗: " + err.message);
           });
       }
 
@@ -1135,7 +309,7 @@
       }
     })();
 
-    // ── Dashboard ──────────────────────────────────────────────────────────
+    // ── Dashboard ──────────────────────────────────────────────────────────────
     (function () {
       var currentFilter = "all";
 
@@ -1143,6 +317,12 @@
       var STATUS_CLASS = { pending: "dash-pending", adopted: "dash-adopted", held: "dash-held", rejected: "dash-rejected" };
       var PRIORITY_LABEL = { high: "高", medium: "中", low: "低" };
       var CHANGE_LABEL = { strong: "反応強", active: "反応あり", weak: "反応弱", dead: "死んだ接続", no_data: "データなし" };
+
+      function safeText(v) { return (v === null || v === undefined) ? "" : String(v); }
+      function showError(id, msg) {
+        var n = document.getElementById(id); if (!n) return;
+        n.hidden = false; n.textContent = "[ ERROR ] " + msg;
+      }
 
       function setDashStatus(msg, cls) {
         var el = document.getElementById("cos-dash-status");
@@ -1288,6 +468,12 @@
         outside_adjustment: "外部接続", signal_fragment: "受信断片",
       };
 
+      function safeText(v) { return (v === null || v === undefined) ? "" : String(v); }
+      function showError(id, msg) {
+        var n = document.getElementById(id); if (!n) return;
+        n.hidden = false; n.textContent = "[ ERROR ] " + msg;
+      }
+
       function setUpStatus(msg, cls) {
         var el = document.getElementById("cos-up-status");
         if (el) { el.textContent = msg; el.className = "cos-up-status " + (cls || ""); }
@@ -1307,7 +493,6 @@
           var card = document.createElement("div");
           card.className = "cos-up-card cos-up-" + (p.status || "pending");
 
-          // header
           var hdr = document.createElement("div");
           hdr.className = "cos-up-header";
           hdr.innerHTML =
@@ -1318,19 +503,16 @@
             "<span class='cos-up-date'>" + safeText(p.createdAt || "") + "</span>";
           card.appendChild(hdr);
 
-          // observation
           var obs = document.createElement("div");
           obs.className = "cos-up-observation";
           obs.textContent = p.observation || "";
           card.appendChild(obs);
 
-          // judgement
           var jdg = document.createElement("div");
           jdg.className = "cos-up-judgement";
           jdg.textContent = p.judgement || "";
           card.appendChild(jdg);
 
-          // AI analysis
           if (p.analysis) {
             var aiBlock = document.createElement("div");
             aiBlock.className = "cos-up-ai-block";
@@ -1351,7 +533,6 @@
             card.appendChild(aiBlock);
           }
 
-          // AI recommendations
           var recs = p.recommendations || [];
           if (recs.length) {
             var recLabel = document.createElement("div");
@@ -1366,7 +547,6 @@
             card.appendChild(recUl);
           }
 
-          // changes
           var changes = p.changes || [];
           if (changes.length) {
             var ul = document.createElement("ul");
@@ -1377,7 +557,6 @@
             card.appendChild(ul);
           }
 
-          // reason
           if (p.reason) {
             var rsn = document.createElement("div");
             rsn.className = "cos-up-reason";
@@ -1385,7 +564,6 @@
             card.appendChild(rsn);
           }
 
-          // actions (pending/approved only)
           if (p.status !== "rejected") {
             var acts = document.createElement("div");
             acts.className = "cos-up-actions";
@@ -1461,7 +639,7 @@
       loadUpdateProposals();
     })();
 
-    // ─── AI実装指示 ─────────────────────────────────────────────────────────
+    // ── AI実装指示 ────────────────────────────────────────────────────────────
     (function() {
       var implFilter = "all";
 
@@ -1469,6 +647,12 @@
         pending: "未確認", ready: "Ready", sent: "Sent",
         done: "Done", hold: "保留", rejected: "却下"
       };
+
+      function safeText(v) { return (v === null || v === undefined) ? "" : String(v); }
+      function showError(id, msg) {
+        var n = document.getElementById(id); if (!n) return;
+        n.hidden = false; n.textContent = "[ ERROR ] " + msg;
+      }
 
       function setImplStatus(msg, cls) {
         var el = document.getElementById("cos-impl-status");
@@ -1493,7 +677,6 @@
           var card = document.createElement("div");
           card.className = "cos-up-card cos-up-" + (t.status || "pending");
 
-          // header
           var header = document.createElement("div");
           header.className = "cos-up-header";
           var title = document.createElement("span");
@@ -1512,12 +695,11 @@
           }
           card.appendChild(header);
 
-          // meta
           var meta = document.createElement("div");
           meta.className = "cos-up-meta";
           meta.innerHTML =
             '<span class="cos-up-page">' + (t.targetPages || []).join(", ") + '</span>' +
-            '<span class="cos-up-priority">元企画: ' + (t.sourcePlanId || "-") + '</span>' +
+            '<span class="cos-up-priority">元企画: ' + safeText(t.sourcePlanId || "-") + '</span>' +
             '<span class="cos-up-date">' + (t.createdAt ? t.createdAt.slice(0,10) : "") + '</span>';
           if (t.source === "fallback") {
             var src = document.createElement("span");
@@ -1526,7 +708,6 @@
           }
           card.appendChild(meta);
 
-          // objective
           if (t.objective) {
             var obj = document.createElement("div");
             obj.className = "cos-up-observation";
@@ -1534,7 +715,6 @@
             card.appendChild(obj);
           }
 
-          // implementationBrief
           if (t.implementationBrief) {
             var brief = document.createElement("div");
             brief.className = "cos-up-reason";
@@ -1542,7 +722,6 @@
             card.appendChild(brief);
           }
 
-          // candidateFiles
           var files = t.candidateFiles || [];
           if (files.length) {
             var fLabel = document.createElement("div");
@@ -1554,7 +733,6 @@
             card.appendChild(fUl);
           }
 
-          // mustKeep
           var mk = t.mustKeep || [];
           if (mk.length) {
             var mkLabel = document.createElement("div");
@@ -1566,7 +744,6 @@
             card.appendChild(mkUl);
           }
 
-          // doNotChange
           var dnc = t.doNotChange || [];
           if (dnc.length) {
             var dncLabel = document.createElement("div");
@@ -1578,7 +755,6 @@
             card.appendChild(dncUl);
           }
 
-          // steps
           var steps = t.steps || [];
           if (steps.length) {
             var stLabel = document.createElement("div");
@@ -1590,7 +766,6 @@
             card.appendChild(stOl);
           }
 
-          // acceptanceCriteria
           var ac = t.acceptanceCriteria || [];
           if (ac.length) {
             var acLabel = document.createElement("div");
@@ -1602,7 +777,6 @@
             card.appendChild(acUl);
           }
 
-          // actions
           if (t.status !== "done" && t.status !== "rejected") {
             var acts = document.createElement("div");
             acts.className = "cos-up-actions";
@@ -1678,9 +852,15 @@
       loadImplTasks();
     })();
 
-    // ─── AI企画案 ───────────────────────────────────────────────────────────
+    // ── AI企画案 ──────────────────────────────────────────────────────────────
     (function() {
       var planFilter = "all";
+
+      function safeText(v) { return (v === null || v === undefined) ? "" : String(v); }
+      function showError(id, msg) {
+        var n = document.getElementById(id); if (!n) return;
+        n.hidden = false; n.textContent = "[ ERROR ] " + msg;
+      }
 
       function setPlanStatus(msg, cls) {
         var el = document.getElementById("cos-plan-status");
@@ -1705,7 +885,6 @@
           var card = document.createElement("div");
           card.className = "cos-up-card cos-up-" + (p.status || "pending");
 
-          // header
           var header = document.createElement("div");
           header.className = "cos-up-header";
           var title = document.createElement("span");
@@ -1718,7 +897,6 @@
           header.appendChild(badge);
           card.appendChild(header);
 
-          // meta
           var meta = document.createElement("div");
           meta.className = "cos-up-meta";
           var targets = (p.targets || []).join(", ") || "-";
@@ -1735,7 +913,6 @@
           }
           card.appendChild(meta);
 
-          // summary
           if (p.summary) {
             var sumEl = document.createElement("div");
             sumEl.className = "cos-up-observation";
@@ -1743,7 +920,6 @@
             card.appendChild(sumEl);
           }
 
-          // reason
           if (p.reason) {
             var rsn = document.createElement("div");
             rsn.className = "cos-up-reason";
@@ -1751,7 +927,6 @@
             card.appendChild(rsn);
           }
 
-          // actions
           if (p.status !== "rejected") {
             var acts = document.createElement("div");
             acts.className = "cos-up-actions";
