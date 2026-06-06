@@ -64,5 +64,39 @@
   <script>window.KYOUKAI_ROOM = 'observer';</script>
   <script src="/static/observer.js?v=3"></script>
   <script src="/static/observer-bgm.js?v=1"></script>
+  <script>
+    (function () {
+      var threshold = 18000;
+      var shown = false;
+
+      setTimeout(function () {
+        if (shown) return;
+        shown = true;
+
+        var link = document.createElement('a');
+        link.href = '/particles';
+        link.style.cssText = [
+          'position:fixed',
+          'bottom:18px',
+          'right:18px',
+          'width:8px',
+          'height:8px',
+          'border-radius:50%',
+          'background:rgba(255,220,30,0.55)',
+          'display:block',
+          'text-decoration:none',
+          'cursor:pointer',
+          'z-index:50',
+          'animation:pobs-pulse 2.4s ease-in-out infinite',
+        ].join(';');
+        link.setAttribute('aria-hidden', 'true');
+
+        var style = document.createElement('style');
+        style.textContent = '@keyframes pobs-pulse{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.9;transform:scale(1.5)}}';
+        document.head.appendChild(style);
+        document.body.appendChild(link);
+      }, threshold);
+    })();
+  </script>
 </body>
 </html>

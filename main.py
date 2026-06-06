@@ -2259,6 +2259,10 @@ async def sitemap_page(request: Request) -> HTMLResponse:
 async def sns_entry_page(request: Request) -> HTMLResponse:
     return render_template(request, "sns-entry.html")
 
+@app.get("/particles", response_class=HTMLResponse)
+async def particles_page(request: Request) -> HTMLResponse:
+    return render_template(request, "particles.html")
+
 # ─── API ────────────────────────────────────────────────
 
 @app.get("/api/genome")

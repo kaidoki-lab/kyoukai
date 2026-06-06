@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>粒子生成構造体観測システム / KYOUKAI</title>
+    <link rel="stylesheet" href="/static/particles.css" />
+    <script defer src="/static/analytics.js"></script>
+  </head>
+  <body>
+    <div id="stage">
+      <canvas id="c"></canvas>
+    </div>
+    <script src="/static/particle-engine.js"></script>
+    <script>
+      (function () {
+        var canvas = document.getElementById('c');
+        var engine = null;
+
+        function isPortrait() {
+          return window.innerHeight > window.innerWidth;
+        }
+
+        function resize() {
+          var vw = window.innerWidth;
+          var vh = window.innerHeight;
+
+          if (isPortrait()) {
+            var ratio = 9 / 16;
+            var cw = vw;
+            var ch = Math.round(cw / ratio);
+            if (ch > vh) {
+              ch = vh;
+              cw = Math.round(ch * ratio);
+            }
+            canvas.width = cw;
+            canvas.height = ch;
+            canvas.style.width = cw + 'px';
+            canvas.style.height = ch + 'px';
+            canvas.style.position = 'absolute';
+            canvas.style.left = Math.round((vw - cw) / 2) + 'px';
+            canvas.style.top = Math.round((vh - ch) / 2) + 'px';
+          } else {
+            canvas.width = vw;
+            canvas.height = vh;
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            canvas.style.position = 'fixed';
+            canvas.style.left = '0';
+            canvas.style.top = '0';
+          }
+        }
+
+        engine = new ParticleObservationEngine(canvas, {
+          observerEffect: true,
+        });
+        resize();
+        engine.setCount(engine.N);
+        window.addEventListener('resize', resize);
+        engine.start();
+      })();
+    </script>
+  </body>
+</html>
