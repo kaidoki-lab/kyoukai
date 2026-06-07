@@ -13,12 +13,6 @@
   animation: driftStatic 9s steps(4, end) infinite;
 }
 
-.drift-from-null .altar-side {
-  box-shadow:
-    0 0 18px rgba(0, 0, 0, 0.34),
-    inset 0 0 28px rgba(0, 0, 0, 0.72);
-}
-
 .drift-from-outside .signal-chapel-frame::after {
   position: absolute;
   inset: 0;
@@ -31,13 +25,6 @@
   mix-blend-mode: screen;
   opacity: 0.48;
   animation: driftStatic 7s steps(3, end) infinite;
-}
-
-.drift-from-outside .signal-info {
-  border-color: rgba(230, 210, 150, 0.26);
-  box-shadow:
-    0 0 18px rgba(218, 181, 96, 0.18),
-    inset 0 0 24px rgba(0, 0, 0, 0.52);
 }
 
 .drift-from-signal .archive-frame::after {
@@ -66,12 +53,6 @@
   color: rgba(48, 70, 82, 0.44);
   font-size: clamp(8px, 0.72vw, 10px);
   text-align: right;
-}
-
-.drift-fragment--signal {
-  margin-top: 10px;
-  color: rgba(228, 205, 142, 0.68);
-  font-size: 11px;
 }
 
 @keyframes driftStatic {

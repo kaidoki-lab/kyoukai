@@ -63,16 +63,6 @@
     target.append(fragment);
   }
 
-  function addSignalFragment() {
-    const target = document.querySelector(".signal-info");
-    if (!target || document.querySelector("[data-drift-signal]")) return;
-    const fragment = document.createElement("p");
-    fragment.className = "drift-fragment drift-fragment--signal";
-    fragment.dataset.driftSignal = "outside";
-    fragment.textContent = "外部由来 / 戻り値なし";
-    target.append(fragment);
-  }
-
   function bindTouchFlags(flags, path) {
     if (path === "/null") {
       document.addEventListener("click", (event) => {
@@ -105,7 +95,6 @@
 
     if (path === "/signal" && previousFlags.visited_outside) {
       addBodyClass(DRIFT_CLASSES.visited_outside);
-      addSignalFragment();
     }
   }
 
