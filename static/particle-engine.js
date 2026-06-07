@@ -64,6 +64,30 @@
     conDist: 120,
   };
 
+  // サイクルごとに回転するフラクタルアトラクタ生成器
+  function makeFractalTarget(angle) {
+    const cos  = Math.cos(angle),                sin  = Math.sin(angle);
+    const cos2 = Math.cos(angle + Math.PI / 3),  sin2 = Math.sin(angle + Math.PI / 3);
+    function rot(c, s, x, y) {
+      const dx = x - 0.5, dy = y - 0.5;
+      return [0.5 + dx * c - dy * s, 0.5 + dx * s + dy * c];
+    }
+    const r0 = rot(cos, sin, 0.50, 0.08), r1 = rot(cos, sin, 0.06, 0.92), r2 = rot(cos, sin, 0.94, 0.92);
+    const rvx = [r0[0], r1[0], r2[0]], rvy = [r0[1], r1[1], r2[1]];
+    const b0 = rot(cos2, sin2, 0.50, 0.08), b1 = rot(cos2, sin2, 0.06, 0.92), b2 = rot(cos2, sin2, 0.94, 0.92);
+    const bvx = [b0[0], b1[0], b2[0]], bvy = [b0[1], b1[1], b2[1]];
+    return function (id, type) {
+      const vx = type === 'b' ? bvx : rvx, vy = type === 'b' ? bvy : rvy;
+      let x = 0.5, y = 0.5, seed = (id + 1) * 2654435761;
+      for (let i = 0; i < 12; i++) {
+        seed = (seed * 1664525 + 1013904223) >>> 0;
+        const v = seed % 3;
+        x = (x + vx[v]) * 0.5; y = (y + vy[v]) * 0.5;
+      }
+      return [x, y];
+    };
+  }
+
   // ══════════════════════════════════════════════════════════
   //  エンジン
   // ══════════════════════════════════════════════════════════
@@ -95,6 +119,10 @@
       // 形成中心
       this.fcx = 0.5;
       this.fcy = 0.5;
+
+      // フラクタルアトラクタ
+      this._fractalAngle = 0;
+      this._fractalFn    = makeFractalTarget(0);
 
       // 観測者
       this.mx  = -1;
@@ -225,6 +253,9 @@
       // グリッド再生成
       this.gridPhy = new SpatialGrid(p.attDist + 10);
       this.gridCon = new SpatialGrid(p.conDist + 10);
+      // フラクタル回転（サイクルごとに別の向きになる）
+      this._fractalAngle += this._rnd(0.25, 0.85);
+      this._fractalFn = makeFractalTarget(this._fractalAngle);
     }
 
     // ── 物理 ───────────────────────────────────────────────
@@ -289,6 +320,28 @@
           const str = phase === 'reforming' ? 0.0010 : 0.0004;
           fx += (tcx - a.x) * str;
           fy += (tcy - a.y) * str;
+        }
+
+        // フラクタル引力 — 粒子ごとのシェルピンスキー目標位置へ引き寄せる
+        // 形成中心(fcx, fcy)を基準に配置するため、リフォーム後も追従する
+        if (phase === 'forming' || phase === 'structured' || phase === 'stable') {
+          const progress = Math.min(1, this.pTimer / Math.max(1, this.pDur * 0.55));
+          const pulse    = 0.75 + Math.sin(this.pTimer * 1.4 + a.id * 0.011) * 0.25;
+          const fractalStr =
+            phase === 'stable'     ? 0.0065 :
+            phase === 'structured' ? 0.0030 :
+                                     0.0006 * progress;
+
+          // フラクタル位置を動的計算（サイクルごとに角度が変わる）
+          const [ftx, fty] = this._fractalFn(a.id, a.t);
+
+          // 画面内に収まる範囲でフラクタルをスケール・センタリング
+          const fscale = Math.min(w, h) * 0.62;
+          const tx = w * this.fcx + (ftx - 0.5) * fscale;
+          const ty = h * this.fcy + (fty - 0.5) * fscale;
+
+          fx += (tx - a.x) * fractalStr * pulse;
+          fy += (ty - a.y) * fractalStr * pulse;
         }
 
         if (phase === 'collapsing') {
