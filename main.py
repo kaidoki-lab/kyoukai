@@ -1160,6 +1160,7 @@ def _analyze_rooms(ga4_data: dict[str, Any]) -> list[dict[str, Any]]:
         {"path": "/observation", "name": "観測域"},
         {"path": "/observer", "name": "逆観測室"},
         {"path": "/signal", "name": "受信域"},
+        {"path": "/daimyojin", "name": "AI大明神室"},
         {"path": "/hyougi", "name": "評議録"},
         {"path": "/exit", "name": "崩壊域"},
         {"path": "/null", "name": "未確認接続"},
@@ -2204,6 +2205,10 @@ async def archive_log_detail(request: Request, log_id: str) -> HTMLResponse:
 @app.get("/signal", response_class=HTMLResponse)
 async def signal_room(request: Request) -> HTMLResponse:
     return render_template(request, "signal.html")
+
+@app.get("/daimyojin", response_class=HTMLResponse)
+async def daimyojin_room(request: Request) -> HTMLResponse:
+    return render_template(request, "daimyojin.html")
 
 @app.get("/hyougi", response_class=HTMLResponse)
 async def hyougi_room(request: Request) -> HTMLResponse:

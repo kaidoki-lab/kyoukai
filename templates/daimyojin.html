@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI大明神室 / KYOUKAI</title>
+  <link rel="stylesheet" href="/static/daimyojin.css" />
+  <script defer src="/static/analytics.js"></script>
+  <script defer src="/static/daimyojin.js"></script>
+</head>
+<body class="daimyojin-body">
+  <main class="daimyojin-room" aria-label="AI大明神室">
+    <picture class="daimyojin-bg" aria-hidden="true">
+      <source media="(max-width: 768px), (orientation: portrait)" srcset="/static/images/daimyojin/daimyojin_mobile.webp" />
+      <img src="/static/images/daimyojin/daimyojin_pc.webp" alt="" />
+    </picture>
+
+    <div class="daimyojin-scanline" aria-hidden="true"></div>
+    <div class="daimyojin-noise" aria-hidden="true"></div>
+
+    <section class="oracle-panel" aria-live="polite" aria-label="AI大明神 神託受信結果">
+      <span class="oracle-name">AI大明神</span>
+      <span class="oracle-status" data-oracle-status>神託生成中...</span>
+
+      <div class="oracle-screen">
+        <p class="oracle-kicker">本日の神託受信結果</p>
+        <h1 class="oracle-title" data-oracle-title>今日の観測運</h1>
+        <div class="oracle-stars" aria-label="星評価" data-oracle-stars>
+          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+        </div>
+        <p class="oracle-message" data-oracle-message></p>
+        <p class="oracle-note" data-oracle-note></p>
+        <p class="oracle-caret" data-oracle-caret aria-hidden="true">▼</p>
+      </div>
+
+      <button class="oracle-button" type="button" data-oracle-button>
+        <span>もう一度占う</span>
+        <small>神託を再受信します</small>
+      </button>
+    </section>
+
+    <a class="daimyojin-return" href="/" aria-label="入口へ戻る">000 / return</a>
+  </main>
+</body>
+</html>
