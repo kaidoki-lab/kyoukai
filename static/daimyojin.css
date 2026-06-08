@@ -94,13 +94,42 @@ body {
   inset: auto;
   border-radius: 4px;
   background:
-    radial-gradient(circle at 52% 46%, rgba(115, 225, 255, 0.18), transparent 34%),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.13) 0 1px, transparent 1px 4px),
-    repeating-linear-gradient(90deg, rgba(255, 0, 120, 0.1) 0 1px, transparent 1px 13px);
+    radial-gradient(circle at 52% 46%, rgba(132, 232, 255, 0.34), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 18%, rgba(41, 220, 255, 0.13) 54%, transparent 76%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.2) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, rgba(255, 0, 120, 0.15) 0 1px, transparent 1px 13px);
   mix-blend-mode: screen;
-  opacity: 0.42;
-  filter: blur(0.2px);
-  animation: daimyojinMonitorFlicker 2.8s steps(3, end) infinite;
+  opacity: 0.62;
+  filter: blur(0.22px) contrast(1.18);
+  animation: daimyojinMonitorFlicker 1.55s steps(3, end) infinite;
+  overflow: hidden;
+}
+
+.monitor-effect::before,
+.monitor-effect::after {
+  position: absolute;
+  inset: -8%;
+  content: "";
+  pointer-events: none;
+}
+
+.monitor-effect::before {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 6px, rgba(255, 255, 255, 0.28) 7px, transparent 9px),
+    repeating-linear-gradient(90deg, rgba(50, 210, 255, 0.08) 0 2px, transparent 2px 17px);
+  opacity: 0.46;
+  animation: daimyojinMonitorRoll 1.9s linear infinite;
+}
+
+.monitor-effect::after {
+  background:
+    radial-gradient(circle at 24% 32%, rgba(255, 255, 255, 0.7) 0 1px, transparent 2px),
+    radial-gradient(circle at 72% 63%, rgba(255, 78, 180, 0.55) 0 1px, transparent 2px),
+    radial-gradient(circle at 48% 82%, rgba(64, 220, 255, 0.55) 0 1px, transparent 2px),
+    linear-gradient(90deg, transparent 0 18%, rgba(255, 255, 255, 0.16) 19%, transparent 21% 100%);
+  background-size: 41px 37px, 53px 47px, 67px 61px, 100% 100%;
+  opacity: 0.36;
+  animation: daimyojinMonitorStatic 340ms steps(2, end) infinite;
 }
 
 .monitor-effect--main {
@@ -116,8 +145,8 @@ body {
   width: 32.4%;
   height: 42.6%;
   background:
-    radial-gradient(circle at 50% 48%, rgba(255, 222, 112, 0.16), transparent 38%),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px 4px),
+    radial-gradient(circle at 50% 48%, rgba(255, 222, 112, 0.24), transparent 38%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.18) 0 1px, transparent 1px 4px),
     linear-gradient(90deg, rgba(56, 220, 255, 0.11), transparent 26%, rgba(255, 52, 18, 0.1));
 }
 
@@ -321,6 +350,14 @@ body {
     inset 0 0 42px rgba(0, 0, 0, 0.78);
 }
 
+.daimyojin-room.is-receiving .monitor-effect {
+  opacity: 0.82;
+  filter: blur(0.28px) contrast(1.38) brightness(1.18);
+  animation:
+    daimyojinMonitorFlicker 520ms steps(2, end) infinite,
+    daimyojinMonitorGlitch 360ms steps(2, end) 4;
+}
+
 .daimyojin-return {
   position: fixed;
   left: 18px;
@@ -332,12 +369,31 @@ body {
 }
 
 @keyframes daimyojinMonitorFlicker {
-  0%, 100% { opacity: 0.34; transform: translate3d(0, 0, 0) scale(1); }
-  24% { opacity: 0.5; }
-  25% { transform: translate3d(1px, 0, 0) scale(1.002); }
-  49% { opacity: 0.24; }
-  50% { transform: translate3d(-1px, 1px, 0) scale(1); }
-  76% { opacity: 0.46; }
+  0%, 100% { opacity: 0.5; transform: translate3d(0, 0, 0) scale(1); }
+  18% { opacity: 0.76; }
+  19% { transform: translate3d(1px, 0, 0) scale(1.004); }
+  42% { opacity: 0.36; }
+  43% { transform: translate3d(-1px, 1px, 0) scale(1); }
+  71% { opacity: 0.68; }
+  72% { transform: translate3d(0, -1px, 0) scale(1.002); }
+}
+
+@keyframes daimyojinMonitorRoll {
+  0% { transform: translate3d(0, -8%, 0); }
+  100% { transform: translate3d(0, 8%, 0); }
+}
+
+@keyframes daimyojinMonitorStatic {
+  0%, 100% { opacity: 0.22; transform: translate3d(0, 0, 0); }
+  33% { opacity: 0.5; transform: translate3d(1px, -1px, 0); }
+  66% { opacity: 0.34; transform: translate3d(-1px, 1px, 0); }
+}
+
+@keyframes daimyojinMonitorGlitch {
+  0%, 100% { clip-path: inset(0); transform: translate3d(0, 0, 0); }
+  25% { clip-path: inset(8% 0 64% 0); transform: translate3d(-3px, 0, 0); }
+  50% { clip-path: inset(46% 0 28% 0); transform: translate3d(3px, 1px, 0); }
+  75% { clip-path: inset(70% 0 8% 0); transform: translate3d(-1px, -1px, 0); }
 }
 
 @keyframes daimyojinNoise {
@@ -500,6 +556,9 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .daimyojin-bg img,
   .daimyojin-noise,
+  .monitor-effect,
+  .monitor-effect::before,
+  .monitor-effect::after,
   .daimyojin-room.is-receiving .oracle-panel,
   .oracle-caret {
     animation: none;

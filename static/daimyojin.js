@@ -49,6 +49,36 @@
   const statuses = ["受信中...", "神託生成中...", "演算中...", "文字化け補正中...", "おみくじ機再起動中..."];
   let lastIndex = -1;
   let typingTimer = 0;
+  let audioContext = null;
+  let lastTickAt = 0;
+
+  function getAudioContext() {
+    const AudioCtor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtor) return null;
+    if (!audioContext) audioContext = new AudioCtor();
+    if (audioContext.state === "suspended") audioContext.resume().catch(() => {});
+    return audioContext;
+  }
+
+  function playTypeTick(index) {
+    const now = performance.now();
+    if (index % 2 !== 0 || now - lastTickAt < 42) return;
+    const context = getAudioContext();
+    if (!context || context.state !== "running") return;
+
+    lastTickAt = now;
+    const osc = context.createOscillator();
+    const gain = context.createGain();
+    osc.type = "square";
+    osc.frequency.setValueAtTime(760 + Math.random() * 120, context.currentTime);
+    gain.gain.setValueAtTime(0.0001, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.035, context.currentTime + 0.006);
+    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.045);
+    osc.connect(gain);
+    gain.connect(context.destination);
+    osc.start();
+    osc.stop(context.currentTime + 0.052);
+  }
 
   function pickFortune() {
     if (fortuneData.length < 2) return fortuneData[0];
@@ -76,13 +106,14 @@
     let index = 0;
     typingTimer = window.setInterval(() => {
       messageEl.textContent = text.slice(0, index);
+      if (text[index - 1] && !/\s/.test(text[index - 1])) playTypeTick(index);
       index += 1;
       if (index > text.length) {
         window.clearInterval(typingTimer);
         caret?.classList.add("is-visible");
         onComplete?.();
       }
-    }, window.matchMedia("(max-width: 768px), (orientation: portrait)").matches ? 22 : 18);
+    }, window.matchMedia("(max-width: 768px), (orientation: portrait)").matches ? 64 : 54);
   }
 
   function runOracle() {
@@ -116,6 +147,7 @@
     }, 680 + Math.floor(Math.random() * 360));
   }
 
+  button.addEventListener("pointerdown", getAudioContext);
   button.addEventListener("click", runOracle);
   window.addEventListener("load", () => window.setTimeout(runOracle, 260), { once: true });
 })();
