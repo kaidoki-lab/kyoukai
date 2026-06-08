@@ -2741,14 +2741,14 @@ a.sp-link:hover,
 /* PC / mobile split: entrance altar */
 @media (min-width: 1100px) {
   .altar-shell {
-    grid-template-columns: minmax(140px, 1fr) auto minmax(140px, 1fr);
-    gap: clamp(12px, 1.5vw, 28px);
-    align-items: stretch;
+    grid-template-columns: 1fr;
+    gap: 0;
+    align-items: center;
     padding: clamp(6px, 1.35vw, 18px);
   }
 
   .altar-frame {
-    width: min(calc(100vw - clamp(320px, 33vw, 560px)), calc((100svh - clamp(12px, 2.7vw, 36px)) * 1.5), 1320px);
+    width: min(calc(100vw - clamp(12px, 2.7vw, 36px)), calc((100svh - clamp(12px, 2.7vw, 36px)) * 1.5), 1640px);
     height: auto;
     max-height: calc(100svh - clamp(12px, 2.7vw, 36px));
     aspect-ratio: 3 / 2;
@@ -2784,9 +2784,9 @@ a.sp-link:hover,
 
   .altar-frame {
     order: 1;
-    width: min(calc(100vw - 28px), calc((100svh - 190px) * 1.5), 1040px);
+    width: min(calc(100vw - 28px), calc((100svh - 28px) * 1.5), 1320px);
     height: auto;
-    max-height: calc(100svh - 190px);
+    max-height: calc(100svh - 28px);
     aspect-ratio: 3 / 2;
   }
 
