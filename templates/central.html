@@ -35,6 +35,78 @@
       </div>
     </header>
 
+    <!-- AI PLAN PROPOSALS -->
+    <section class="cos-section" id="cos-plan-proposals">
+      <h2 class="cos-section-title">[ AI企画案 ]</h2>
+      <div class="cos-up-toolbar">
+        <button class="cos-up-run-btn" id="cos-plan-run">企画を生成</button>
+        <span class="cos-up-status" id="cos-plan-status">待機中</span>
+        <span class="cos-up-filter-label">表示：</span>
+        <button class="cos-plan-filter active" data-planfilter="all">すべて</button>
+        <button class="cos-plan-filter" data-planfilter="pending">未判断</button>
+        <button class="cos-plan-filter" data-planfilter="approved">採用</button>
+        <button class="cos-plan-filter" data-planfilter="hold">保留</button>
+        <button class="cos-plan-filter" data-planfilter="rejected">却下</button>
+      </div>
+      <div class="cos-error" id="cos-plan-error" hidden></div>
+      <div id="cos-plan-list"><div class="cos-up-empty">企画案なし — 「企画を生成」でAIが提案する</div></div>
+    </section>
+
+    <!-- AI IMPLEMENTATION TASKS -->
+    <section class="cos-section" id="cos-impl-tasks">
+      <h2 class="cos-section-title">[ AI実装指示 ]</h2>
+      <div class="cos-up-toolbar">
+        <button class="cos-up-run-btn" id="cos-impl-run">実装指示を生成</button>
+        <span class="cos-up-status" id="cos-impl-status">待機中</span>
+        <span class="cos-up-filter-label">表示：</span>
+        <button class="cos-impl-filter active" data-implfilter="all">すべて</button>
+        <button class="cos-impl-filter" data-implfilter="pending">未確認</button>
+        <button class="cos-impl-filter" data-implfilter="ready">Ready</button>
+        <button class="cos-impl-filter" data-implfilter="sent">Sent</button>
+        <button class="cos-impl-filter" data-implfilter="done">Done</button>
+        <button class="cos-impl-filter" data-implfilter="hold">保留</button>
+        <button class="cos-impl-filter" data-implfilter="rejected">却下</button>
+      </div>
+      <div class="cos-error" id="cos-impl-error" hidden></div>
+      <div id="cos-impl-list"><div class="cos-up-empty">実装指示なし — 企画案を採用後「実装指示を生成」する</div></div>
+    </section>
+
+    <!-- UPDATE PROPOSALS -->
+    <section class="cos-section" id="cos-update-proposals">
+      <h2 class="cos-section-title">[ 定期更新提案 ]</h2>
+      <div class="cos-up-toolbar">
+        <button class="cos-up-run-btn" id="cos-up-run">提案を更新</button>
+        <span class="cos-up-status" id="cos-up-status">待機中</span>
+        <span class="cos-up-filter-label">表示：</span>
+        <button class="cos-up-filter active" data-upfilter="all">すべて</button>
+        <button class="cos-up-filter" data-upfilter="pending">未判断</button>
+        <button class="cos-up-filter" data-upfilter="approved">採用</button>
+        <button class="cos-up-filter" data-upfilter="hold">保留</button>
+        <button class="cos-up-filter" data-upfilter="rejected">却下</button>
+      </div>
+      <div class="cos-error" id="cos-up-error" hidden></div>
+      <div id="cos-up-list"><div class="cos-up-empty">提案なし — 「提案を更新」で生成する</div></div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section class="cos-section" id="cos-dashboard">
+      <h2 class="cos-section-title">[ 増殖管理ダッシュボード ]</h2>
+
+      <div class="cos-dash-toolbar">
+        <button class="cos-dash-run-btn" id="cos-dash-run">分析実行</button>
+        <span class="cos-dash-status" id="cos-dash-status">待機中</span>
+        <span class="cos-dash-filter-label">表示：</span>
+        <button class="cos-dash-filter active" data-filter="all">すべて</button>
+        <button class="cos-dash-filter" data-filter="pending">未承認</button>
+        <button class="cos-dash-filter" data-filter="adopted">採用</button>
+        <button class="cos-dash-filter" data-filter="held">保留</button>
+        <button class="cos-dash-filter" data-filter="rejected">却下</button>
+      </div>
+
+      <div class="cos-error" id="cos-dash-error" hidden></div>
+      <div id="cos-proposals-list"><div class="cos-dash-empty">提案なし — 「分析実行」で生成する</div></div>
+    </section>
+
     <!-- WATCH SYSTEM / SYNC STATE -->
     <section class="cos-section" id="cos-watch">
       <h2 class="cos-section-title">[ 差分監視 / 同期状態 ]</h2>
@@ -84,78 +156,6 @@
           <tbody id="cos-watch-difflog-body"></tbody>
         </table>
       </div>
-    </section>
-
-    <!-- DASHBOARD -->
-    <section class="cos-section" id="cos-dashboard">
-      <h2 class="cos-section-title">[ 増殖管理ダッシュボード ]</h2>
-
-      <div class="cos-dash-toolbar">
-        <button class="cos-dash-run-btn" id="cos-dash-run">分析実行</button>
-        <span class="cos-dash-status" id="cos-dash-status">待機中</span>
-        <span class="cos-dash-filter-label">表示：</span>
-        <button class="cos-dash-filter active" data-filter="all">すべて</button>
-        <button class="cos-dash-filter" data-filter="pending">未承認</button>
-        <button class="cos-dash-filter" data-filter="adopted">採用</button>
-        <button class="cos-dash-filter" data-filter="held">保留</button>
-        <button class="cos-dash-filter" data-filter="rejected">却下</button>
-      </div>
-
-      <div class="cos-error" id="cos-dash-error" hidden></div>
-      <div id="cos-proposals-list"><div class="cos-dash-empty">提案なし — 「分析実行」で生成する</div></div>
-    </section>
-
-    <!-- UPDATE PROPOSALS -->
-    <section class="cos-section" id="cos-update-proposals">
-      <h2 class="cos-section-title">[ 定期更新提案 ]</h2>
-      <div class="cos-up-toolbar">
-        <button class="cos-up-run-btn" id="cos-up-run">提案を更新</button>
-        <span class="cos-up-status" id="cos-up-status">待機中</span>
-        <span class="cos-up-filter-label">表示：</span>
-        <button class="cos-up-filter active" data-upfilter="all">すべて</button>
-        <button class="cos-up-filter" data-upfilter="pending">未判断</button>
-        <button class="cos-up-filter" data-upfilter="approved">採用</button>
-        <button class="cos-up-filter" data-upfilter="hold">保留</button>
-        <button class="cos-up-filter" data-upfilter="rejected">却下</button>
-      </div>
-      <div class="cos-error" id="cos-up-error" hidden></div>
-      <div id="cos-up-list"><div class="cos-up-empty">提案なし — 「提案を更新」で生成する</div></div>
-    </section>
-
-    <!-- AI IMPLEMENTATION TASKS -->
-    <section class="cos-section" id="cos-impl-tasks">
-      <h2 class="cos-section-title">[ AI実装指示 ]</h2>
-      <div class="cos-up-toolbar">
-        <button class="cos-up-run-btn" id="cos-impl-run">実装指示を生成</button>
-        <span class="cos-up-status" id="cos-impl-status">待機中</span>
-        <span class="cos-up-filter-label">表示：</span>
-        <button class="cos-impl-filter active" data-implfilter="all">すべて</button>
-        <button class="cos-impl-filter" data-implfilter="pending">未確認</button>
-        <button class="cos-impl-filter" data-implfilter="ready">Ready</button>
-        <button class="cos-impl-filter" data-implfilter="sent">Sent</button>
-        <button class="cos-impl-filter" data-implfilter="done">Done</button>
-        <button class="cos-impl-filter" data-implfilter="hold">保留</button>
-        <button class="cos-impl-filter" data-implfilter="rejected">却下</button>
-      </div>
-      <div class="cos-error" id="cos-impl-error" hidden></div>
-      <div id="cos-impl-list"><div class="cos-up-empty">実装指示なし — 企画案を採用後「実装指示を生成」する</div></div>
-    </section>
-
-    <!-- AI PLAN PROPOSALS -->
-    <section class="cos-section" id="cos-plan-proposals">
-      <h2 class="cos-section-title">[ AI企画案 ]</h2>
-      <div class="cos-up-toolbar">
-        <button class="cos-up-run-btn" id="cos-plan-run">企画を生成</button>
-        <span class="cos-up-status" id="cos-plan-status">待機中</span>
-        <span class="cos-up-filter-label">表示：</span>
-        <button class="cos-plan-filter active" data-planfilter="all">すべて</button>
-        <button class="cos-plan-filter" data-planfilter="pending">未判断</button>
-        <button class="cos-plan-filter" data-planfilter="approved">採用</button>
-        <button class="cos-plan-filter" data-planfilter="hold">保留</button>
-        <button class="cos-plan-filter" data-planfilter="rejected">却下</button>
-      </div>
-      <div class="cos-error" id="cos-plan-error" hidden></div>
-      <div id="cos-plan-list"><div class="cos-up-empty">企画案なし — 「企画を生成」でAIが提案する</div></div>
     </section>
 
     <footer class="cos-footer">
@@ -776,6 +776,66 @@
             ac.forEach(function(a) { var li = document.createElement("li"); li.textContent = a; acUl.appendChild(li); });
             card.appendChild(acUl);
           }
+
+          // Codex copy button
+          var copyWrap = document.createElement("div");
+          copyWrap.className = "cos-up-actions";
+          var copyBtn = document.createElement("button");
+          copyBtn.className = "cos-up-action-btn cos-up-act-copy";
+          copyBtn.textContent = "Codex用コピー";
+          copyBtn.addEventListener("click", (function(task) {
+            return function() {
+              var lines = [];
+              lines.push("# " + (task.title || "実装指示"));
+              lines.push("元企画ID: " + (task.sourcePlanId || "-"));
+              lines.push("対象ページ: " + (task.targetPages || []).join(", "));
+              lines.push("");
+              if (task.objective) {
+                lines.push("## 実装目的");
+                lines.push(task.objective);
+                lines.push("");
+              }
+              if (task.implementationBrief) {
+                lines.push("## 実装概要");
+                lines.push(task.implementationBrief);
+                lines.push("");
+              }
+              if ((task.candidateFiles || []).length) {
+                lines.push("## 対象ファイル候補");
+                task.candidateFiles.forEach(function(f) { lines.push("- " + f); });
+                lines.push("");
+              }
+              if ((task.mustKeep || []).length) {
+                lines.push("## 保持すること");
+                task.mustKeep.forEach(function(m) { lines.push("- " + m); });
+                lines.push("");
+              }
+              if ((task.doNotChange || []).length) {
+                lines.push("## 変更してはいけない点");
+                task.doNotChange.forEach(function(d) { lines.push("- " + d); });
+                lines.push("");
+              }
+              if ((task.steps || []).length) {
+                lines.push("## 作業手順");
+                task.steps.forEach(function(s, i) { lines.push((i + 1) + ". " + s); });
+                lines.push("");
+              }
+              if ((task.acceptanceCriteria || []).length) {
+                lines.push("## 完了条件");
+                task.acceptanceCriteria.forEach(function(a) { lines.push("- " + a); });
+                lines.push("");
+              }
+              navigator.clipboard.writeText(lines.join("\n")).then(function() {
+                copyBtn.textContent = "コピー完了 ✓";
+                setTimeout(function() { copyBtn.textContent = "Codex用コピー"; }, 2000);
+              }).catch(function() {
+                copyBtn.textContent = "コピー失敗";
+                setTimeout(function() { copyBtn.textContent = "Codex用コピー"; }, 2000);
+              });
+            };
+          })(t));
+          copyWrap.appendChild(copyBtn);
+          card.appendChild(copyWrap);
 
           if (t.status !== "done" && t.status !== "rejected") {
             var acts = document.createElement("div");
