@@ -804,18 +804,27 @@ WATCH_HISTORY_DIR = WATCH_DIR / "history"
 
 GA4_PROPERTY_ID = os.environ.get("KYOUKAI_GA4_PROPERTY_ID", "538546349")
 GA4_CREDENTIALS_FILE = BASE_DIR / "ga4-credentials.json"
-UPDATE_PROPOSALS_FILE = CENTRAL_OS_DIR / "update-proposals.json"
 AI_ANALYST_FILE = CENTRAL_OS_DIR / "analysis" / "ai_analyst.py"
 PLANNING_DIR = CENTRAL_OS_DIR / "planning"
 AI_PLANNER_FILE = PLANNING_DIR / "ai_planner.py"
-PROPOSAL_PLANS_FILE = PLANNING_DIR / "proposal_plans.json"
-HISTORY_DIR = CENTRAL_OS_DIR / "history"
-ACCEPTED_PLANS_FILE = HISTORY_DIR / "accepted-plans.json"
-REJECTED_PLANS_FILE = HISTORY_DIR / "rejected-plans.json"
 EXECUTION_DIR = CENTRAL_OS_DIR / "execution"
 AI_EXECUTOR_FILE = EXECUTION_DIR / "ai_executor.py"
-IMPLEMENTATION_TASKS_FILE = EXECUTION_DIR / "implementation_tasks.json"
-EXECUTED_TASKS_FILE = HISTORY_DIR / "executed-tasks.json"
+HISTORY_DIR = CENTRAL_OS_DIR / "history"
+
+# Vercel 本番はファイルシステムが読み取り専用のため、書き込みファイルは /tmp へ
+_IS_VERCEL = bool(os.environ.get("VERCEL"))
+_TMP = Path(tempfile.gettempdir())
+
+def _writable(local_path: Path, filename: str) -> Path:
+    """Return /tmp/<filename> on Vercel, otherwise local_path."""
+    return (_TMP / filename) if _IS_VERCEL else local_path
+
+UPDATE_PROPOSALS_FILE    = _writable(CENTRAL_OS_DIR / "update-proposals.json",          "update-proposals.json")
+PROPOSAL_PLANS_FILE      = _writable(PLANNING_DIR   / "proposal_plans.json",             "proposal_plans.json")
+ACCEPTED_PLANS_FILE      = _writable(HISTORY_DIR    / "accepted-plans.json",             "accepted-plans.json")
+REJECTED_PLANS_FILE      = _writable(HISTORY_DIR    / "rejected-plans.json",             "rejected-plans.json")
+IMPLEMENTATION_TASKS_FILE = _writable(EXECUTION_DIR / "implementation_tasks.json",       "implementation_tasks.json")
+EXECUTED_TASKS_FILE      = _writable(HISTORY_DIR    / "executed-tasks.json",             "executed-tasks.json")
 
 # ─── AI analyst module (importlib, handles hyphen in path) ─────────────────────
 
