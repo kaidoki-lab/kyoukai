@@ -27,6 +27,17 @@
   pointer-events: none;
 }
 
+.kyoukai-guide--touch-follow {
+  right: auto;
+  bottom: auto;
+  pointer-events: none;
+  will-change: left, top;
+}
+
+.kyoukai-guide--touch-follow .kyoukai-guide__body {
+  pointer-events: none;
+}
+
 .signal-room-body .kyoukai-guide--dock {
   top: max(16px, env(safe-area-inset-top));
   bottom: auto;
@@ -282,6 +293,23 @@
   bottom: 6px;
 }
 
+.kyoukai-guide--touch-follow .kyoukai-guide__bubble {
+  left: 42px;
+  right: auto;
+  top: -4px;
+  bottom: auto;
+}
+
+.kyoukai-guide--touch-follow.kyoukai-guide--bubble-left .kyoukai-guide__bubble {
+  left: auto;
+  right: 48px;
+}
+
+.kyoukai-guide--touch-follow.kyoukai-guide--bubble-up .kyoukai-guide__bubble {
+  top: auto;
+  bottom: 6px;
+}
+
 .kyoukai-guide__bubble::before {
   content: "DETECT";
   display: block;
@@ -323,6 +351,29 @@
 }
 
 .kyoukai-guide--cursor.kyoukai-guide--bubble-up .kyoukai-guide__bubble::after {
+  top: auto;
+  bottom: 14px;
+}
+
+.kyoukai-guide--touch-follow .kyoukai-guide__bubble::after {
+  left: -5px;
+  right: auto;
+  top: 12px;
+  bottom: auto;
+  border: 0;
+  border-left: 1px solid rgba(0, 255, 225, 0.26);
+  border-bottom: 1px solid rgba(0, 255, 225, 0.26);
+}
+
+.kyoukai-guide--touch-follow.kyoukai-guide--bubble-left .kyoukai-guide__bubble::after {
+  left: auto;
+  right: -5px;
+  border: 0;
+  border-right: 1px solid rgba(0, 255, 225, 0.26);
+  border-bottom: 1px solid rgba(0, 255, 225, 0.26);
+}
+
+.kyoukai-guide--touch-follow.kyoukai-guide--bubble-up .kyoukai-guide__bubble::after {
   top: auto;
   bottom: 14px;
 }
@@ -392,6 +443,11 @@
     top: auto;
     width: 52px;
     height: 52px;
+  }
+
+  .kyoukai-guide--touch-follow {
+    right: auto;
+    bottom: auto;
   }
 
   .kyoukai-guide__bubble {

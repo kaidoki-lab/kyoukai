@@ -92,6 +92,8 @@
   const DETECTION_COOLDOWN_MS = 1600;
   const DESKTOP_OFFSET_X = 18;
   const DESKTOP_OFFSET_Y = 14;
+  const MOBILE_OFFSET_X = 18;
+  const MOBILE_OFFSET_Y = -72;
 
   const storage = (() => {
     try {
@@ -490,6 +492,79 @@
     moveGuide();
   }
 
+  function setupTouchGuide(guide, bubble, state) {
+    const guideWidth = guide.offsetWidth || 52;
+    const guideHeight = guide.offsetHeight || 52;
+    let targetX = window.innerWidth - guideWidth - 12;
+    let targetY = window.innerHeight - guideHeight - 72;
+    let currentX = targetX;
+    let currentY = targetY;
+    let frameId = 0;
+    let lastTargetKey = "";
+    let lastDetectionAt = 0;
+
+    guide.classList.add("kyoukai-guide--touch-follow");
+
+    function moveGuide() {
+      const maxX = Math.max(8, window.innerWidth - guideWidth - 8);
+      const maxY = Math.max(8, window.innerHeight - guideHeight - 8);
+      currentX += (targetX - currentX) * 0.14;
+      currentY += (targetY - currentY) * 0.14;
+      const nextLeft = clamp(currentX, 8, maxX);
+      const nextTop = clamp(currentY, 8, maxY);
+      guide.style.left = `${nextLeft}px`;
+      guide.style.top = `${nextTop}px`;
+      guide.classList.toggle("kyoukai-guide--bubble-left", nextLeft > window.innerWidth - 220);
+      guide.classList.toggle("kyoukai-guide--bubble-up", nextTop > window.innerHeight - 116);
+      frameId = window.requestAnimationFrame(moveGuide);
+    }
+
+    function updateDetection(clientX, clientY) {
+      const detected = classifyTarget(document.elementFromPoint(clientX, clientY));
+      setReactionClass(guide, detected.type);
+      if (!detected.type) {
+        lastTargetKey = "";
+        return;
+      }
+
+      const now = Date.now();
+      if (detected.key !== lastTargetKey && now - lastDetectionAt > DETECTION_COOLDOWN_MS) {
+        lastTargetKey = detected.key;
+        lastDetectionAt = now;
+        showGuideMessage(guide, bubble, state, { message: getDetectionMessage(detected.type) });
+      }
+    }
+
+    function follow(clientX, clientY) {
+      targetX = clientX + MOBILE_OFFSET_X;
+      targetY = clientY + MOBILE_OFFSET_Y;
+      window.clearTimeout(detectTimer);
+      detectTimer = window.setTimeout(() => updateDetection(clientX, clientY), 32);
+    }
+
+    function onPointerMove(event) {
+      if (event.pointerType === "mouse" || event.pointerType === "pen") {
+        follow(event.clientX, event.clientY);
+      }
+    }
+
+    function onTouchMove(event) {
+      const touch = event.touches[0];
+      if (touch) follow(touch.clientX, touch.clientY);
+    }
+
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    window.addEventListener("touchstart", onTouchMove, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("pagehide", () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("touchstart", onTouchMove);
+      window.removeEventListener("touchmove", onTouchMove);
+    }, { once: true });
+    moveGuide();
+  }
+
   function logGuideState(state) {
     if (!state.debug) return;
     console.log("[KYOUKAI guide]", {
@@ -518,6 +593,8 @@
 
     if (desktopPointer) {
       setupCursorGuide(elements.guide, elements.bubble, state);
+    } else {
+      setupTouchGuide(elements.guide, elements.bubble, state);
     }
 
     if (state.returnedToTop) {
