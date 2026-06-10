@@ -2,21 +2,26 @@
 KYOUKAI Central OS — AI実装監督 v1
 採用済み企画案を受け取り、Codex用の作業指示書を生成する。
 
-Ollama接続時  : ローカルAIが実装指示書を生成
-Ollama未接続時: フォールバック（骨組みのみ）を返す
+優先順位:
+  1. Ollama（ローカル起動中の場合）
+  2. Groq API（GROQ_API_KEY 環境変数がある場合）
+  3. フォールバック（骨組みのみ）
 """
 
 from __future__ import annotations
 
 import json
+import os
 import re
 from datetime import datetime, timezone
 from typing import Any
 from urllib.error import URLError
 from urllib.request import Request as UrlRequest, urlopen
 
-OLLAMA_URL   = "http://127.0.0.1:11434/api/generate"
-OLLAMA_MODEL = "qwen2.5:0.5b"
+OLLAMA_URL    = "http://127.0.0.1:11434/api/generate"
+OLLAMA_MODEL  = "qwen2.5:0.5b"
+GROQ_API_URL  = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_MODEL    = "llama-3.1-8b-instant"
 
 # ─── 共通ルール ──────────────────────────────────────────────────────────────
 
@@ -74,7 +79,7 @@ def _fallback_task_body(plan: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-# ─── Ollama生成 ──────────────────────────────────────────────────────────────
+# ─── プロンプト ──────────────────────────────────────────────────────────────
 
 def _build_prompt(plan: dict[str, Any], context: dict[str, Any]) -> str:
     targets = ", ".join(plan.get("targets", ["/null"]))
@@ -111,6 +116,8 @@ def _extract_task_body(text: str) -> dict[str, Any] | None:
     return None
 
 
+# ─── Ollama ──────────────────────────────────────────────────────────────────
+
 def _ollama_generate(plan: dict[str, Any], context: dict[str, Any]) -> dict[str, Any] | None:
     prompt = _build_prompt(plan, context)
     payload = json.dumps({
@@ -133,6 +140,37 @@ def _ollama_generate(plan: dict[str, Any], context: dict[str, Any]) -> dict[str,
     return None
 
 
+# ─── Groq API ────────────────────────────────────────────────────────────────
+
+def _groq_generate(plan: dict[str, Any], context: dict[str, Any]) -> dict[str, Any] | None:
+    api_key = os.environ.get("GROQ_API_KEY", "")
+    if not api_key:
+        return None
+    prompt = _build_prompt(plan, context)
+    payload = json.dumps({
+        "model": GROQ_MODEL,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.75,
+        "max_tokens": 500,
+    }).encode("utf-8")
+    try:
+        req = UrlRequest(
+            GROQ_API_URL, data=payload,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}",
+            },
+            method="POST",
+        )
+        with urlopen(req, timeout=15.0) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        raw = str(data["choices"][0]["message"]["content"]).strip()
+        return _extract_task_body(raw)
+    except (OSError, URLError, TimeoutError, json.JSONDecodeError, KeyError):
+        pass
+    return None
+
+
 # ─── 公開API ─────────────────────────────────────────────────────────────────
 
 _KYOUKAI_CONTEXT: dict[str, Any] = {
@@ -146,8 +184,7 @@ def generate_task(plan: dict[str, Any], context: dict[str, Any] | None = None) -
     """
     Generate a Codex-ready implementation task from an approved plan.
 
-    Returns a task dict with all required fields.
-    Falls back to minimal skeleton if Ollama is unavailable.
+    Priority: Ollama → Groq API → fallback
     """
     ctx = dict(_KYOUKAI_CONTEXT)
     if context:
@@ -158,11 +195,16 @@ def generate_task(plan: dict[str, Any], context: dict[str, Any] | None = None) -
     plan_id = plan.get("id", "unknown")
 
     ai_body = _ollama_generate(plan, ctx)
-    source = "ollama" if ai_body else "fallback"
+    source = "ollama"
+
+    if not ai_body:
+        ai_body = _groq_generate(plan, ctx)
+        source = "groq"
+
     if not ai_body:
         ai_body = _fallback_task_body(plan)
+        source = "fallback"
 
-    # normalize list fields
     def _to_list(val: Any, default: list) -> list:
         if isinstance(val, list):
             return [str(v) for v in val if v]

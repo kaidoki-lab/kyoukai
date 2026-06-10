@@ -2,21 +2,26 @@
 KYOUKAI Central OS — AI企画官 v1
 GA4分析・観測データを受け取り、自由な企画案を生成する。
 
-Ollama接続時  : ローカルAIが企画を生成
-Ollama未接続時: 最低限の仮企画を返す
+優先順位:
+  1. Ollama（ローカル起動中の場合）
+  2. Groq API（GROQ_API_KEY 環境変数がある場合）
+  3. フォールバック（固定テンプレート）
 """
 
 from __future__ import annotations
 
 import json
+import os
 import re
 from datetime import datetime, timezone
 from typing import Any
 from urllib.error import URLError
 from urllib.request import Request as UrlRequest, urlopen
 
-OLLAMA_URL   = "http://127.0.0.1:11434/api/generate"
-OLLAMA_MODEL = "qwen2.5:0.5b"
+OLLAMA_URL    = "http://127.0.0.1:11434/api/generate"
+OLLAMA_MODEL  = "qwen2.5:0.5b"
+GROQ_API_URL  = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_MODEL    = "llama-3.1-8b-instant"
 
 # ─── フォールバック仮企画 ──────────────────────────────────────────────────────
 
@@ -45,7 +50,7 @@ _FALLBACK_PLANS = [
 ]
 
 
-# ─── Ollama生成 ──────────────────────────────────────────────────────────────
+# ─── プロンプト ──────────────────────────────────────────────────────────────
 
 def _build_prompt(planner_input: dict[str, Any]) -> str:
     rooms = planner_input.get("rooms", [])
@@ -89,6 +94,8 @@ def _extract_plans(text: str) -> list[dict[str, Any]] | None:
         return None
 
 
+# ─── Ollama ──────────────────────────────────────────────────────────────────
+
 def _ollama_generate(planner_input: dict[str, Any]) -> list[dict[str, Any]] | None:
     prompt = _build_prompt(planner_input)
     payload = json.dumps({
@@ -111,23 +118,58 @@ def _ollama_generate(planner_input: dict[str, Any]) -> list[dict[str, Any]] | No
     return None
 
 
+# ─── Groq API ────────────────────────────────────────────────────────────────
+
+def _groq_generate(planner_input: dict[str, Any]) -> list[dict[str, Any]] | None:
+    api_key = os.environ.get("GROQ_API_KEY", "")
+    if not api_key:
+        return None
+    prompt = _build_prompt(planner_input)
+    payload = json.dumps({
+        "model": GROQ_MODEL,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.85,
+        "max_tokens": 600,
+    }).encode("utf-8")
+    try:
+        req = UrlRequest(
+            GROQ_API_URL, data=payload,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}",
+            },
+            method="POST",
+        )
+        with urlopen(req, timeout=15.0) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        raw = str(data["choices"][0]["message"]["content"]).strip()
+        return _extract_plans(raw)
+    except (OSError, URLError, TimeoutError, json.JSONDecodeError, KeyError):
+        pass
+    return None
+
+
 # ─── 公開API ─────────────────────────────────────────────────────────────────
 
 def generate_plans(planner_input: dict[str, Any]) -> list[dict[str, Any]]:
     """
     Generate AI plan proposals.
 
-    Returns list of plan dicts with: id, title, summary, reason, targets,
-    implementationSize, status, createdAt.
-    Falls back to minimal placeholder plans if Ollama is unavailable.
+    Priority: Ollama → Groq API → fallback
     """
     now = datetime.now(timezone.utc).isoformat()
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
 
     raw_plans = _ollama_generate(planner_input)
-    source = "ollama" if raw_plans else "fallback"
+    source = "ollama"
+
+    if not raw_plans:
+        raw_plans = _groq_generate(planner_input)
+        source = "groq"
+
     if not raw_plans:
         raw_plans = list(_FALLBACK_PLANS)
+        source = "fallback"
 
     result = []
     for i, plan in enumerate(raw_plans[:5]):
