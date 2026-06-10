@@ -156,20 +156,29 @@ def _build_prompt(planner_input: dict[str, Any]) -> str:
 
 
 def _extract_plans(text: str) -> list[dict[str, Any]] | None:
-    match = re.search(r'\[.*?\]', text, re.DOTALL)
-    if not match:
+    """入れ子構造に対応したJSON配列抽出。"""
+    start = text.find('[')
+    if start == -1:
         return None
-    try:
-        data = json.loads(match.group())
-        if not isinstance(data, list):
-            return None
-        valid = [
-            item for item in data
-            if isinstance(item, dict) and "title" in item and "summary" in item
-        ]
-        return valid if valid else None
-    except json.JSONDecodeError:
-        return None
+    depth = 0
+    for i, ch in enumerate(text[start:], start):
+        if ch == '[':
+            depth += 1
+        elif ch == ']':
+            depth -= 1
+            if depth == 0:
+                try:
+                    data = json.loads(text[start:i + 1])
+                    if not isinstance(data, list):
+                        return None
+                    valid = [
+                        item for item in data
+                        if isinstance(item, dict) and "title" in item and "summary" in item
+                    ]
+                    return valid if valid else None
+                except json.JSONDecodeError:
+                    return None
+    return None
 
 
 # ─── Ollama ──────────────────────────────────────────────────────────────────

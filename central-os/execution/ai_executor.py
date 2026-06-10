@@ -110,15 +110,23 @@ def _build_prompt(plan: dict[str, Any], context: dict[str, Any]) -> str:
 
 
 def _extract_task_body(text: str) -> dict[str, Any] | None:
-    match = re.search(r'\{[^{}]*"objective"[^{}]*\}', text, re.DOTALL)
-    if not match:
+    """入れ子構造に対応したJSONオブジェクト抽出。"""
+    start = text.find('{')
+    if start == -1:
         return None
-    try:
-        data = json.loads(match.group())
-        if "objective" in data and "implementationBrief" in data:
-            return data
-    except json.JSONDecodeError:
-        pass
+    depth = 0
+    for i, ch in enumerate(text[start:], start):
+        if ch == '{':
+            depth += 1
+        elif ch == '}':
+            depth -= 1
+            if depth == 0:
+                try:
+                    data = json.loads(text[start:i + 1])
+                    if isinstance(data, dict) and "objective" in data and "implementationBrief" in data:
+                        return data
+                except json.JSONDecodeError:
+                    pass
     return None
 
 
