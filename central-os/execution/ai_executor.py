@@ -18,10 +18,16 @@ from typing import Any
 from urllib.error import URLError
 from urllib.request import Request as UrlRequest, urlopen
 
-OLLAMA_URL    = "http://127.0.0.1:11434/api/generate"
-OLLAMA_MODEL  = "qwen2.5:0.5b"
-GROQ_API_URL  = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL    = "llama-3.1-8b-instant"
+OLLAMA_URL          = "http://127.0.0.1:11434/api/generate"
+OLLAMA_MODEL        = "qwen2.5:0.5b"
+GROQ_API_URL        = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_MODEL          = "llama-3.1-8b-instant"
+OPENROUTER_API_URL  = "https://openrouter.ai/api/v1/chat/completions"
+OPENROUTER_MODELS   = [
+    "google/gemma-4-26b-a4b-it:free",
+    "google/gemma-4-31b-it:free",
+    "moonshotai/kimi-k2.6:free",
+]
 
 # ─── 共通ルール ──────────────────────────────────────────────────────────────
 
@@ -172,6 +178,41 @@ def _groq_generate(plan: dict[str, Any], context: dict[str, Any]) -> dict[str, A
     return None
 
 
+# ─── OpenRouter API ──────────────────────────────────────────────────────────
+
+def _openrouter_generate(plan: dict[str, Any], context: dict[str, Any]) -> dict[str, Any] | None:
+    api_key = os.environ.get("OPENROUTER_API_KEY", "")
+    if not api_key:
+        return None
+    prompt = _build_prompt(plan, context)
+    for model in OPENROUTER_MODELS:
+        payload = json.dumps({
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.75,
+            "max_tokens": 500,
+        }).encode("utf-8")
+        try:
+            req = UrlRequest(
+                OPENROUTER_API_URL, data=payload,
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {api_key}",
+                    "HTTP-Referer": "https://www.void-kyoukai.net",
+                },
+                method="POST",
+            )
+            with urlopen(req, timeout=20.0) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            raw = str(data["choices"][0]["message"]["content"]).strip()
+            result = _extract_task_body(raw)
+            if result:
+                return result
+        except (OSError, URLError, TimeoutError, json.JSONDecodeError, KeyError):
+            pass
+    return None
+
+
 # ─── 公開API ─────────────────────────────────────────────────────────────────
 
 _KYOUKAI_CONTEXT: dict[str, Any] = {
@@ -201,6 +242,10 @@ def generate_task(plan: dict[str, Any], context: dict[str, Any] | None = None) -
     if not ai_body:
         ai_body = _groq_generate(plan, ctx)
         source = "groq"
+
+    if not ai_body:
+        ai_body = _openrouter_generate(plan, ctx)
+        source = "openrouter"
 
     if not ai_body:
         ai_body = _fallback_task_body(plan)
