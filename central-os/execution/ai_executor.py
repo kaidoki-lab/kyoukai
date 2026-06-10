@@ -159,6 +159,7 @@ def _groq_generate(plan: dict[str, Any], context: dict[str, Any]) -> dict[str, A
             headers={
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {api_key}",
+                "User-Agent": "Mozilla/5.0 (compatible; KYOUKAI-OS/1.0)",
             },
             method="POST",
         )

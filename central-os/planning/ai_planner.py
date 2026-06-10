@@ -137,6 +137,7 @@ def _groq_generate(planner_input: dict[str, Any]) -> list[dict[str, Any]] | None
             headers={
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {api_key}",
+                "User-Agent": "Mozilla/5.0 (compatible; KYOUKAI-OS/1.0)",
             },
             method="POST",
         )

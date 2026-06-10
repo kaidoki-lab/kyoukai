@@ -2390,7 +2390,11 @@ async def api_test_groq() -> JSONResponse:
         req = _Req(
             "https://api.groq.com/openai/v1/chat/completions",
             data=payload,
-            headers={"Content-Type": "application/json", "Authorization": f"Bearer {key}"},
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {key}",
+                "User-Agent": "Mozilla/5.0 (compatible; KYOUKAI-OS/1.0)",
+            },
             method="POST",
         )
         with _open(req, timeout=10.0) as resp:
