@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import os
+import random
 import re
 from datetime import datetime, timezone
 from typing import Any
@@ -29,13 +30,13 @@ OPENROUTER_MODELS   = [
     "moonshotai/kimi-k2.6:free",
 ]
 
-# ─── フォールバック仮企画 ──────────────────────────────────────────────────────
+# ─── フォールバック仮企画プール（ランダム選択・重複回避用） ──────────────────
 
-_FALLBACK_PLANS = [
+_FALLBACK_POOL = [
     {
         "title": "崩落域の記憶断片追加",
         "summary": "/nullに断片化したテキストを追加し、「なにかがあった」という印象を与える。",
-        "reason": "崩落域への反応が確認されており、さらなる深みで滞在時間が伸びる可能性がある。",
+        "reason": "崩落域への反応があり、さらなる深みで滞在時間が伸びる可能性がある。",
         "targets": ["/null"],
         "implementationSize": "small",
     },
@@ -49,11 +50,82 @@ _FALLBACK_PLANS = [
     {
         "title": "外部境界テキストの変質",
         "summary": "/outsideの接続テキストを壊れた形式に変更し、境界の異常感を演出する。",
-        "reason": "KYOUKAIの世界観強化のため、外部接続を「狂った境界」として演出する。",
+        "reason": "外部接続を「狂った境界」として演出し世界観を強化する。",
         "targets": ["/outside"],
         "implementationSize": "small",
     },
+    {
+        "title": "archive残留ログの追加",
+        "summary": "/archiveに新しい断片ログを1件追加し、記録室の密度を上げる。",
+        "reason": "記録室への関心が確認されており、コンテンツ追加で深みが増す。",
+        "targets": ["/archive"],
+        "implementationSize": "small",
+    },
+    {
+        "title": "受信域の信号断片更新",
+        "summary": "/signalのラジオテキストを1件更新し、受信体験を新鮮に保つ。",
+        "reason": "受信域は滞在時間が長く、テキスト更新で再訪問を促せる。",
+        "targets": ["/signal"],
+        "implementationSize": "small",
+    },
+    {
+        "title": "祭壇域の導線テキスト変更",
+        "summary": "トップページの/observationへの誘導テキストを微調整する。",
+        "reason": "入口の言葉が全体の滞在率を左右するため。",
+        "targets": ["/"],
+        "implementationSize": "small",
+    },
+    {
+        "title": "逆観測室への隠れたリンク",
+        "summary": "/observerへの導線を深い場所に1箇所追加する。",
+        "reason": "逆観測室はまだ発見されにくいため、深層導線を強化する。",
+        "targets": ["/observer"],
+        "implementationSize": "small",
+    },
+    {
+        "title": "崩壊域の遷移演出強化",
+        "summary": "/exitの遷移テキストを1件追加し、境界体験を深める。",
+        "reason": "境界域への反応があり、遷移演出が世界観の核になっている。",
+        "targets": ["/exit"],
+        "implementationSize": "small",
+    },
+    {
+        "title": "null接続後のarchive誘導",
+        "summary": "/nullから/archiveへの残留リンクをひっそりと追加する。",
+        "reason": "崩落を体験した訪問者が記録室へ流れる導線を作る。",
+        "targets": ["/null", "/archive"],
+        "implementationSize": "small",
+    },
+    {
+        "title": "観測ログの新規追加",
+        "summary": "/observationの生命体ログを1件追加し、観測体験を更新する。",
+        "reason": "観測域は最も反応が強く、更新頻度が再訪問率に直結する。",
+        "targets": ["/observation"],
+        "implementationSize": "small",
+    },
+    {
+        "title": "外部アイコンの種類追加",
+        "summary": "/outsideに新しいアイコンパターンを1種追加する。",
+        "reason": "外部接続の探索行動が確認されており、発見要素を増やす。",
+        "targets": ["/outside"],
+        "implementationSize": "small",
+    },
+    {
+        "title": "hyougi録の断片テキスト追加",
+        "summary": "/hyougiに評議断片テキストを1件追加する。",
+        "reason": "評議録への流入はあるが内容が薄く、密度を上げる必要がある。",
+        "targets": ["/hyougi"],
+        "implementationSize": "small",
+    },
 ]
+
+
+def _pick_fallback(excluded_titles: set[str], count: int = 3) -> list[dict]:
+    """採用済みタイトルを除いてランダムに企画を選ぶ。"""
+    available = [p for p in _FALLBACK_POOL if p["title"] not in excluded_titles]
+    if not available:
+        available = list(_FALLBACK_POOL)  # 全部除外されたら全部から選ぶ
+    return random.sample(available, min(count, len(available)))
 
 
 # ─── プロンプト ──────────────────────────────────────────────────────────────
@@ -202,6 +274,10 @@ def generate_plans(planner_input: dict[str, Any]) -> list[dict[str, Any]]:
     now = datetime.now(timezone.utc).isoformat()
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
 
+    # 採用済み企画のタイトルセットを作る（重複除外用）
+    accepted = planner_input.get("recentAccepted", [])
+    excluded_titles: set[str] = {p.get("title", "") for p in accepted if p.get("title")}
+
     raw_plans = _ollama_generate(planner_input)
     source = "ollama"
 
@@ -214,7 +290,7 @@ def generate_plans(planner_input: dict[str, Any]) -> list[dict[str, Any]]:
         source = "openrouter"
 
     if not raw_plans:
-        raw_plans = list(_FALLBACK_PLANS)
+        raw_plans = _pick_fallback(excluded_titles, count=3)
         source = "fallback"
 
     result = []
