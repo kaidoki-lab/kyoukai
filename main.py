@@ -2372,6 +2372,34 @@ async def api_update_proposal_status(proposal_id: str, body: dict = Body(...)) -
     except Exception as exc:
         return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
 
+@app.get("/api/test-groq")
+async def api_test_groq() -> JSONResponse:
+    """Groq API 接続テスト用エンドポイント（デバッグ用）"""
+    import os as _os
+    from urllib.request import Request as _Req, urlopen as _open
+    from urllib.error import URLError as _URLError
+    key = _os.environ.get("GROQ_API_KEY", "")
+    if not key:
+        return JSONResponse({"ok": False, "error": "GROQ_API_KEY not set"})
+    payload = json.dumps({
+        "model": "llama-3.1-8b-instant",
+        "messages": [{"role": "user", "content": "hi"}],
+        "max_tokens": 5,
+    }).encode("utf-8")
+    try:
+        req = _Req(
+            "https://api.groq.com/openai/v1/chat/completions",
+            data=payload,
+            headers={"Content-Type": "application/json", "Authorization": f"Bearer {key}"},
+            method="POST",
+        )
+        with _open(req, timeout=10.0) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        return JSONResponse({"ok": True, "reply": data["choices"][0]["message"]["content"], "key_prefix": key[:8]})
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc), "key_prefix": key[:8]})
+
+
 @app.post("/api/plan-proposals/run")
 async def api_run_plan_proposals() -> JSONResponse:
     try:
