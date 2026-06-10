@@ -2372,36 +2372,47 @@ async def api_update_proposal_status(proposal_id: str, body: dict = Body(...)) -
     except Exception as exc:
         return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
 
-@app.get("/api/test-groq")
-async def api_test_groq() -> JSONResponse:
-    """Groq API 接続テスト用エンドポイント（デバッグ用）"""
+@app.get("/api/test-ai")
+async def api_test_ai() -> JSONResponse:
+    """AI接続テスト用エンドポイント（デバッグ用）"""
     import os as _os
     from urllib.request import Request as _Req, urlopen as _open
-    from urllib.error import URLError as _URLError
-    key = _os.environ.get("GROQ_API_KEY", "")
-    if not key:
-        return JSONResponse({"ok": False, "error": "GROQ_API_KEY not set"})
-    payload = json.dumps({
-        "model": "llama-3.1-8b-instant",
-        "messages": [{"role": "user", "content": "hi"}],
-        "max_tokens": 5,
-    }).encode("utf-8")
-    try:
-        req = _Req(
-            "https://api.groq.com/openai/v1/chat/completions",
-            data=payload,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {key}",
-                "User-Agent": "Mozilla/5.0 (compatible; KYOUKAI-OS/1.0)",
-            },
-            method="POST",
-        )
-        with _open(req, timeout=10.0) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-        return JSONResponse({"ok": True, "reply": data["choices"][0]["message"]["content"], "key_prefix": key[:8]})
-    except Exception as exc:
-        return JSONResponse({"ok": False, "error": str(exc), "key_prefix": key[:8]})
+
+    results = {}
+
+    # Groq test
+    groq_key = _os.environ.get("GROQ_API_KEY", "")
+    if groq_key:
+        payload = json.dumps({"model": "llama-3.1-8b-instant", "messages": [{"role": "user", "content": "hi"}], "max_tokens": 5}).encode()
+        try:
+            req = _Req("https://api.groq.com/openai/v1/chat/completions", data=payload,
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {groq_key}", "User-Agent": "Mozilla/5.0"}, method="POST")
+            with _open(req, timeout=10) as r:
+                d = json.loads(r.read())
+            results["groq"] = {"ok": True, "reply": d["choices"][0]["message"]["content"]}
+        except Exception as e:
+            results["groq"] = {"ok": False, "error": str(e)}
+    else:
+        results["groq"] = {"ok": False, "error": "no key"}
+
+    # OpenRouter test
+    or_key = _os.environ.get("OPENROUTER_API_KEY", "")
+    if or_key:
+        for model in ["google/gemma-4-26b-a4b-it:free", "google/gemma-4-31b-it:free", "moonshotai/kimi-k2.6:free"]:
+            payload = json.dumps({"model": model, "messages": [{"role": "user", "content": "hi"}], "max_tokens": 5}).encode()
+            try:
+                req = _Req("https://openrouter.ai/api/v1/chat/completions", data=payload,
+                    headers={"Content-Type": "application/json", "Authorization": f"Bearer {or_key}", "HTTP-Referer": "https://www.void-kyoukai.net"}, method="POST")
+                with _open(req, timeout=15) as r:
+                    d = json.loads(r.read())
+                results["openrouter"] = {"ok": True, "model": model, "reply": d["choices"][0]["message"]["content"]}
+                break
+            except Exception as e:
+                results[f"openrouter_{model}"] = {"ok": False, "error": str(e)[:80]}
+    else:
+        results["openrouter"] = {"ok": False, "error": "no key"}
+
+    return JSONResponse(results)
 
 
 @app.post("/api/plan-proposals/run")
