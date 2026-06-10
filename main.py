@@ -826,6 +826,10 @@ REJECTED_PLANS_FILE      = _writable(HISTORY_DIR    / "rejected-plans.json",    
 IMPLEMENTATION_TASKS_FILE = _writable(EXECUTION_DIR / "implementation_tasks.json",       "implementation_tasks.json")
 EXECUTED_TASKS_FILE      = _writable(HISTORY_DIR    / "executed-tasks.json",             "executed-tasks.json")
 
+ANALYTICS_DIR            = CENTRAL_OS_DIR / "analytics"
+YOUTUBE_SUMMARY_FILE     = ANALYTICS_DIR / "youtube_summary.json"
+YOUTUBE_NEXT_SHORTS_FILE = ANALYTICS_DIR / "youtube_next_shorts.json"
+
 # ─── AI analyst module (importlib, handles hyphen in path) ─────────────────────
 
 def _load_ai_analyst():
@@ -1784,6 +1788,25 @@ def central_os_payload() -> dict[str, Any]:
     # implementationTasks (AI実装監督)
     result["data"]["implementationTasks"] = _read_json_list(IMPLEMENTATION_TASKS_FILE)
 
+    # YouTube Analytics
+    try:
+        with open(YOUTUBE_SUMMARY_FILE, encoding="utf-8") as f:
+            result["data"]["youtubeSummary"] = json.load(f)
+    except FileNotFoundError:
+        result["data"]["youtubeSummary"] = None
+    except Exception as exc:
+        result["errors"]["youtubeSummary"] = f"read error: {exc}"
+        result["data"]["youtubeSummary"] = None
+
+    try:
+        with open(YOUTUBE_NEXT_SHORTS_FILE, encoding="utf-8") as f:
+            result["data"]["youtubeNextShorts"] = json.load(f)
+    except FileNotFoundError:
+        result["data"]["youtubeNextShorts"] = None
+    except Exception as exc:
+        result["errors"]["youtubeNextShorts"] = f"read error: {exc}"
+        result["data"]["youtubeNextShorts"] = None
+
     return result
 
 
@@ -2453,6 +2476,42 @@ async def api_update_task_status(task_id: str, body: dict = Body(...)) -> JSONRe
         return JSONResponse({"ok": True, "task": updated})
     except ValueError as exc:
         return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
+
+
+@app.get("/api/youtube/summary")
+async def api_youtube_summary() -> JSONResponse:
+    """YouTube分析サマリーを返す（youtube_analyzer.py が生成したjsonを読む）。"""
+    try:
+        with open(YOUTUBE_SUMMARY_FILE, encoding="utf-8") as f:
+            summary = json.load(f)
+        next_shorts = None
+        if YOUTUBE_NEXT_SHORTS_FILE.exists():
+            with open(YOUTUBE_NEXT_SHORTS_FILE, encoding="utf-8") as f:
+                next_shorts = json.load(f)
+        return JSONResponse({"ok": True, "summary": summary, "nextShorts": next_shorts},
+                            headers={"Cache-Control": "no-store"})
+    except FileNotFoundError:
+        return JSONResponse({"ok": False, "error": "データなし。youtube_fetcher.py → youtube_analyzer.py の順で実行してください。"},
+                            status_code=404)
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
+
+
+@app.post("/api/youtube/generate-shorts")
+async def api_youtube_generate_shorts() -> JSONResponse:
+    """youtube_prompt_builder.py を呼び出してショート案を生成する。"""
+    import importlib.util as _ilu
+    pb_file = BASE_DIR / "central-os" / "analytics" / "youtube_prompt_builder.py"
+    if not pb_file.exists():
+        return JSONResponse({"ok": False, "error": "youtube_prompt_builder.py が見つかりません"}, status_code=500)
+    try:
+        spec = _ilu.spec_from_file_location("youtube_prompt_builder", pb_file)
+        mod = _ilu.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        suggestions = await asyncio.get_event_loop().run_in_executor(None, mod.generate_next_shorts)
+        return JSONResponse({"ok": True, "count": len(suggestions), "suggestions": suggestions})
     except Exception as exc:
         return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
 

@@ -15,3 +15,5 @@ kyoukai.db
 .vercel
 *_HANDOFF.md
 ga4-credentials.json
+credentials/
+central-os/analytics/youtube_token.json

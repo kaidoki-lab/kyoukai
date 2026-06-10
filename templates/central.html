@@ -158,6 +158,40 @@
       </div>
     </section>
 
+    <!-- YOUTUBE ANALYTICS -->
+    <section class="cos-section" id="cos-youtube">
+      <h2 class="cos-section-title">[ YouTube分析 ]</h2>
+      <div class="cos-up-toolbar">
+        <button class="cos-up-run-btn" id="cos-yt-gen-btn">ショート案を生成</button>
+        <span class="cos-up-status" id="cos-yt-gen-status">待機中</span>
+      </div>
+      <div class="cos-note" id="cos-yt-note">データなし — ローカルで <code>youtube_fetcher.py → youtube_analyzer.py</code> を実行してからリロードしてください</div>
+      <div class="cos-error" id="cos-yt-error" hidden></div>
+
+      <div id="cos-yt-body" hidden>
+        <div class="cos-watch-summary" id="cos-yt-meta"></div>
+
+        <h3 class="cos-subsection-title">上位動画</h3>
+        <div class="cos-rooms-table-wrap">
+          <table class="cos-table">
+            <thead><tr><th>タイトル</th><th>スコア</th><th>再生</th><th>維持率%</th><th>いいね</th><th>登録+</th></tr></thead>
+            <tbody id="cos-yt-top-body"></tbody>
+          </table>
+        </div>
+
+        <h3 class="cos-subsection-title">下位動画</h3>
+        <div class="cos-rooms-table-wrap">
+          <table class="cos-table">
+            <thead><tr><th>タイトル</th><th>スコア</th><th>再生</th><th>維持率%</th><th>いいね</th><th>登録+</th></tr></thead>
+            <tbody id="cos-yt-bottom-body"></tbody>
+          </table>
+        </div>
+
+        <h3 class="cos-subsection-title">次のショート案</h3>
+        <div id="cos-yt-next-shorts"><div class="cos-up-empty">「ショート案を生成」ボタンで提案を生成できます</div></div>
+      </div>
+    </section>
+
     <footer class="cos-footer">
       <div>— END OF OBSERVATION —</div>
       <div class="cos-footer-sub">central-os は読み取り専用</div>
@@ -1060,6 +1094,139 @@
       });
 
       loadPlanProposals();
+    })();
+
+    // ── YouTube Analytics ──────────────────────────────────────────────────────
+    (function () {
+      "use strict";
+
+      var genBtn    = document.getElementById("cos-yt-gen-btn");
+      var genStatus = document.getElementById("cos-yt-gen-status");
+      var noteEl    = document.getElementById("cos-yt-note");
+      var bodyEl    = document.getElementById("cos-yt-body");
+      var metaEl    = document.getElementById("cos-yt-meta");
+      var topBody   = document.getElementById("cos-yt-top-body");
+      var botBody   = document.getElementById("cos-yt-bottom-body");
+      var nextEl    = document.getElementById("cos-yt-next-shorts");
+
+      function setGenStatus(text, mod) {
+        if (!genStatus) return;
+        genStatus.textContent = text;
+        genStatus.className = "cos-up-status" + (mod ? " cos-up-status--" + mod : "");
+      }
+
+      function _safeText(v) {
+        if (v === null || v === undefined) return "—";
+        return String(v);
+      }
+
+      function _videoRow(v) {
+        var tr = document.createElement("tr");
+        var titleA = "";
+        if (v.video_id) {
+          titleA = '<a href="https://www.youtube.com/watch?v=' + v.video_id + '" target="_blank" rel="noopener">' + _safeText(v.title) + '</a>';
+        } else {
+          titleA = _safeText(v.title);
+        }
+        tr.innerHTML = [
+          "<td>" + titleA + "</td>",
+          "<td>" + _safeText(v.score) + "</td>",
+          "<td>" + _safeText(v.views) + "</td>",
+          "<td>" + (v.averageViewPercentage !== null && v.averageViewPercentage !== undefined ? Number(v.averageViewPercentage).toFixed(1) : "—") + "</td>",
+          "<td>" + _safeText(v.likes) + "</td>",
+          "<td>" + _safeText(v.subscribersGained) + "</td>",
+        ].join("");
+        return tr;
+      }
+
+      function renderSummary(summary, nextShorts) {
+        if (!summary) return;
+
+        noteEl && (noteEl.hidden = true);
+        bodyEl && (bodyEl.hidden = false);
+
+        // メタ情報
+        if (metaEl) {
+          var fetchedAt = summary.fetchedAt ? summary.fetchedAt.slice(0, 16).replace("T", " ") + " UTC" : "—";
+          var analyzedAt = summary.analyzedAt ? summary.analyzedAt.slice(0, 16).replace("T", " ") + " UTC" : "—";
+          metaEl.innerHTML = [
+            '<div class="cos-watch-stat"><span class="cos-label">最終取得</span><span class="cos-value">' + fetchedAt + '</span></div>',
+            '<div class="cos-watch-stat"><span class="cos-label">分析日時</span><span class="cos-value">' + analyzedAt + '</span></div>',
+            '<div class="cos-watch-stat"><span class="cos-label">対象本数</span><span class="cos-value">' + _safeText(summary.videoCount) + '</span></div>',
+            '<div class="cos-watch-stat"><span class="cos-label">集計期間</span><span class="cos-value">直近' + _safeText(summary.dayRange) + '日</span></div>',
+            '<div class="cos-watch-stat"><span class="cos-label">平均スコア</span><span class="cos-value">' + _safeText(summary.avgScore) + '</span></div>',
+          ].join("");
+        }
+
+        // 上位動画
+        if (topBody) {
+          topBody.innerHTML = "";
+          (summary.topVideos || []).forEach(function (v) { topBody.appendChild(_videoRow(v)); });
+        }
+
+        // 下位動画
+        if (botBody) {
+          botBody.innerHTML = "";
+          (summary.bottomVideos || []).forEach(function (v) { botBody.appendChild(_videoRow(v)); });
+        }
+
+        // 次のショート案
+        renderNextShorts(nextShorts);
+      }
+
+      function renderNextShorts(data) {
+        if (!nextEl) return;
+        if (!data || !data.suggestions || !data.suggestions.length) {
+          nextEl.innerHTML = '<div class="cos-up-empty">「ショート案を生成」ボタンで提案を生成できます</div>';
+          return;
+        }
+        var genAt = data.generatedAt ? data.generatedAt.slice(0, 16).replace("T", " ") + " UTC" : "";
+        var html = '<div class="cos-note" style="margin-bottom:8px">生成: ' + genAt + ' / source: ' + (data.source || "?") + '</div>';
+        data.suggestions.forEach(function (s, i) {
+          html += '<div class="cos-up-card" style="margin-bottom:8px">';
+          html += '<div class="cos-up-title" style="font-weight:600">' + (i + 1) + '. ' + _safeText(s.title) + '</div>';
+          html += '<div class="cos-up-meta" style="margin-top:4px">コンセプト: ' + _safeText(s.concept) + '</div>';
+          if (s.hook) html += '<div class="cos-up-meta">冒頭フック: ' + _safeText(s.hook) + '</div>';
+          if (s.reason) html += '<div class="cos-up-meta" style="color:#888">理由: ' + _safeText(s.reason) + '</div>';
+          html += '</div>';
+        });
+        nextEl.innerHTML = html;
+      }
+
+      function loadYoutube() {
+        fetch("/api/youtube/summary")
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            if (d.ok) {
+              renderSummary(d.summary, d.nextShorts);
+            } else {
+              if (noteEl) noteEl.textContent = d.error || "データなし";
+            }
+          })
+          .catch(function () {});
+      }
+
+      if (genBtn) {
+        genBtn.addEventListener("click", function () {
+          genBtn.disabled = true;
+          setGenStatus("生成中...", "running");
+          fetch("/api/youtube/generate-shorts", { method: "POST" })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+              if (d.ok) {
+                setGenStatus("完了 (" + (d.count || 0) + "件)", "ok");
+                renderNextShorts({ source: "ai", generatedAt: new Date().toISOString(), suggestions: d.suggestions });
+              } else {
+                setGenStatus("失敗", "error");
+                window._cosShowError && window._cosShowError("cos-yt-error", d.error || "不明なエラー");
+              }
+            })
+            .catch(function (e) { setGenStatus("失敗", "error"); window._cosShowError && window._cosShowError("cos-yt-error", e.message); })
+            .finally(function () { genBtn.disabled = false; });
+        });
+      }
+
+      loadYoutube();
     })();
   </script>
 </body>
