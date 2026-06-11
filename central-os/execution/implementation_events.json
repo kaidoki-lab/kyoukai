@@ -1,0 +1,28 @@
+[
+  {
+    "id": "implementation-event-plan-20260610104837-01",
+    "sourcePlanId": "plan-20260610104837-01",
+    "sourceTaskId": "",
+    "title": "祭壇域のデータベース化",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "祭壇域に関係する内部Markdownを既存SQLiteへ移行し、日本語全文検索・一覧・更新・再移行が可能な管理基盤を実装した。",
+    "artifacts": [
+      "database.sql",
+      "schema.py",
+      "data_migration.py",
+      "tests/test_altar_database.py",
+      "central-os/execution/implementation_events.json"
+    ],
+    "verification": [
+      "5文書から16セクションをkyoukai.dbへ移行済み",
+      "祭壇域の日本語全文検索を確認済み",
+      "再移行時0件更新の冪等性を確認済み",
+      "全9単体テスト成功"
+    ],
+    "completedAt": "2026-06-11T02:36:34.410490+00:00",
+    "recordedBy": "codex"
+  }
+]

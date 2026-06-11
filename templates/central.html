@@ -69,6 +69,8 @@
       </div>
       <div class="cos-error" id="cos-impl-error" hidden></div>
       <div id="cos-impl-list"><div class="cos-up-empty">実装指示なし — 企画案を採用後「実装指示を生成」する</div></div>
+      <h3 class="cos-impl-events-title">実装完了事象</h3>
+      <div id="cos-impl-events"><div class="cos-up-empty">完了事象なし</div></div>
     </section>
 
     <!-- UPDATE PROPOSALS -->
@@ -889,12 +891,86 @@
         });
       }
 
+      function renderImplEvents(events) {
+        var container = document.getElementById("cos-impl-events");
+        if (!container) return;
+        if (!events.length) {
+          container.innerHTML = "<div class='cos-up-empty'>完了事象なし</div>";
+          return;
+        }
+        container.innerHTML = "";
+        events.slice().reverse().forEach(function(event) {
+          var card = document.createElement("div");
+          card.className = "cos-up-card cos-up-done";
+
+          var header = document.createElement("div");
+          header.className = "cos-up-header";
+          var title = document.createElement("span");
+          title.className = "cos-up-title";
+          title.textContent = event.title || "(無題)";
+          var badge = document.createElement("span");
+          badge.className = "cos-up-badge cos-up-badge-done";
+          badge.textContent = "実装完了";
+          header.appendChild(title);
+          header.appendChild(badge);
+          card.appendChild(header);
+
+          var meta = document.createElement("div");
+          meta.className = "cos-up-meta";
+          meta.innerHTML =
+            '<span class="cos-up-page">' + (event.targetPages || []).join(", ") + '</span>' +
+            '<span class="cos-up-priority">元企画: ' + safeText(event.sourcePlanId || "-") + '</span>' +
+            '<span class="cos-up-date">' + (event.completedAt ? event.completedAt.slice(0,10) : "") + '</span>';
+          card.appendChild(meta);
+
+          var summary = document.createElement("div");
+          summary.className = "cos-up-observation";
+          summary.textContent = event.summary || "";
+          card.appendChild(summary);
+
+          var artifacts = event.artifacts || [];
+          if (artifacts.length) {
+            var artifactLabel = document.createElement("div");
+            artifactLabel.className = "cos-up-rec-label";
+            artifactLabel.textContent = "成果物";
+            card.appendChild(artifactLabel);
+            var artifactList = document.createElement("ul");
+            artifactList.className = "cos-up-recommendations";
+            artifacts.forEach(function(item) {
+              var li = document.createElement("li");
+              li.textContent = item;
+              artifactList.appendChild(li);
+            });
+            card.appendChild(artifactList);
+          }
+
+          var verification = event.verification || [];
+          if (verification.length) {
+            var verifyLabel = document.createElement("div");
+            verifyLabel.className = "cos-up-rec-label";
+            verifyLabel.textContent = "検証";
+            card.appendChild(verifyLabel);
+            var verifyList = document.createElement("ul");
+            verifyList.className = "cos-up-recommendations";
+            verification.forEach(function(item) {
+              var li = document.createElement("li");
+              li.textContent = item;
+              verifyList.appendChild(li);
+            });
+            card.appendChild(verifyList);
+          }
+          container.appendChild(card);
+        });
+      }
+
       function loadImplTasks() {
         fetch("/api/central-os")
           .then(function(r) { return r.json(); })
           .then(function(data) {
             var tasks = (data.data && data.data.implementationTasks) || [];
+            var events = (data.data && data.data.implementationEvents) || [];
             renderImplTasks(tasks);
+            renderImplEvents(events);
           })
           .catch(function(e) { showError("cos-impl-error", e.message); });
       }

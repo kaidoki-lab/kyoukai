@@ -359,6 +359,12 @@ body {
   background: #f3f0ff; border-color: #805ad5; color: #44337a; font-weight: 600;
 }
 .cos-up-empty { color: #a0aec0; font-size: 21px; padding: 16px 0; }
+.cos-impl-events-title {
+  margin: 24px 0 10px;
+  color: #276749;
+  font-size: 20px;
+  letter-spacing: 0.08em;
+}
 
 .cos-up-card {
   border: 1px solid #e2e8f0; border-left: 4px solid #805ad5;

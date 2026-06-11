@@ -29,6 +29,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 
+from data_migration import migrate as migrate_altar_markdown
+from implementation_events import load_events, planner_completed_context
+from schema import AltarRepository
+
 
 BASE_DIR = Path(__file__).resolve().parent
 VIDEOS_DIR = BASE_DIR / "videos"
@@ -636,6 +640,7 @@ class GenomeStore:
 
 
 store = GenomeStore(DB_PATH)
+ALTAR_MIGRATION_RESULTS = migrate_altar_markdown(DB_PATH)
 
 
 ALLOWED_AFFILIATE_HOSTS = {"px.a8.net"}
@@ -825,6 +830,7 @@ ACCEPTED_PLANS_FILE      = _writable(HISTORY_DIR    / "accepted-plans.json",    
 REJECTED_PLANS_FILE      = _writable(HISTORY_DIR    / "rejected-plans.json",             "rejected-plans.json")
 IMPLEMENTATION_TASKS_FILE = _writable(EXECUTION_DIR / "implementation_tasks.json",       "implementation_tasks.json")
 EXECUTED_TASKS_FILE      = _writable(HISTORY_DIR    / "executed-tasks.json",             "executed-tasks.json")
+IMPLEMENTATION_EVENTS_FILE = EXECUTION_DIR / "implementation_events.json"
 
 ANALYTICS_DIR            = CENTRAL_OS_DIR / "analytics"
 YOUTUBE_SUMMARY_FILE     = ANALYTICS_DIR / "youtube_summary.json"
@@ -897,7 +903,8 @@ def run_ai_planner() -> dict[str, Any]:
     ga4_data = _fetch_ga4_data()
     room_scores = _analyze_rooms(ga4_data)
 
-    recent_accepted = _read_json_list(ACCEPTED_PLANS_FILE)[-5:]
+    completed_context = planner_completed_context(load_events(IMPLEMENTATION_EVENTS_FILE))
+    recent_accepted = (_read_json_list(ACCEPTED_PLANS_FILE) + completed_context)[-5:]
     recent_rejected = _read_json_list(REJECTED_PLANS_FILE)[-5:]
     recent_changes: list = []
 
@@ -1787,6 +1794,13 @@ def central_os_payload() -> dict[str, Any]:
 
     # implementationTasks (AI実装監督)
     result["data"]["implementationTasks"] = _read_json_list(IMPLEMENTATION_TASKS_FILE)
+    result["data"]["implementationEvents"] = load_events(IMPLEMENTATION_EVENTS_FILE)
+    altar_stats = AltarRepository(DB_PATH).stats()
+    result["data"]["altarDatabase"] = {
+        "status": "ready",
+        **altar_stats,
+        "sourceCount": len(ALTAR_MIGRATION_RESULTS),
+    }
 
     # YouTube Analytics
     try:
