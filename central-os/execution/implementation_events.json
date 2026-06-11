@@ -99,5 +99,27 @@
     ],
     "completedAt": "2026-06-11T04:06:48.152808+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260611-planner-public-policy",
+    "sourcePlanId": "manual-20260611-planner-public-policy",
+    "sourceTaskId": "",
+    "title": "Central OS企画生成の公開体験方針",
+    "targetPages": [
+      "/central"
+    ],
+    "status": "completed",
+    "summary": "企画生成結果を公開ページの文章・演出・導線案に限定し、DB・Codex・管理・分析機能など内部システム案、内部ページ案、完了済み重複案を除外する方針検査を実装した。",
+    "artifacts": [
+      "main.py",
+      "tests/test_planner_policy.py"
+    ],
+    "verification": [
+      "unittest 25件成功",
+      "内部機能案3種、内部ページ、完了済み重複の除外を確認",
+      "全案除外時に公開体験案3件へ差し替わることを確認"
+    ],
+    "completedAt": "2026-06-11T05:34:53.361093+00:00",
+    "recordedBy": "codex"
   }
 ]

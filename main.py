@@ -898,13 +898,157 @@ def _read_json_list(path: Path) -> list:
         return []
 
 
+PUBLIC_PLAN_TARGETS = {
+    "/",
+    "/observation",
+    "/observer",
+    "/signal",
+    "/daimyojin",
+    "/hyougi",
+    "/exit",
+    "/null",
+    "/outside",
+    "/archive",
+}
+INTERNAL_PLAN_TERMS = (
+    "central os",
+    "セントラルos",
+    "セントラル OS",
+    "codex",
+    "データベース",
+    "database",
+    "db化",
+    "管理機能",
+    "管理画面",
+    "分析機能",
+    "分析画面",
+    "データ分析機能",
+    "実装自動化",
+    "自動生成機能",
+    "api連携",
+    "スキーマ",
+    "マイグレーション",
+)
+
+
+def _plan_text(plan: dict[str, Any]) -> str:
+    return " ".join(
+        str(plan.get(field) or "")
+        for field in ("title", "summary")
+    ).casefold()
+
+
+def _plan_rejection_reason(
+    plan: dict[str, Any],
+    completed_events: list[dict[str, Any]],
+) -> str | None:
+    text = _plan_text(plan)
+    if any(term.casefold() in text for term in INTERNAL_PLAN_TERMS):
+        return "internal-system-feature"
+
+    targets = plan.get("targets")
+    if not isinstance(targets, list) or not targets:
+        return "missing-public-target"
+    if any(str(target) not in PUBLIC_PLAN_TARGETS for target in targets):
+        return "non-public-target"
+
+    title = str(plan.get("title") or "").strip().casefold()
+    summary = str(plan.get("summary") or "").strip().casefold()
+    for event in completed_events:
+        completed_title = str(event.get("title") or "").strip().casefold()
+        completed_summary = str(event.get("summary") or "").strip().casefold()
+        if title and title == completed_title:
+            return "already-completed"
+        if summary and summary == completed_summary:
+            return "already-completed"
+    return None
+
+
+def _safe_public_plan_fallback() -> list[dict[str, Any]]:
+    now = datetime.now(timezone.utc).isoformat()
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    candidates = [
+        {
+            "title": "未確認接続の断片文更新",
+            "summary": "/nullの既存世界観に沿う短い断片文を追加し、情報密度を整える。",
+            "reason": "部屋の異常な余韻を保ちながら滞在体験を深めるため。",
+            "targets": ["/null"],
+        },
+        {
+            "title": "観測域の視線導線調整",
+            "summary": "/observationの既存要素の配置と文言を調整し、視線の流れを整える。",
+            "reason": "新機能を増やさず観測体験を分かりやすくするため。",
+            "targets": ["/observation"],
+        },
+        {
+            "title": "受信域の放送断片追加",
+            "summary": "/signalに既存演出と調和する短い放送断片を追加する。",
+            "reason": "受信域らしい日本的な異常感を補強するため。",
+            "targets": ["/signal"],
+        },
+        {
+            "title": "評議録の記録断片追加",
+            "summary": "/hyougiに既存の記録形式に沿う短い評議断片を追加する。",
+            "reason": "評議録の内容密度を小さな変更で補うため。",
+            "targets": ["/hyougi"],
+        },
+        {
+            "title": "外部接続の境界文調整",
+            "summary": "/outsideの接続文を調整し、外部との境界が揺らぐ印象を強める。",
+            "reason": "既存構造のまま異常な接続感を補強するため。",
+            "targets": ["/outside"],
+        },
+        {
+            "title": "記録室の見出し整理",
+            "summary": "/archiveの既存見出しと短文を整え、記録の読み順を明確にする。",
+            "reason": "記録室の雰囲気を保ちながら閲覧性を整えるため。",
+            "targets": ["/archive"],
+        },
+    ]
+    return [
+        {
+            "id": f"plan-{stamp}-{index:02d}",
+            **candidate,
+            "implementationSize": "small",
+            "status": "pending",
+            "createdAt": now,
+            "source": "policy-fallback",
+        }
+        for index, candidate in enumerate(candidates, start=1)
+    ]
+
+
+def _filter_public_plans(
+    plans: list[dict[str, Any]],
+    completed_events: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    accepted = []
+    rejected = []
+    seen = set()
+    for plan in plans:
+        reason = _plan_rejection_reason(plan, completed_events)
+        fingerprint = (
+            str(plan.get("title") or "").strip().casefold(),
+            tuple(str(target) for target in plan.get("targets", [])),
+        )
+        if reason is None and fingerprint in seen:
+            reason = "duplicate-generated-plan"
+        if reason:
+            rejected.append({"id": str(plan.get("id") or ""), "reason": reason})
+            continue
+        seen.add(fingerprint)
+        accepted.append(plan)
+    return accepted, rejected
+
+
 def run_ai_planner() -> dict[str, Any]:
     """Assemble planner input, call ai_planner, save proposal_plans.json."""
     # gather context
     ga4_data = _fetch_ga4_data()
     room_scores = _analyze_rooms(ga4_data)
 
-    completed_context = planner_completed_context(load_events(IMPLEMENTATION_EVENTS_FILE))
+    completed_events = load_events(IMPLEMENTATION_EVENTS_FILE)
+    completed_context = planner_completed_context(completed_events)
     recent_accepted = (_read_json_list(ACCEPTED_PLANS_FILE) + completed_context)[-5:]
     recent_rejected = _read_json_list(REJECTED_PLANS_FILE)[-5:]
     recent_changes: list = []
@@ -957,11 +1101,22 @@ def run_ai_planner() -> dict[str, Any]:
             }
         ]
 
+    plans, rejected_plans = _filter_public_plans(plans, completed_events)
+    if len(plans) < 3:
+        plans, fallback_rejections = _filter_public_plans(
+            plans + _safe_public_plan_fallback(),
+            completed_events,
+        )
+        rejected_plans.extend(fallback_rejections)
+    plans = plans[:3]
+
     with open(PROPOSAL_PLANS_FILE, "w", encoding="utf-8") as f:
         json.dump(plans, f, ensure_ascii=False, indent=2)
 
     return {
         "plans_written": len(plans),
+        "plans_rejected_by_policy": len(rejected_plans),
+        "rejected_reasons": rejected_plans,
         "source": plans[0].get("source", "unknown") if plans else "none",
         "file": str(PROPOSAL_PLANS_FILE),
     }
