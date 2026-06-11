@@ -48,5 +48,36 @@
     ],
     "completedAt": "2026-06-11T03:17:41.511008+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-plan-20260611033302-02",
+    "sourcePlanId": "plan-20260611033302-02",
+    "sourceTaskId": "",
+    "title": "Codex実装自動化の拡張",
+    "targetPages": [
+      "/Codex",
+      "/daimyojin"
+    ],
+    "status": "completed",
+    "summary": "config.jsonを正本としてCodex制作者ページの対象ファイル解析とAI大明神室の受信パラメータを実行時に自動生成する機能を追加した。/Codexはnoindexかつ公開導線非掲載とし、Central OS内部名称を表示しない。",
+    "artifacts": [
+      "auto_generator.py",
+      "config.json",
+      "templates/codex_template.html",
+      "templates/daimyojin.html",
+      "static/daimyojin.js",
+      "main.py",
+      "tests/test_auto_generator.py"
+    ],
+    "verification": [
+      "全15単体テスト成功",
+      "JavaScript構文検証成功",
+      "/Codexと/codexがHTTP 200でREADY表示",
+      "生成時間14.5msを確認",
+      "AI大明神室への設定注入を確認",
+      "一般表示にCentral OS内部名称が出ないことを確認"
+    ],
+    "completedAt": "2026-06-11T03:43:12.903200+00:00",
+    "recordedBy": "codex"
   }
 ]

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>{{ codex_title }} / KYOUKAI</title>
+  <style>
+    :root { color-scheme: dark; font-family: "MS Gothic", "Yu Gothic", monospace; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #050705; color: #c9f7d2; }
+    main { width: min(960px, calc(100% - 32px)); margin: 40px auto; }
+    header, section { border: 1px solid #31583a; background: #09100b; padding: 20px; margin-bottom: 16px; }
+    h1, h2 { margin: 0 0 14px; font-weight: 500; letter-spacing: .08em; }
+    h1 { font-size: clamp(22px, 4vw, 36px); }
+    h2 { color: #8bd89a; font-size: 18px; }
+    p, li, td, th { line-height: 1.65; }
+    .status { display: inline-block; padding: 4px 10px; border: 1px solid #4c9b5f; color: #a8ffbb; }
+    .status.error { border-color: #a34a4a; color: #ff9d9d; }
+    .meta { color: #789a80; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 9px; border-bottom: 1px solid #263c2b; text-align: left; overflow-wrap: anywhere; }
+    th { color: #8bd89a; }
+    ol { padding-left: 24px; }
+    a { color: #789a80; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="meta">CREATOR ONLY / NOINDEX / CONFIG {{ automation_version }}</p>
+      <h1>{{ codex_title }}</h1>
+      <p>{{ codex_description }}</p>
+      <span class="status{% if not codex_ready %} error{% endif %}">
+        {% if codex_ready %}READY{% else %}SOURCE MISSING{% endif %}
+      </span>
+      <p class="meta">generation: {{ generation_ms }} ms / targets: {{ codex_targets | join(", ") }}</p>
+    </header>
+
+    <section>
+      <h2>[ SOURCE EXTRACTION ]</h2>
+      <table>
+        <thead><tr><th>PATH</th><th>STATE</th><th>SIZE</th><th>HASH</th></tr></thead>
+        <tbody>
+          {% for source in codex_sources %}
+          <tr>
+            <td>{{ source.path }}</td>
+            <td>{% if source.exists %}OK{% else %}MISSING{% endif %}</td>
+            <td>{{ source.size }}</td>
+            <td>{{ source.sha256 or "-" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>[ AUTOMATED PIPELINE ]</h2>
+      <ol>
+        {% for step in codex_pipeline %}<li>{{ step }}</li>{% endfor %}
+      </ol>
+    </section>
+
+    <a href="/" rel="nofollow">000 / return</a>
+  </main>
+</body>
+</html>

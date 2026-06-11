@@ -7,6 +7,7 @@
   const starsEl = document.querySelector("[data-oracle-stars]");
   const button = document.querySelector("[data-oracle-button]");
   const caret = document.querySelector("[data-oracle-caret]");
+  const automation = window.KYOUKAI_DAIMYOJIN_AUTOMATION || {};
 
   if (!room || !titleEl || !messageEl || !noteEl || !statusEl || !starsEl || !button) return;
 
@@ -46,7 +47,15 @@
     ["机の角運", 2, "近づくほど角が角らしくなります。", "避けた記憶だけを持ち帰ってください。"],
   ].map(([category, stars, message, note]) => ({ category, stars, message, note }));
 
-  const statuses = ["受信中...", "神託生成中...", "演算中...", "文字化け補正中...", "おみくじ機再起動中..."];
+  const statuses = Array.isArray(automation.statuses) && automation.statuses.length
+    ? automation.statuses
+    : ["受信中...", "神託生成中...", "演算中..."];
+  const initialDelay = Number(automation.initialDelayMs ?? 260);
+  const receiveDelayMin = Number(automation.receiveDelayMinMs ?? 680);
+  const receiveDelayRange = Number(automation.receiveDelayRangeMs ?? 360);
+  const desktopTypeDelay = Number(automation.desktopTypeDelayMs ?? 54);
+  const mobileTypeDelay = Number(automation.mobileTypeDelayMs ?? 64);
+  const buttonUnlockDelay = Number(automation.buttonUnlockDelayMs ?? 1000);
   let lastIndex = -1;
   let typingTimer = 0;
   let audioContext = null;
@@ -113,7 +122,7 @@
         caret?.classList.add("is-visible");
         onComplete?.();
       }
-    }, window.matchMedia("(max-width: 768px), (orientation: portrait)").matches ? 64 : 54);
+    }, window.matchMedia("(max-width: 768px), (orientation: portrait)").matches ? mobileTypeDelay : desktopTypeDelay);
   }
 
   function runOracle() {
@@ -142,12 +151,12 @@
       typeText(text, () => {
         window.setTimeout(() => {
           button.disabled = false;
-        }, 1000);
+        }, buttonUnlockDelay);
       });
-    }, 680 + Math.floor(Math.random() * 360));
+    }, receiveDelayMin + Math.floor(Math.random() * receiveDelayRange));
   }
 
   button.addEventListener("pointerdown", getAudioContext);
   button.addEventListener("click", runOracle);
-  window.addEventListener("load", () => window.setTimeout(runOracle, 260), { once: true });
+  window.addEventListener("load", () => window.setTimeout(runOracle, initialDelay), { once: true });
 })();

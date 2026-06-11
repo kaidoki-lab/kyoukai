@@ -29,6 +29,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 
+from auto_generator import build_codex_context, build_daimyojin_config
 from data_migration import migrate as migrate_altar_markdown
 from implementation_events import load_events, planner_completed_context
 from schema import AltarRepository
@@ -2210,15 +2211,16 @@ templates = Jinja2Templates(directory=BASE_DIR / "templates")
 from fastapi import Body
 from fastapi.responses import JSONResponse
 
-def render_template(request: Request, name: str) -> HTMLResponse:
+def render_template(request: Request, name: str, **extra_context: Any) -> HTMLResponse:
+    context = {"request": request, **extra_context}
     try:
         return templates.TemplateResponse(
             request=request,
             name=name,
-            context={"request": request},
+            context=context,
         )
     except TypeError:
-        return templates.TemplateResponse(name, {"request": request})
+        return templates.TemplateResponse(name, context)
 
 # ─── Pages ──────────────────────────────────────────────────────────────
 
@@ -2254,7 +2256,16 @@ async def signal_room(request: Request) -> HTMLResponse:
 
 @app.get("/daimyojin", response_class=HTMLResponse)
 async def daimyojin_room(request: Request) -> HTMLResponse:
-    return render_template(request, "daimyojin.html")
+    return render_template(
+        request,
+        "daimyojin.html",
+        daimyojin_config=json.dumps(build_daimyojin_config(), ensure_ascii=False),
+    )
+
+@app.get("/Codex", response_class=HTMLResponse, include_in_schema=False)
+@app.get("/codex", response_class=HTMLResponse, include_in_schema=False)
+async def codex_automation_page(request: Request) -> HTMLResponse:
+    return render_template(request, "codex_template.html", **build_codex_context())
 
 @app.get("/hyougi", response_class=HTMLResponse)
 async def hyougi_room(request: Request) -> HTMLResponse:

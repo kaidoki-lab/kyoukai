@@ -1,0 +1,41 @@
+{
+  "version": "1.0",
+  "codex": {
+    "title": "CODEX IMPLEMENTATION AUTOMATION",
+    "description": "実装指示から完了報告までの生成状態を確認する制作者用ページ。",
+    "targetPages": [
+      "/Codex",
+      "/daimyojin"
+    ],
+    "sourceFiles": [
+      "AGENTS.md",
+      "complete_implementation.py",
+      "implementation_events.py",
+      "templates/daimyojin.html",
+      "static/daimyojin.js"
+    ],
+    "pipeline": [
+      "元企画IDと対象ページを保持する",
+      "設定から対象ページ用データを生成する",
+      "テストと表示確認を実行する",
+      "完了事象・成果物・検証結果を制作者用完了台帳へ同期する",
+      "関連差分だけをコミットしてmainへプッシュする",
+      "Vercel本番反映を確認する"
+    ]
+  },
+  "daimyojin": {
+    "statuses": [
+      "受信中...",
+      "神託生成中...",
+      "演算中...",
+      "文字化け補正中...",
+      "おみくじ機再起動中..."
+    ],
+    "initialDelayMs": 260,
+    "receiveDelayMinMs": 680,
+    "receiveDelayRangeMs": 360,
+    "desktopTypeDelayMs": 54,
+    "mobileTypeDelayMs": 64,
+    "buttonUnlockDelayMs": 1000
+  }
+}
