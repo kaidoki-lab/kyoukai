@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EXTERNAL PERSONA / KYOUKAI</title>
+  <meta name="description" content="KYOUKAI外部通信ノード。Twomiへの広告リンクを含みます。" />
+  <link rel="stylesheet" href="/static/external-signal.css" />
+  <script defer src="/static/analytics.js"></script>
+  <script defer src="/static/external-signal.js"></script>
+</head>
+<body class="external-signal-body">
+  <aside class="external-signal-disclosure" aria-label="広告表示">
+    <strong>広告</strong>
+    <span>この通信にはTwomiへのアフィリエイトリンクが含まれます</span>
+  </aside>
+
+  <main class="external-signal-node" data-external-signal>
+    <header class="external-signal-header">
+      <p>境界外通信管制 / NODE 27395002</p>
+      <h1>外部人格を検出</h1>
+      <span data-signal-status>接続待機</span>
+    </header>
+
+    <section class="external-signal-screen" aria-live="polite">
+      <div class="external-signal-noise" aria-hidden="true"></div>
+      <div class="external-signal-persona" aria-hidden="true"><span></span></div>
+      <div class="external-signal-log" data-signal-log>
+        <p>受信元は境界の外側にあります。</p>
+        <p>応答を開始すると短い通信が発生します。</p>
+      </div>
+    </section>
+
+    <div class="external-signal-controls">
+      <button type="button" data-signal-start>通信を開始</button>
+      <a href="/signal">受信域へ戻る</a>
+    </div>
+
+    <section class="external-signal-exit" data-signal-exit hidden>
+      <p class="external-signal-exit__state">接続維持不可 / 外部側に通信の続きがあります</p>
+      <p class="external-signal-exit__ad">広告 / 外部サービス</p>
+      <p class="external-signal-exit__prompt">外部通信を継続する</p>
+      <a
+        class="external-signal-exit__link"
+        href="https://px.a8.net/svt/ejp?a8mat=4B5TCD+32QNAQ+5VDQ+BX3J6"
+        rel="nofollow sponsored noopener"
+        target="_blank"
+        data-twomi-link
+      >
+        【Twomi】
+      </a>
+      <p class="external-signal-exit__note">移動先ではTwomiの利用条件とプライバシーポリシーが適用されます。</p>
+      <img
+        class="external-signal-tracker"
+        border="0"
+        width="1"
+        height="1"
+        src="https://www15.a8.net/0.gif?a8mat=4B5TCD+32QNAQ+5VDQ+BX3J6"
+        alt=""
+      />
+    </section>
+  </main>
+</body>
+</html>

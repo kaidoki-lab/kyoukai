@@ -121,5 +121,31 @@
     ],
     "completedAt": "2026-06-11T05:34:53.361093+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260612-twomi-external-signal",
+    "sourcePlanId": "manual-20260612-twomi-external-signal",
+    "sourceTaskId": "",
+    "title": "Twomi外部通信ノード",
+    "targetPages": [
+      "/signal",
+      "/external-signal"
+    ],
+    "status": "completed",
+    "summary": "受信域から独立した外部人格通信へ入り、短い通信途絶後に広告表記付きA8リンクでTwomiへ接続する導線を実装した。",
+    "artifacts": [
+      "TWOMI_EXTERNAL_SIGNAL_SPEC.md",
+      "templates/external-signal.html",
+      "static/external-signal.css",
+      "static/external-signal.js",
+      "tests/test_twomi_external_signal.py"
+    ],
+    "verification": [
+      "unittest 29件成功",
+      "Python・JavaScript構文確認成功",
+      "ローカルHTTP 200、広告表記、A8リンク、計測画像、受信域導線を確認"
+    ],
+    "completedAt": "2026-06-11T22:51:36.027500+00:00",
+    "recordedBy": "codex"
   }
 ]

@@ -389,6 +389,41 @@ a.sp-link:hover,
   color: rgba(231, 220, 193, 0.9);
 }
 
+.external-persona-route {
+  position: absolute;
+  z-index: 7;
+  right: clamp(18px, 4vw, 64px);
+  bottom: clamp(68px, 8vh, 110px);
+  display: grid;
+  gap: 3px;
+  width: min(280px, calc(100% - 36px));
+  padding: 10px 13px;
+  border: 1px solid rgba(176, 213, 178, 0.38);
+  background: rgba(3, 10, 5, 0.88);
+  color: #b8cdbc;
+  text-decoration: none;
+  box-shadow: 0 0 18px rgba(84, 168, 95, 0.08);
+}
+
+.external-persona-route span,
+.external-persona-route small {
+  color: #748a78;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+}
+
+.external-persona-route strong {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.external-persona-route:hover,
+.external-persona-route:focus-visible {
+  border-color: rgba(225, 240, 170, 0.75);
+  color: #f3f4ce;
+}
+
 .signal-info {
   position: absolute;
   left: calc(50% + min(50vw, calc(100svh * 9 / 32)) + clamp(14px, 2vw, 28px));

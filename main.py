@@ -2479,6 +2479,10 @@ async def archive_log_detail(request: Request, log_id: str) -> HTMLResponse:
 async def signal_room(request: Request) -> HTMLResponse:
     return render_template(request, "signal.html")
 
+@app.get("/external-signal", response_class=HTMLResponse)
+async def external_signal_room(request: Request) -> HTMLResponse:
+    return render_template(request, "external-signal.html")
+
 @app.get("/daimyojin", response_class=HTMLResponse)
 async def daimyojin_room(request: Request) -> HTMLResponse:
     return render_template(
