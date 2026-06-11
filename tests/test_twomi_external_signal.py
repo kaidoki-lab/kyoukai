@@ -32,6 +32,9 @@ class TwomiExternalSignalTests(unittest.TestCase):
         self.assertIn("exit.hidden = false", script)
         self.assertIn("affiliate_outbound_click", script)
         self.assertIn('slot_name: "twomi_external_persona"', script)
+        self.assertIn("await wait(3800)", script)
+        self.assertIn("await wait(4500)", script)
+        self.assertIn("await wait(3200)", script)
 
     def test_signal_room_links_to_external_signal_node(self):
         html = (BASE_DIR / "templates" / "signal.html").read_text(encoding="utf-8")

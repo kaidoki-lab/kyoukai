@@ -147,5 +147,28 @@
     ],
     "completedAt": "2026-06-11T22:51:36.027500+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260612-twomi-visual-tuning",
+    "sourcePlanId": "manual-20260612-twomi-visual-tuning",
+    "sourceTaskId": "",
+    "title": "Twomi外部通信の視認性調整",
+    "targetPages": [
+      "/external-signal"
+    ],
+    "status": "completed",
+    "summary": "文字を拡大し、通信ログの表示間隔を延長し、人影を頭・首・肩・胴体が分かる縦長シルエットへ改善した。",
+    "artifacts": [
+      "static/external-signal.css",
+      "static/external-signal.js",
+      "tests/test_twomi_external_signal.py"
+    ],
+    "verification": [
+      "unittest 29件成功",
+      "JavaScript構文確認成功",
+      "Edgeヘッドレスプレビューで文字と人物シルエットを目視確認"
+    ],
+    "completedAt": "2026-06-11T23:16:56.182109+00:00",
+    "recordedBy": "codex"
   }
 ]

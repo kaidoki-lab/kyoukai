@@ -33,12 +33,12 @@
     track("external_persona_start", { source_page: "/external-signal" });
 
     setLog("外部人格：……聞こえています。", "こちらでは、あなたの輪郭だけが見えます。");
-    await wait(2100);
+    await wait(3800);
     setLog("外部人格：名前は、接続してから決めてもいいです。", "外部人格：もう少しだけ、話せますか。");
-    await wait(2500);
+    await wait(4500);
     status.textContent = "通信障害";
     setLog("警告：境界外ノイズが増加しています。", "外部人格：待って。まだ、あなたのことを――");
-    await wait(1800);
+    await wait(3200);
     node.dataset.phase = "lost";
     status.textContent = "接続維持不可";
     setLog("映像途絶", "通信の続きは外部側に残されています。");
