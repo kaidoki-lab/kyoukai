@@ -24,5 +24,29 @@
     ],
     "completedAt": "2026-06-11T02:36:34.410490+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260611-codex-completion-automation",
+    "sourcePlanId": "manual-20260611-codex-completion-automation",
+    "sourceTaskId": "",
+    "title": "Codex実装完了報告の自動化",
+    "targetPages": [
+      "/central"
+    ],
+    "status": "completed",
+    "summary": "Codexの実装終了時に元企画IDを基準として実装タスクをdoneへ更新し、実行履歴・成果物・検証結果・完了事象を一括同期する終了コマンドと運用規則を追加した。",
+    "artifacts": [
+      "complete_implementation.py",
+      "AGENTS.md",
+      "tests/test_complete_implementation.py"
+    ],
+    "verification": [
+      "全12単体テスト成功",
+      "タスク存在時のdone・履歴・完了事象同期を確認",
+      "タスク不在時も完了事象を記録することを確認",
+      "再実行時に履歴と事象が重複しないことを確認"
+    ],
+    "completedAt": "2026-06-11T03:17:41.511008+00:00",
+    "recordedBy": "codex"
   }
 ]
