@@ -971,13 +971,76 @@ def get_plan_proposals() -> list[dict[str, Any]]:
     return _read_json_list(PROPOSAL_PLANS_FILE)
 
 
+def _normalize_update_proposal_for_executor(proposal: dict[str, Any]) -> dict[str, Any]:
+    targets = proposal.get("targets")
+    if not isinstance(targets, list):
+        targets = []
+    targets = [str(target).strip() for target in targets if str(target).strip()]
+
+    observed_page = str(proposal.get("observedPage") or "").strip()
+    if observed_page and observed_page not in targets:
+        targets.insert(0, observed_page)
+
+    changes = proposal.get("changes")
+    if isinstance(changes, list):
+        summary = " / ".join(
+            str(change).strip() for change in changes if str(change).strip()
+        )
+    else:
+        summary = str(changes or "").strip()
+    if not summary:
+        summary = str(
+            proposal.get("judgement")
+            or proposal.get("observation")
+            or proposal.get("analysis")
+            or ""
+        ).strip()
+
+    target_label = observed_page or (targets[0] if targets else "対象ページ")
+    return {
+        "id": proposal.get("id"),
+        "title": proposal.get("title") or f"{target_label} 定期更新",
+        "summary": summary,
+        "reason": proposal.get("reason") or proposal.get("hypothesis") or "",
+        "targets": targets,
+        "implementationSize": proposal.get("implementationSize") or "small",
+        "status": proposal.get("status"),
+        "createdAt": proposal.get("createdAt"),
+        "source": "update-proposal",
+    }
+
+
+def _collect_approved_implementation_plans(
+    plans: list[dict[str, Any]],
+    update_proposals: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    approved = [plan for plan in plans if plan.get("status") == "approved"]
+    approved.extend(
+        _normalize_update_proposal_for_executor(proposal)
+        for proposal in update_proposals
+        if proposal.get("status") == "approved"
+    )
+
+    unique = []
+    seen_ids = set()
+    for plan in approved:
+        plan_id = plan.get("id")
+        if not plan_id or plan_id in seen_ids:
+            continue
+        seen_ids.add(plan_id)
+        unique.append(plan)
+    return unique
+
+
 def run_ai_executor() -> dict[str, Any]:
-    """Generate implementation tasks for all approved plans not yet processed."""
+    """Generate implementation tasks for approved plans and update proposals."""
     plans = _read_json_list(PROPOSAL_PLANS_FILE)
-    approved = [p for p in plans if p.get("status") == "approved"]
+    update_proposals = _read_json_list(UPDATE_PROPOSALS_FILE)
+    approved = _collect_approved_implementation_plans(plans, update_proposals)
 
     existing_tasks = _read_json_list(IMPLEMENTATION_TASKS_FILE)
     processed_plan_ids = {t.get("sourcePlanId") for t in existing_tasks}
+    used_task_ids = {t.get("id") for t in existing_tasks}
 
     new_tasks = []
     for plan in approved:
@@ -1037,6 +1100,10 @@ def run_ai_executor() -> dict[str, Any]:
                 "source": "fallback",
             }
 
+        task["sourceProposalType"] = plan.get("source") or "proposal-plan"
+        if task.get("id") in used_task_ids:
+            task["id"] = f"{task['id']}-{len(new_tasks) + 1:02d}"
+        used_task_ids.add(task.get("id"))
         new_tasks.append(task)
         processed_plan_ids.add(plan_id)
 
@@ -1049,6 +1116,9 @@ def run_ai_executor() -> dict[str, Any]:
         "tasks_written": len(new_tasks),
         "total_tasks": len(all_tasks),
         "approved_plans": len(approved),
+        "approved_update_proposals": sum(
+            1 for proposal in update_proposals if proposal.get("status") == "approved"
+        ),
         "file": str(IMPLEMENTATION_TASKS_FILE),
     }
 

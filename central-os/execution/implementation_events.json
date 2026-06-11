@@ -79,5 +79,25 @@
     ],
     "completedAt": "2026-06-11T03:43:12.903200+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260611-update-proposal-executor",
+    "sourcePlanId": "manual-20260611-update-proposal-executor",
+    "sourceTaskId": "",
+    "title": "定期更新提案からAI実装指示を生成",
+    "targetPages": [
+      "/central"
+    ],
+    "status": "completed",
+    "summary": "採用済み定期更新提案をAI実装監督の入力へ統合し、実装指示を生成できるよう修正した。",
+    "artifacts": [
+      "main.py",
+      "tests/test_update_proposal_executor.py"
+    ],
+    "verification": [
+      "unittest 19件成功"
+    ],
+    "completedAt": "2026-06-11T04:06:48.152808+00:00",
+    "recordedBy": "codex"
   }
 ]
