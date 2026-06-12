@@ -170,5 +170,30 @@
     ],
     "completedAt": "2026-06-11T23:16:56.182109+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260612-signal-mobile-pillar-ad",
+    "sourcePlanId": "manual-20260612-signal-mobile-pillar-ad",
+    "sourceTaskId": "",
+    "title": "受信域の柱広告ホットスポット化",
+    "targetPages": [
+      "/signal"
+    ],
+    "status": "completed",
+    "summary": "スマホ版受信域に提供画像をそのまま採用し、研究施設風パネルを撤去、柱の広告札へ透明なTwomiリンクを配置し、前景テレビへ既存動画を重ねた。",
+    "artifacts": [
+      "static/signal-room-twomi-mobile.png",
+      "templates/signal.html",
+      "static/space.css",
+      "TWOMI_EXTERNAL_SIGNAL_SPEC.md",
+      "tests/test_twomi_external_signal.py"
+    ],
+    "verification": [
+      "unittest 29件成功",
+      "9:16 Edgeプレビューで柱広告札とテレビ動画の位置を確認",
+      "A8リンク、sponsored属性、計測画像、旧パネル削除を確認"
+    ],
+    "completedAt": "2026-06-12T04:28:04.171065+00:00",
+    "recordedBy": "codex"
   }
 ]

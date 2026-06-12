@@ -36,11 +36,17 @@ class TwomiExternalSignalTests(unittest.TestCase):
         self.assertIn("await wait(4500)", script)
         self.assertIn("await wait(3200)", script)
 
-    def test_signal_room_links_to_external_signal_node(self):
+    def test_signal_room_uses_mobile_background_and_pillar_hotspot(self):
         html = (BASE_DIR / "templates" / "signal.html").read_text(encoding="utf-8")
+        mobile_image = BASE_DIR / "static" / "signal-room-twomi-mobile.png"
 
-        self.assertIn('href="/external-signal"', html)
-        self.assertIn("広告を含む外部接続", html)
+        self.assertTrue(mobile_image.exists())
+        self.assertIn("/static/signal-room-twomi-mobile.png", html)
+        self.assertIn('class="signal-twomi-hotspot"', html)
+        self.assertIn("4B5TCD+32QNAQ+5VDQ+BX3J6", html)
+        self.assertIn("広告：Twomiへ外部接続", html)
+        self.assertNotIn("AD / EXTERNAL PERSONA DETECTED", html)
+        self.assertNotIn("ky-monetize-route--signal", html)
 
 
 if __name__ == "__main__":

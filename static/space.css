@@ -389,39 +389,21 @@ a.sp-link:hover,
   color: rgba(231, 220, 193, 0.9);
 }
 
-.external-persona-route {
-  position: absolute;
-  z-index: 7;
-  right: clamp(18px, 4vw, 64px);
-  bottom: clamp(68px, 8vh, 110px);
-  display: grid;
-  gap: 3px;
-  width: min(280px, calc(100% - 36px));
-  padding: 10px 13px;
-  border: 1px solid rgba(176, 213, 178, 0.38);
-  background: rgba(3, 10, 5, 0.88);
-  color: #b8cdbc;
-  text-decoration: none;
-  box-shadow: 0 0 18px rgba(84, 168, 95, 0.08);
+.signal-twomi-hotspot,
+.signal-twomi-tracker {
+  display: none;
 }
 
-.external-persona-route span,
-.external-persona-route small {
-  color: #748a78;
-  font-size: 0.6rem;
-  letter-spacing: 0.08em;
-}
-
-.external-persona-route strong {
-  font-size: 0.78rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-}
-
-.external-persona-route:hover,
-.external-persona-route:focus-visible {
-  border-color: rgba(225, 240, 170, 0.75);
-  color: #f3f4ce;
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
 
 .signal-info {
@@ -3084,6 +3066,48 @@ a.sp-link:hover,
     width: min(100vw, 720px);
     margin: 0 auto;
     flex: 0 0 auto;
+  }
+
+  .signal-tv-screen {
+    left: 6.4%;
+    top: 48.9%;
+    width: 59.8%;
+    height: 28%;
+    border-radius: 4% / 5%;
+    transform: perspective(720px) rotateX(0.4deg);
+  }
+
+  .signal-channel-hit {
+    left: 67%;
+    top: 49.5%;
+    width: 15%;
+    height: 25%;
+  }
+
+  .signal-twomi-hotspot {
+    position: absolute;
+    left: 85.8%;
+    top: 10.9%;
+    z-index: 20;
+    display: block;
+    width: 13.8%;
+    height: 22%;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .signal-twomi-hotspot:focus-visible {
+    outline: 2px solid rgba(239, 224, 178, 0.78);
+    outline-offset: 2px;
+  }
+
+  .signal-twomi-tracker {
+    position: absolute;
+    width: 1px;
+    height: 1px;
   }
 
   .signal-channel-hit {
