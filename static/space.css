@@ -20,11 +20,13 @@
 
 html {
   height: 100%;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
   min-height: 100%;
+  max-width: 100%;
   background: var(--sp-bg);
   color: var(--sp-text);
   font-family: var(--sp-font);
@@ -858,7 +860,8 @@ a.sp-link:hover,
 
 /* KYOUKAI entrance altar */
 .altar-page {
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
   height: 100vh;
   min-height: 100svh;
   background:
@@ -885,7 +888,8 @@ a.sp-link:hover,
   z-index: 1;
   display: grid;
   place-items: center;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
   min-height: 100vh;
   min-height: 100svh;
   margin: 0;
@@ -2899,12 +2903,17 @@ a.sp-link:hover,
     overflow-y: auto;
   }
 
+  .altar-side--log {
+    display: none;
+  }
+
   .altar-shell {
     display: flex;
     flex-direction: column;
     gap: 16px;
     align-items: stretch;
     padding: clamp(10px, 2vw, 18px);
+    overflow-x: hidden;
   }
 
   .altar-frame {
@@ -2948,12 +2957,18 @@ a.sp-link:hover,
     overflow-y: auto;
   }
 
+  /* ログパネルはPCのみ表示 */
+  .altar-side--log {
+    display: none;
+  }
+
   .altar-shell {
     display: flex;
     flex-direction: column;
     gap: 14px;
     align-items: stretch;
     padding: 0;
+    overflow-x: hidden;
   }
 
   .altar-frame {
