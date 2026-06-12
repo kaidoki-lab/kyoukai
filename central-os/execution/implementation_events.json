@@ -195,5 +195,30 @@
     ],
     "completedAt": "2026-06-12T04:28:04.171065+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260612-signal-desktop-pillar-ad",
+    "sourcePlanId": "manual-20260612-signal-desktop-pillar-ad",
+    "sourceTaskId": "",
+    "title": "受信域PC版の柱広告ホットスポット化",
+    "targetPages": [
+      "/signal"
+    ],
+    "status": "completed",
+    "summary": "PC版受信域に提供された16:9画像を採用し、前景テレビへ既存動画を差し込み、右奥の柱広告札へ透明なTwomiリンクを配置した。",
+    "artifacts": [
+      "static/signal-room-twomi-desktop.png",
+      "templates/signal.html",
+      "static/space.css",
+      "TWOMI_EXTERNAL_SIGNAL_SPEC.md",
+      "tests/test_twomi_external_signal.py"
+    ],
+    "verification": [
+      "unittest 29件成功",
+      "1672x941 Edgeプレビューでテレビ動画と柱広告札の配置を確認",
+      "PC・スマホで個別背景画像と個別計測スロットを確認"
+    ],
+    "completedAt": "2026-06-12T05:33:02.058890+00:00",
+    "recordedBy": "codex"
   }
 ]

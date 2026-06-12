@@ -22,7 +22,7 @@
     <figure class="signal-chapel-frame" aria-label="KYOUKAI signal room">
       <picture>
         <source media="(max-width: 768px)" srcset="/static/signal-room-twomi-mobile.png" />
-        <img class="signal-chapel-image" src="/static/kyoukai_signal_room_20260602.png" alt="Signal room background" />
+        <img class="signal-chapel-image" src="/static/signal-room-twomi-desktop.png" alt="Signal room background" />
       </picture>
 
       <section class="signal-tv-screen" aria-label="Video receiver">
@@ -167,7 +167,9 @@
         headers: { "Content-Type": "application/json" },
         keepalive: true,
         body: JSON.stringify({
-          slot_name: "signal_mobile_pillar",
+          slot_name: window.matchMedia("(max-width: 768px)").matches
+            ? "signal_mobile_pillar"
+            : "signal_desktop_pillar",
           signal_id: 27395002,
           provider: "A8",
         }),

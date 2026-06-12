@@ -39,14 +39,18 @@ class TwomiExternalSignalTests(unittest.TestCase):
     def test_signal_room_uses_mobile_background_and_pillar_hotspot(self):
         html = (BASE_DIR / "templates" / "signal.html").read_text(encoding="utf-8")
         mobile_image = BASE_DIR / "static" / "signal-room-twomi-mobile.png"
+        desktop_image = BASE_DIR / "static" / "signal-room-twomi-desktop.png"
 
         self.assertTrue(mobile_image.exists())
+        self.assertTrue(desktop_image.exists())
         self.assertIn("/static/signal-room-twomi-mobile.png", html)
+        self.assertIn("/static/signal-room-twomi-desktop.png", html)
         self.assertIn('class="signal-twomi-hotspot"', html)
         self.assertIn("4B5TCD+32QNAQ+5VDQ+BX3J6", html)
         self.assertIn("広告：Twomiへ外部接続", html)
         self.assertNotIn("AD / EXTERNAL PERSONA DETECTED", html)
         self.assertNotIn("ky-monetize-route--signal", html)
+        self.assertIn('"signal_desktop_pillar"', html)
 
 
 if __name__ == "__main__":
