@@ -1525,6 +1525,48 @@ a.sp-link:hover,
   }
 }
 
+@keyframes altarLogScroll {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
+
+.altar-log-tape {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+  animation: altarLogScroll 100s linear infinite;
+}
+
+.altar-side--right .altar-log-tape {
+  animation-duration: 120s;
+  animation-delay: -55s;
+}
+
+.alog {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.alog--head {
+  color: rgba(180, 230, 150, 0.48);
+  letter-spacing: 0.08em;
+}
+
+.alog--time {
+  color: rgba(100, 210, 220, 0.4);
+}
+
+.alog--alert {
+  color: rgba(255, 110, 100, 0.4);
+}
+
+.alog--sep {
+  color: rgba(100, 150, 80, 0.18);
+  letter-spacing: 0.06em;
+}
+
 @keyframes externalArtifactNoise {
   0% { transform: translate3d(-1px, 0, 0); }
   50% { transform: translate3d(1px, -1px, 0); }
@@ -2802,6 +2844,50 @@ a.sp-link:hover,
     max-height: calc(100svh - clamp(12px, 2.7vw, 36px));
     align-self: stretch;
     overflow: hidden;
+  }
+
+  /* ログパネル — 両脇の黒帯を fixed overlay で埋める */
+  .altar-side--log {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 0;
+    pointer-events: none;
+    /* フレーム幅と同じ計算式から余白幅を算出 */
+    width: calc(
+      (100vw - min(
+        calc(100vw - clamp(12px, 2.7vw, 36px)),
+        calc((100svh - clamp(12px, 2.7vw, 36px)) * 1.5),
+        1640px
+      )) / 2
+    );
+    overflow: hidden;
+    padding: 0 clamp(4px, 0.5vw, 10px);
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    color: rgba(140, 210, 130, 0.28);
+    font-family: var(--sp-mono);
+    font-size: clamp(7px, 0.5vw, 10px);
+    line-height: 2.8;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .altar-side--log::before {
+    display: none;
+  }
+
+  .altar-side--left.altar-side--log {
+    left: 0;
+    justify-self: unset;
+  }
+
+  .altar-side--right.altar-side--log {
+    right: 0;
+    justify-self: unset;
+    color: rgba(100, 210, 220, 0.22);
   }
 }
 
