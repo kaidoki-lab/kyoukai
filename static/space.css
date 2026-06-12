@@ -1527,10 +1527,11 @@ a.sp-link:hover,
 
 @keyframes altarLogScroll {
   from { transform: translateY(0); }
-  to   { transform: translateY(-50%); }
+  to   { transform: translateY(var(--scroll-dist, -50%)); }
 }
 
 .altar-log-tape {
+  --scroll-dist: -50%;
   display: flex;
   flex-direction: column;
   will-change: transform;
