@@ -1021,14 +1021,18 @@ def _safe_public_plan_fallback() -> list[dict[str, Any]]:
 def _filter_public_plans(
     plans: list[dict[str, Any]],
     completed_events: list[dict[str, Any]],
+    rejected_titles: set[str] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
     accepted = []
     rejected = []
     seen = set()
     for plan in plans:
         reason = _plan_rejection_reason(plan, completed_events)
+        title_key = str(plan.get("title") or "").strip().casefold()
+        if reason is None and rejected_titles and title_key in rejected_titles:
+            reason = "previously-rejected-by-user"
         fingerprint = (
-            str(plan.get("title") or "").strip().casefold(),
+            title_key,
             tuple(str(target) for target in plan.get("targets", [])),
         )
         if reason is None and fingerprint in seen:
@@ -1050,7 +1054,8 @@ def run_ai_planner() -> dict[str, Any]:
     completed_events = load_events(IMPLEMENTATION_EVENTS_FILE)
     completed_context = planner_completed_context(completed_events)
     recent_accepted = (_read_json_list(ACCEPTED_PLANS_FILE) + completed_context)[-5:]
-    recent_rejected = _read_json_list(REJECTED_PLANS_FILE)[-5:]
+    recent_rejected = _read_json_list(REJECTED_PLANS_FILE)[-20:]
+    rejected_titles = {str(r.get("title", "")).strip().casefold() for r in recent_rejected if r.get("title")}
     recent_changes: list = []
 
     try:
@@ -1101,11 +1106,12 @@ def run_ai_planner() -> dict[str, Any]:
             }
         ]
 
-    plans, rejected_plans = _filter_public_plans(plans, completed_events)
+    plans, rejected_plans = _filter_public_plans(plans, completed_events, rejected_titles)
     if len(plans) < 3:
         plans, fallback_rejections = _filter_public_plans(
             plans + _safe_public_plan_fallback(),
             completed_events,
+            rejected_titles,
         )
         rejected_plans.extend(fallback_rejections)
     plans = plans[:3]
@@ -2709,6 +2715,30 @@ async def api_update_plan_status(plan_id: str, body: dict = Body(...)) -> JSONRe
         return JSONResponse({"ok": True, "plan": updated})
     except ValueError as exc:
         return JSONResponse({"ok": False, "error": str(exc)}, status_code=400)
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
+
+
+@app.post("/api/implementation-events/archive")
+async def api_archive_implementation_events() -> JSONResponse:
+    """完了済み実装事象をアーカイブファイルへ移動し、メインファイルから削除する。"""
+    try:
+        events = load_events(IMPLEMENTATION_EVENTS_FILE)
+        completed = [e for e in events if e.get("status") == "completed"]
+        remaining = [e for e in events if e.get("status") != "completed"]
+        if not completed:
+            return JSONResponse({"ok": True, "archived": 0, "message": "完了済み事象なし"})
+        archive_file = EXECUTION_DIR / "implementation_events_archive.json"
+        existing_archive: list = []
+        if archive_file.exists():
+            try:
+                existing_archive = json.loads(archive_file.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError):
+                existing_archive = []
+        existing_archive.extend(completed)
+        archive_file.write_text(json.dumps(existing_archive, ensure_ascii=False, indent=2), encoding="utf-8")
+        IMPLEMENTATION_EVENTS_FILE.write_text(json.dumps(remaining, ensure_ascii=False, indent=2), encoding="utf-8")
+        return JSONResponse({"ok": True, "archived": len(completed), "remaining": len(remaining)})
     except Exception as exc:
         return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
 

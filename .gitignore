@@ -14,6 +14,16 @@ kyoukai.db
 
 .vercel
 *_HANDOFF.md
+HANDOFF_*.md
+HANDOFF_INDEX.md
 ga4-credentials.json
 credentials/
 central-os/analytics/youtube_token.json
+
+# ローカル専用プロジェクト
+booth-particle-observer/
+booth-wallpaper-pack-v2/
+shorts_factory/tools/
+shorts_factory/output_shorts/
+shorts_factory/recordings_archive/
+.claude/

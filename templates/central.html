@@ -69,7 +69,8 @@
       </div>
       <div class="cos-error" id="cos-impl-error" hidden></div>
       <div id="cos-impl-list"><div class="cos-up-empty">実装指示なし — 企画案を採用後「実装指示を生成」する</div></div>
-      <h3 class="cos-impl-events-title">実装完了事象</h3>
+      <h3 class="cos-impl-events-title">実装完了事象 <button class="cos-archive-btn" id="cos-events-archive-btn">アーカイブ</button></h3>
+      <div class="cos-error" id="cos-events-archive-error" hidden></div>
       <div id="cos-impl-events"><div class="cos-up-empty">完了事象なし</div></div>
     </section>
 
@@ -90,24 +91,6 @@
       <div id="cos-up-list"><div class="cos-up-empty">提案なし — 「提案を更新」で生成する</div></div>
     </section>
 
-    <!-- DASHBOARD -->
-    <section class="cos-section" id="cos-dashboard">
-      <h2 class="cos-section-title">[ 増殖管理ダッシュボード ]</h2>
-
-      <div class="cos-dash-toolbar">
-        <button class="cos-dash-run-btn" id="cos-dash-run">分析実行</button>
-        <span class="cos-dash-status" id="cos-dash-status">待機中</span>
-        <span class="cos-dash-filter-label">表示：</span>
-        <button class="cos-dash-filter active" data-filter="all">すべて</button>
-        <button class="cos-dash-filter" data-filter="pending">未承認</button>
-        <button class="cos-dash-filter" data-filter="adopted">採用</button>
-        <button class="cos-dash-filter" data-filter="held">保留</button>
-        <button class="cos-dash-filter" data-filter="rejected">却下</button>
-      </div>
-
-      <div class="cos-error" id="cos-dash-error" hidden></div>
-      <div id="cos-proposals-list"><div class="cos-dash-empty">提案なし — 「分析実行」で生成する</div></div>
-    </section>
 
     <!-- WATCH SYSTEM / SYNC STATE -->
     <section class="cos-section" id="cos-watch">
@@ -345,8 +328,8 @@
       }
     })();
 
-    // ── Dashboard ──────────────────────────────────────────────────────────────
-    (function () {
+    // ── Dashboard (removed) ────────────────────────────────────────────────────
+    if (false) (function () {
       var currentFilter = "all";
 
       var STATUS_LABEL = { pending: "未承認", adopted: "採用", held: "保留", rejected: "却下" };
@@ -1020,6 +1003,31 @@
       });
 
       loadImplTasks();
+
+      var archiveBtn = document.getElementById("cos-events-archive-btn");
+      if (archiveBtn) {
+        archiveBtn.addEventListener("click", function() {
+          archiveBtn.disabled = true;
+          archiveBtn.textContent = "処理中…";
+          fetch("/api/implementation-events/archive", { method: "POST" })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+              if (data.ok) {
+                archiveBtn.textContent = "アーカイブ済 (" + data.archived + "件)";
+                loadImplTasks();
+              } else {
+                archiveBtn.textContent = "アーカイブ";
+                archiveBtn.disabled = false;
+                showError("cos-events-archive-error", data.error);
+              }
+            })
+            .catch(function(e) {
+              archiveBtn.textContent = "アーカイブ";
+              archiveBtn.disabled = false;
+              showError("cos-events-archive-error", e.message);
+            });
+        });
+      }
     })();
 
     // ── AI企画案 ──────────────────────────────────────────────────────────────

@@ -364,7 +364,22 @@ body {
   color: #276749;
   font-size: 20px;
   letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
+.cos-archive-btn {
+  font-size: 13px;
+  padding: 3px 10px;
+  background: #2d3748;
+  color: #a0aec0;
+  border: 1px solid #4a5568;
+  border-radius: 3px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+}
+.cos-archive-btn:hover:not(:disabled) { background: #4a5568; color: #e2e8f0; }
+.cos-archive-btn:disabled { opacity: 0.5; cursor: default; }
 
 .cos-up-card {
   border: 1px solid #e2e8f0; border-left: 4px solid #805ad5;

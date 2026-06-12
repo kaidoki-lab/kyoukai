@@ -20,6 +20,7 @@ from urllib.request import Request as UrlRequest, urlopen
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 ANALYTICS_DIR = BASE_DIR / "central-os" / "analytics"
+LORE_FILE = BASE_DIR / "central-os" / "lore" / "kyoukai-world.md"
 SUMMARY_JSON = ANALYTICS_DIR / "youtube_summary.json"
 NEXT_SHORTS_JSON = ANALYTICS_DIR / "youtube_next_shorts.json"
 
@@ -39,6 +40,12 @@ def _load_summary() -> dict:
     return json.loads(SUMMARY_JSON.read_text(encoding="utf-8"))
 
 
+def _load_lore() -> str:
+    if LORE_FILE.exists():
+        return LORE_FILE.read_text(encoding="utf-8")
+    return ""
+
+
 def build_prompt(summary: dict) -> str:
     top = summary.get("topVideos", [])
     bottom = summary.get("bottomVideos", [])
@@ -46,6 +53,7 @@ def build_prompt(summary: dict) -> str:
     weak_words = summary.get("weakTitleWords", [])
     total = summary.get("videoCount", 0)
     days = summary.get("dayRange", 30)
+    lore = _load_lore()
 
     top_lines = "\n".join(
         f"  - 「{v['title']}」 スコア:{v['score']} 再生:{v['views']} 維持率:{v['averageViewPercentage']}% 登録:{v['subscribersGained']}"
@@ -57,23 +65,30 @@ def build_prompt(summary: dict) -> str:
         for v in bottom[:5]
     ) or "  (データなし)"
 
-    return f"""あなたはYouTube Shortsのコンテンツ戦略家です。
-以下の分析データをもとに、次に作るべきショート動画案を10本提案してください。
+    lore_section = f"\n## KYOUKAIの世界観（必読）\n{lore}\n" if lore else ""
 
-## 分析期間
-直近{days}日 / 対象{total}本
+    return f"""あなたはKYOUKAIというアート・実験Webサイトの映像企画者です。
+KYOUKAIのYouTube Shorts用の動画案を10本提案してください。
+{lore_section}
+## 分析データ（直近{days}日 / {total}本）
 
-## 伸びた動画（上位）
+### 伸びた動画（上位）
 {top_lines}
 
-## 死んだ動画（下位）
+### 死んだ動画（下位）
 {bottom_lines}
 
-## 強いタイトルのキーワード
+### 強いタイトルのキーワード
 {', '.join(strong_words) if strong_words else 'なし'}
 
-## 弱いタイトルのキーワード
+### 弱いタイトルのキーワード
 {', '.join(weak_words) if weak_words else 'なし'}
+
+## 制約
+- KYOUKAIの世界観に忠実にすること
+- ハウツー・解説・顔出し・明るいトーンは禁止
+- タイトルは「〇〇とは？」「〇〇のやり方」型禁止
+- 動画はアート・実験映像として提案する
 
 ## 出力形式（JSONのみ・説明不要）
 [
@@ -200,11 +215,14 @@ def generate_next_shorts() -> list[dict]:
         "suggestions": suggestions,
     }
 
-    NEXT_SHORTS_JSON.write_text(
-        json.dumps(output, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-    print(f"[OK] {NEXT_SHORTS_JSON}")
+    try:
+        NEXT_SHORTS_JSON.write_text(
+            json.dumps(output, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        print(f"[OK] {NEXT_SHORTS_JSON}")
+    except OSError as e:
+        print(f"[WARN] ファイル書き込みスキップ: {e}")
     for i, s in enumerate(suggestions, 1):
         print(f"  {i:02d}. {s['title']} / {s['concept']}")
     return suggestions

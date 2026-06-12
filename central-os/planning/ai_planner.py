@@ -15,9 +15,12 @@ import os
 import random
 import re
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 from urllib.error import URLError
 from urllib.request import Request as UrlRequest, urlopen
+
+LORE_FILE = Path(__file__).resolve().parent.parent / "lore" / "kyoukai-world.md"
 
 OLLAMA_URL          = "http://127.0.0.1:11434/api/generate"
 OLLAMA_MODEL        = "qwen2.5:0.5b"
@@ -130,6 +133,12 @@ def _pick_fallback(excluded_titles: set[str], count: int = 3) -> list[dict]:
 
 # ─── プロンプト ──────────────────────────────────────────────────────────────
 
+def _load_lore() -> str:
+    if LORE_FILE.exists():
+        return LORE_FILE.read_text(encoding="utf-8")
+    return ""
+
+
 def _build_prompt(planner_input: dict[str, Any]) -> str:
     rooms = planner_input.get("rooms", [])
     recent_accepted = planner_input.get("recentAccepted", [])
@@ -143,12 +152,19 @@ def _build_prompt(planner_input: dict[str, Any]) -> str:
     accepted_titles = [p.get("title", "") for p in recent_accepted[:3]]
     rejected_titles = [p.get("title", "") for p in recent_rejected[:3]]
 
+    lore = _load_lore()
+    lore_section = f"\n## KYOUKAIの世界観（必読）\n{lore}\n\n" if lore else ""
+
     return (
-        "KYOUKAIは自己増殖する狂ったウェブサイトです。制作者向けの企画案を3件、日本語JSONで生成してください。\n\n"
+        f"あなたはKYOUKAIというアート・実験Webサイトの企画者です。{lore_section}"
+        "サイトの実装企画案を3件、日本語JSONで生成してください。\n\n"
         f"現在の部屋状態: {room_summary}\n"
         f"最近採用した企画: {', '.join(accepted_titles) if accepted_titles else 'なし'}\n"
         f"最近却下した企画: {', '.join(rejected_titles) if rejected_titles else 'なし'}\n\n"
-        "企画案の形式（3件のJSON配列のみ。説明不要）:\n"
+        "## 制約\n"
+        "- 世界観に忠実にすること（ハウツー・解説・明るいトーン禁止）\n"
+        "- 実装規模はsmallのみ（1ファイル以内で完結する変更）\n\n"
+        "## 出力形式（3件のJSON配列のみ。説明不要）\n"
         '[{"title":"20字以内のタイトル","summary":"企画の概要（50字以内）",'
         '"reason":"なぜこの企画をするのか（30字以内）",'
         '"targets":["/対象ページ"],"implementationSize":"small"}]'

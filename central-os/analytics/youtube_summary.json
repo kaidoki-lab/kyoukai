@@ -1,6 +1,6 @@
 {
-  "fetchedAt": "2026-06-10T09:23:56.008687+00:00",
-  "analyzedAt": "2026-06-10T09:24:08.916856+00:00",
+  "fetchedAt": "2026-06-12T06:29:07.427554+00:00",
+  "analyzedAt": "2026-06-12T06:29:10.153202+00:00",
   "videoCount": 44,
   "dayRange": 30,
   "channelId": "UC7a60N6ahFgizJCrVrSG9oA",
@@ -107,13 +107,13 @@
       "subscribersGained": 0
     },
     {
-      "video_id": "xojwsDPT3Ok",
-      "title": "40代無職、AI副業のはずが変なサイト作ってた",
-      "published_at": "2026-06-10T06:48:32Z",
-      "score": 35.8,
-      "views": 164,
+      "video_id": "8R3uiovIqH0",
+      "title": "40代、無職、見せる",
+      "published_at": "2026-06-12T03:45:24Z",
+      "score": 42.2,
+      "views": 191,
       "averageViewPercentage": null,
-      "likes": 1,
+      "likes": 2,
       "comments": 1,
       "subscribersGained": null
     }
@@ -142,7 +142,7 @@
     "Tests",
     "Panda"
   ],
-  "avgScore": 197.5,
+  "avgScore": 190.9,
   "allScored": [
     {
       "video_id": "7UOpI-Yq0k0",
@@ -244,15 +244,15 @@
       "subscribersGained": null
     },
     {
-      "video_id": "4dzpDnlVK4s",
-      "title": "10秒でわかる世界のヤバい事情 #64｜動かない国境、届かない物資｜Border Shutdown Cripples Aid Routes",
-      "published_at": "2025-12-06T02:23:02Z",
-      "score": 276.4,
-      "views": 1372,
-      "averageViewPercentage": null,
-      "likes": 2,
+      "video_id": "dJNq1ATFnyE",
+      "title": "見えていても、人は気づかない｜Inattentional Blindness",
+      "published_at": "2026-01-07T07:31:00Z",
+      "score": 277.7,
+      "views": 4,
+      "averageViewPercentage": 137.95,
+      "likes": 1,
       "comments": 0,
-      "subscribersGained": null
+      "subscribersGained": 0
     },
     {
       "video_id": "20WwAgbU0lI",
@@ -277,17 +277,6 @@
       "subscribersGained": null
     },
     {
-      "video_id": "aqB4Dy9-N-8",
-      "title": "日本発ウイルス治療が最終治験へ｜Surv.m-CRA-1",
-      "published_at": "2025-12-19T15:14:23Z",
-      "score": 266.7,
-      "views": 5,
-      "averageViewPercentage": 131.85,
-      "likes": 2,
-      "comments": 0,
-      "subscribersGained": 0
-    },
-    {
       "video_id": "sKcLvoxWtyQ",
       "title": "10秒でわかる世界のヤバい事情 #73｜金利が下がらない世界｜Why Rates Stay High",
       "published_at": "2025-12-17T15:09:33Z",
@@ -297,17 +286,6 @@
       "likes": 3,
       "comments": 0,
       "subscribersGained": null
-    },
-    {
-      "video_id": "dJNq1ATFnyE",
-      "title": "見えていても、人は気づかない｜Inattentional Blindness",
-      "published_at": "2026-01-07T07:31:00Z",
-      "score": 236.7,
-      "views": 5,
-      "averageViewPercentage": 117.36,
-      "likes": 1,
-      "comments": 0,
-      "subscribersGained": 0
     },
     {
       "video_id": "Bnm1Jiu9lj0",
@@ -376,6 +354,17 @@
       "subscribersGained": 0
     },
     {
+      "video_id": "aqB4Dy9-N-8",
+      "title": "日本発ウイルス治療が最終治験へ｜Surv.m-CRA-1",
+      "published_at": "2025-12-19T15:14:23Z",
+      "score": 196.5,
+      "views": 3,
+      "averageViewPercentage": 96.93,
+      "likes": 2,
+      "comments": 0,
+      "subscribersGained": 0
+    },
+    {
       "video_id": "WvIJbos0bj0",
       "title": "AIを煽り続けた結果",
       "published_at": "2026-03-20T02:03:39Z",
@@ -384,17 +373,6 @@
       "averageViewPercentage": 94.74,
       "likes": 0,
       "comments": 1,
-      "subscribersGained": 0
-    },
-    {
-      "video_id": "fDa6KEw7810",
-      "title": "崖に浮かぶ一枚の岩｜Trolltunga in Norway",
-      "published_at": "2025-12-08T03:37:43Z",
-      "score": 191.3,
-      "views": 20,
-      "averageViewPercentage": 93.63,
-      "likes": 0,
-      "comments": 0,
       "subscribersGained": 0
     },
     {
@@ -437,6 +415,17 @@
       "score": 161.6,
       "views": 3,
       "averageViewPercentage": 79.0,
+      "likes": 1,
+      "comments": 1,
+      "subscribersGained": 0
+    },
+    {
+      "video_id": "xojwsDPT3Ok",
+      "title": "40代無職、AI副業のはずが変なサイト作ってた",
+      "published_at": "2026-06-10T06:48:32Z",
+      "score": 156.1,
+      "views": 143,
+      "averageViewPercentage": 62.25000000000001,
       "likes": 1,
       "comments": 1,
       "subscribersGained": 0
@@ -574,13 +563,24 @@
       "subscribersGained": 0
     },
     {
-      "video_id": "xojwsDPT3Ok",
-      "title": "40代無職、AI副業のはずが変なサイト作ってた",
-      "published_at": "2026-06-10T06:48:32Z",
-      "score": 35.8,
-      "views": 164,
+      "video_id": "yv5uYj_yEcA",
+      "title": "40代、無職、焦る",
+      "published_at": "2026-06-11T07:44:24Z",
+      "score": 43.6,
+      "views": 203,
       "averageViewPercentage": null,
       "likes": 1,
+      "comments": 1,
+      "subscribersGained": null
+    },
+    {
+      "video_id": "8R3uiovIqH0",
+      "title": "40代、無職、見せる",
+      "published_at": "2026-06-12T03:45:24Z",
+      "score": 42.2,
+      "views": 191,
+      "averageViewPercentage": null,
+      "likes": 2,
       "comments": 1,
       "subscribersGained": null
     },

@@ -238,6 +238,7 @@
         this.cycle++;
         this._evolve();
       }
+      if (typeof this.onPhaseChange === 'function') this.onPhaseChange(this.phase);
     }
 
     _evolve() {
@@ -598,6 +599,11 @@
       this.par[key] = val;
       if (key === 'conDist') this.gridCon = new SpatialGrid(val + 10);
       if (key === 'attDist') this.gridPhy = new SpatialGrid(val + 10);
+    }
+
+    setObsEffect(on) {
+      this.opts.observerEffect = on;
+      if (!on) { this.mx = -1; this.my = -1; }
     }
   }
 
