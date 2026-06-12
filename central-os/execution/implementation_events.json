@@ -220,5 +220,26 @@
     ],
     "completedAt": "2026-06-12T05:33:02.058890+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260612-signal-external-interstitial",
+    "sourcePlanId": "manual-20260612-signal-external-interstitial",
+    "sourceTaskId": "",
+    "title": "受信域から外部通信演出を経由",
+    "targetPages": [
+      "/signal",
+      "/external-signal"
+    ],
+    "status": "completed",
+    "summary": "柱の広告札からA8へ直接遷移せず、既存の外部人格通信演出を経て通信途絶後にTwomi接続を表示する導線へ修正",
+    "artifacts": [
+      "templates/signal.html",
+      "tests/test_twomi_external_signal.py"
+    ],
+    "verification": [
+      "unittest全29件成功。受信域にA8直リンクがなく/external-signalを経由することを確認"
+    ],
+    "completedAt": "2026-06-12T07:37:15.451284+00:00",
+    "recordedBy": "codex"
   }
 ]

@@ -41,12 +41,10 @@
       <a
         id="twomiSignalHotspot"
         class="signal-twomi-hotspot"
-        href="https://px.a8.net/svt/ejp?a8mat=4B5TCD+32QNAQ+5VDQ+BX3J6"
-        target="_blank"
-        rel="nofollow sponsored noopener"
-        aria-label="広告：Twomiへ外部接続"
+        href="/external-signal"
+        aria-label="広告：外部通信を開始"
       >
-        <span class="visually-hidden">広告：Twomiへ外部接続</span>
+        <span class="visually-hidden">広告：外部通信を開始</span>
       </a>
       <img
         class="signal-twomi-tracker"
@@ -156,24 +154,10 @@
     channelHit?.addEventListener("click", () => playSignalVideo(true));
     twomiHotspot?.addEventListener("click", () => {
       if (typeof window.gtag === "function") {
-        window.gtag("event", "affiliate_outbound_click", {
-          affiliate_provider: "A8",
-          destination: "Twomi",
+        window.gtag("event", "external_signal_entry", {
           source_page: "/signal",
         });
       }
-      fetch("/api/signal-click", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        keepalive: true,
-        body: JSON.stringify({
-          slot_name: window.matchMedia("(max-width: 768px)").matches
-            ? "signal_mobile_pillar"
-            : "signal_desktop_pillar",
-          signal_id: 27395002,
-          provider: "A8",
-        }),
-      }).catch(() => {});
     });
     window.addEventListener("pagehide", () => {
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();

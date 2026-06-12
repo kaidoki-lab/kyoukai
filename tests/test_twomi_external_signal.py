@@ -46,11 +46,13 @@ class TwomiExternalSignalTests(unittest.TestCase):
         self.assertIn("/static/signal-room-twomi-mobile.png", html)
         self.assertIn("/static/signal-room-twomi-desktop.png", html)
         self.assertIn('class="signal-twomi-hotspot"', html)
-        self.assertIn("4B5TCD+32QNAQ+5VDQ+BX3J6", html)
-        self.assertIn("広告：Twomiへ外部接続", html)
+        self.assertIn('href="/external-signal"', html)
+        self.assertNotIn('href="https://px.a8.net/', html)
+        self.assertIn("広告：外部通信を開始", html)
         self.assertNotIn("AD / EXTERNAL PERSONA DETECTED", html)
         self.assertNotIn("ky-monetize-route--signal", html)
-        self.assertIn('"signal_desktop_pillar"', html)
+        self.assertIn('"external_signal_entry"', html)
+        self.assertNotIn('"affiliate_outbound_click"', html)
 
 
 if __name__ == "__main__":
