@@ -2957,8 +2957,9 @@ a.sp-link:hover,
     overflow-y: auto;
   }
 
-  /* ログパネルはPCのみ表示 */
-  .altar-side--log {
+  /* ログパネル・フッターナビはPCのみ表示 */
+  .altar-side--log,
+  .altar-page .kyoukai-footer {
     display: none;
   }
 
