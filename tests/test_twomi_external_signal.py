@@ -16,25 +16,39 @@ class TwomiExternalSignalTests(unittest.TestCase):
         html = (BASE_DIR / "templates" / "external-signal.html").read_text(
             encoding="utf-8"
         )
+        image = BASE_DIR / "static" / "images" / "external-boundary.png"
 
-        self.assertIn("この通信にはTwomiへのアフィリエイトリンクが含まれます", html)
+        self.assertTrue(image.exists())
+        self.assertIn("/static/images/external-boundary.png", html)
+        self.assertIn("この先は外部サービスへの接続を含みます", html)
         self.assertIn("4B5TCD+32QNAQ+5VDQ+BX3J6", html)
         self.assertIn('rel="nofollow sponsored noopener"', html)
-        self.assertIn('target="_blank"', html)
         self.assertIn("https://www15.a8.net/0.gif", html)
+        self.assertIn("追いかけますか？", html)
+        self.assertIn("追いかける", html)
+        self.assertIn("追いかけない", html)
+        self.assertNotIn("external-signal-persona", html)
+        self.assertNotIn("外部人格", html)
 
-    def test_external_link_is_revealed_after_connection_loss(self):
+    def test_external_link_requires_boundary_choice(self):
         script = (BASE_DIR / "static" / "external-signal.js").read_text(
             encoding="utf-8"
         )
 
-        self.assertIn('status.textContent = "接続維持不可"', script)
-        self.assertIn("exit.hidden = false", script)
+        self.assertIn("const CONNECTING_DURATION = 2000", script)
+        self.assertIn('setState("connecting")', script)
+        self.assertIn('setState("choice")', script)
+        self.assertIn('setState("leaving")', script)
+        self.assertIn('setState("cancelled")', script)
+        self.assertIn("event.preventDefault()", script)
+        self.assertIn("window.location.assign(AFFILIATE_URL)", script)
         self.assertIn("affiliate_outbound_click", script)
-        self.assertIn('slot_name: "twomi_external_persona"', script)
-        self.assertIn("await wait(3800)", script)
-        self.assertIn("await wait(4500)", script)
-        self.assertIn("await wait(3200)", script)
+        self.assertIn('slot_name: "twomi_external_boundary"', script)
+        self.assertIn("await wait(CONNECTING_DURATION)", script)
+        self.assertIn("await wait(LEAVING_DURATION)", script)
+        self.assertNotIn("window.location.assign(AFFILIATE_URL);", script.split(
+            'followLink.addEventListener("click"', 1
+        )[0])
 
     def test_signal_room_uses_mobile_background_and_pillar_hotspot(self):
         html = (BASE_DIR / "templates" / "signal.html").read_text(encoding="utf-8")

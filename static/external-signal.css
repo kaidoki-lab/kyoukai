@@ -1,302 +1,443 @@
 :root {
   color-scheme: dark;
   font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", monospace;
-  background: #050906;
-  color: #d8e8d8;
+  background: #000;
+  color: #f5f2e9;
 }
 
 * {
   box-sizing: border-box;
 }
 
+html,
 body {
+  width: 100%;
+  min-height: 100%;
   margin: 0;
-  min-height: 100vh;
+  padding: 0;
   overflow-x: hidden;
-  background:
-    repeating-linear-gradient(0deg, rgba(171, 255, 186, 0.025) 0 1px, transparent 1px 4px),
-    radial-gradient(circle at 50% 32%, #17261a 0, #070d08 42%, #020403 100%);
+  background: #000;
 }
 
-.external-signal-disclosure {
+button,
+a {
+  font: inherit;
+}
+
+.external-signal-body {
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+.signal-boundary {
   position: relative;
-  z-index: 5;
-  display: flex;
-  gap: 0.7rem;
-  align-items: center;
-  width: min(760px, calc(100% - 32px));
-  margin: 16px auto 0;
-  padding: 10px 14px;
-  border: 1px solid rgba(224, 234, 180, 0.45);
-  background: rgba(12, 16, 10, 0.94);
-  color: #e6e9c9;
-  font-size: clamp(0.9rem, 2vw, 1rem);
-  line-height: 1.55;
-  letter-spacing: 0.04em;
-}
-
-.external-signal-disclosure strong {
-  flex: 0 0 auto;
-  padding: 2px 7px;
-  border: 1px solid currentColor;
-  color: #fff4a8;
-}
-
-.external-signal-node {
-  position: relative;
-  width: min(760px, calc(100% - 32px));
-  margin: 18px auto 48px;
-  border: 1px solid rgba(143, 207, 151, 0.4);
-  background: rgba(2, 8, 4, 0.9);
-  box-shadow: 0 0 50px rgba(54, 157, 76, 0.12);
-}
-
-.external-signal-header {
-  padding: 20px 24px 18px;
-  border-bottom: 1px solid rgba(143, 207, 151, 0.25);
-}
-
-.external-signal-header p,
-.external-signal-header span {
-  margin: 0;
-  color: #789b7e;
-  font-size: clamp(0.82rem, 1.8vw, 0.94rem);
-  letter-spacing: 0.14em;
-}
-
-.external-signal-header h1 {
-  margin: 9px 0 7px;
-  font-size: clamp(1.65rem, 5vw, 2.55rem);
-  font-weight: 500;
-  letter-spacing: 0.13em;
-}
-
-.external-signal-screen {
-  position: relative;
-  min-height: 390px;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
   overflow: hidden;
-  border-bottom: 1px solid rgba(143, 207, 151, 0.25);
-  background: #020603;
+  isolation: isolate;
+  background: #000;
 }
 
-.external-signal-noise,
-.external-signal-screen::after {
+.boundary-backdrop {
+  position: absolute;
+  inset: -9%;
+  z-index: -2;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.48), rgba(0, 0, 0, 0.66)),
+    url("/static/images/external-boundary.png") center / cover no-repeat;
+  filter: blur(28px) saturate(0.72) brightness(0.55);
+  transform: scale(1.08);
+}
+
+.boundary-stage {
+  position: relative;
+  width: min(100vw, calc(100svh * 941 / 1672));
+  height: min(100svh, calc(100vw * 1672 / 941));
+  max-width: 941px;
+  max-height: 1672px;
+  overflow: hidden;
+  background: #070006;
+  box-shadow:
+    0 0 70px rgba(245, 0, 175, 0.2),
+    0 0 120px rgba(0, 80, 255, 0.12);
+}
+
+.boundary-image,
+.boundary-chroma,
+.boundary-noise,
+.boundary-scanlines,
+.boundary-glow,
+.boundary-flash {
   position: absolute;
   inset: 0;
-  content: "";
+  width: 100%;
+  height: 100%;
   pointer-events: none;
 }
 
-.external-signal-noise {
-  z-index: 3;
-  opacity: 0.18;
-  background:
-    repeating-linear-gradient(90deg, transparent 0 13px, rgba(192, 255, 201, 0.14) 14px),
-    repeating-linear-gradient(0deg, transparent 0 3px, rgba(255, 255, 255, 0.1) 4px);
-  animation: externalSignalNoise 0.28s steps(2) infinite;
-}
-
-.external-signal-screen::after {
-  z-index: 4;
-  background: linear-gradient(transparent 45%, rgba(146, 255, 164, 0.08) 50%, transparent 55%);
-  animation: externalSignalScan 4.6s linear infinite;
-}
-
-.external-signal-persona {
-  position: absolute;
+.boundary-image {
   z-index: 1;
-  top: 20px;
-  left: 50%;
-  width: 220px;
-  height: 290px;
-  opacity: 0.18;
-  transform: translateX(-50%);
-  filter: blur(5px);
-  transition: opacity 1.1s ease, filter 1.1s ease, transform 0.4s ease;
+  display: block;
+  object-fit: cover;
+  transform: scale(1.002);
+  filter: saturate(1.04) contrast(1.025);
+  animation: boundaryBreath 11s ease-in-out infinite;
+  will-change: transform, filter;
 }
 
-.external-signal-persona::before,
-.external-signal-persona::after,
-.external-signal-persona span {
-  position: absolute;
-  left: 50%;
-  content: "";
-  transform: translateX(-50%);
-  background: linear-gradient(90deg, #17251a, #54745a 48%, #1a2a1d);
-  box-shadow: 0 0 35px rgba(120, 225, 139, 0.25);
+.boundary-chroma {
+  z-index: 2;
+  opacity: 0.07;
+  background: url("/static/images/external-boundary.png") center / cover no-repeat;
+  mix-blend-mode: screen;
+  filter: saturate(1.65) hue-rotate(16deg);
+  animation: boundaryChroma 7.8s steps(2, end) infinite;
 }
 
-.external-signal-persona::before {
-  top: 8px;
-  width: 72px;
-  height: 94px;
-  border-radius: 46% 46% 42% 42% / 40% 40% 55% 55%;
-  clip-path: polygon(20% 4%, 79% 4%, 96% 27%, 88% 76%, 66% 96%, 35% 96%, 11% 76%, 4% 28%);
+.boundary-noise {
+  z-index: 4;
+  opacity: 0.1;
+  background:
+    repeating-radial-gradient(circle at 31% 47%, rgba(255, 255, 255, 0.2) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(117deg, transparent 0 5px, rgba(255, 0, 166, 0.1) 5px 6px);
+  mix-blend-mode: screen;
+  animation: boundaryNoise 680ms steps(2, end) infinite;
 }
 
-.external-signal-persona::after {
-  top: 91px;
-  width: 34px;
-  height: 48px;
-  border-radius: 8px 8px 14px 14px;
-}
-
-.external-signal-persona span {
-  bottom: 2px;
-  width: 218px;
-  height: 174px;
-  border-radius: 44% 44% 12% 12% / 18% 18% 8% 8%;
-  clip-path: polygon(34% 0, 66% 0, 76% 9%, 96% 20%, 88% 100%, 12% 100%, 4% 20%, 24% 9%);
-}
-
-.external-signal-persona span::before {
-  position: absolute;
-  top: 22px;
-  left: 50%;
-  width: 2px;
-  height: 138px;
-  content: "";
-  background: rgba(190, 235, 196, 0.14);
-  transform: translateX(-50%);
-}
-
-.external-signal-node[data-phase="contact"] .external-signal-persona {
-  opacity: 0.68;
-  filter: blur(2px);
-}
-
-.external-signal-node[data-phase="lost"] .external-signal-persona {
-  opacity: 0;
-  filter: blur(12px);
-  transform: translateX(-50%) skewX(12deg);
-}
-
-.external-signal-log {
-  position: absolute;
+.boundary-scanlines {
   z-index: 5;
-  right: 18px;
-  bottom: 18px;
-  left: 18px;
-  min-height: 112px;
-  padding: 17px 19px;
-  border-left: 2px solid #6eaa78;
-  background: rgba(0, 6, 2, 0.78);
-  color: #b8d6bd;
-  font-size: clamp(1rem, 2.4vw, 1.18rem);
-  line-height: 1.85;
+  opacity: 0.14;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.2) 0 1px,
+    transparent 1px 4px
+  );
 }
 
-.external-signal-log p {
-  margin: 0;
+.boundary-glow {
+  z-index: 3;
+  opacity: 0.44;
+  background:
+    radial-gradient(
+      ellipse at 50% 52%,
+      rgba(255, 255, 255, 0.72) 0,
+      rgba(238, 195, 255, 0.25) 12%,
+      rgba(235, 0, 255, 0.11) 23%,
+      transparent 39%
+    );
+  mix-blend-mode: screen;
+  animation: boundaryGlow 3.7s ease-in-out infinite;
 }
 
-.external-signal-controls {
-  display: flex;
-  gap: 12px;
-  justify-content: space-between;
-  padding: 18px 22px;
+.boundary-flash {
+  z-index: 12;
+  opacity: 0;
+  background: #fff;
+  mix-blend-mode: screen;
 }
 
-.external-signal-controls button,
-.external-signal-controls a,
-.external-signal-exit__link {
-  border: 1px solid rgba(153, 215, 163, 0.48);
-  background: #09130b;
-  color: #c6dfca;
-  font: inherit;
+.boundary-hotspot {
+  position: absolute;
+  left: 35%;
+  top: 35%;
+  z-index: 10;
+  width: 30%;
+  height: 32%;
+  padding: 0;
+  border: 0;
+  border-radius: 48%;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.boundary-hotspot:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.86);
+  outline-offset: -5px;
+}
+
+.boundary-return {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  left: max(12px, env(safe-area-inset-left));
+  z-index: 20;
+  padding: 7px 9px;
+  background: rgba(0, 0, 0, 0.7);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: clamp(0.68rem, 2.1vw, 0.82rem);
+  letter-spacing: 0.08em;
+  text-decoration: none;
+}
+
+.boundary-pr {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 20;
+  display: grid;
+  max-width: min(56%, 260px);
+  padding: 7px 9px;
+  background: rgba(0, 0, 0, 0.76);
+  color: rgba(255, 255, 255, 0.76);
+  font-size: clamp(0.62rem, 1.9vw, 0.74rem);
+  line-height: 1.45;
+  text-align: right;
+}
+
+.boundary-pr strong {
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.boundary-command {
+  position: absolute;
+  right: clamp(14px, 4vw, 28px);
+  bottom: max(18px, calc(env(safe-area-inset-bottom) + 10px));
+  left: clamp(14px, 4vw, 28px);
+  z-index: 30;
+  padding: clamp(17px, 4.5vw, 28px);
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  background: rgba(0, 0, 0, 0.94);
+  box-shadow:
+    0 0 0 3px #000,
+    0 0 0 4px rgba(255, 255, 255, 0.55),
+    0 12px 38px rgba(0, 0, 0, 0.72);
+}
+
+.boundary-command[hidden] {
+  display: none;
+}
+
+.boundary-command.is-visible {
+  animation: commandAppear 180ms steps(2, end) both;
+}
+
+.boundary-command__text {
+  min-height: 1.7em;
+  margin: 0 0 14px;
+  color: #fff;
+  font-size: clamp(1.05rem, 4.4vw, 1.42rem);
+  line-height: 1.65;
+  letter-spacing: 0.05em;
+}
+
+.boundary-command__options {
+  display: grid;
+  gap: 4px;
+}
+
+.boundary-command__option {
+  display: block;
+  width: 100%;
+  min-height: 46px;
+  padding: 9px 8px;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: clamp(0.98rem, 3.8vw, 1.18rem);
+  line-height: 1.5;
+  text-align: left;
   text-decoration: none;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
-.external-signal-controls button,
-.external-signal-controls a {
-  padding: 13px 18px;
-  font-size: 1rem;
+.boundary-command__option:hover,
+.boundary-command__option:focus-visible {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.09);
+  outline: 1px solid rgba(255, 255, 255, 0.58);
 }
 
-.external-signal-controls button:disabled {
+.boundary-command__option[aria-disabled="true"],
+.boundary-command__option:disabled {
   cursor: wait;
-  opacity: 0.45;
+  opacity: 0.55;
 }
 
-.external-signal-exit {
-  margin: 0 22px 24px;
-  padding: 18px;
-  border: 1px solid rgba(236, 224, 133, 0.45);
-  background: rgba(28, 25, 7, 0.55);
-  font-size: 1rem;
-  line-height: 1.7;
+.boundary-command__notice {
+  margin: 13px 0 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: clamp(0.68rem, 2.4vw, 0.8rem);
+  line-height: 1.5;
+  letter-spacing: 0.04em;
 }
 
-.external-signal-exit__state,
-.external-signal-exit__ad,
-.external-signal-exit__prompt,
-.external-signal-exit__note {
-  margin: 0 0 12px;
-}
-
-.external-signal-exit__ad {
-  color: #fff0a0;
-  font-size: 0.86rem;
-  letter-spacing: 0.13em;
-}
-
-.external-signal-exit__link {
-  display: block;
-  padding: 14px 16px;
-  border-color: #d7c968;
-  color: #fff3a4;
-  font-size: 1.2rem;
-  font-weight: 700;
+.boundary-status {
+  position: absolute;
+  top: 50%;
+  right: 12%;
+  left: 12%;
+  z-index: 22;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(0.76rem, 2.7vw, 0.95rem);
+  letter-spacing: 0.14em;
   text-align: center;
+  text-shadow: 0 0 12px #fff, 2px 0 #ff008c, -2px 0 #00d9ff;
+  opacity: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
-.external-signal-exit__note {
-  margin-top: 12px;
-  color: #8e9c8f;
-  font-size: 0.82rem;
-  line-height: 1.6;
-}
-
-.external-signal-tracker {
+.boundary-tracker {
   position: absolute;
   width: 1px;
   height: 1px;
+  opacity: 0;
 }
 
-@keyframes externalSignalNoise {
-  50% { transform: translate(2px, -1px); }
+.signal-boundary[data-state="connecting"] .boundary-hotspot,
+.signal-boundary[data-state="choice"] .boundary-hotspot,
+.signal-boundary[data-state="leaving"] .boundary-hotspot {
+  pointer-events: none;
 }
 
-@keyframes externalSignalScan {
-  from { transform: translateY(-110%); }
-  to { transform: translateY(110%); }
+.signal-boundary[data-state="connecting"] .boundary-image {
+  animation: boundaryConnectImage 2s cubic-bezier(0.2, 0.72, 0.25, 1) both;
 }
 
-@media (max-width: 560px) {
-  .external-signal-disclosure {
-    align-items: flex-start;
+.signal-boundary[data-state="connecting"] .boundary-chroma {
+  opacity: 0.42;
+  animation: boundaryConnectChroma 150ms steps(2, end) infinite;
+}
+
+.signal-boundary[data-state="connecting"] .boundary-noise {
+  opacity: 0.52;
+  animation-duration: 90ms;
+}
+
+.signal-boundary[data-state="connecting"] .boundary-glow {
+  animation: boundaryConnectGlow 2s ease-in both;
+}
+
+.signal-boundary[data-state="connecting"] .boundary-flash {
+  animation: boundaryFlash 2s ease-out both;
+}
+
+.signal-boundary[data-state="connecting"] .boundary-status,
+.signal-boundary[data-state="leaving"] .boundary-status,
+.signal-boundary[data-state="cancelled"] .boundary-status {
+  opacity: 1;
+}
+
+.signal-boundary[data-state="choice"] .boundary-image {
+  transform: scale(1.026);
+  filter: saturate(1.08) contrast(1.04);
+}
+
+.signal-boundary[data-state="leaving"] .boundary-image {
+  animation: boundaryLeave 950ms ease-in both;
+}
+
+.signal-boundary[data-state="leaving"] .boundary-glow {
+  opacity: 0.9;
+}
+
+@keyframes boundaryBreath {
+  0%,
+  100% { transform: scale(1.002); filter: saturate(1.04) contrast(1.025) brightness(1); }
+  50% { transform: scale(1.018); filter: saturate(1.09) contrast(1.04) brightness(1.035); }
+}
+
+@keyframes boundaryChroma {
+  0%,
+  92%,
+  100% { transform: translate(0); }
+  94% { transform: translate(2px, -1px); }
+  96% { transform: translate(-2px, 1px); }
+}
+
+@keyframes boundaryNoise {
+  0% { transform: translate(0); }
+  25% { transform: translate(1px, -2px); }
+  50% { transform: translate(-2px, 1px); }
+  75% { transform: translate(2px, 2px); }
+}
+
+@keyframes boundaryGlow {
+  0%,
+  100% { opacity: 0.32; transform: scale(0.96); }
+  50% { opacity: 0.58; transform: scale(1.045); }
+}
+
+@keyframes boundaryConnectImage {
+  0% { transform: scale(1.01); filter: saturate(1.04) contrast(1.02); }
+  45% { transform: scale(1.055); filter: saturate(1.35) contrast(1.15); }
+  78% { transform: scale(1.1) skewX(-0.45deg); filter: saturate(1.55) contrast(1.28) brightness(1.08); }
+  100% { transform: scale(1.135); filter: saturate(1.18) contrast(1.1); }
+}
+
+@keyframes boundaryConnectChroma {
+  0% { transform: translate(-5px, 1px) scale(1.03); }
+  50% { transform: translate(6px, -2px) scale(1.05); }
+  100% { transform: translate(-2px, 4px) scale(1.04); }
+}
+
+@keyframes boundaryConnectGlow {
+  0% { opacity: 0.42; transform: scale(0.92); }
+  62% { opacity: 0.98; transform: scale(1.18); }
+  100% { opacity: 0.7; transform: scale(1.3); }
+}
+
+@keyframes boundaryFlash {
+  0%,
+  16% { opacity: 0; }
+  24% { opacity: 0.82; }
+  31% { opacity: 0.08; }
+  52% { opacity: 0; }
+  58% { opacity: 0.34; }
+  66%,
+  100% { opacity: 0; }
+}
+
+@keyframes boundaryLeave {
+  from { transform: scale(1.03); filter: brightness(1) contrast(1.06); }
+  to { transform: scale(1.22); filter: brightness(1.6) contrast(1.25) blur(1px); }
+}
+
+@keyframes commandAppear {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+  .boundary-backdrop {
+    display: none;
   }
 
-  .external-signal-screen {
-    min-height: 420px;
+  .boundary-stage {
+    width: 100vw;
+    height: 100svh;
+    max-width: none;
+    max-height: none;
   }
 
-  .external-signal-controls {
-    align-items: stretch;
-    flex-direction: column;
+  .boundary-image,
+  .boundary-chroma {
+    object-fit: cover;
+    background-size: cover;
   }
 
-  .external-signal-controls a {
-    text-align: center;
+  .boundary-return {
+    font-size: 0.67rem;
+  }
+
+  .boundary-pr {
+    max-width: 58%;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
+  .boundary-image,
+  .boundary-chroma,
+  .boundary-noise,
+  .boundary-glow {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }

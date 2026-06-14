@@ -3,55 +3,78 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EXTERNAL PERSONA / KYOUKAI</title>
-  <meta name="description" content="KYOUKAI外部通信ノード。Twomiへの広告リンクを含みます。" />
+  <title>EXTERNAL BOUNDARY / KYOUKAI</title>
+  <meta name="description" content="KYOUKAI境界外接続。この先にはTwomiへの広告リンクが含まれます。" />
   <link rel="stylesheet" href="/static/external-signal.css" />
   <script defer src="/static/analytics.js"></script>
   <script defer src="/static/external-signal.js"></script>
 </head>
 <body class="external-signal-body">
-  <aside class="external-signal-disclosure" aria-label="広告表示">
-    <strong>広告</strong>
-    <span>この通信にはTwomiへのアフィリエイトリンクが含まれます</span>
-  </aside>
+  <main
+    class="signal-boundary"
+    data-external-signal
+    data-state="idle"
+    data-affiliate-url="https://px.a8.net/svt/ejp?a8mat=4B5TCD+32QNAQ+5VDQ+BX3J6"
+  >
+    <div class="boundary-backdrop" aria-hidden="true"></div>
 
-  <main class="external-signal-node" data-external-signal>
-    <header class="external-signal-header">
-      <p>境界外通信管制 / NODE 27395002</p>
-      <h1>外部人格を検出</h1>
-      <span data-signal-status>接続待機</span>
-    </header>
-
-    <section class="external-signal-screen" aria-live="polite">
-      <div class="external-signal-noise" aria-hidden="true"></div>
-      <div class="external-signal-persona" aria-hidden="true"><span></span></div>
-      <div class="external-signal-log" data-signal-log>
-        <p>受信元は境界の外側にあります。</p>
-        <p>応答を開始すると短い通信が発生します。</p>
-      </div>
-    </section>
-
-    <div class="external-signal-controls">
-      <button type="button" data-signal-start>通信を開始</button>
-      <a href="/signal">受信域へ戻る</a>
-    </div>
-
-    <section class="external-signal-exit" data-signal-exit hidden>
-      <p class="external-signal-exit__state">接続維持不可 / 外部側に通信の続きがあります</p>
-      <p class="external-signal-exit__ad">広告 / 外部サービス</p>
-      <p class="external-signal-exit__prompt">外部通信を継続する</p>
-      <a
-        class="external-signal-exit__link"
-        href="https://px.a8.net/svt/ejp?a8mat=4B5TCD+32QNAQ+5VDQ+BX3J6"
-        rel="nofollow sponsored noopener"
-        target="_blank"
-        data-twomi-link
-      >
-        【Twomi】
-      </a>
-      <p class="external-signal-exit__note">移動先ではTwomiの利用条件とプライバシーポリシーが適用されます。</p>
+    <section class="boundary-stage" aria-label="境界外通信">
       <img
-        class="external-signal-tracker"
+        class="boundary-image"
+        src="/static/images/external-boundary.png"
+        alt="無数の祭具と古いテレビに囲まれた、白い裂け目のある境界"
+      />
+      <div class="boundary-chroma" aria-hidden="true"></div>
+      <div class="boundary-noise" aria-hidden="true"></div>
+      <div class="boundary-scanlines" aria-hidden="true"></div>
+      <div class="boundary-glow" aria-hidden="true"></div>
+      <div class="boundary-flash" aria-hidden="true"></div>
+
+      <button
+        class="boundary-hotspot"
+        type="button"
+        data-boundary-hotspot
+        aria-label="中央の白い裂け目に触れる"
+      ></button>
+
+      <a class="boundary-return" href="/signal">受信域へ戻る</a>
+
+      <aside class="boundary-pr" aria-label="広告表示">
+        <strong>外部接続 / PR</strong>
+        <span>この先は外部サービスへの接続を含みます</span>
+      </aside>
+
+      <section
+        class="boundary-command"
+        data-boundary-command
+        role="dialog"
+        aria-modal="false"
+        aria-labelledby="boundaryCommandText"
+        hidden
+      >
+        <p id="boundaryCommandText" class="boundary-command__text" data-command-text>
+          追いかけますか？
+        </p>
+        <div class="boundary-command__options">
+          <a
+            class="boundary-command__option"
+            href="https://px.a8.net/svt/ejp?a8mat=4B5TCD+32QNAQ+5VDQ+BX3J6"
+            rel="nofollow sponsored noopener"
+            data-follow-boundary
+          >
+            <span aria-hidden="true">▶</span> 追いかける
+          </a>
+          <button class="boundary-command__option" type="button" data-cancel-boundary>
+            <span aria-hidden="true">　</span> 追いかけない
+          </button>
+        </div>
+        <p class="boundary-command__notice">境界外接続にはPRが含まれます</p>
+      </section>
+
+      <p class="boundary-status" data-boundary-status aria-live="polite"></p>
+
+      <img
+        class="boundary-tracker"
         border="0"
         width="1"
         height="1"

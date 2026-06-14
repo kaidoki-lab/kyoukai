@@ -241,5 +241,29 @@
     ],
     "completedAt": "2026-06-12T07:37:15.451284+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260614-external-boundary",
+    "sourcePlanId": "manual-20260614-external-boundary",
+    "sourceTaskId": "",
+    "title": "外部通信を境界裂け目演出へ変更",
+    "targetPages": [
+      "/external-signal"
+    ],
+    "status": "completed",
+    "summary": "添付9:16境界画像を主役にし、人物・SF端末UIを削除。中央裂け目の接続演出後に追跡可否を選び、追いかける選択時のみTwomiへ遷移する構成へ変更",
+    "artifacts": [
+      "static/images/external-boundary.png",
+      "templates/external-signal.html",
+      "static/external-signal.css",
+      "static/external-signal.js",
+      "tests/test_twomi_external_signal.py",
+      "TWOMI_EXTERNAL_SIGNAL_SPEC.md"
+    ],
+    "verification": [
+      "unittest全29件成功、JavaScript構文成功、画像・ホットスポット・二択・人物削除を配信DOMで確認、自動遷移なしをテスト"
+    ],
+    "completedAt": "2026-06-14T23:04:54.962089+00:00",
+    "recordedBy": "codex"
   }
 ]
