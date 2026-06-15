@@ -312,5 +312,28 @@
     ],
     "completedAt": "2026-06-15T00:28:43.675903+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260615-ma-voice",
+    "sourcePlanId": "manual-20260615-ma-voice",
+    "sourceTaskId": "",
+    "title": "悪魔の間の会話表示と低音演出を強化",
+    "targetPages": [
+      "/ma"
+    ],
+    "status": "completed",
+    "summary": "ブラウザ版会話パネルをさらに上へ移動し、本文を24〜34pxへ拡大。タイプライター表示中にWeb Audioによる低い声風の短音を追加。スマホ版配置と文字サイズは維持。",
+    "artifacts": [
+      "static/ma.css",
+      "static/ma.js",
+      "templates/ma.html"
+    ],
+    "verification": [
+      "JavaScript構文検査成功",
+      "Python unittest 29件成功",
+      "ローカルHTTPで/ma、更新CSS、更新JavaScriptの配信を確認"
+    ],
+    "completedAt": "2026-06-15T00:35:05.046588+00:00",
+    "recordedBy": "codex"
   }
 ]

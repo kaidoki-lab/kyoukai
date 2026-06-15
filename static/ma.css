@@ -60,11 +60,11 @@ html, body {
 
 .ma-panel {
   position: fixed;
-  bottom: clamp(24px, 4vh, 48px);
+  bottom: clamp(72px, 11vh, 120px);
   left: 50%;
-  width: min(900px, calc(100vw - 64px));
-  height: clamp(120px, 17vh, 160px);
-  min-height: 120px;
+  width: min(980px, calc(100vw - 64px));
+  height: clamp(150px, 20vh, 190px);
+  min-height: 150px;
   background: rgba(0, 0, 0, 0.82);
   border: 1px solid rgba(102, 0, 0, 0.7);
   transform: translateX(-50%);
@@ -87,6 +87,7 @@ html, body {
     right: 0;
     width: auto;
     height: 30vh;
+    min-height: 120px;
     background: #000;
     border: 0;
     border-top: 1px solid #330000;
@@ -95,7 +96,7 @@ html, body {
 }
 
 .ma-speaker {
-  font-size: clamp(15px, 1.2vw, 18px);
+  font-size: clamp(17px, 1.35vw, 21px);
   letter-spacing: 0.15em;
   color: #660000;
   text-transform: uppercase;
@@ -104,8 +105,8 @@ html, body {
 }
 
 .ma-text {
-  font-size: clamp(20px, 1.65vw, 28px);
-  line-height: 1.65;
+  font-size: clamp(24px, 2vw, 34px);
+  line-height: 1.55;
   color: #cccccc;
   flex: 1;
   white-space: pre-wrap;

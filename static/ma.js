@@ -61,6 +61,53 @@
   var _twFull = '';
   var _twPos = 0;
   var _onTypeDone = null;
+  var _audioContext = null;
+
+  function getAudioContext() {
+    if (_audioContext) return _audioContext;
+    var AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return null;
+    _audioContext = new AudioContext();
+    return _audioContext;
+  }
+
+  function playVoicePulse() {
+    var context = getAudioContext();
+    if (!context || context.state !== 'running') return;
+
+    var now = context.currentTime;
+    var oscillator = context.createOscillator();
+    var gain = context.createGain();
+    var lowpass = context.createBiquadFilter();
+
+    oscillator.type = 'sawtooth';
+    oscillator.frequency.setValueAtTime(78 + Math.random() * 8, now);
+    oscillator.frequency.exponentialRampToValueAtTime(66, now + 0.13);
+
+    lowpass.type = 'lowpass';
+    lowpass.frequency.setValueAtTime(520, now);
+    lowpass.Q.setValueAtTime(5, now);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.075, now + 0.018);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+
+    oscillator.connect(lowpass);
+    lowpass.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start(now);
+    oscillator.stop(now + 0.15);
+  }
+
+  function unlockAudio() {
+    var context = getAudioContext();
+    if (context && context.state === 'suspended') {
+      context.resume();
+    }
+  }
+
+  document.addEventListener('pointerdown', unlockAudio, { once: true });
+  document.addEventListener('keydown', unlockAudio, { once: true });
 
   function startTypewriter(textEl, fullText, onDone) {
     clearInterval(_twTimer);
@@ -73,6 +120,10 @@
     _twTimer = setInterval(function () {
       _twPos++;
       textEl.textContent = _twFull.slice(0, _twPos);
+      var currentChar = _twFull.charAt(_twPos - 1);
+      if (_twPos % 2 === 1 && !/[\s、。！？…]/.test(currentChar)) {
+        playVoicePulse();
+      }
       if (_twPos >= _twFull.length) {
         clearInterval(_twTimer);
         _twDone = true;
