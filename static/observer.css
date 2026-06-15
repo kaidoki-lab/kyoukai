@@ -284,6 +284,19 @@ body {
   scale: 1.03;
 }
 
+/* hidden door to /ma — center door on platform */
+.ma-gate {
+  position: absolute;
+  left: calc(var(--observer-frame-left) + var(--observer-frame-width) * 0.42);
+  top: 38vh;
+  z-index: 38;
+  display: block;
+  width: calc(var(--observer-frame-width) * 0.16);
+  height: 20vh;
+  text-decoration: none;
+  cursor: default;
+}
+
 .room-hotspot {
   position: absolute;
   z-index: 34;

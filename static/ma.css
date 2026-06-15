@@ -1,0 +1,136 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ma-body {
+  background: #000;
+  font-family: "Yu Gothic", "Meiryo", "Hiragino Kaku Gothic ProN", sans-serif;
+}
+
+/* ---------- Background ---------- */
+
+.ma-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: url("/static/kyoukai_ma_bg_desktop.png");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+@media (max-width: 768px) {
+  .ma-bg {
+    background-image: url("/static/kyoukai_ma_bg.jpg");
+    background-size: auto 100%;
+  }
+}
+
+.ma-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 60% 50% at 50% 45%,
+    rgba(180, 0, 0, 0.18) 0%,
+    transparent 70%
+  );
+  animation: ma-breathe 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.ma-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 35vh;
+  background: linear-gradient(to bottom, transparent, #000);
+  pointer-events: none;
+}
+
+/* ---------- Panel ---------- */
+
+.ma-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30vh;
+  min-height: 120px;
+  background: #000;
+  border-top: 1px solid #330000;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 16px 24px 20px;
+}
+
+.ma-speaker {
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  color: #660000;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  min-height: 1em;
+}
+
+.ma-text {
+  font-size: clamp(14px, 2.2vw, 18px);
+  line-height: 1.75;
+  color: #cccccc;
+  flex: 1;
+  white-space: pre-wrap;
+}
+
+.ma-next {
+  position: absolute;
+  bottom: 14px;
+  right: 22px;
+  background: none;
+  border: none;
+  color: #550000;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+  animation: ma-blink 1.6s ease-in-out infinite;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.ma-next.visible {
+  opacity: 1;
+}
+
+/* ---------- Animations ---------- */
+
+@keyframes ma-breathe {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1.0; }
+}
+
+@keyframes ma-blink {
+  0%, 100% { opacity: 0.2; }
+  50%       { opacity: 1.0; }
+}
+
+@keyframes ma-shake {
+  0%        { transform: translate(0, 0); }
+  20%       { transform: translate(-3px, 1px); }
+  40%       { transform: translate(3px, -1px); }
+  60%       { transform: translate(-2px, 2px); }
+  80%       { transform: translate(2px, -2px); }
+  100%      { transform: translate(0, 0); }
+}
+
+.ma-shake {
+  animation: ma-shake 0.35s ease-in-out;
+}

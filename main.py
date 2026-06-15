@@ -2525,6 +2525,10 @@ async def null_room(request: Request) -> HTMLResponse:
 async def outside_core(request: Request) -> HTMLResponse:
     return render_template(request, "outside.html")
 
+@app.get("/ma", response_class=HTMLResponse)
+async def ma_room(request: Request) -> HTMLResponse:
+    return render_template(request, "ma.html")
+
 @app.get("/central", response_class=HTMLResponse)
 async def central_os_page(request: Request) -> HTMLResponse:
     return render_template(request, "central.html")

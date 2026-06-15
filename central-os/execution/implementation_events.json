@@ -265,5 +265,30 @@
     ],
     "completedAt": "2026-06-14T23:04:54.962089+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260615-ma-room",
+    "sourcePlanId": "manual-20260615-ma-room",
+    "sourceTaskId": "",
+    "title": "悪魔の間を端末別背景で実装",
+    "targetPages": [
+      "/ma"
+    ],
+    "status": "completed",
+    "summary": "observerの隠し扉から入る悪魔の間を追加し、スマホでは9:16、ブラウザでは16:9の背景画像を表示。テスト用赤枠を削除。",
+    "artifacts": [
+      "templates/ma.html",
+      "static/ma.css",
+      "static/ma.js",
+      "static/kyoukai_ma_bg.jpg",
+      "static/kyoukai_ma_bg_desktop.png"
+    ],
+    "verification": [
+      "Python unittest 29件成功",
+      "ローカルHTTPで/maと両背景画像の200応答を確認",
+      ".ma-gateのbackgroundとoutline削除を確認"
+    ],
+    "completedAt": "2026-06-15T00:20:56.844454+00:00",
+    "recordedBy": "codex"
   }
 ]
