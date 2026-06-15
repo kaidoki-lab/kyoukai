@@ -81,8 +81,9 @@ background-size: auto 100%;      /* 9:16画像を縦いっぱいに表示 */
 
 ### パネル
 
-- `height: 30vh`、`min-height: 120px`
-- `background: #000`、`border-top: 1px solid #330000`
+- ブラウザ版は悪魔の足元へ重なる半透明パネル（最大幅900px、本文20〜28px）
+- スマホ版は従来どおり下部30vh固定パネル（本文14〜18px）
+- スマホ版は`background: #000`、`border-top: 1px solid #330000`
 - テキスト色: `#cccccc`、話者名色: `#660000`
 
 ---

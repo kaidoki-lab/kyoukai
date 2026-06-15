@@ -290,5 +290,27 @@
     ],
     "completedAt": "2026-06-15T00:20:56.844454+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260615-ma-desktop-dialog",
+    "sourcePlanId": "manual-20260615-ma-desktop-dialog",
+    "sourceTaskId": "",
+    "title": "悪魔の間ブラウザ版会話パネル調整",
+    "targetPages": [
+      "/ma"
+    ],
+    "status": "completed",
+    "summary": "ブラウザ版の会話パネルを悪魔の足元へ重なる半透明表示へ変更し、本文を最大28pxへ拡大。スマホ版の配置と文字サイズは維持。",
+    "artifacts": [
+      "static/ma.css",
+      "templates/ma.html"
+    ],
+    "verification": [
+      "Python unittest 29件成功",
+      "ローカルHTTPで/maの200応答を確認",
+      "768px以下で従来のスマホ用パネルと文字サイズへ戻ることをCSSで確認"
+    ],
+    "completedAt": "2026-06-15T00:28:43.675903+00:00",
+    "recordedBy": "codex"
   }
 ]

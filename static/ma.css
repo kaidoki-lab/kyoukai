@@ -51,8 +51,8 @@ html, body {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 35vh;
-  background: linear-gradient(to bottom, transparent, #000);
+  height: 28vh;
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.78));
   pointer-events: none;
 }
 
@@ -60,13 +60,14 @@ html, body {
 
 .ma-panel {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 30vh;
+  bottom: clamp(24px, 4vh, 48px);
+  left: 50%;
+  width: min(900px, calc(100vw - 64px));
+  height: clamp(120px, 17vh, 160px);
   min-height: 120px;
-  background: #000;
-  border-top: 1px solid #330000;
+  background: rgba(0, 0, 0, 0.82);
+  border: 1px solid rgba(102, 0, 0, 0.7);
+  transform: translateX(-50%);
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -74,8 +75,27 @@ html, body {
   padding: 16px 24px 20px;
 }
 
+@media (max-width: 768px) {
+  .ma-fade {
+    height: 35vh;
+    background: linear-gradient(to bottom, transparent, #000);
+  }
+
+  .ma-panel {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    height: 30vh;
+    background: #000;
+    border: 0;
+    border-top: 1px solid #330000;
+    transform: none;
+  }
+}
+
 .ma-speaker {
-  font-size: 12px;
+  font-size: clamp(15px, 1.2vw, 18px);
   letter-spacing: 0.15em;
   color: #660000;
   text-transform: uppercase;
@@ -84,11 +104,22 @@ html, body {
 }
 
 .ma-text {
-  font-size: clamp(14px, 2.2vw, 18px);
-  line-height: 1.75;
+  font-size: clamp(20px, 1.65vw, 28px);
+  line-height: 1.65;
   color: #cccccc;
   flex: 1;
   white-space: pre-wrap;
+}
+
+@media (max-width: 768px) {
+  .ma-speaker {
+    font-size: 12px;
+  }
+
+  .ma-text {
+    font-size: clamp(14px, 2.2vw, 18px);
+    line-height: 1.75;
+  }
 }
 
 .ma-next {
