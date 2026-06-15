@@ -4658,6 +4658,19 @@ a.sp-link:hover,
 
 /* /null desktop control cleanup: mirror the mobile black status + compact START layout. */
 @media (min-width: 769px) {
+  .collapse-room-body > .kyoukai-footer {
+    display: none;
+  }
+
+  .collapse-arcade-image {
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255, 46, 214, 0.18), transparent 28%),
+      radial-gradient(circle at 86% 26%, rgba(0, 247, 255, 0.16), transparent 26%),
+      linear-gradient(90deg, rgba(255, 0, 172, 0.06), rgba(0, 255, 231, 0.05)),
+      url("/static/kyoukai_null_arcade_desktop.png") center / cover no-repeat;
+    background-color: #160012;
+  }
+
   .collapse-start-panel {
     right: clamp(22px, 3vw, 54px);
     bottom: clamp(22px, 3vw, 48px);

@@ -378,5 +378,28 @@
     ],
     "completedAt": "2026-06-15T05:51:51.446000+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260616-null-desktop-background",
+    "sourcePlanId": "manual-20260616-null-desktop-background",
+    "sourceTaskId": "",
+    "title": "崩落域ブラウザ版の背景と下部表示を更新",
+    "targetPages": [
+      "/null"
+    ],
+    "status": "completed",
+    "summary": "ブラウザ版崩落域の背景を新しい16:9ゲームセンター画像へ差し替え、下部のサイトマップ・インフォを含むフッターを非表示化。スマホ版の既存縦長背景は維持。",
+    "artifacts": [
+      "static/kyoukai_null_arcade_desktop.png",
+      "static/space.css",
+      "templates/null.html"
+    ],
+    "verification": [
+      "CSS差分検査成功",
+      "769px以上で新16:9背景とフッター非表示、768px以下で既存縦長背景を維持することを確認",
+      "依存不要テスト15件成功。残り3モジュールは実行環境のuvicorn未導入により読み込み不可"
+    ],
+    "completedAt": "2026-06-15T17:57:44.178539+00:00",
+    "recordedBy": "codex"
   }
 ]
