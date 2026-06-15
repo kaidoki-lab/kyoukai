@@ -335,5 +335,27 @@
     ],
     "completedAt": "2026-06-15T00:35:05.046588+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260615-ma-background-motion",
+    "sourcePlanId": "manual-20260615-ma-background-motion",
+    "sourceTaskId": "",
+    "title": "悪魔の間の背景画像に呼吸モーションを追加",
+    "targetPages": [
+      "/ma"
+    ],
+    "status": "completed",
+    "summary": "ブラウザ版とスマホ版の背景画像へ、緩やかなズームと上下移動を追加。ブラウザは12秒、スマホは15秒周期とし、動きを減らす端末設定では停止。",
+    "artifacts": [
+      "static/ma.css",
+      "templates/ma.html"
+    ],
+    "verification": [
+      "Python unittest 29件成功",
+      "JavaScript構文検査成功",
+      "ローカルHTTPで更新CSSの配信を確認"
+    ],
+    "completedAt": "2026-06-15T00:50:31.708778+00:00",
+    "recordedBy": "codex"
   }
 ]

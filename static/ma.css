@@ -21,16 +21,27 @@ html, body {
   position: fixed;
   inset: 0;
   z-index: 0;
+  overflow: hidden;
+}
+
+.ma-bg::before {
+  content: "";
+  position: absolute;
+  inset: -3%;
   background-image: url("/static/kyoukai_ma_bg_desktop.png");
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
+  transform-origin: 50% 48%;
+  animation: ma-image-drift 12s ease-in-out infinite;
 }
 
 @media (max-width: 768px) {
-  .ma-bg {
+  .ma-bg::before {
     background-image: url("/static/kyoukai_ma_bg.jpg");
     background-size: auto 100%;
+    transform-origin: 50% 42%;
+    animation-duration: 15s;
   }
 }
 
@@ -149,6 +160,15 @@ html, body {
   50%       { opacity: 1.0; }
 }
 
+@keyframes ma-image-drift {
+  0%, 100% {
+    transform: scale(1.01) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: scale(1.045) translate3d(0, -0.7%, 0);
+  }
+}
+
 @keyframes ma-blink {
   0%, 100% { opacity: 0.2; }
   50%       { opacity: 1.0; }
@@ -165,4 +185,12 @@ html, body {
 
 .ma-shake {
   animation: ma-shake 0.35s ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ma-bg::before,
+  .ma-glow,
+  .ma-next {
+    animation: none;
+  }
 }
