@@ -357,5 +357,26 @@
     ],
     "completedAt": "2026-06-15T00:50:31.708778+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260615-ma-world-dictionary",
+    "sourcePlanId": "manual-20260615-ma-world-dictionary",
+    "sourceTaskId": "",
+    "title": "KYOUKAI世界辞典へ悪魔の間の進捗を追加",
+    "targetPages": [
+      "/ma"
+    ],
+    "status": "completed",
+    "summary": "AIコンテキスト注入用の正本central-os/lore/kyoukai-world.mdを確認し、悪魔の間の世界設定、実装済み演出、2026-06-15の進捗を追記。",
+    "artifacts": [
+      "central-os/lore/kyoukai-world.md"
+    ],
+    "verification": [
+      "Markdown差分検査成功",
+      "悪魔の間の部屋一覧・詳細・更新進捗への追記を確認",
+      "依存不要テスト15件成功。残り3モジュールは実行環境のuvicorn未導入により読み込み不可"
+    ],
+    "completedAt": "2026-06-15T05:51:51.446000+00:00",
+    "recordedBy": "codex"
   }
 ]
