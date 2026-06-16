@@ -229,6 +229,16 @@
       </div>
     </section>
 
+    <!-- ANALYSIS SUMMARY (for handoff to Claude / Codex) -->
+    <section class="cos-section" id="cos-summary">
+      <h2 class="cos-section-title">[ 分析サマリー ]</h2>
+      <div class="cos-up-toolbar">
+        <button class="cos-up-run-btn" id="cos-summary-copy-btn">コピー</button>
+        <span class="cos-up-status" id="cos-summary-copy-status">クラウド・Codexへの引き渡し用</span>
+      </div>
+      <pre id="cos-summary-text" style="white-space:pre-wrap; font-size:18px; line-height:1.6; background:#0d0d14; border:1px solid #2d2d3d; border-radius:6px; padding:16px; max-height:480px; overflow:auto;">生成中...</pre>
+    </section>
+
     <footer class="cos-footer">
       <div>— END OF OBSERVATION —</div>
       <div class="cos-footer-sub">central-os は読み取り専用</div>
@@ -1170,6 +1180,91 @@
       }).catch(function (err) {
         errorEl && window._cosShowError("cos-evt-error", err.message);
       });
+    })();
+
+    // ── 分析サマリー（クラウド・Codexへの引き渡し用） ───────────────────────────
+    (function () {
+      "use strict";
+
+      var textEl = document.getElementById("cos-summary-text");
+      var copyBtn = document.getElementById("cos-summary-copy-btn");
+      var copyStatus = document.getElementById("cos-summary-copy-status");
+
+      function safeText(v) { return (v === null || v === undefined) ? "" : String(v); }
+
+      function buildSummary(data) {
+        var lines = [];
+        var today = new Date().toISOString().slice(0, 10);
+        lines.push("# KYOUKAI 分析サマリー — " + today);
+        lines.push("");
+
+        var evt = data.eventObservation;
+        lines.push("## イベント観測（本日）");
+        if (evt && evt.available) {
+          var ov = evt.overview || {};
+          lines.push("観測者: " + safeText(ov.observers) + " / 表示回数: " + safeText(ov.pageviews) + " / イベント数: " + safeText(ov.events));
+          lines.push("");
+          lines.push("よく見られた部屋:");
+          (evt.top_pages || []).forEach(function (p) {
+            lines.push("- " + safeText(p.room_name) + " (" + safeText(p.path) + "): " + safeText(p.pageviews) + "回");
+          });
+          lines.push("");
+          lines.push("流入元:");
+          (evt.traffic_sources || []).forEach(function (s) {
+            lines.push("- " + safeText(s.channel) + ": " + safeText(s.sessions) + "セッション");
+          });
+          if (evt.utm_warning) {
+            lines.push("");
+            lines.push("[注意] Direct流入の比率が高い。SNS導線のUTM設定不足の可能性あり。");
+          }
+          lines.push("");
+          lines.push("部屋到達イベント: " + JSON.stringify(evt.room_enter_events || {}));
+          lines.push("外部接続クリック: " + JSON.stringify(evt.external_click_events || {}));
+          lines.push("Signal外部通信: " + JSON.stringify(evt.signal_events || {}));
+        } else {
+          lines.push("データなし（GA4未接続）");
+        }
+        lines.push("");
+
+        var proposals = Array.isArray(data.updateProposals) ? data.updateProposals : [];
+        lines.push("## 部屋別分析（AI分析官）");
+        if (proposals.length === 0) {
+          lines.push("データなし — Central OSで「提案を更新」を実行してください");
+        }
+        proposals.forEach(function (p) {
+          lines.push("");
+          lines.push("### " + safeText(p.observedPage));
+          if (p.observation) lines.push("観測: " + safeText(p.observation));
+          if (p.judgement) lines.push("判定: " + safeText(p.judgement));
+          if (p.analysis) lines.push("考察: " + safeText(p.analysis));
+          if (p.hypothesis) lines.push("仮説: " + safeText(p.hypothesis));
+          var recs = Array.isArray(p.recommendations) ? p.recommendations : [];
+          if (recs.length) {
+            lines.push("推奨:");
+            recs.forEach(function (r, i) { lines.push("  " + (i + 1) + ". " + safeText(r)); });
+          }
+        });
+
+        return lines.join("\n");
+      }
+
+      window._cosCentralData.then(function (result) {
+        if (!result || !textEl) return;
+        textEl.textContent = buildSummary(result.data || {});
+      }).catch(function () {
+        if (textEl) textEl.textContent = "サマリー生成に失敗しました。";
+      });
+
+      if (copyBtn) {
+        copyBtn.addEventListener("click", function () {
+          var text = textEl ? textEl.textContent : "";
+          navigator.clipboard.writeText(text).then(function () {
+            if (copyStatus) { copyStatus.textContent = "コピーしました"; copyStatus.className = "cos-up-status ok"; }
+          }).catch(function () {
+            if (copyStatus) { copyStatus.textContent = "コピー失敗（手動選択してください）"; copyStatus.className = "cos-up-status error"; }
+          });
+        });
+      }
     })();
 
     // ── YouTube Analytics ──────────────────────────────────────────────────────
