@@ -70,11 +70,13 @@ def _rule_based(page: str) -> dict[str, Any]:
 
 # ─── Ollama生成 ─────────────────────────────────────────────────────────────
 
-def _build_prompt(page: str, pv: int, dur: float, bounce: float, priority: str) -> str:
+def _build_prompt(page: str, pv: int, dur: float, bounce: float, priority: str, event_note: str = "") -> str:
+    event_section = f"\nイベント観測（本日）: {event_note}\n" if event_note else ""
     return (
         f"KYOUKAIは自己増殖するウェブサイトです。"
         f"以下のGA4データを日本語で分析し、JSONのみで回答してください。\n\n"
-        f"ページ: {page}  PV(30日): {pv}  平均滞在: {round(dur,1)}秒  直帰率: {round(bounce*100,1)}%  優先度: {priority}\n\n"
+        f"ページ: {page}  PV(30日): {pv}  平均滞在: {round(dur,1)}秒  直帰率: {round(bounce*100,1)}%  優先度: {priority}\n"
+        f"{event_section}\n"
         f"回答形式（JSONのみ。説明不要）:\n"
         f'{{\"analysis\":\"考察文（50字以内）\",\"hypothesis\":\"仮説（30字以内）\",'
         f'\"recommendations\":[\"推奨1\",\"推奨2\",\"推奨3\"]}}'
@@ -92,8 +94,8 @@ def _extract_json(text: str) -> dict[str, Any] | None:
         return None
 
 
-def _ollama_analyze(page: str, pv: int, dur: float, bounce: float, priority: str) -> dict[str, Any] | None:
-    prompt = _build_prompt(page, pv, dur, bounce, priority)
+def _ollama_analyze(page: str, pv: int, dur: float, bounce: float, priority: str, event_note: str = "") -> dict[str, Any] | None:
+    prompt = _build_prompt(page, pv, dur, bounce, priority, event_note)
     payload = json.dumps({
         "model": OLLAMA_MODEL,
         "prompt": prompt,
@@ -122,15 +124,22 @@ def analyze_page(
     bounce_rate: float = 0.0,
     priority: str = "low",
     use_ollama: bool = True,
+    event_note: str = "",
 ) -> dict[str, Any]:
     """
     Return AI analysis for a GA4 page entry.
+
+    event_note: Central OSのイベント観測（room_enter_*, ofuse_click等）から
+    作られた一言サマリー。GA4イベントが導線・離脱・外部接続の判断材料になる。
 
     Returns dict with keys: analysis, hypothesis, recommendations
     Falls back to rule-based if Ollama is unavailable or returns malformed JSON.
     """
     if use_ollama:
-        result = _ollama_analyze(page, pv, avg_duration, bounce_rate, priority)
+        result = _ollama_analyze(page, pv, avg_duration, bounce_rate, priority, event_note)
         if result:
             return result
-    return _rule_based(page)
+    result = _rule_based(page)
+    if event_note:
+        result["analysis"] = (result.get("analysis", "") + f" [イベント観測: {event_note}]").strip()
+    return result

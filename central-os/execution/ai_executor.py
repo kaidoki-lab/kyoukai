@@ -62,6 +62,29 @@ _COMMON_STEPS = [
     "ローカル表示を確認する",
 ]
 
+# 対象ページ → この実装で増減を見るべきGA4カスタムイベント
+_TARGET_EVENT_MAP: dict[str, list[str]] = {
+    "/":            ["room_enter_home"],
+    "/observation": ["room_enter_observation"],
+    "/observer":    ["room_enter_observer"],
+    "/signal":      ["room_enter_signal", "signal_hotspot_click", "external_connection_follow", "external_connection_cancel"],
+    "/outside":     ["room_enter_outside", "ofuse_click", "booth_click", "amazon_click", "affiliate_click", "outside_link_click"],
+    "/exit":        ["room_enter_exit"],
+    "/null":        ["room_enter_null"],
+    "/archive":     ["room_enter_archive"],
+    "/hyougi":      ["room_enter_hyougi"],
+    "/ma":          ["room_enter_ma"],
+}
+
+
+def _target_events_for(targets: list[str]) -> list[str]:
+    events: list[str] = []
+    for path in targets:
+        for event_name in _TARGET_EVENT_MAP.get(path, []):
+            if event_name not in events:
+                events.append(event_name)
+    return events
+
 
 # ─── フォールバック ──────────────────────────────────────────────────────────
 
@@ -88,10 +111,16 @@ def _fallback_task_body(plan: dict[str, Any]) -> dict[str, Any]:
 # ─── プロンプト ──────────────────────────────────────────────────────────────
 
 def _build_prompt(plan: dict[str, Any], context: dict[str, Any]) -> str:
-    targets = ", ".join(plan.get("targets", ["/null"]))
+    targets_list = plan.get("targets", ["/null"])
+    targets = ", ".join(targets_list)
+    target_events = _target_events_for(targets_list)
     project_rule = context.get(
         "projectRule",
         "KYOUKAIは自己増殖する狂ったウェブサイトです。ゲームではない。",
+    )
+    event_section = (
+        f"対象イベント: {', '.join(target_events)}（この実装でこれらのイベント数の改善を目指す）\n"
+        if target_events else ""
     )
     return (
         "KYOUKAIウェブサイトの実装作業指示書を日本語JSONで生成してください。\n\n"
@@ -99,9 +128,10 @@ def _build_prompt(plan: dict[str, Any], context: dict[str, Any]) -> str:
         f"企画概要: {plan.get('summary', '')}\n"
         f"理由: {plan.get('reason', '')}\n"
         f"対象ページ: {targets}\n"
+        f"{event_section}"
         f"プロジェクト方針: {project_rule}\n\n"
         "回答形式（JSONのみ。説明不要）:\n"
-        '{"objective":"実装目的（50字以内）",'
+        '{"objective":"実装目的（50字以内、対象イベントの改善を意識すること）",'
         '"implementationBrief":"具体的な実装概要（100字以内）",'
         '"candidateFiles":["ファイル名1","ファイル名2"],'
         '"steps":["手順1","手順2","手順3"],'
@@ -270,6 +300,7 @@ def generate_task(plan: dict[str, Any], context: dict[str, Any] | None = None) -
         "createdAt": now,
         "title": f"{plan.get('title', '企画')} 実装指示",
         "targetPages": list(plan.get("targets", ["/null"])),
+        "targetEvents": _target_events_for(plan.get("targets", ["/null"])),
         "objective": str(ai_body.get("objective", ""))[:120],
         "implementationBrief": str(ai_body.get("implementationBrief", ""))[:300],
         "candidateFiles": _to_list(ai_body.get("candidateFiles"), ["main.py"]),

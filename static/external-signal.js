@@ -24,7 +24,9 @@
   });
 
   const track = (eventName, params = {}) => {
-    if (typeof window.gtag === "function") {
+    if (typeof window.trackKyoukaiEvent === "function") {
+      window.trackKyoukaiEvent(eventName, params);
+    } else if (typeof window.gtag === "function") {
       window.gtag("event", eventName, params);
     }
   };
@@ -65,8 +67,13 @@
 
     hotspot.disabled = true;
     status.textContent = "境界外信号を追跡しています";
+    track("signal_hotspot_click", { source_page: "/external-signal" });
     setState("connecting");
     track("external_boundary_start", {
+      source_page: "/external-signal",
+      boundary_image: BOUNDARY_IMAGE_SRC,
+    });
+    track("external_connection_start", {
       source_page: "/external-signal",
       boundary_image: BOUNDARY_IMAGE_SRC,
     });
@@ -75,6 +82,7 @@
     status.textContent = "";
     setState("choice");
     showCommand();
+    track("external_connection_choice_show", { source_page: "/external-signal" });
   });
 
   cancelButton.addEventListener("click", async () => {
@@ -85,6 +93,7 @@
     status.textContent = CANCELLED_TEXT;
     setState("cancelled");
     track("external_boundary_cancel", { source_page: "/external-signal" });
+    track("external_connection_cancel", { source_page: "/external-signal" });
 
     await wait(CANCELLED_DURATION);
     resetBoundary();
@@ -99,6 +108,11 @@
     status.textContent = "接続を追跡しています";
     setState("leaving");
     track("affiliate_outbound_click", {
+      affiliate_provider: "A8",
+      destination: "Twomi",
+      source_page: "/external-signal",
+    });
+    track("external_connection_follow", {
       affiliate_provider: "A8",
       destination: "Twomi",
       source_page: "/external-signal",

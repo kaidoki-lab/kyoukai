@@ -139,10 +139,35 @@ def _load_lore() -> str:
     return ""
 
 
+def _build_event_section(event_obs: dict[str, Any] | None) -> str:
+    if not event_obs or not event_obs.get("available"):
+        return ""
+
+    room_enter = event_obs.get("room_enter_events") or {}
+    external = event_obs.get("external_click_events") or {}
+    signal = event_obs.get("signal_events") or {}
+    utm_warning = event_obs.get("utm_warning", False)
+
+    lines = [
+        "\n## イベント観測（本日のGA4カスタムイベント）",
+        f"部屋到達: {room_enter}",
+        f"外部接続クリック: {external}",
+        f"Signal外部通信: {signal}",
+    ]
+    if utm_warning:
+        lines.append("Direct流入の比率が高い。SNS導線のUTM設定不足が疑われる。")
+    lines.append(
+        "これらのイベント数を根拠に「どの部屋の導線を強化すべきか」"
+        "「外部接続クリックが少ない場合はどう改善すべきか」を考慮すること。\n"
+    )
+    return "\n".join(lines)
+
+
 def _build_prompt(planner_input: dict[str, Any]) -> str:
     rooms = planner_input.get("rooms", [])
     recent_accepted = planner_input.get("recentAccepted", [])
     recent_rejected = planner_input.get("recentRejected", [])
+    event_obs = planner_input.get("eventObservation")
 
     room_summary = ", ".join(
         f"{r.get('name', '?')}({r.get('score', '?')})"
@@ -154,16 +179,20 @@ def _build_prompt(planner_input: dict[str, Any]) -> str:
 
     lore = _load_lore()
     lore_section = f"\n## KYOUKAIの世界観（必読）\n{lore}\n\n" if lore else ""
+    event_section = _build_event_section(event_obs)
 
     return (
         f"あなたはKYOUKAIというアート・実験Webサイトの企画者です。{lore_section}"
         "サイトの実装企画案を3件、日本語JSONで生成してください。\n\n"
         f"現在の部屋状態: {room_summary}\n"
         f"最近採用した企画: {', '.join(accepted_titles) if accepted_titles else 'なし'}\n"
-        f"最近却下した企画: {', '.join(rejected_titles) if rejected_titles else 'なし'}\n\n"
+        f"最近却下した企画: {', '.join(rejected_titles) if rejected_titles else 'なし'}\n"
+        f"{event_section}\n"
         "## 制約\n"
         "- 世界観に忠実にすること（ハウツー・解説・明るいトーン禁止）\n"
-        "- 実装規模はsmallのみ（1ファイル以内で完結する変更）\n\n"
+        "- 実装規模はsmallのみ（1ファイル以内で完結する変更）\n"
+        "- ゲーム化（実績解除・進行状況・レベル・スコア表示）は絶対に禁止\n"
+        "- Central OSをユーザー側に露出させる企画は禁止\n\n"
         "## 出力形式（3件のJSON配列のみ。説明不要）\n"
         '[{"title":"20字以内のタイトル","summary":"企画の概要（50字以内）",'
         '"reason":"なぜこの企画をするのか（30字以内）",'

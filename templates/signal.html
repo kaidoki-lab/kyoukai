@@ -18,6 +18,7 @@
   <script defer src="/static/monetize-core.js"></script>
 </head>
 <body class="signal-room-body">
+  <script>window.KYOUKAI_ROOM = 'signal';</script>
   <main class="signal-room" data-audio="locked">
     <figure class="signal-chapel-frame" aria-label="KYOUKAI signal room">
       <picture>
@@ -153,10 +154,11 @@
     audioHit?.addEventListener("click", unlockAudio);
     channelHit?.addEventListener("click", () => playSignalVideo(true));
     twomiHotspot?.addEventListener("click", () => {
-      if (typeof window.gtag === "function") {
-        window.gtag("event", "external_signal_entry", {
-          source_page: "/signal",
-        });
+      if (typeof window.trackKyoukaiEvent === "function") {
+        window.trackKyoukaiEvent("external_signal_entry", { source_page: "/signal" });
+        window.trackKyoukaiEvent("affiliate_click", { source_page: "/signal", link_type: "affiliate" });
+      } else if (typeof window.gtag === "function") {
+        window.gtag("event", "external_signal_entry", { source_page: "/signal" });
       }
     });
     window.addEventListener("pagehide", () => {

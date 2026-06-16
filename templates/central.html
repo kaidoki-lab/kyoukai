@@ -177,6 +177,58 @@
       </div>
     </section>
 
+    <!-- EVENT OBSERVATION -->
+    <section class="cos-section" id="cos-events-observation">
+      <h2 class="cos-section-title">[ イベント観測 ]</h2>
+      <div class="cos-note" id="cos-evt-note">データなし — GA4認証情報（ga4-credentials.json）を確認してください</div>
+      <div class="cos-error" id="cos-evt-error" hidden></div>
+
+      <div id="cos-evt-body" hidden>
+        <div class="cos-watch-summary" id="cos-evt-overview"></div>
+        <div class="cos-note" id="cos-evt-utm-warning" hidden></div>
+
+        <h3 class="cos-subsection-title">よく見られた部屋</h3>
+        <div class="cos-rooms-table-wrap">
+          <table class="cos-table">
+            <thead><tr><th>部屋</th><th>パス</th><th>表示回数</th></tr></thead>
+            <tbody id="cos-evt-pages-body"></tbody>
+          </table>
+        </div>
+
+        <h3 class="cos-subsection-title">流入元</h3>
+        <div class="cos-rooms-table-wrap">
+          <table class="cos-table">
+            <thead><tr><th>チャネル</th><th>セッション</th></tr></thead>
+            <tbody id="cos-evt-sources-body"></tbody>
+          </table>
+        </div>
+
+        <h3 class="cos-subsection-title">部屋到達イベント</h3>
+        <div class="cos-rooms-table-wrap">
+          <table class="cos-table">
+            <thead><tr><th>イベント</th><th>件数</th></tr></thead>
+            <tbody id="cos-evt-room-enter-body"></tbody>
+          </table>
+        </div>
+
+        <h3 class="cos-subsection-title">外部接続イベント</h3>
+        <div class="cos-rooms-table-wrap">
+          <table class="cos-table">
+            <thead><tr><th>イベント</th><th>件数</th></tr></thead>
+            <tbody id="cos-evt-external-body"></tbody>
+          </table>
+        </div>
+
+        <h3 class="cos-subsection-title">Signal外部通信イベント</h3>
+        <div class="cos-rooms-table-wrap">
+          <table class="cos-table">
+            <thead><tr><th>イベント</th><th>件数</th></tr></thead>
+            <tbody id="cos-evt-signal-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <footer class="cos-footer">
       <div>— END OF OBSERVATION —</div>
       <div class="cos-footer-sub">central-os は読み取り専用</div>
@@ -185,14 +237,29 @@
   </main>
 
   <script>
-    // ── Watch + fetch ──────────────────────────────────────────────────────────
+    // ── 共有ユーティリティ ─────────────────────────────────────────────────────
+    window._cosSafeText = function (v) { return (v === null || v === undefined) ? "" : String(v); };
+    window._cosShowError = function (id, msg) {
+      var node = document.getElementById(id);
+      if (!node) return;
+      node.hidden = false;
+      node.textContent = "[ ERROR ] " + msg;
+    };
+    window._cosCentralData = fetch("/api/central-os", { headers: { "Accept": "application/json" } })
+      .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+      .catch(function (err) {
+        window._cosShowError("cos-watch-error", "central-os読込失敗: " + err.message);
+        return null;
+      });
+
+    // ── Watch + 同期状態 ───────────────────────────────────────────────────────
     (function () {
       "use strict";
 
       function el(tag, attrs, children) {
-        const node = document.createElement(tag);
+        var node = document.createElement(tag);
         if (attrs) {
-          for (const k in attrs) {
+          for (var k in attrs) {
             if (k === "class") node.className = attrs[k];
             else if (k === "text") node.textContent = attrs[k];
             else node.setAttribute(k, attrs[k]);
@@ -203,21 +270,6 @@
         }
         return node;
       }
-
-      function safeText(value) {
-        if (value === null || value === undefined) return "";
-        return String(value);
-      }
-
-      function showError(id, message) {
-        const node = document.getElementById(id);
-        if (!node) return;
-        node.hidden = false;
-        node.textContent = "[ ERROR ] " + message;
-      }
-
-      // expose showError globally for other IIFEs
-      window._cosShowError = showError;
 
       function renderWatch(watchData, diffLogData, watchTargetsData) {
         var targetCountEl = document.getElementById("cos-watch-target-count");
@@ -277,10 +329,10 @@
           } else {
             diffItems.slice().reverse().forEach(function(item) {
               var tr = document.createElement("tr");
-              tr.appendChild(el("td", { text: safeText(item.date) }));
-              tr.appendChild(el("td", { text: safeText(item.targetPath || item.targetId) }));
-              tr.appendChild(el("td", { text: safeText(item.changeType) }));
-              tr.appendChild(el("td", { text: safeText(item.summary) }));
+              tr.appendChild(el("td", { text: window._cosSafeText(item.date) }));
+              tr.appendChild(el("td", { text: window._cosSafeText(item.targetPath || item.targetId) }));
+              tr.appendChild(el("td", { text: window._cosSafeText(item.changeType) }));
+              tr.appendChild(el("td", { text: window._cosSafeText(item.summary) }));
               var osTd = document.createElement("td");
               if (item.osUpdated === true) {
                 osTd.textContent = "✓";
@@ -289,10 +341,10 @@
                 osTd.textContent = "—";
                 osTd.className = "cos-watch-pending-cell";
               } else {
-                osTd.textContent = safeText(item.osUpdated);
+                osTd.textContent = window._cosSafeText(item.osUpdated);
               }
               tr.appendChild(osTd);
-              tr.appendChild(el("td", { text: safeText(item.syncStatus || "—") }));
+              tr.appendChild(el("td", { text: window._cosSafeText(item.syncStatus || "—") }));
               tbody.appendChild(tr);
             });
           }
@@ -300,178 +352,19 @@
       }
 
       function renderAll(result) {
-        const data = result && result.data ? result.data : {};
-        const errors = result && result.errors ? result.errors : {};
+        var data   = result && result.data   ? result.data   : {};
+        var errors = result && result.errors ? result.errors : {};
 
-        if (errors.diffLog) showError("cos-watch-error", "diff-log.json: " + errors.diffLog);
-        if (errors.watchTargets) showError("cos-watch-error", "watch-targets.json: " + errors.watchTargets);
+        if (errors.diffLog)      window._cosShowError("cos-watch-error", "diff-log.json: " + errors.diffLog);
+        if (errors.watchTargets) window._cosShowError("cos-watch-error", "watch-targets.json: " + errors.watchTargets);
 
-        try { renderWatch(data.watch, data.diffLog, data.watchTargets); } catch (e) { showError("cos-watch-error", String(e)); }
+        try { renderWatch(data.watch, data.diffLog, data.watchTargets); }
+        catch (e) { window._cosShowError("cos-watch-error", String(e)); }
       }
 
-      function load() {
-        fetch("/api/central-os", { headers: { "Accept": "application/json" } })
-          .then(function (res) {
-            if (!res.ok) throw new Error("HTTP " + res.status);
-            return res.json();
-          })
-          .then(renderAll)
-          .catch(function (err) {
-            showError("cos-watch-error", "central-os読込失敗: " + err.message);
-          });
-      }
-
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", load);
-      } else {
-        load();
-      }
-    })();
-
-    // ── Dashboard (removed) ────────────────────────────────────────────────────
-    if (false) (function () {
-      var currentFilter = "all";
-
-      var STATUS_LABEL = { pending: "未承認", adopted: "採用", held: "保留", rejected: "却下" };
-      var STATUS_CLASS = { pending: "dash-pending", adopted: "dash-adopted", held: "dash-held", rejected: "dash-rejected" };
-      var PRIORITY_LABEL = { high: "高", medium: "中", low: "低" };
-      var CHANGE_LABEL = { strong: "反応強", active: "反応あり", weak: "反応弱", dead: "死んだ接続", no_data: "データなし" };
-
-      function safeText(v) { return (v === null || v === undefined) ? "" : String(v); }
-      function showError(id, msg) {
-        var n = document.getElementById(id); if (!n) return;
-        n.hidden = false; n.textContent = "[ ERROR ] " + msg;
-      }
-
-      function setDashStatus(msg, cls) {
-        var el = document.getElementById("cos-dash-status");
-        if (el) { el.textContent = msg; el.className = "cos-dash-status " + (cls || ""); }
-      }
-
-      function renderProposals(proposals) {
-        var container = document.getElementById("cos-proposals-list");
-        if (!container) return;
-        var filtered = currentFilter === "all" ? proposals : proposals.filter(function(p) { return p.status === currentFilter; });
-        if (filtered.length === 0) {
-          container.innerHTML = "<div class='cos-dash-empty'>該当する提案なし</div>";
-          return;
-        }
-        container.innerHTML = "";
-        filtered.forEach(function(p) {
-          var card = document.createElement("div");
-          card.className = "cos-proposal-card cos-proposal-" + (p.status || "pending");
-
-          var header = document.createElement("div");
-          header.className = "cos-proposal-header";
-          header.innerHTML =
-            "<span class='cos-proposal-room'>" + safeText(p.target_room) + " — " + safeText(p.name || "") + "</span>" +
-            "<span class='cos-proposal-tag " + (STATUS_CLASS[p.status] || "") + "'>" + (STATUS_LABEL[p.status] || p.status) + "</span>" +
-            "<span class='cos-proposal-priority'>優先度: " + (PRIORITY_LABEL[p.priority] || p.priority) + "</span>" +
-            "<span class='cos-proposal-change-type'>" + (CHANGE_LABEL[p.change_type] || p.change_type) + "</span>";
-          card.appendChild(header);
-
-          var obs = document.createElement("div");
-          obs.className = "cos-proposal-observation";
-          obs.textContent = p.observation || "";
-          card.appendChild(obs);
-
-          var judgment = document.createElement("div");
-          judgment.className = "cos-proposal-judgment";
-          judgment.textContent = p.judgment || "";
-          card.appendChild(judgment);
-
-          var candidates = p.candidates || [];
-          if (candidates.length > 0) {
-            var ul = document.createElement("ul");
-            ul.className = "cos-proposal-candidates";
-            candidates.forEach(function(c) {
-              var li = document.createElement("li");
-              li.textContent = c;
-              ul.appendChild(li);
-            });
-            card.appendChild(ul);
-          }
-
-          if (p.codex_instruction) {
-            var codex = document.createElement("pre");
-            codex.className = "cos-proposal-codex";
-            codex.textContent = p.codex_instruction;
-            card.appendChild(codex);
-          }
-
-          if (p.status === "pending" || p.status === "adopted") {
-            var actions = document.createElement("div");
-            actions.className = "cos-proposal-actions";
-            [["adopt", "採用", "adopted"], ["hold", "保留", "held"], ["reject", "却下", "rejected"]].forEach(function(btn) {
-              if (p.status === "adopted" && btn[2] === "adopted") return;
-              var b = document.createElement("button");
-              b.className = "cos-dash-action-btn cos-dash-" + btn[0];
-              b.textContent = btn[1];
-              b.addEventListener("click", function() { updateStatus(p.id, btn[2]); });
-              actions.appendChild(b);
-            });
-            card.appendChild(actions);
-          }
-
-          container.appendChild(card);
-        });
-      }
-
-      function loadProposals() {
-        fetch("/api/proposals")
-          .then(function(r) { return r.json(); })
-          .then(function(data) {
-            if (data.ok) renderProposals(data.proposals || []);
-            else showError("cos-dash-error", "proposals読込失敗: " + data.error);
-          })
-          .catch(function(e) { showError("cos-dash-error", e.message); });
-      }
-
-      function updateStatus(id, status) {
-        fetch("/api/proposals/" + id + "/status", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: status }),
-        })
-          .then(function(r) { return r.json(); })
-          .then(function(data) {
-            if (data.ok) loadProposals();
-            else showError("cos-dash-error", "更新失敗: " + data.error);
-          })
-          .catch(function(e) { showError("cos-dash-error", e.message); });
-      }
-
-      var runBtn = document.getElementById("cos-dash-run");
-      if (runBtn) {
-        runBtn.addEventListener("click", function() {
-          setDashStatus("分析中…", "running");
-          runBtn.disabled = true;
-          fetch("/api/analysis/run", { method: "POST" })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-              if (data.ok) {
-                setDashStatus("生成完了 — " + data.proposals_generated + "件", "ok");
-                loadProposals();
-              } else {
-                setDashStatus("エラー", "error");
-                showError("cos-dash-error", data.error);
-              }
-            })
-            .catch(function(e) { setDashStatus("失敗", "error"); showError("cos-dash-error", e.message); })
-            .finally(function() { runBtn.disabled = false; });
-        });
-      }
-
-      document.querySelectorAll(".cos-dash-filter").forEach(function(btn) {
-        btn.addEventListener("click", function() {
-          currentFilter = btn.dataset.filter || "all";
-          document.querySelectorAll(".cos-dash-filter").forEach(function(b) { b.classList.remove("active"); });
-          btn.classList.add("active");
-          loadProposals();
-        });
+      window._cosCentralData.then(function (result) {
+        if (result) renderAll(result);
       });
-
-      loadProposals();
     })();
 
     // ── 定期更新提案 ──────────────────────────────────────────────────────────
@@ -486,12 +379,6 @@
         scenario_change: "シナリオ", archive_addition: "記録追加",
         outside_adjustment: "外部接続", signal_fragment: "受信断片",
       };
-
-      function safeText(v) { return (v === null || v === undefined) ? "" : String(v); }
-      function showError(id, msg) {
-        var n = document.getElementById(id); if (!n) return;
-        n.hidden = false; n.textContent = "[ ERROR ] " + msg;
-      }
 
       function setUpStatus(msg, cls) {
         var el = document.getElementById("cos-up-status");
@@ -515,11 +402,11 @@
           var hdr = document.createElement("div");
           hdr.className = "cos-up-header";
           hdr.innerHTML =
-            "<span class='cos-up-page'>" + safeText(p.observedPage) + "</span>" +
+            "<span class='cos-up-page'>" + window._cosSafeText(p.observedPage) + "</span>" +
             "<span class='cos-up-tag " + (UP_STATUS_CLASS[p.status] || "") + "'>" + (UP_STATUS_LABEL[p.status] || p.status) + "</span>" +
             "<span class='cos-up-type'>" + (UP_TYPE_LABEL[p.proposalType] || p.proposalType) + "</span>" +
             "<span class='cos-up-prio " + (UP_PRIORITY_CLASS[p.priority] || "") + "'>" + (UP_PRIORITY_LABEL[p.priority] || p.priority) + "</span>" +
-            "<span class='cos-up-date'>" + safeText(p.createdAt || "") + "</span>";
+            "<span class='cos-up-date'>" + window._cosSafeText(p.createdAt || "") + "</span>";
           card.appendChild(hdr);
 
           var obs = document.createElement("div");
@@ -602,13 +489,21 @@
       }
 
       function loadUpdateProposals() {
+        window._cosCentralData.then(function(data) {
+          if (!data) return;
+          var proposals = (data.data && data.data.updateProposals) || [];
+          renderUpdateProposals(proposals);
+        });
+      }
+
+      function refreshUpdateProposals() {
         fetch("/api/central-os")
           .then(function(r) { return r.json(); })
           .then(function(data) {
             var proposals = (data.data && data.data.updateProposals) || [];
             renderUpdateProposals(proposals);
           })
-          .catch(function(e) { showError("cos-up-error", e.message); });
+          .catch(function(e) { window._cosShowError("cos-up-error", e.message); });
       }
 
       function updateUpStatus(id, status) {
@@ -619,10 +514,10 @@
         })
           .then(function(r) { return r.json(); })
           .then(function(data) {
-            if (data.ok) loadUpdateProposals();
-            else showError("cos-up-error", "更新失敗: " + data.error);
+            if (data.ok) refreshUpdateProposals();
+            else window._cosShowError("cos-up-error", "更新失敗: " + data.error);
           })
-          .catch(function(e) { showError("cos-up-error", e.message); });
+          .catch(function(e) { window._cosShowError("cos-up-error", e.message); });
       }
 
       var runBtn = document.getElementById("cos-up-run");
@@ -635,13 +530,13 @@
             .then(function(data) {
               if (data.ok) {
                 setUpStatus(data.proposals_written + "件生成", "ok");
-                loadUpdateProposals();
+                refreshUpdateProposals();
               } else {
                 setUpStatus("エラー", "error");
-                showError("cos-up-error", data.error);
+                window._cosShowError("cos-up-error", data.error);
               }
             })
-            .catch(function(e) { setUpStatus("失敗", "error"); showError("cos-up-error", e.message); })
+            .catch(function(e) { setUpStatus("失敗", "error"); window._cosShowError("cos-up-error", e.message); })
             .finally(function() { runBtn.disabled = false; });
         });
       }
@@ -666,12 +561,6 @@
         pending: "未確認", ready: "Ready", sent: "Sent",
         done: "Done", hold: "保留", rejected: "却下"
       };
-
-      function safeText(v) { return (v === null || v === undefined) ? "" : String(v); }
-      function showError(id, msg) {
-        var n = document.getElementById(id); if (!n) return;
-        n.hidden = false; n.textContent = "[ ERROR ] " + msg;
-      }
 
       function setImplStatus(msg, cls) {
         var el = document.getElementById("cos-impl-status");
@@ -718,7 +607,7 @@
           meta.className = "cos-up-meta";
           meta.innerHTML =
             '<span class="cos-up-page">' + (t.targetPages || []).join(", ") + '</span>' +
-            '<span class="cos-up-priority">元企画: ' + safeText(t.sourcePlanId || "-") + '</span>' +
+            '<span class="cos-up-priority">元企画: ' + window._cosSafeText(t.sourcePlanId || "-") + '</span>' +
             '<span class="cos-up-date">' + (t.createdAt ? t.createdAt.slice(0,10) : "") + '</span>';
           if (t.source === "fallback") {
             var src = document.createElement("span");
@@ -902,7 +791,7 @@
           meta.className = "cos-up-meta";
           meta.innerHTML =
             '<span class="cos-up-page">' + (event.targetPages || []).join(", ") + '</span>' +
-            '<span class="cos-up-priority">元企画: ' + safeText(event.sourcePlanId || "-") + '</span>' +
+            '<span class="cos-up-priority">元企画: ' + window._cosSafeText(event.sourcePlanId || "-") + '</span>' +
             '<span class="cos-up-date">' + (event.completedAt ? event.completedAt.slice(0,10) : "") + '</span>';
           card.appendChild(meta);
 
@@ -947,15 +836,25 @@
       }
 
       function loadImplTasks() {
+        window._cosCentralData.then(function(data) {
+          if (!data) return;
+          var tasks  = (data.data && data.data.implementationTasks)  || [];
+          var events = (data.data && data.data.implementationEvents) || [];
+          renderImplTasks(tasks);
+          renderImplEvents(events);
+        });
+      }
+
+      function refreshImplTasks() {
         fetch("/api/central-os")
           .then(function(r) { return r.json(); })
           .then(function(data) {
-            var tasks = (data.data && data.data.implementationTasks) || [];
+            var tasks  = (data.data && data.data.implementationTasks)  || [];
             var events = (data.data && data.data.implementationEvents) || [];
             renderImplTasks(tasks);
             renderImplEvents(events);
           })
-          .catch(function(e) { showError("cos-impl-error", e.message); });
+          .catch(function(e) { window._cosShowError("cos-impl-error", e.message); });
       }
 
       function updateImplStatus(id, status) {
@@ -966,10 +865,10 @@
         })
           .then(function(r) { return r.json(); })
           .then(function(data) {
-            if (data.ok) loadImplTasks();
-            else showError("cos-impl-error", "更新失敗: " + data.error);
+            if (data.ok) refreshImplTasks();
+            else window._cosShowError("cos-impl-error", "更新失敗: " + data.error);
           })
-          .catch(function(e) { showError("cos-impl-error", e.message); });
+          .catch(function(e) { window._cosShowError("cos-impl-error", e.message); });
       }
 
       var implRunBtn = document.getElementById("cos-impl-run");
@@ -982,13 +881,13 @@
             .then(function(data) {
               if (data.ok) {
                 setImplStatus(data.tasks_written + "件生成", "ok");
-                loadImplTasks();
+                refreshImplTasks();
               } else {
                 setImplStatus("エラー", "error");
-                showError("cos-impl-error", data.error);
+                window._cosShowError("cos-impl-error", data.error);
               }
             })
-            .catch(function(e) { setImplStatus("失敗", "error"); showError("cos-impl-error", e.message); })
+            .catch(function(e) { setImplStatus("失敗", "error"); window._cosShowError("cos-impl-error", e.message); })
             .finally(function() { implRunBtn.disabled = false; });
         });
       }
@@ -1014,17 +913,17 @@
             .then(function(data) {
               if (data.ok) {
                 archiveBtn.textContent = "アーカイブ済 (" + data.archived + "件)";
-                loadImplTasks();
+                refreshImplTasks();
               } else {
                 archiveBtn.textContent = "アーカイブ";
                 archiveBtn.disabled = false;
-                showError("cos-events-archive-error", data.error);
+                window._cosShowError("cos-events-archive-error", data.error);
               }
             })
             .catch(function(e) {
               archiveBtn.textContent = "アーカイブ";
               archiveBtn.disabled = false;
-              showError("cos-events-archive-error", e.message);
+              window._cosShowError("cos-events-archive-error", e.message);
             });
         });
       }
@@ -1033,12 +932,6 @@
     // ── AI企画案 ──────────────────────────────────────────────────────────────
     (function() {
       var planFilter = "all";
-
-      function safeText(v) { return (v === null || v === undefined) ? "" : String(v); }
-      function showError(id, msg) {
-        var n = document.getElementById(id); if (!n) return;
-        n.hidden = false; n.textContent = "[ ERROR ] " + msg;
-      }
 
       function setPlanStatus(msg, cls) {
         var el = document.getElementById("cos-plan-status");
@@ -1124,13 +1017,21 @@
       }
 
       function loadPlanProposals() {
+        window._cosCentralData.then(function(data) {
+          if (!data) return;
+          var plans = (data.data && data.data.planProposals) || [];
+          renderPlanProposals(plans);
+        });
+      }
+
+      function refreshPlanProposals() {
         fetch("/api/central-os")
           .then(function(r) { return r.json(); })
           .then(function(data) {
             var plans = (data.data && data.data.planProposals) || [];
             renderPlanProposals(plans);
           })
-          .catch(function(e) { showError("cos-plan-error", e.message); });
+          .catch(function(e) { window._cosShowError("cos-plan-error", e.message); });
       }
 
       function updatePlanStatus(id, status) {
@@ -1141,10 +1042,10 @@
         })
           .then(function(r) { return r.json(); })
           .then(function(data) {
-            if (data.ok) loadPlanProposals();
-            else showError("cos-plan-error", "更新失敗: " + data.error);
+            if (data.ok) refreshPlanProposals();
+            else window._cosShowError("cos-plan-error", "更新失敗: " + data.error);
           })
-          .catch(function(e) { showError("cos-plan-error", e.message); });
+          .catch(function(e) { window._cosShowError("cos-plan-error", e.message); });
       }
 
       var planRunBtn = document.getElementById("cos-plan-run");
@@ -1157,13 +1058,13 @@
             .then(function(data) {
               if (data.ok) {
                 setPlanStatus(data.plans_written + "件生成（" + (data.source || "-") + "）", "ok");
-                loadPlanProposals();
+                refreshPlanProposals();
               } else {
                 setPlanStatus("エラー", "error");
-                showError("cos-plan-error", data.error);
+                window._cosShowError("cos-plan-error", data.error);
               }
             })
-            .catch(function(e) { setPlanStatus("失敗", "error"); showError("cos-plan-error", e.message); })
+            .catch(function(e) { setPlanStatus("失敗", "error"); window._cosShowError("cos-plan-error", e.message); })
             .finally(function() { planRunBtn.disabled = false; });
         });
       }
@@ -1178,6 +1079,97 @@
       });
 
       loadPlanProposals();
+    })();
+
+    // ── イベント観測 ──────────────────────────────────────────────────────────
+    (function () {
+      "use strict";
+
+      var noteEl    = document.getElementById("cos-evt-note");
+      var errorEl   = document.getElementById("cos-evt-error");
+      var bodyEl    = document.getElementById("cos-evt-body");
+      var overviewEl = document.getElementById("cos-evt-overview");
+      var utmWarnEl = document.getElementById("cos-evt-utm-warning");
+      var pagesBody = document.getElementById("cos-evt-pages-body");
+      var sourcesBody = document.getElementById("cos-evt-sources-body");
+      var roomEnterBody = document.getElementById("cos-evt-room-enter-body");
+      var externalBody = document.getElementById("cos-evt-external-body");
+      var signalBody = document.getElementById("cos-evt-signal-body");
+
+      function safeText(v) { return (v === null || v === undefined) ? "" : String(v); }
+
+      function fillEventTable(tbody, eventCounts) {
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        Object.keys(eventCounts || {}).forEach(function (name) {
+          var tr = document.createElement("tr");
+          tr.innerHTML = "<td>" + safeText(name) + "</td><td>" + safeText(eventCounts[name]) + "</td>";
+          tbody.appendChild(tr);
+        });
+      }
+
+      function renderEventObservation(data) {
+        if (!data) return;
+        if (!data.available) {
+          if (noteEl) {
+            noteEl.hidden = false;
+            noteEl.textContent = "データなし — " + (data.reason === "ga4_credentials_missing"
+              ? "GA4認証情報（ga4-credentials.json）が見つかりません"
+              : "GA4イベントデータを取得できません" + (data.error ? " (" + data.error + ")" : ""));
+          }
+          return;
+        }
+
+        noteEl && (noteEl.hidden = true);
+        bodyEl && (bodyEl.hidden = false);
+
+        if (overviewEl) {
+          var ov = data.overview || {};
+          overviewEl.innerHTML = [
+            '<div class="cos-watch-stat"><span class="cos-label">観測者</span><span class="cos-value">' + safeText(ov.observers) + '</span></div>',
+            '<div class="cos-watch-stat"><span class="cos-label">表示回数</span><span class="cos-value">' + safeText(ov.pageviews) + '</span></div>',
+            '<div class="cos-watch-stat"><span class="cos-label">イベント数</span><span class="cos-value">' + safeText(ov.events) + '</span></div>',
+          ].join("");
+        }
+
+        if (utmWarnEl) {
+          if (data.utm_warning) {
+            utmWarnEl.hidden = false;
+            utmWarnEl.textContent = "[ 注意 ] Direct流入の比率が高い — SNS導線にUTMパラメータが不足している可能性があります";
+          } else {
+            utmWarnEl.hidden = true;
+          }
+        }
+
+        if (pagesBody) {
+          pagesBody.innerHTML = "";
+          (data.top_pages || []).forEach(function (p) {
+            var tr = document.createElement("tr");
+            tr.innerHTML = "<td>" + safeText(p.room_name) + "</td><td>" + safeText(p.path) + "</td><td>" + safeText(p.pageviews) + "</td>";
+            pagesBody.appendChild(tr);
+          });
+        }
+
+        if (sourcesBody) {
+          sourcesBody.innerHTML = "";
+          (data.traffic_sources || []).forEach(function (s) {
+            var tr = document.createElement("tr");
+            tr.innerHTML = "<td>" + safeText(s.channel) + "</td><td>" + safeText(s.sessions) + "</td>";
+            sourcesBody.appendChild(tr);
+          });
+        }
+
+        fillEventTable(roomEnterBody, data.room_enter_events);
+        fillEventTable(externalBody, data.external_click_events);
+        fillEventTable(signalBody, data.signal_events);
+      }
+
+      window._cosCentralData.then(function (result) {
+        if (!result) return;
+        renderEventObservation(result.data && result.data.eventObservation);
+      }).catch(function (err) {
+        errorEl && window._cosShowError("cos-evt-error", err.message);
+      });
     })();
 
     // ── YouTube Analytics ──────────────────────────────────────────────────────

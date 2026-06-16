@@ -32,7 +32,9 @@
     if (item.randomAmazon) return "amazon";
     const href = String(item.href || "").toLowerCase();
     if (href.includes("ofuse.me")) return "ofuse";
-    if (href.startsWith("http")) return "external";
+    if (href.includes("booth.pm")) return "booth";
+    if (href.includes("amzn.to") || href.includes("amazon.")) return "amazon";
+    if (href.startsWith("http")) return "affiliate";
     return "internal";
   }
 
@@ -49,17 +51,32 @@
     link.dataset.slotType = slotType(item);
     link.dataset.slotLabel = item && item.label || id || "OUTSIDE OBJECT";
     link.dataset.destinationType = destinationType(item);
+    link.dataset.externalType = destinationType(item);
   }
 
   function trackOutsideSlotClick(event) {
     const link = event.currentTarget;
     if (!link || typeof window.gtag !== "function") return;
-    window.gtag("event", "outside_slot_click", {
+    const params = {
       slot_id: link.dataset.slotId || "",
       slot_type: link.dataset.slotType || "",
       slot_label: link.dataset.slotLabel || "",
       destination_type: link.dataset.destinationType || ""
-    });
+    };
+    window.gtag("event", "outside_slot_click", params);
+
+    const externalType = link.dataset.externalType || "";
+    const specificEventByType = {
+      ofuse: "ofuse_click",
+      booth: "booth_click",
+      amazon: "amazon_click",
+      affiliate: "affiliate_click"
+    };
+    const trackFn = typeof window.trackKyoukaiEvent === "function" ? window.trackKyoukaiEvent : null;
+    if (trackFn && specificEventByType[externalType]) {
+      trackFn(specificEventByType[externalType], params);
+      trackFn("outside_link_click", Object.assign({}, params, { link_type: externalType }));
+    }
   }
 
   function prepareRandomLink(event) {

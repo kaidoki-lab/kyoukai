@@ -1068,6 +1068,11 @@ def run_ai_planner() -> dict[str, Any]:
     except (FileNotFoundError, json.JSONDecodeError):
         pass
 
+    try:
+        event_observation = _fetch_ga4_event_observation()
+    except Exception:
+        event_observation = {"available": False, "reason": "exception"}
+
     planner_input: dict[str, Any] = {
         "ga4": ga4_data,
         "analysis": {},
@@ -1075,6 +1080,7 @@ def run_ai_planner() -> dict[str, Any]:
         "recentChanges": recent_changes,
         "recentAccepted": recent_accepted,
         "recentRejected": recent_rejected,
+        "eventObservation": event_observation,
     }
 
     # save planner_input for inspection
@@ -1348,14 +1354,58 @@ def update_plan_status(plan_id: str, status: str) -> dict[str, Any]:
 
     return found
 
-def analyze_page_ai(page: str, pv: int, avg_duration: float, bounce_rate: float, priority: str) -> dict:
+_EVENT_NOTE_ROOM_SLUGS = {
+    "/": "home", "/observation": "observation", "/observer": "observer",
+    "/signal": "signal", "/outside": "outside", "/exit": "exit",
+    "/null": "null", "/archive": "archive", "/hyougi": "hyougi", "/ma": "ma",
+}
+
+
+def _event_note_for_page(path: str, event_obs: dict[str, Any]) -> str:
+    """イベント観測データから、このページに関係する一言サマリーを作る。"""
+    if not event_obs or not event_obs.get("available"):
+        return ""
+
+    notes: list[str] = []
+    slug = _EVENT_NOTE_ROOM_SLUGS.get(path)
+    if slug:
+        count = (event_obs.get("room_enter_events") or {}).get(f"room_enter_{slug}", 0)
+        notes.append(f"本日の部屋到達イベント: {count}件")
+
+    if path == "/outside":
+        ext = event_obs.get("external_click_events") or {}
+        notes.append(
+            "外部接続クリック: "
+            f"OFUSE {ext.get('ofuse_click', 0)} / BOOTH {ext.get('booth_click', 0)} / "
+            f"Amazon {ext.get('amazon_click', 0)} / Affiliate {ext.get('affiliate_click', 0)}"
+        )
+
+    if path == "/signal":
+        sig = event_obs.get("signal_events") or {}
+        notes.append(
+            "Signal外部通信: "
+            f"裂け目タップ {sig.get('signal_hotspot_click', 0)} / "
+            f"追いかける {sig.get('external_connection_follow', 0)} / "
+            f"追いかけない {sig.get('external_connection_cancel', 0)}"
+        )
+
+    if event_obs.get("utm_warning"):
+        notes.append("Direct流入比率が高く、UTM不足の可能性あり")
+
+    return " ／ ".join(notes)
+
+
+def analyze_page_ai(
+    page: str, pv: int, avg_duration: float, bounce_rate: float, priority: str,
+    event_note: str = "",
+) -> dict:
     """Call ai_analyst.analyze_page, fall back to empty dict on any error."""
     if _ai_analyst_mod is None:
         return {}
     try:
         return _ai_analyst_mod.analyze_page(
             page=page, pv=pv, avg_duration=avg_duration,
-            bounce_rate=bounce_rate, priority=priority,
+            bounce_rate=bounce_rate, priority=priority, event_note=event_note,
         )
     except Exception:
         return {}
@@ -1403,6 +1453,132 @@ def _fetch_ga4_data() -> dict[str, Any]:
         return {"rows": rows, "source": "ga4", "fetched_at": now_iso()}
     except Exception as exc:
         return {"error": str(exc), "source": "ga4_error"}
+
+
+# Central OS「イベント観測」セクションで使うカスタムイベント名の一覧。
+# room_enter_* はpublic_roomのbody scriptに設定されたwindow.KYOUKAI_ROOMから自動送信される。
+KYOUKAI_CUSTOM_EVENTS = [
+    "room_enter_home", "room_enter_observation", "room_enter_observer",
+    "room_enter_signal", "room_enter_outside", "room_enter_exit",
+    "room_enter_null", "room_enter_archive", "room_enter_hyougi", "room_enter_ma",
+    "ofuse_click", "booth_click", "amazon_click", "affiliate_click", "outside_link_click",
+    "signal_hotspot_click", "external_connection_start", "external_connection_choice_show",
+    "external_connection_follow", "external_connection_cancel",
+]
+
+KYOUKAI_ROOM_LABELS = {
+    "/": "祭壇域 (KYOUKAI)", "/observation": "観測域", "/observer": "Observer Room",
+    "/signal": "受信域", "/null": "崩落域", "/exit": "崩壊域", "/archive": "記録室",
+    "/hyougi": "評議録", "/outside": "OUTSIDE", "/ma": "悪魔の間",
+}
+
+
+def _fetch_ga4_event_observation() -> dict[str, Any]:
+    """Fetch today's event/engagement observation data from GA4 Data API.
+
+    制作者専用のCentral OS表示にのみ使う。ユーザー側には公開しない。
+    """
+    if not GA4_CREDENTIALS_FILE.exists():
+        return {"available": False, "reason": "ga4_credentials_missing"}
+    try:
+        from google.analytics.data_v1beta import BetaAnalyticsDataClient
+        from google.analytics.data_v1beta.types import (
+            DateRange, Dimension, Metric, OrderBy, RunReportRequest,
+        )
+        from google.oauth2 import service_account
+
+        creds = service_account.Credentials.from_service_account_file(
+            str(GA4_CREDENTIALS_FILE),
+            scopes=["https://www.googleapis.com/auth/analytics.readonly"],
+        )
+        client = BetaAnalyticsDataClient(credentials=creds)
+        today_range = [DateRange(start_date="today", end_date="today")]
+        property_name = f"properties/{GA4_PROPERTY_ID}"
+
+        overview_resp = client.run_report(RunReportRequest(
+            property=property_name,
+            metrics=[Metric(name="activeUsers"), Metric(name="screenPageViews"), Metric(name="eventCount")],
+            date_ranges=today_range,
+        ))
+        overview = {"observers": 0, "pageviews": 0, "events": 0}
+        if overview_resp.rows:
+            row = overview_resp.rows[0]
+            overview = {
+                "observers": int(row.metric_values[0].value),
+                "pageviews": int(row.metric_values[1].value),
+                "events": int(row.metric_values[2].value),
+            }
+
+        pages_resp = client.run_report(RunReportRequest(
+            property=property_name,
+            dimensions=[Dimension(name="pagePath")],
+            metrics=[Metric(name="screenPageViews")],
+            date_ranges=today_range,
+            order_bys=[OrderBy(metric=OrderBy.MetricOrderBy(metric_name="screenPageViews"), desc=True)],
+            limit=8,
+        ))
+        top_pages = [
+            {
+                "path": row.dimension_values[0].value,
+                "room_name": KYOUKAI_ROOM_LABELS.get(row.dimension_values[0].value, row.dimension_values[0].value),
+                "pageviews": int(row.metric_values[0].value),
+            }
+            for row in pages_resp.rows
+        ]
+
+        source_resp = client.run_report(RunReportRequest(
+            property=property_name,
+            dimensions=[Dimension(name="sessionDefaultChannelGroup")],
+            metrics=[Metric(name="sessions")],
+            date_ranges=today_range,
+            order_bys=[OrderBy(metric=OrderBy.MetricOrderBy(metric_name="sessions"), desc=True)],
+            limit=10,
+        ))
+        traffic_sources = [
+            {"channel": row.dimension_values[0].value, "sessions": int(row.metric_values[0].value)}
+            for row in source_resp.rows
+        ]
+        direct_sessions = next((s["sessions"] for s in traffic_sources if s["channel"] == "Direct"), 0)
+        total_sessions = sum(s["sessions"] for s in traffic_sources)
+        utm_warning = total_sessions > 0 and (direct_sessions / total_sessions) > 0.6
+
+        events_resp = client.run_report(RunReportRequest(
+            property=property_name,
+            dimensions=[Dimension(name="eventName")],
+            metrics=[Metric(name="eventCount")],
+            date_ranges=today_range,
+            limit=100,
+        ))
+        event_counts: dict[str, int] = {
+            row.dimension_values[0].value: int(row.metric_values[0].value)
+            for row in events_resp.rows
+        }
+        custom_event_counts = {name: event_counts.get(name, 0) for name in KYOUKAI_CUSTOM_EVENTS}
+
+        return {
+            "available": True,
+            "fetched_at": now_iso(),
+            "date_range": "today",
+            "overview": overview,
+            "top_pages": top_pages,
+            "traffic_sources": traffic_sources,
+            "utm_warning": utm_warning,
+            "room_enter_events": {k: v for k, v in custom_event_counts.items() if k.startswith("room_enter_")},
+            "external_click_events": {
+                k: custom_event_counts[k]
+                for k in ("ofuse_click", "booth_click", "amazon_click", "affiliate_click", "outside_link_click")
+            },
+            "signal_events": {
+                k: custom_event_counts[k]
+                for k in (
+                    "signal_hotspot_click", "external_connection_start",
+                    "external_connection_choice_show", "external_connection_follow",
+                    "external_connection_cancel",
+                )
+            },
+        }
+    except Exception as exc:
+        return {"available": False, "reason": "ga4_error", "error": str(exc)}
 
 
 def _analyze_rooms(ga4_data: dict[str, Any]) -> list[dict[str, Any]]:
@@ -1586,6 +1762,10 @@ def run_analysis() -> dict[str, Any]:
 def generate_update_proposals() -> dict[str, Any]:
     """Fetch GA4 data, apply analysis rules v1, save update-proposals.json."""
     ga4_data = _fetch_ga4_data()
+    try:
+        event_obs = _fetch_ga4_event_observation()
+    except Exception:
+        event_obs = {"available": False, "reason": "exception"}
     rows: list[dict[str, Any]] = ga4_data.get("rows", [])
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
@@ -1717,7 +1897,7 @@ def generate_update_proposals() -> dict[str, Any]:
         priority_val = _priority(path, pv)
 
         # AI analysis layer
-        ai = analyze_page_ai(path, pv, dur, bounce, priority_val)
+        ai = analyze_page_ai(path, pv, dur, bounce, priority_val, _event_note_for_page(path, event_obs))
 
         proposals.append({
             "id": prop_id,
@@ -1745,7 +1925,7 @@ def generate_update_proposals() -> dict[str, Any]:
         prev = existing.get(path, {})
         status = prev.get("status", "pending")
         prop_id = f"proposal-{abs(hash(path + 'nodata')) % 900 + 100:03d}"
-        ai = analyze_page_ai(path, 0, 0.0, 0.0, "watch")
+        ai = analyze_page_ai(path, 0, 0.0, 0.0, "watch", _event_note_for_page(path, event_obs))
         proposals.append({
             "id": prop_id,
             "createdAt": today,
@@ -2033,6 +2213,13 @@ def central_os_payload() -> dict[str, Any]:
         **altar_stats,
         "sourceCount": len(ALTAR_MIGRATION_RESULTS),
     }
+
+    # イベント観測（GA4カスタムイベント・制作者専用）
+    try:
+        result["data"]["eventObservation"] = _fetch_ga4_event_observation()
+    except Exception as exc:
+        result["errors"]["eventObservation"] = f"read error: {exc}"
+        result["data"]["eventObservation"] = {"available": False, "reason": "exception"}
 
     # YouTube Analytics
     try:
