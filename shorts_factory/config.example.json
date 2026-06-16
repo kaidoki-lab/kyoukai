@@ -1,0 +1,35 @@
+{
+  "obs": {
+    "host": "127.0.0.1",
+    "port": 4455,
+    "password": "YOUR_OBS_WEBSOCKET_PASSWORD",
+    "exe_path": "C:\\Program Files\\obs-studio\\bin\\64bit\\obs64.exe",
+    "recording_path": "input_videos",
+    "work_scene_name": "KYOUKAI_WORK_RECORD",
+    "work_source_name": "KYOUKAI_Display_Capture",
+    "recording_width": 1920,
+    "recording_height": 1080,
+    "recording_fps": 30
+  },
+  "video": {
+    "short_length_sec": 30,
+    "candidates_per_video": 5,
+    "min_candidates_per_video": 3,
+    "manual_cut_points": [],
+    "marker_pre_roll_sec": 10,
+    "output_width": 1080,
+    "output_height": 1920,
+    "fps": 30,
+    "ffmpeg_path": "",
+    "ffprobe_path": ""
+  },
+  "storage": {
+    "keep_days": 3
+  },
+  "site": {
+    "base_url": "https://www.void-kyoukai.net/",
+    "utm_source": "youtube",
+    "utm_medium": "shorts",
+    "utm_campaign_prefix": "devlog"
+  }
+}

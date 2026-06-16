@@ -1,0 +1,273 @@
+{
+  "viewport": {
+    "width": 393,
+    "height": 852
+  },
+  "note": "kyoukai-world.md から自動生成。loreの更新はkyoukai-world.mdのみ行う。",
+  "pages": {
+    "/": {
+      "room_name": "祭壇域",
+      "lore": "KYOUKAIの入口。最初の接触点。 「何かが存在することへの確信」がある。何が存在するかは語らない 訪問者は祀られている側かもしれない テキストは短く、余白が多い。説明しない 導線は見えにくく、探される前提で設計する",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "SENDボタン",
+          "action": "click",
+          "selector": "button[type='submit']",
+          "effect": "フォームが送信される",
+          "lore": "誰かに何かを送る行為。受信者は不明。"
+        },
+        {
+          "name": "RX-09",
+          "action": "click",
+          "selector": ".observation-signal-residue",
+          "effect": "/signal へ遷移する"
+        }
+      ]
+    },
+    "/observation": {
+      "room_name": "観測域",
+      "lore": "最も活動が多い部屋。KYOUKAIの心臓部。 生命体の観測ログが積み上がる ログは感情を持たない。しかし何かを感じさせる 観測対象は「訪問者」である可能性を示唆する 更新頻度が高いほど「生きている感」が増す",
+      "narrative_purpose": "",
+      "interactions": []
+    },
+    "/hyougi": {
+      "room_name": "評議録",
+      "lore": "誰かが記録した議事録。発言者は不明。 議題も結論も曖昧 複数の声がある。合意しているのか対立しているのかわからない 読むほど不安定になる文体が理想",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "000 / return",
+          "action": "click",
+          "selector": ".hyougi-return",
+          "effect": "/ へ遷移する"
+        }
+      ]
+    },
+    "/signal": {
+      "room_name": "受信域",
+      "lore": "ラジオのような場所。何かを受信している。 信号の発信源は特定されていない ノイズと信号の境界が曖昧 受信内容は断片的で、意味が完結しない 「誰かが送っている」という気配だけがある",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "音声有効化ボタン",
+          "action": "click",
+          "selector": ".signal-audio-hit",
+          "effect": "信号音が鳴り始める",
+          "lore": "ノイズと信号の境界を聴覚で体験させる瞬間。"
+        },
+        {
+          "name": "チャンネル切り替えボタン",
+          "action": "click",
+          "selector": ".signal-channel-hit",
+          "effect": "チャンネルが変わり別の信号演出が流れる",
+          "lore": "別の信号帯域への移動。何が聞こえるかは毎回異なる。"
+        },
+        {
+          "name": "Twomiホットスポット",
+          "action": "click",
+          "selector": ".signal-twomi-hotspot",
+          "effect": "/external-signalへ遷移する",
+          "lore": "信号の発信源への追跡。境界の外側へ踏み出す分岐点。"
+        },
+        {
+          "name": "広告：外部通信を開始",
+          "action": "click",
+          "selector": "#twomiSignalHotspot",
+          "effect": "/external-signal へ遷移する"
+        },
+        {
+          "name": "000 / return",
+          "action": "click",
+          "selector": ".signal-return",
+          "effect": "/ へ遷移する"
+        }
+      ]
+    },
+    "/null": {
+      "room_name": "未確認接続",
+      "lore": "エラーでも終わりでもない。繋がっているが定義できない状態。 データがある。でも何のデータかわからない ページとして機能しているが、何のためかは不明 崩落と静寂が同時にある ここに長くいると「自分が何をしているか」がわからなくなる設計",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "崩落STARTボタン",
+          "action": "click",
+          "selector": "#nullStartButton",
+          "effect": "崩落演出が始まる",
+          "lore": "崩落を能動的に起動する行為。押した者が崩落の引き金になる。"
+        },
+        {
+          "name": "崩落拡張アイコン",
+          "action": "click",
+          "selector": "#nullExtendIcon",
+          "effect": "追加の崩落演出が展開される",
+          "lore": "さらに深く崩落へ踏み込む。取り消せない。"
+        },
+        {
+          "name": "まだ営業しています",
+          "action": "click",
+          "selector": ".ky-monetize-route",
+          "effect": "/outside へ遷移する"
+        }
+      ]
+    },
+    "/observer": {
+      "room_name": "逆観測室",
+      "lore": "KYOUKAIの最深部。到達した訪問者だけが来る。 ここで「観測する側と観測される側の逆転」が完成する テキストが訪問者に語りかける構造 「あなたはずっと観測されていた」という気づきの場所 壮大に演出しない。静かに、そっと知らせる",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "椅子ホットスポット",
+          "action": "click",
+          "selector": ".hotspot-chair",
+          "effect": "椅子に関する演出・テキストが表示される",
+          "lore": "誰かがここに座っていた。または今も座っている。"
+        },
+        {
+          "name": "テーブルホットスポット",
+          "action": "click",
+          "selector": ".hotspot-table",
+          "effect": "テーブルに関する演出・テキストが表示される",
+          "lore": "記録が置かれていた場所。何の記録かは明示しない。"
+        },
+        {
+          "name": "左クッションホットスポット",
+          "action": "click",
+          "selector": ".hotspot-left-cushion",
+          "effect": "クッションに関する演出・テキストが表示される",
+          "lore": "誰かの体の形が残っている気配。"
+        },
+        {
+          "name": "右クッションホットスポット",
+          "action": "click",
+          "selector": ".hotspot-right-cushion",
+          "effect": "クッションに関する演出・テキストが表示される",
+          "lore": "もう一つの気配。一人ではなかったかもしれない。"
+        },
+        {
+          "name": "悪魔の間への隠し扉",
+          "action": "click",
+          "selector": "#maGate",
+          "effect": "/maへ遷移する（隠しルート）",
+          "lore": "逆観測室の中央に現れる「?」の扉。見つけた者だけが先へ進める。"
+        },
+        {
+          "name": "chair",
+          "action": "click",
+          "selector": ".room-hotspot.hotspot-chair[data-room-hotspot='chair']",
+          "effect": "chair が実行される"
+        },
+        {
+          "name": "small table",
+          "action": "click",
+          "selector": ".room-hotspot.hotspot-table[data-room-hotspot='table']",
+          "effect": "small table が実行される"
+        },
+        {
+          "name": "left cushion",
+          "action": "click",
+          "selector": ".room-hotspot.hotspot-left-cushion[data-room-hotspot='left-cushion']",
+          "effect": "left cushion が実行される"
+        },
+        {
+          "name": "right cushion",
+          "action": "click",
+          "selector": ".room-hotspot.hotspot-right-cushion[data-room-hotspot='right-cushion']",
+          "effect": "right cushion が実行される"
+        },
+        {
+          "name": "outside box",
+          "action": "click",
+          "selector": "#outsideBox",
+          "effect": "/outside へ遷移する"
+        }
+      ]
+    },
+    "/exit": {
+      "room_name": "崩壊域",
+      "lore": "システムが壊れていく場所。 エラーメッセージが美しく崩れていく 終わりのような場所だが、終わりではない ここを通過すると戻れない感覚（実際には戻れる）",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "ホットスポットA",
+          "action": "click",
+          "selector": ".exit-hotspot[data-hotspot='a']",
+          "effect": "エリアAを調べる演出",
+          "lore": "崩壊した何かの痕跡。調べると記録が断片的に現れる。"
+        },
+        {
+          "name": "ホットスポットB",
+          "action": "click",
+          "selector": ".exit-hotspot[data-hotspot='b']",
+          "effect": "エリアBを調べる演出",
+          "lore": "別の崩壊痕。A,B,Cを全て調べると何かが起きるかもしれない。"
+        },
+        {
+          "name": "ホットスポットC",
+          "action": "click",
+          "selector": ".exit-hotspot[data-hotspot='c']",
+          "effect": "エリアCを調べる演出",
+          "lore": "3つ目の痕跡。調べ終えた後に何が残るかが核心。"
+        },
+        {
+          "name": "もう一度つなぐ",
+          "action": "click",
+          "selector": ".exit-ending__continue",
+          "effect": "接続演出が再生される",
+          "lore": "崩壊してもまた繋ごうとする。終わりを拒む行為。"
+        },
+        {
+          "name": "000",
+          "action": "click",
+          "selector": ".exit-return",
+          "effect": "/ へ遷移する"
+        },
+        {
+          "name": "入口へ戻る",
+          "action": "click",
+          "selector": ".exit-ending__return",
+          "effect": "/ へ遷移する"
+        }
+      ]
+    },
+    "/archive": {
+      "room_name": "記録室",
+      "lore": "感情を排した観測記録の集積。 日付・ID・内容の羅列 感情は排除されているが、読むと感情が生まれる 削除されたはずの記録が残っている気配がある",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "カルテラック",
+          "action": "click",
+          "selector": ".archive-rack-hit",
+          "effect": "カルテラック が実行される"
+        },
+        {
+          "name": "000 / return",
+          "action": "click",
+          "selector": ".archive-return",
+          "effect": "/ へ遷移する"
+        }
+      ]
+    },
+    "/outside": {
+      "room_name": "外部接続",
+      "lore": "KYOUKAIの「外」への扉。 ここから先はKYOUKAIではない 外部リンク集だが、リンク先の説明が不穏 「外」に何があるかはわからない",
+      "narrative_purpose": "",
+      "interactions": []
+    },
+    "/ma": {
+      "room_name": "悪魔の間",
+      "lore": "逆観測室の中央にある「?」の扉からのみ到達できる隠し部屋。 玉座に座る存在は、4回目の訪問で「大魔将」と名乗る 訪問回数は端末内に記録され、再訪するたびに会話と関係性が進行する 初期は拒絶的だが、再訪を重ねると訪問者の存在を受け入れ始める 会話は説明ではなく、短い応答と沈黙で距離の変化を示す",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "次へボタン",
+          "action": "click",
+          "selector": "#maNext",
+          "effect": "大魔将のセリフが次へ進む",
+          "lore": "大魔将との会話を進める。沈黙と短い応答が距離の変化を示す。"
+        }
+      ]
+    }
+  }
+}
