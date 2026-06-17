@@ -969,8 +969,8 @@ def _safe_public_plan_fallback() -> list[dict[str, Any]]:
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
     candidates = [
         {
-            "title": "未確認接続の断片文更新",
-            "summary": "/nullの既存世界観に沿う短い断片文を追加し、情報密度を整える。",
+            "title": "崩落域の断片文更新",
+            "summary": "/nullの崩落域としての世界観に沿う短い断片文を追加し、情報密度を整える。",
             "reason": "部屋の異常な余韻を保ちながら滞在体験を深めるため。",
             "targets": ["/null"],
         },
@@ -1468,7 +1468,7 @@ KYOUKAI_CUSTOM_EVENTS = [
 
 KYOUKAI_ROOM_LABELS = {
     "/": "祭壇域 (KYOUKAI)", "/observation": "観測域", "/observer": "Observer Room",
-    "/signal": "受信域", "/null": "崩落域", "/exit": "崩壊域", "/archive": "記録室",
+    "/signal": "受信域", "/null": "崩落域", "/exit": "境界域", "/archive": "記録室",
     "/hyougi": "評議録", "/outside": "OUTSIDE", "/ma": "悪魔の間",
 }
 
@@ -1590,8 +1590,8 @@ def _analyze_rooms(ga4_data: dict[str, Any]) -> list[dict[str, Any]]:
         {"path": "/signal", "name": "受信域"},
         {"path": "/daimyojin", "name": "AI大明神室"},
         {"path": "/hyougi", "name": "評議録"},
-        {"path": "/exit", "name": "崩壊域"},
-        {"path": "/null", "name": "未確認接続"},
+        {"path": "/exit", "name": "境界域"},
+        {"path": "/null", "name": "崩落域"},
         {"path": "/outside", "name": "外部接続"},
         {"path": "/archive", "name": "記録室"},
     ]
@@ -1783,7 +1783,7 @@ def generate_update_proposals() -> dict[str, Any]:
                 "/archive へ残留ログを追加する",
             ],
             "reason": "GA4上で/nullへの反応が確認できるため、崩落域を増殖候補に入れる。",
-            "name": "未確認接続",
+            "name": "崩落域",
         },
         "/observation": {
             "proposalType": "page_growth",
@@ -1815,7 +1815,7 @@ def generate_update_proposals() -> dict[str, Any]:
                 "exitログに断片テキストを1件追加する",
             ],
             "reason": "/exit への反応があるため、境界導線を強化して世界観を深める。",
-            "name": "崩壊域",
+            "name": "境界域",
         },
         "/archive": {
             "proposalType": "archive_addition",
@@ -1963,7 +1963,7 @@ def _build_judgement(path: str, pv: int, rank: int, row: dict[str, Any]) -> str:
     """Build a human-readable judgement string."""
     name_map = {
         "/null": "崩落域", "/observation": "観測域", "/outside": "外部接続",
-        "/exit": "崩壊域", "/archive": "記録室", "/signal": "受信域", "/": "祭壇域",
+        "/exit": "境界域", "/archive": "記録室", "/signal": "受信域", "/": "祭壇域",
     }
     name = name_map.get(path, path)
     if rank == 0:

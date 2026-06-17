@@ -21,7 +21,7 @@
     { id: "archive", path: "/archive", label: "残留域", hint: "記録反応アリ" },
     { id: "signal", path: "/signal", label: "音声室", hint: "音ノ反応" },
     { id: "hyougi", path: "/hyougi", label: "評議", hint: "声ノ反応" },
-    { id: "exit", path: "/exit", label: "脱出室", hint: "出口反応" },
+    { id: "exit", path: "/exit", label: "境界域", hint: "接続反応" },
     { id: "null", path: "/null", label: "崩落域", hint: "崩レ反応" },
     { id: "outside", path: "/outside", label: "外部接続", hint: "外ノ気配ガアル" },
     { id: "support", path: "/support", label: "小さな箱", hint: "箱、アルネ" }

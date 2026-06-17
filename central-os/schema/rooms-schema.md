@@ -47,7 +47,8 @@ KYOUKAI内部辞書 — rooms.json フィールド定義
 | 観測域 | `/observation` | PAGE_MAP登録 |
 | 受信域 | `/signal` | PAGE_MAP登録（signal.html） |
 | 逆観測室 | `/observer` | ユーザー指定 |
-| 未確認接続 | `/null` | PAGE_MAP登録（null.html） |
+| 境界域 | `/exit` | ユーザー指定・FastAPI route登録（exit.html） |
+| 崩落域 | `/null` | ユーザー指定・PAGE_MAP登録（null.html） |
 | 外部接続 | `/outside` | PAGE_MAP登録（outside.html） |
 | 評議録 | `/hyougi` | PAGE_MAP登録（hyougi.html） |
 

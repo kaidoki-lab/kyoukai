@@ -8,97 +8,85 @@
       image: "/static/exit/exit_01_hall.png",
       pulse: ["44%", "57%"],
       choices: {
-        a: { label: "ドア", value: 2 },
-        b: { label: "穴", value: -1 },
-        c: { label: "ぬいぐるみ", value: 1 }
+        a: { label: "ドア", value: 2, spot: [42, 29, 20, 16] },
+        b: { label: "穴", value: -1, spot: [31, 74, 23, 14] },
+        c: { label: "ぬいぐるみ", value: 1, spot: [64, 60, 22, 15] }
       }
     },
     corner: {
       image: "/static/exit/exit_02_corner.png",
       pulse: ["56%", "42%"],
       choices: {
-        a: { label: "左", value: -2 },
-        b: { label: "右", value: 1 },
-        c: { label: "窓", value: 3 }
+        a: { label: "左奥", value: -2, spot: [14, 32, 25, 16] },
+        b: { label: "右奥", value: 1, spot: [56, 45, 25, 16] },
+        c: { label: "壁の装飾", value: 3, spot: [60, 72, 25, 16] }
       }
     },
     emergency: {
       image: "/static/exit/exit_03_emergency.png",
       pulse: ["50%", "40%"],
       choices: {
-        a: { label: "EXIT", value: -3 },
-        b: { label: "階段", value: 2 },
-        c: { label: "壁", value: -1 }
+        a: { label: "EXIT", value: -3, spot: [29, 19, 26, 15] },
+        b: { label: "階段", value: 2, spot: [35, 42, 25, 16] },
+        c: { label: "壁の亀裂", value: -1, spot: [64, 66, 24, 17] }
       }
     },
     window: {
       image: "/static/exit/exit_04_window.png",
       pulse: ["58%", "33%"],
       choices: {
-        a: { label: "窓", value: 1 },
-        b: { label: "植木", value: -2 },
-        c: { label: "奥", value: 2 }
+        a: { label: "窓", value: 1, spot: [10, 52, 26, 17] },
+        b: { label: "植木", value: -2, spot: [47, 25, 23, 15] },
+        c: { label: "奥の景色", value: 2, spot: [66, 60, 25, 17] }
       }
     },
     "hall-b": {
       image: "/static/exit/exit_01b_hall.png",
       pulse: ["39%", "70%"],
       choices: {
-        a: { label: "ドア", value: -1 },
-        b: { label: "穴", value: -3 },
-        c: { label: "ぬいぐるみ", value: 2 }
+        a: { label: "ドア", value: -1, spot: [39, 28, 22, 16] },
+        b: { label: "穴", value: -3, spot: [32, 73, 23, 15] },
+        c: { label: "ぬいぐるみ", value: 2, spot: [62, 59, 23, 16] }
       }
     },
     "corner-b": {
       image: "/static/exit/exit_02b_corner.png",
       pulse: ["51%", "48%"],
       choices: {
-        a: { label: "左", value: 3 },
-        b: { label: "右", value: -2 },
-        c: { label: "窓", value: 1 }
+        a: { label: "左奥", value: 3, spot: [15, 32, 25, 16] },
+        b: { label: "右奥", value: -2, spot: [57, 47, 24, 16] },
+        c: { label: "壁の装飾", value: 1, spot: [62, 73, 24, 16] }
       }
     },
     "emergency-b": {
       image: "/static/exit/exit_03b_emergency.png",
       pulse: ["50%", "43%"],
       choices: {
-        a: { label: "EXIT", value: -1 },
-        b: { label: "階段", value: 2 },
-        c: { label: "壁", value: -3 }
+        a: { label: "EXIT", value: -1, spot: [29, 19, 26, 15] },
+        b: { label: "階段", value: 2, spot: [35, 42, 25, 16] },
+        c: { label: "壁の亀裂", value: -3, spot: [64, 66, 24, 17] }
       }
     },
     "window-b": {
       image: "/static/exit/exit_04b_window.png",
       pulse: ["61%", "45%"],
       choices: {
-        a: { label: "窓", value: 1 },
-        b: { label: "植木", value: -2 },
-        c: { label: "奥", value: 3 }
+        a: { label: "窓", value: 1, spot: [10, 52, 26, 17] },
+        b: { label: "植木", value: -2, spot: [47, 25, 23, 15] },
+        c: { label: "奥の景色", value: 3, spot: [66, 60, 25, 17] }
       }
     }
   };
 
   const fragments = ["hall", "corner", "emergency", "window", "hall-b", "corner-b", "emergency-b", "window-b"];
-  const whispers = ["みえてる？", "そこ？", "まだいる？", "でれない", "きこえる？", "こないで", "どこ？", "はやく"];
+  const whispers = ["みえてる？", "そこ？", "まだいる？", "でれない", "きこえる？", "こないで", "ちがう", "おそい", "まって", "ここじゃない"];
   const girlStates = ["run-a", "run-b", "look-back", "tired", "still", "stumble", "small", "far"];
   const SEGMENT_TOUCH_LIMIT = 5;
-  const FULL_LOADER_FROM_STEP = 5;
-  const loadingProgression = [0, 1, 3, 5, 7];
-  const loadingImages = [
-    "/static/exit/loading/loading_01.png",
-    "/static/exit/loading/loading_02.png",
-    "/static/exit/loading/loading_03.png",
-    "/static/exit/loading/loading_04.png",
-    "/static/exit/loading/loading_05.png",
-    "/static/exit/loading/loading_06.png",
-    "/static/exit/loading/loading_07.png",
-    "/static/exit/loading/loading_08.png"
-  ];
   const endings = [
-    { id: "escape", label: "逃走成功" },
-    { id: "backflow", label: "逆流" },
-    { id: "loop", label: "再ループ" },
-    { id: "collapse", label: "接続崩壊" },
+    { id: "passage", label: "接続通過" },
+    { id: "backflow", label: "逆流接続" },
+    { id: "reconnect", label: "再接続" },
+    { id: "boundary-collapse", label: "境界崩壊" },
     { id: "drift", label: "漂流継続" }
   ];
 
@@ -116,7 +104,7 @@
   const hotspots = Array.from(document.querySelectorAll("[data-hotspot]"));
 
   let currentScene = pickInitialScene();
-  let connectionScore = 0;
+  let routeScore = 0;
   let stepCount = 0;
   let segmentStep = 0;
   let loading = false;
@@ -134,85 +122,65 @@
     return Math.floor(1200 + Math.random() * 1600);
   }
 
-  function sceneDelay(useFullLoader) {
-    if (useFullLoader) return randomDelay();
-    return Math.floor(320 + Math.random() * 260);
-  }
-
-  function randomBetween(min, max) {
-    return min + Math.random() * (max - min);
-  }
-
-  function randomSpot(existingSpots) {
-    for (let attempt = 0; attempt < 18; attempt += 1) {
-      const spot = {
-        left: randomBetween(8, 70),
-        top: randomBetween(20, 78),
-        width: randomBetween(18, 27),
-        height: randomBetween(11, 18)
-      };
-      const centerX = spot.left + spot.width / 2;
-      const centerY = spot.top + spot.height / 2;
-      const tooClose = existingSpots.some((other) => {
-        const otherX = other.left + other.width / 2;
-        const otherY = other.top + other.height / 2;
-        return Math.abs(centerX - otherX) < 22 && Math.abs(centerY - otherY) < 16;
-      });
-      if (!tooClose) return spot;
-    }
-    return {
-      left: randomBetween(8, 70),
-      top: randomBetween(20, 78),
-      width: randomBetween(18, 27),
-      height: randomBetween(11, 18)
-    };
-  }
-
   function randomizeHotspots(scene) {
-    const placed = [];
     hotspots.forEach((button) => {
       const choice = scene.choices[button.dataset.hotspot];
       const label = choice?.label || "調べる";
-      const spot = randomSpot(placed);
-      placed.push(spot);
+      const spot = choice?.spot || [38, 42, 24, 16];
       button.dataset.hotspotName = label;
       button.setAttribute("aria-label", `${label}を調べる`);
-      button.style.left = `${spot.left.toFixed(2)}%`;
-      button.style.top = `${spot.top.toFixed(2)}%`;
-      button.style.width = `${spot.width.toFixed(2)}%`;
-      button.style.height = `${spot.height.toFixed(2)}%`;
+      button.style.left = `${spot[0]}%`;
+      button.style.top = `${spot[1]}%`;
+      button.style.width = `${spot[2]}%`;
+      button.style.height = `${spot[3]}%`;
     });
+  }
+
+  function girlStateForStep(step) {
+    if (step <= 1) return "run-a";
+    if (step === 2) return "run-b";
+    if (step === 3) return "run-b";
+    if (step === 4) return "tired";
+    if (step === 5) return "look-back";
+    return girlStates[Math.min(girlStates.length - 1, Math.floor(Math.random() * girlStates.length))];
+  }
+
+  function loaderLineForStep(step) {
+    if (step % 3 === 1) return "Loading...";
+    if (step % 3 === 2) return "Connecting...";
+    return "Signal unstable...";
   }
 
   function showLoader() {
     loading = true;
-    const girlState = girlStates[Math.floor(Math.random() * girlStates.length)];
-    const progressionIndex = Math.min(Math.max(segmentStep - 1, 0), loadingProgression.length - 1);
-    const loadingIndex = loadingProgression[progressionIndex];
-    const loadingImage = loadingImages[loadingIndex] || "";
-    const impossibleRate = Math.round(((progressionIndex + 1) / loadingProgression.length) * 100);
+    const girlState = girlStateForStep(segmentStep);
+    const progressionIndex = Math.min(Math.max(segmentStep - 1, 0), 5);
+    const driftRate = Math.min(99, 12 + segmentStep * 13);
     boundary.classList.add("is-loading");
     loader.dataset.girl = girlState;
     loader.dataset.progress = String(progressionIndex + 1);
     loader.setAttribute("aria-hidden", "false");
     if (loaderArt) {
-      if (loadingImage) {
-        loaderArt.src = loadingImage;
-        loaderArt.classList.add("is-visible");
-      } else {
-        loaderArt.removeAttribute("src");
-        loaderArt.classList.remove("is-visible");
-      }
+      loaderArt.removeAttribute("src");
+      loaderArt.classList.remove("is-visible");
     }
     loaderGirl?.setAttribute("data-state", girlState);
     if (loaderStatus) {
-      loaderStatus.textContent = `脱出不可能 ${impossibleRate}%`;
+      loaderStatus.textContent = `border signal ${String(driftRate).padStart(2, "0")}%`;
     }
+    loader.querySelector("[data-loader-primary]").textContent = loaderLineForStep(segmentStep);
     bubble.classList.remove("is-visible");
     bubble.textContent = "";
 
-    if (segmentStep >= 3) {
+    if (segmentStep === 3) {
+      bubble.textContent = "みえてる？";
+    } else if (segmentStep === 5) {
+      bubble.textContent = "こないで";
+    } else if (segmentStep >= 6 && Math.random() < 0.72) {
       bubble.textContent = whispers[Math.floor(Math.random() * whispers.length)];
+    }
+
+    if (bubble.textContent) {
       window.setTimeout(() => bubble.classList.add("is-visible"), 180);
     }
   }
@@ -246,10 +214,10 @@
 
   function decideEnding() {
     if (segmentStep < SEGMENT_TOUCH_LIMIT) return null;
-    if (connectionScore >= 8) return endings[0];
-    if (connectionScore <= -8) return endings[1];
-    if (Math.abs(connectionScore) <= 2) return endings[2];
-    if (connectionScore < 5) return endings[3];
+    if (routeScore >= 8) return endings[0];
+    if (routeScore <= -8) return endings[1];
+    if (Math.abs(routeScore) <= 2) return endings[2];
+    if (routeScore < 5) return endings[3];
     return endings[4];
   }
 
@@ -260,7 +228,8 @@
     endingTitle.textContent = `${result.label} / 観測不能`;
     window.dispatchEvent(new CustomEvent("kyoukai:exit-ending", {
       detail: {
-        result: result.id
+        result: result.id,
+        routeScore
       }
     }));
   }
@@ -271,30 +240,19 @@
     const choice = scene.choices[choiceId];
     if (!choice) return;
 
-    connectionScore += choice.value;
+    routeScore += choice.value;
     stepCount += 1;
     segmentStep += 1;
-    const useFullLoader = segmentStep >= FULL_LOADER_FROM_STEP;
-    loading = true;
-    if (useFullLoader) {
-      showLoader();
-    } else {
-      boundary.classList.remove("is-shifting");
-      void boundary.offsetWidth;
-      boundary.classList.add("is-shifting");
-    }
+    window.KYOUKAI_EXIT_ROUTE_SCORE = routeScore;
+    showLoader();
 
     window.setTimeout(() => {
       currentScene = randomNextScene();
       renderScene();
-      if (useFullLoader) {
-        hideLoader();
-      } else {
-        loading = false;
-      }
+      hideLoader();
       const result = decideEnding();
       if (result) showEnding(result);
-    }, sceneDelay(useFullLoader));
+    }, randomDelay());
   }
 
   function randomNextScene() {
@@ -304,9 +262,10 @@
 
   function restart() {
     currentScene = fragments[Math.floor(Math.random() * 4)];
-    connectionScore = 0;
+    routeScore = 0;
     stepCount = 0;
     segmentStep = 0;
+    window.KYOUKAI_EXIT_ROUTE_SCORE = routeScore;
     loading = false;
     boundary.classList.remove("is-ended");
     boundary.classList.remove("is-loading");

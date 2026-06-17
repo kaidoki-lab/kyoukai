@@ -401,5 +401,42 @@
     ],
     "completedAt": "2026-06-15T17:57:44.178539+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260617-exit-boundary-v31",
+    "sourcePlanId": "manual-20260617-exit-boundary-v31",
+    "sourceTaskId": "",
+    "title": "境界域v3.1ロード少女シナリオ実装",
+    "targetPages": [
+      "/exit",
+      "/null"
+    ],
+    "status": "completed",
+    "summary": "/exitを境界域として再定義し、/nullを崩落側へ分離。8枚の既存画像に固定ホットスポットを設定し、選択ごとに必ずロード画面を挟んで少女の逃走記録を進行させる構造へ更新。route_score保持と接続結果系エンディング文言も追加。",
+    "artifacts": [
+      "templates/exit.html",
+      "static/exit.css",
+      "static/exit.js",
+      "main.py",
+      "static/kyoukai-guide.js",
+      "static/bgm/README.txt",
+      "static/space.css",
+      "central-os/lore/kyoukai-world.md",
+      "central-os/rooms.json",
+      "central-os/connection/route-lock-rules.md",
+      "central-os/schema/rooms-schema.md",
+      "central-os/planning/ai_planner.py",
+      "central-os/update-proposals.json",
+      "central-os/review/phase-2-review.md",
+      "central-os/phase/phase-2-checklist.md"
+    ],
+    "verification": [
+      "node --check static\\\\exit.js 成功",
+      "python -m py_compile main.py 成功",
+      "unittest 15件成功",
+      "旧 /exit=崩壊域 表記と旧エンディング・ランダムホットスポット名の検索が空"
+    ],
+    "completedAt": "2026-06-17T02:46:19.510511+00:00",
+    "recordedBy": "codex"
   }
 ]

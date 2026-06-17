@@ -189,8 +189,8 @@ body {
   place-items: center;
   overflow: hidden;
   background:
-    radial-gradient(circle at 50% 54%, rgba(80, 18, 34, 0.28), transparent 36%),
-    #030303;
+    radial-gradient(circle at 50% 54%, rgba(42, 10, 20, 0.24), transparent 36%),
+    #010101;
   opacity: 0;
   pointer-events: none;
   transform: translate(-50%, -50%);
@@ -266,8 +266,9 @@ body {
   transform: translate(-50%, -50%) scale(1);
   image-rendering: pixelated;
   filter:
-    drop-shadow(0 0 1px rgba(255, 210, 220, 0.12))
-    drop-shadow(0 0 8px rgba(0, 0, 0, 0.82));
+    drop-shadow(0 0 1px rgba(255, 230, 232, 0.42))
+    drop-shadow(0 0 8px rgba(255, 82, 122, 0.18))
+    drop-shadow(0 0 14px rgba(0, 0, 0, 0.92));
   animation: exitGirlRun 460ms steps(2, end) infinite;
 }
 
@@ -319,7 +320,8 @@ body {
 .exit-loader__leg {
   position: absolute;
   display: block;
-  background: #050505;
+  background: #090909;
+  box-shadow: 0 0 0 1px rgba(255, 238, 238, 0.08);
 }
 
 .exit-loader__hair {

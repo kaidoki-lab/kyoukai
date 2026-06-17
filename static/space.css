@@ -2560,7 +2560,7 @@ a.sp-link:hover,
   pointer-events: none;
 }
 
-/* 脱出室 /exit */
+/* 境界域 /exit */
 .exit-realm-body {
   min-height: 100vh;
   margin: 0;

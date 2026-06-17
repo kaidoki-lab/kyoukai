@@ -60,8 +60,8 @@
     "createdAt": "2026-06-03",
     "source": "ga4",
     "observedPage": "/exit",
-    "observation": "崩壊域（/exit）— PV:88 / 滞在:190.1秒 / 直帰率:25.0%",
-    "judgement": "崩壊域のPVが上位。増殖候補に入れる。",
+    "observation": "境界域（/exit）— PV:88 / 滞在:190.1秒 / 直帰率:25.0%",
+    "judgement": "境界域のPVが上位。増殖候補に入れる。",
     "analysis": "境界域への反応が高い。訪問者は出口ではなく接続先への期待を持っている可能性がある。",
     "hypothesis": "遷移体験そのものへの興味が集中している。",
     "recommendations": [

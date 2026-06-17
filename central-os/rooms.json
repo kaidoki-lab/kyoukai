@@ -23,21 +23,21 @@
     {
       "id": "room_02",
       "name": "境界域",
-      "route": "未確定",
+      "route": "/exit",
       "status": "実装済み",
       "priority": "最優先",
-      "role": "プロジェクト全体のコア空間。",
+      "role": "内部と外部の境界、出口不能、接続不安定、少女の逃走記録を扱う部屋。",
       "monetization": [],
       "sns": [],
       "issues": [
-        "対応するルートが未確定。どのページが境界域に相当するか要確認。"
+        "ロード画面の少女シナリオを中心に、境界体験として継続調整する"
       ],
       "nextActions": [
-        "境界域に対応するテンプレート・ルートを特定し、rooms.json を更新する"
+        "少女の逃走記録と各部屋への将来接続を段階的に整理する"
       ],
-      "codexMemo": "ルート未確定。確認後に更新すること。",
-      "syncStatus": "pending",
-      "lastSynced": null
+      "codexMemo": "ユーザー指示により /exit を境界域として確定。対応テンプレートは exit.html。",
+      "syncStatus": "synced",
+      "lastSynced": "2026-06-17"
     },
     {
       "id": "room_03",
@@ -61,19 +61,19 @@
     {
       "id": "room_04",
       "name": "崩壊域",
-      "route": "/exit",
-      "status": "制作中",
+      "route": "未確定",
+      "status": "保留",
       "priority": "中",
-      "role": "崩壊・エラー・混沌をテーマにした部屋。",
+      "role": "崩壊・エラー・混沌をテーマにした概念。現在は /exit とは分離。",
       "monetization": [],
       "sns": [],
       "issues": [],
       "nextActions": [
-        "崩壊域としての演出・世界観をさらに強化する"
+        "崩壊域を独立部屋として扱うか、/null 側の崩落演出へ統合するかを判断する"
       ],
-      "codexMemo": "ルートは /exit で確定。対応テンプレートは exit.html。",
-      "syncStatus": "synced",
-      "lastSynced": "2026-06-02"
+      "codexMemo": "/exit は境界域へ再定義済み。崩壊側の実装は /null の崩落域へ寄せる。",
+      "syncStatus": "pending",
+      "lastSynced": "2026-06-17"
     },
     {
       "id": "room_05",
@@ -146,22 +146,22 @@
     },
     {
       "id": "room_09",
-      "name": "未確認接続",
+      "name": "崩落域",
       "route": "/null",
-      "status": "保留",
-      "priority": "保留",
-      "role": "正体不明・未定義の接続先。",
+      "status": "実装済み",
+      "priority": "中",
+      "role": "世界崩壊、崩壊度上昇、接続悪化、失敗方向を扱う部屋。",
       "monetization": [],
       "sns": [],
       "issues": [
-        "null.html の現在の内容・演出が世界観と合致しているか未確認。"
+        "崩落域としての崩壊加速演出を継続調整する。"
       ],
       "nextActions": [
-        "未確認接続としての演出を検討する"
+        "崩壊度上昇、接続悪化、失敗方向の演出を整理する"
       ],
-      "codexMemo": "ルートは /null で確定。対応テンプレートは null.html。",
+      "codexMemo": "ルートは /null で確定。対応テンプレートは null.html。/exit の境界域とは役割分離済み。",
       "syncStatus": "synced",
-      "lastSynced": "2026-05-26"
+      "lastSynced": "2026-06-17"
     },
     {
       "id": "room_10",

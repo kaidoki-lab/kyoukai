@@ -86,7 +86,7 @@ _FALLBACK_POOL = [
         "implementationSize": "small",
     },
     {
-        "title": "崩壊域の遷移演出強化",
+        "title": "境界域の遷移演出強化",
         "summary": "/exitの遷移テキストを1件追加し、境界体験を深める。",
         "reason": "境界域への反応があり、遷移演出が世界観の核になっている。",
         "targets": ["/exit"],

@@ -27,7 +27,8 @@ KYOUKAI における route の確定・管理ルールを定義する。
 | 観測域 | `/observation` | PAGE_MAP登録（index.html） |
 | 受信域 | `/signal` | PAGE_MAP登録（signal.html） |
 | 逆観測室 | `/observer` | ユーザー指定 |
-| 未確認接続 | `/null` | PAGE_MAP登録（null.html） |
+| 境界域 | `/exit` | ユーザー指定・FastAPI route登録（exit.html） |
+| 崩落域 | `/null` | ユーザー指定・PAGE_MAP登録（null.html） |
 | 外部接続 | `/outside` | PAGE_MAP登録（outside.html） |
 | 評議録 | `/hyougi` | PAGE_MAP登録（hyougi.html） |
 
@@ -37,8 +38,7 @@ KYOUKAI における route の確定・管理ルールを定義する。
 
 | 部屋 | route | 未確定理由 |
 |---|---|---|
-| 境界域 | 未確定 | 対応テンプレート・ルート未確認 |
-| 崩壊域 | 未確定 | /exit との対応関係未確認 |
+| 崩壊域 | 未確定 | /exit から分離済み。独立部屋にするか /null 側概念へ統合するか未確定 |
 | 音声室 | 未確定 | 独立ページの有無未確認 |
 | 記録室 | 未確定 | /archive との対応関係未確認 |
 | 賽銭箱 | 未確定 | /support・/outside との関係未確認 |
@@ -89,6 +89,7 @@ KYOUKAI における route の確定・管理ルールを定義する。
 - /observation
 - /signal
 - /hyougi
+- /exit
 - /null
 - /outside
 - /central
@@ -102,7 +103,6 @@ KYOUKAI における route の確定・管理ルールを定義する。
 ### main.py実在・未分類route
 
 - /archive : 記録室候補
-- /exit : 境界域候補
 - /support : 外部接続の別名候補
 
 上記3件は main.py に実在するが、ユーザー確認前に 
@@ -110,7 +110,6 @@ ooms.json の route へ割り当てない。
 
 ### 未確定route
 
-- 境界域
 - 崩壊域
 - 音声室
 - 記録室
