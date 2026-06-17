@@ -438,5 +438,41 @@
     ],
     "completedAt": "2026-06-17T02:46:19.510511+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260617-remove-footers",
+    "sourcePlanId": "manual-20260617-remove-footers",
+    "sourceTaskId": "",
+    "title": "リンク先ページのフッター削除",
+    "targetPages": [
+      "/",
+      "/null",
+      "/archive",
+      "/signal"
+    ],
+    "status": "completed",
+    "summary": "スマホ版・ブラウザ版を問わず、リンク先ページに表示されるグローバルフッターおよびcentral footerをテンプレートから削除。",
+    "artifacts": [
+      "templates/home.html",
+      "templates/about.html",
+      "templates/archive.html",
+      "templates/archive-logs.html",
+      "templates/contact.html",
+      "templates/gokuraku.html",
+      "templates/null.html",
+      "templates/privacy-policy.html",
+      "templates/signal.html",
+      "templates/sitemap.html",
+      "templates/terms.html",
+      "templates/central.html"
+    ],
+    "verification": [
+      "rg '<footer|kyoukai-footer|footer-group|cos-footer' templates が空",
+      "git diff --check -- templates 成功",
+      "unittest 15件成功",
+      "main.py py_compile 成功"
+    ],
+    "completedAt": "2026-06-17T04:02:47.167193+00:00",
+    "recordedBy": "codex"
   }
 ]
