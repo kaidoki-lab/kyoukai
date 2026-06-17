@@ -2911,6 +2911,21 @@ async def api_update_plan_status(plan_id: str, body: dict = Body(...)) -> JSONRe
         return JSONResponse({"ok": False, "error": str(exc)}, status_code=500)
 
 
+@app.get("/api/implementation-events/archive")
+async def api_get_implementation_events_archive() -> JSONResponse:
+    """アーカイブ済み実装事象を返す。"""
+    try:
+        archive_file = EXECUTION_DIR / "implementation_events_archive.json"
+        if not archive_file.exists():
+            return JSONResponse({"ok": True, "events": []})
+        events = json.loads(archive_file.read_text(encoding="utf-8"))
+        if not isinstance(events, list):
+            events = []
+        return JSONResponse({"ok": True, "events": events})
+    except Exception as exc:
+        return JSONResponse({"ok": False, "error": str(exc), "events": []}, status_code=500)
+
+
 @app.post("/api/implementation-events/archive")
 async def api_archive_implementation_events() -> JSONResponse:
     """完了済み実装事象をアーカイブファイルへ移動し、メインファイルから削除する。"""

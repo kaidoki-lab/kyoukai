@@ -35,23 +35,6 @@
       </div>
     </header>
 
-    <!-- AI PLAN PROPOSALS -->
-    <section class="cos-section" id="cos-plan-proposals">
-      <h2 class="cos-section-title">[ AI企画案 ]</h2>
-      <div class="cos-up-toolbar">
-        <button class="cos-up-run-btn" id="cos-plan-run">企画を生成</button>
-        <span class="cos-up-status" id="cos-plan-status">待機中</span>
-        <span class="cos-up-filter-label">表示：</span>
-        <button class="cos-plan-filter active" data-planfilter="all">すべて</button>
-        <button class="cos-plan-filter" data-planfilter="pending">未判断</button>
-        <button class="cos-plan-filter" data-planfilter="approved">採用</button>
-        <button class="cos-plan-filter" data-planfilter="hold">保留</button>
-        <button class="cos-plan-filter" data-planfilter="rejected">却下</button>
-      </div>
-      <div class="cos-error" id="cos-plan-error" hidden></div>
-      <div id="cos-plan-list"><div class="cos-up-empty">企画案なし — 「企画を生成」でAIが提案する</div></div>
-    </section>
-
     <!-- AI IMPLEMENTATION TASKS -->
     <section class="cos-section" id="cos-impl-tasks">
       <h2 class="cos-section-title">[ AI実装指示 ]</h2>
@@ -69,28 +52,17 @@
       </div>
       <div class="cos-error" id="cos-impl-error" hidden></div>
       <div id="cos-impl-list"><div class="cos-up-empty">実装指示なし — 企画案を採用後「実装指示を生成」する</div></div>
-      <h3 class="cos-impl-events-title">実装完了事象 <button class="cos-archive-btn" id="cos-events-archive-btn">アーカイブ</button></h3>
+      <h3 class="cos-impl-events-title">実装完了事象 <button class="cos-archive-btn" id="cos-events-archive-btn">アーカイブへ移動</button> <button class="cos-archive-btn" id="cos-events-archive-open-btn">アーカイブを開く</button></h3>
       <div class="cos-error" id="cos-events-archive-error" hidden></div>
       <div id="cos-impl-events"><div class="cos-up-empty">完了事象なし</div></div>
-    </section>
-
-    <!-- UPDATE PROPOSALS -->
-    <section class="cos-section" id="cos-update-proposals">
-      <h2 class="cos-section-title">[ 定期更新提案 ]</h2>
-      <div class="cos-up-toolbar">
-        <button class="cos-up-run-btn" id="cos-up-run">提案を更新</button>
-        <span class="cos-up-status" id="cos-up-status">待機中</span>
-        <span class="cos-up-filter-label">表示：</span>
-        <button class="cos-up-filter active" data-upfilter="all">すべて</button>
-        <button class="cos-up-filter" data-upfilter="pending">未判断</button>
-        <button class="cos-up-filter" data-upfilter="approved">採用</button>
-        <button class="cos-up-filter" data-upfilter="hold">保留</button>
-        <button class="cos-up-filter" data-upfilter="rejected">却下</button>
+      <div id="cos-impl-archive-panel" hidden>
+        <div class="cos-up-toolbar" style="margin-top:8px;">
+          <span class="cos-label">アーカイブ済み事象</span>
+          <span class="cos-up-status" id="cos-impl-archive-status"></span>
+        </div>
+        <div id="cos-impl-archive-list"></div>
       </div>
-      <div class="cos-error" id="cos-up-error" hidden></div>
-      <div id="cos-up-list"><div class="cos-up-empty">提案なし — 「提案を更新」で生成する</div></div>
     </section>
-
 
     <!-- WATCH SYSTEM / SYNC STATE -->
     <section class="cos-section" id="cos-watch">
@@ -233,10 +205,11 @@
     <section class="cos-section" id="cos-summary">
       <h2 class="cos-section-title">[ 分析サマリー ]</h2>
       <div class="cos-up-toolbar">
+        <button class="cos-up-run-btn" id="cos-summary-run-btn">実行</button>
         <button class="cos-up-run-btn" id="cos-summary-copy-btn">コピー</button>
         <span class="cos-up-status" id="cos-summary-copy-status">クラウド・Codexへの引き渡し用</span>
       </div>
-      <pre id="cos-summary-text" style="white-space:pre-wrap; font-size:18px; line-height:1.6; background:#0d0d14; border:1px solid #2d2d3d; border-radius:6px; padding:16px; max-height:480px; overflow:auto;">生成中...</pre>
+      <pre id="cos-summary-text" style="white-space:pre-wrap; font-size:18px; line-height:1.6; background:#0d0d14; border:1px solid #2d2d3d; border-radius:6px; padding:16px; max-height:480px; overflow:auto;">(未実行 — 「実行」ボタンで生成)</pre>
     </section>
 
   </main>
@@ -370,192 +343,6 @@
       window._cosCentralData.then(function (result) {
         if (result) renderAll(result);
       });
-    })();
-
-    // ── 定期更新提案 ──────────────────────────────────────────────────────────
-    (function () {
-      var upFilter = "all";
-      var UP_STATUS_LABEL = { pending: "未判断", approved: "採用", hold: "保留", rejected: "却下" };
-      var UP_STATUS_CLASS = { pending: "up-pending", approved: "up-approved", hold: "up-hold", rejected: "up-rejected" };
-      var UP_PRIORITY_LABEL = { high: "高", medium: "中", low: "低", watch: "観測" };
-      var UP_PRIORITY_CLASS = { high: "up-prio-high", medium: "up-prio-medium", low: "up-prio-low", watch: "up-prio-watch" };
-      var UP_TYPE_LABEL = {
-        page_growth: "増殖", visual_change: "ビジュアル", route_change: "導線",
-        scenario_change: "シナリオ", archive_addition: "記録追加",
-        outside_adjustment: "外部接続", signal_fragment: "受信断片",
-      };
-
-      function setUpStatus(msg, cls) {
-        var el = document.getElementById("cos-up-status");
-        if (el) { el.textContent = msg; el.className = "cos-up-status " + (cls || ""); }
-      }
-
-      function renderUpdateProposals(proposals) {
-        var container = document.getElementById("cos-up-list");
-        if (!container) return;
-        var filtered = upFilter === "all" ? proposals
-          : proposals.filter(function(p) { return p.status === upFilter; });
-        if (!filtered.length) {
-          container.innerHTML = "<div class='cos-up-empty'>該当する提案なし</div>";
-          return;
-        }
-        container.innerHTML = "";
-        filtered.forEach(function(p) {
-          var card = document.createElement("div");
-          card.className = "cos-up-card cos-up-" + (p.status || "pending");
-
-          var hdr = document.createElement("div");
-          hdr.className = "cos-up-header";
-          hdr.innerHTML =
-            "<span class='cos-up-page'>" + window._cosSafeText(p.observedPage) + "</span>" +
-            "<span class='cos-up-tag " + (UP_STATUS_CLASS[p.status] || "") + "'>" + (UP_STATUS_LABEL[p.status] || p.status) + "</span>" +
-            "<span class='cos-up-type'>" + (UP_TYPE_LABEL[p.proposalType] || p.proposalType) + "</span>" +
-            "<span class='cos-up-prio " + (UP_PRIORITY_CLASS[p.priority] || "") + "'>" + (UP_PRIORITY_LABEL[p.priority] || p.priority) + "</span>" +
-            "<span class='cos-up-date'>" + window._cosSafeText(p.createdAt || "") + "</span>";
-          card.appendChild(hdr);
-
-          var obs = document.createElement("div");
-          obs.className = "cos-up-observation";
-          obs.textContent = p.observation || "";
-          card.appendChild(obs);
-
-          var jdg = document.createElement("div");
-          jdg.className = "cos-up-judgement";
-          jdg.textContent = p.judgement || "";
-          card.appendChild(jdg);
-
-          if (p.analysis) {
-            var aiBlock = document.createElement("div");
-            aiBlock.className = "cos-up-ai-block";
-            var aiLabel = document.createElement("span");
-            aiLabel.className = "cos-up-ai-label";
-            aiLabel.textContent = "AI考察";
-            aiBlock.appendChild(aiLabel);
-            var aiText = document.createElement("div");
-            aiText.className = "cos-up-ai-analysis";
-            aiText.textContent = p.analysis;
-            aiBlock.appendChild(aiText);
-            if (p.hypothesis) {
-              var hyp = document.createElement("div");
-              hyp.className = "cos-up-ai-hypothesis";
-              hyp.textContent = "仮説：" + p.hypothesis;
-              aiBlock.appendChild(hyp);
-            }
-            card.appendChild(aiBlock);
-          }
-
-          var recs = p.recommendations || [];
-          if (recs.length) {
-            var recLabel = document.createElement("div");
-            recLabel.className = "cos-up-rec-label";
-            recLabel.textContent = "推奨更新案";
-            card.appendChild(recLabel);
-            var recUl = document.createElement("ul");
-            recUl.className = "cos-up-recommendations";
-            recs.forEach(function(r) {
-              var li = document.createElement("li"); li.textContent = r; recUl.appendChild(li);
-            });
-            card.appendChild(recUl);
-          }
-
-          var changes = p.changes || [];
-          if (changes.length) {
-            var ul = document.createElement("ul");
-            ul.className = "cos-up-changes";
-            changes.forEach(function(c) {
-              var li = document.createElement("li"); li.textContent = c; ul.appendChild(li);
-            });
-            card.appendChild(ul);
-          }
-
-          if (p.reason) {
-            var rsn = document.createElement("div");
-            rsn.className = "cos-up-reason";
-            rsn.textContent = p.reason;
-            card.appendChild(rsn);
-          }
-
-          if (p.status !== "rejected") {
-            var acts = document.createElement("div");
-            acts.className = "cos-up-actions";
-            [["approved","採用"], ["hold","保留"], ["rejected","却下"]].forEach(function(btn) {
-              if (p.status === btn[0]) return;
-              var b = document.createElement("button");
-              b.className = "cos-up-action-btn cos-up-act-" + btn[0];
-              b.textContent = btn[1];
-              b.addEventListener("click", function() { updateUpStatus(p.id, btn[0]); });
-              acts.appendChild(b);
-            });
-            card.appendChild(acts);
-          }
-
-          container.appendChild(card);
-        });
-      }
-
-      function loadUpdateProposals() {
-        window._cosCentralData.then(function(data) {
-          if (!data) return;
-          var proposals = (data.data && data.data.updateProposals) || [];
-          renderUpdateProposals(proposals);
-        });
-      }
-
-      function refreshUpdateProposals() {
-        fetch("/api/central-os")
-          .then(function(r) { return r.json(); })
-          .then(function(data) {
-            var proposals = (data.data && data.data.updateProposals) || [];
-            renderUpdateProposals(proposals);
-          })
-          .catch(function(e) { window._cosShowError("cos-up-error", e.message); });
-      }
-
-      function updateUpStatus(id, status) {
-        fetch("/api/update-proposals/" + id + "/status", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: status }),
-        })
-          .then(function(r) { return r.json(); })
-          .then(function(data) {
-            if (data.ok) refreshUpdateProposals();
-            else window._cosShowError("cos-up-error", "更新失敗: " + data.error);
-          })
-          .catch(function(e) { window._cosShowError("cos-up-error", e.message); });
-      }
-
-      var runBtn = document.getElementById("cos-up-run");
-      if (runBtn) {
-        runBtn.addEventListener("click", function() {
-          setUpStatus("生成中…", "running");
-          runBtn.disabled = true;
-          fetch("/api/update-proposals/run", { method: "POST" })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-              if (data.ok) {
-                setUpStatus(data.proposals_written + "件生成", "ok");
-                refreshUpdateProposals();
-              } else {
-                setUpStatus("エラー", "error");
-                window._cosShowError("cos-up-error", data.error);
-              }
-            })
-            .catch(function(e) { setUpStatus("失敗", "error"); window._cosShowError("cos-up-error", e.message); })
-            .finally(function() { runBtn.disabled = false; });
-        });
-      }
-
-      document.querySelectorAll(".cos-up-filter").forEach(function(btn) {
-        btn.addEventListener("click", function() {
-          upFilter = btn.dataset.upfilter || "all";
-          document.querySelectorAll(".cos-up-filter").forEach(function(b) { b.classList.remove("active"); });
-          btn.classList.add("active");
-          loadUpdateProposals();
-        });
-      });
-
-      loadUpdateProposals();
     })();
 
     // ── AI実装指示 ────────────────────────────────────────────────────────────
@@ -920,170 +707,87 @@
                 archiveBtn.textContent = "アーカイブ済 (" + data.archived + "件)";
                 refreshImplTasks();
               } else {
-                archiveBtn.textContent = "アーカイブ";
+                archiveBtn.textContent = "アーカイブへ移動";
                 archiveBtn.disabled = false;
                 window._cosShowError("cos-events-archive-error", data.error);
               }
             })
             .catch(function(e) {
-              archiveBtn.textContent = "アーカイブ";
+              archiveBtn.textContent = "アーカイブへ移動";
               archiveBtn.disabled = false;
               window._cosShowError("cos-events-archive-error", e.message);
             });
         });
       }
-    })();
 
-    // ── AI企画案 ──────────────────────────────────────────────────────────────
-    (function() {
-      var planFilter = "all";
+      var archiveOpenBtn   = document.getElementById("cos-events-archive-open-btn");
+      var archivePanel     = document.getElementById("cos-impl-archive-panel");
+      var archiveList      = document.getElementById("cos-impl-archive-list");
+      var archiveStatus    = document.getElementById("cos-impl-archive-status");
 
-      function setPlanStatus(msg, cls) {
-        var el = document.getElementById("cos-plan-status");
-        if (el) { el.textContent = msg; el.className = "cos-up-status " + (cls || ""); }
-      }
-
-      function renderPlanProposals(plans) {
-        var container = document.getElementById("cos-plan-list");
-        if (!container) return;
-
-        var filtered = plans.filter(function(p) {
-          return planFilter === "all" || p.status === planFilter;
-        });
-
-        if (!filtered.length) {
-          container.innerHTML = "<div class='cos-up-empty'>該当する企画案なし</div>";
+      function renderArchiveEvents(events) {
+        if (!archiveList) return;
+        if (!events.length) {
+          archiveList.innerHTML = "<div class='cos-up-empty'>アーカイブなし</div>";
           return;
         }
-
-        container.innerHTML = "";
-        filtered.forEach(function(p) {
+        archiveList.innerHTML = "";
+        events.slice().reverse().forEach(function(event) {
           var card = document.createElement("div");
-          card.className = "cos-up-card cos-up-" + (p.status || "pending");
-
+          card.className = "cos-up-card cos-up-done";
           var header = document.createElement("div");
           header.className = "cos-up-header";
           var title = document.createElement("span");
           title.className = "cos-up-title";
-          title.textContent = p.title || "(無題)";
+          title.textContent = event.title || "(無題)";
           var badge = document.createElement("span");
-          badge.className = "cos-up-badge cos-up-badge-" + (p.status || "pending");
-          badge.textContent = { pending: "未判断", approved: "採用", hold: "保留", rejected: "却下" }[p.status] || p.status;
+          badge.className = "cos-up-badge cos-up-badge-done";
+          badge.textContent = "完了";
           header.appendChild(title);
           header.appendChild(badge);
           card.appendChild(header);
-
           var meta = document.createElement("div");
           meta.className = "cos-up-meta";
-          var targets = (p.targets || []).join(", ") || "-";
-          var sizeLabel = { small: "小", medium: "中", large: "大" }[p.implementationSize] || p.implementationSize || "-";
-          meta.innerHTML = '<span class="cos-up-page">' + targets + '</span>'
-            + '<span class="cos-up-priority">' + sizeLabel + '</span>'
-            + '<span class="cos-up-date">' + (p.createdAt ? p.createdAt.slice(0, 10) : "") + '</span>';
-          if (p.source === "fallback") {
-            var src = document.createElement("span");
-            src.className = "cos-up-priority";
-            src.textContent = "FB";
-            src.title = "フォールバック生成";
-            meta.appendChild(src);
-          }
+          meta.innerHTML =
+            '<span class="cos-up-page">' + (event.targetPages || []).join(", ") + '</span>' +
+            '<span class="cos-up-date">' + (event.completedAt ? event.completedAt.slice(0,10) : "") + '</span>';
           card.appendChild(meta);
-
-          if (p.summary) {
-            var sumEl = document.createElement("div");
-            sumEl.className = "cos-up-observation";
-            sumEl.textContent = p.summary;
-            card.appendChild(sumEl);
+          if (event.summary) {
+            var sum = document.createElement("div");
+            sum.className = "cos-up-observation";
+            sum.textContent = event.summary;
+            card.appendChild(sum);
           }
-
-          if (p.reason) {
-            var rsn = document.createElement("div");
-            rsn.className = "cos-up-reason";
-            rsn.textContent = p.reason;
-            card.appendChild(rsn);
-          }
-
-          if (p.status !== "rejected") {
-            var acts = document.createElement("div");
-            acts.className = "cos-up-actions";
-            [["approved", "採用"], ["hold", "保留"], ["rejected", "却下"]].forEach(function(btn) {
-              if (p.status === btn[0]) return;
-              var b = document.createElement("button");
-              b.className = "cos-up-action-btn cos-up-act-" + btn[0];
-              b.textContent = btn[1];
-              b.addEventListener("click", function() { updatePlanStatus(p.id, btn[0]); });
-              acts.appendChild(b);
-            });
-            card.appendChild(acts);
-          }
-
-          container.appendChild(card);
+          archiveList.appendChild(card);
         });
       }
 
-      function loadPlanProposals() {
-        window._cosCentralData.then(function(data) {
-          if (!data) return;
-          var plans = (data.data && data.data.planProposals) || [];
-          renderPlanProposals(plans);
-        });
-      }
-
-      function refreshPlanProposals() {
-        fetch("/api/central-os")
-          .then(function(r) { return r.json(); })
-          .then(function(data) {
-            var plans = (data.data && data.data.planProposals) || [];
-            renderPlanProposals(plans);
-          })
-          .catch(function(e) { window._cosShowError("cos-plan-error", e.message); });
-      }
-
-      function updatePlanStatus(id, status) {
-        fetch("/api/plan-proposals/" + encodeURIComponent(id) + "/status", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: status }),
-        })
-          .then(function(r) { return r.json(); })
-          .then(function(data) {
-            if (data.ok) refreshPlanProposals();
-            else window._cosShowError("cos-plan-error", "更新失敗: " + data.error);
-          })
-          .catch(function(e) { window._cosShowError("cos-plan-error", e.message); });
-      }
-
-      var planRunBtn = document.getElementById("cos-plan-run");
-      if (planRunBtn) {
-        planRunBtn.addEventListener("click", function() {
-          setPlanStatus("生成中…", "running");
-          planRunBtn.disabled = true;
-          fetch("/api/plan-proposals/run", { method: "POST" })
+      if (archiveOpenBtn) {
+        archiveOpenBtn.addEventListener("click", function() {
+          if (archivePanel && !archivePanel.hidden) {
+            archivePanel.hidden = true;
+            archiveOpenBtn.textContent = "アーカイブを開く";
+            return;
+          }
+          archiveOpenBtn.disabled = true;
+          archiveOpenBtn.textContent = "読込中…";
+          fetch("/api/implementation-events/archive")
             .then(function(r) { return r.json(); })
             .then(function(data) {
-              if (data.ok) {
-                setPlanStatus(data.plans_written + "件生成（" + (data.source || "-") + "）", "ok");
-                refreshPlanProposals();
-              } else {
-                setPlanStatus("エラー", "error");
-                window._cosShowError("cos-plan-error", data.error);
-              }
+              var events = data.events || [];
+              if (archiveStatus) archiveStatus.textContent = events.length + "件";
+              renderArchiveEvents(events);
+              if (archivePanel) archivePanel.hidden = false;
+              archiveOpenBtn.textContent = "閉じる";
+              archiveOpenBtn.disabled = false;
             })
-            .catch(function(e) { setPlanStatus("失敗", "error"); window._cosShowError("cos-plan-error", e.message); })
-            .finally(function() { planRunBtn.disabled = false; });
+            .catch(function(e) {
+              archiveOpenBtn.textContent = "アーカイブを開く";
+              archiveOpenBtn.disabled = false;
+              window._cosShowError("cos-events-archive-error", e.message);
+            });
         });
       }
-
-      document.querySelectorAll(".cos-plan-filter").forEach(function(btn) {
-        btn.addEventListener("click", function() {
-          planFilter = btn.dataset.planfilter || "all";
-          document.querySelectorAll(".cos-plan-filter").forEach(function(b) { b.classList.remove("active"); });
-          btn.classList.add("active");
-          loadPlanProposals();
-        });
-      });
-
-      loadPlanProposals();
     })();
 
     // ── イベント観測 ──────────────────────────────────────────────────────────
@@ -1243,12 +947,26 @@
         return lines.join("\n");
       }
 
-      window._cosCentralData.then(function (result) {
-        if (!result || !textEl) return;
-        textEl.textContent = buildSummary(result.data || {});
-      }).catch(function () {
-        if (textEl) textEl.textContent = "サマリー生成に失敗しました。";
-      });
+      var runBtn = document.getElementById("cos-summary-run-btn");
+      if (runBtn) {
+        runBtn.addEventListener("click", function() {
+          runBtn.disabled = true;
+          runBtn.textContent = "生成中…";
+          if (textEl) textEl.textContent = "生成中…";
+          fetch("/api/central-os", { headers: { "Accept": "application/json" } })
+            .then(function(res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+            .then(function(result) {
+              if (textEl) textEl.textContent = buildSummary(result.data || {});
+              runBtn.textContent = "実行";
+              runBtn.disabled = false;
+            })
+            .catch(function(e) {
+              if (textEl) textEl.textContent = "生成失敗: " + e.message;
+              runBtn.textContent = "実行";
+              runBtn.disabled = false;
+            });
+        });
+      }
 
       if (copyBtn) {
         copyBtn.addEventListener("click", function () {
