@@ -671,6 +671,28 @@
   .kgi-cursor { animation: none; opacity: 1; }
 }
 
+/* タップ開始プロンプト */
+.kgi-tap-hint {
+  margin: 0;
+  color: rgba(0, 255, 225, 0.55);
+  font-family: "Courier New", Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 500ms ease, transform 500ms ease;
+  animation: kgiTapPulse 2s ease-in-out infinite;
+}
+
+.kgi-tap-hint--in  { opacity: 1; transform: translateY(0); }
+.kgi-tap-hint--out { opacity: 0 !important; animation: none; }
+
+@keyframes kgiTapPulse {
+  0%, 100% { opacity: 0.55; }
+  50%       { opacity: 0.22; }
+}
+
 @media (max-width: 400px) {
   .kgi-dialogue__text { font-size: 12px; }
   .kgi-btn--primary   { font-size: 12px; padding: 10px 22px; }

@@ -229,37 +229,61 @@
     const overlay = buildOverlay();
     document.body.appendChild(overlay);
 
-    const figure    = overlay.querySelector(".kgi-figure");
-    const textEl    = overlay.querySelector(".kgi-dialogue__text");
-    const actions   = overlay.querySelector(".kgi-actions");
-    const startBtn  = overlay.querySelector(".kgi-btn--primary");
-    const skipBtn   = overlay.querySelector(".kgi-btn--skip");
+    const figure   = overlay.querySelector(".kgi-figure");
+    const textEl   = overlay.querySelector(".kgi-dialogue__text");
+    const actions  = overlay.querySelector(".kgi-actions");
+    const startBtn = overlay.querySelector(".kgi-btn--primary");
+    const skipBtn  = overlay.querySelector(".kgi-btn--skip");
+
+    // 「タップして開始」プロンプト（音声解放のため）
+    const tapHint = document.createElement("p");
+    tapHint.className = "kgi-tap-hint";
+    tapHint.textContent = "- タップで開始 -";
+    tapHint.setAttribute("aria-hidden", "true");
+    overlay.querySelector(".kgi-stage").appendChild(tapHint);
 
     trackEvent("guide_intro_show", {});
 
-    // フェードイン
+    // フェードイン → 案内人表示
     requestAnimationFrame(() => {
       overlay.classList.add("kgi-overlay--in");
       window.setTimeout(() => {
         figure.classList.add("kgi-figure--in");
-        playCrtNoise();
+        window.setTimeout(() => tapHint.classList.add("kgi-tap-hint--in"), 300);
       }, 260);
     });
 
-    // タイプライター開始
     let stopType = null;
-    window.setTimeout(() => {
-      stopType = typeWriter(textEl, INTRO_TEXT, CHAR_DELAY_MS, playVoice, () => {
-        actions.classList.add("kgi-actions--in");
-        actions.removeAttribute("aria-hidden");
-        startBtn.focus();
-      });
-    }, 760);
+    let started  = false;
 
-    // スキップは2.6秒後に出現
-    window.setTimeout(() => {
-      skipBtn.classList.add("kgi-skip--visible");
-    }, SKIP_DELAY_MS);
+    function startTypewriter() {
+      if (started) return;
+      started = true;
+
+      tapHint.classList.add("kgi-tap-hint--out");
+      window.setTimeout(() => tapHint.remove(), 400);
+
+      // AudioContext 解放 → CRTノイズ
+      getAudioCtx();
+      playCrtNoise();
+
+      // タイプライター開始
+      window.setTimeout(() => {
+        stopType = typeWriter(textEl, INTRO_TEXT, CHAR_DELAY_MS, playVoice, () => {
+          actions.classList.add("kgi-actions--in");
+          actions.removeAttribute("aria-hidden");
+          startBtn.focus();
+        });
+      }, 180);
+
+      // スキップは2.6秒後に出現
+      window.setTimeout(() => {
+        skipBtn.classList.add("kgi-skip--visible");
+      }, SKIP_DELAY_MS);
+    }
+
+    // オーバーレイへの最初のタップ/クリックで開始
+    overlay.addEventListener("pointerdown", startTypewriter, { once: true });
 
     startBtn.addEventListener("click", () => finishIntro(overlay, true));
     skipBtn.addEventListener("click", () => {
