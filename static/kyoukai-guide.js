@@ -187,7 +187,7 @@
     osc.frequency.value = freq;
     const now = ctx.currentTime;
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.55, now + atk);
+    gain.gain.linearRampToValueAtTime(0.9, now + atk);
     gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
     osc.frequency.setValueAtTime(freq, now);
     osc.frequency.linearRampToValueAtTime(freq * 0.965, now + dur);
