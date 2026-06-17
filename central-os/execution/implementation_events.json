@@ -495,5 +495,34 @@
     ],
     "completedAt": "2026-06-17T23:37:02.742033+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260618-guide-bubble-scale",
+    "sourcePlanId": "manual-20260618-guide-bubble-scale",
+    "sourceTaskId": "",
+    "title": "案内人追従テキスト拡大",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "案内人が追従中に表示する吹き出しテキストをふた回り大きくし、余白と最大幅も拡張。各ページのkyoukai-guide.css参照をv=3へ更新してキャッシュ反映を確実化。",
+    "artifacts": [
+      "static/kyoukai-guide.css",
+      "templates/archive.html",
+      "templates/exit.html",
+      "templates/gokuraku.html",
+      "templates/home.html",
+      "templates/hyougi.html",
+      "templates/index.html",
+      "templates/null.html",
+      "templates/outside.html",
+      "templates/signal.html"
+    ],
+    "verification": [
+      "git diff --check 成功",
+      "unittest 15件成功"
+    ],
+    "completedAt": "2026-06-17T23:45:38.526497+00:00",
+    "recordedBy": "codex"
   }
 ]
