@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Observation / KYOUKAI</title>
-    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="/static/style.css?v=2" />
     <link rel="stylesheet" href="/static/kyoukai-guide.css?v=3" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1522978966321203" crossorigin="anonymous"></script>
     <script defer src="/static/analytics.js"></script>
@@ -14,7 +14,10 @@
   </head>
   <body>
     <main class="facility observation-room" id="facility">
-      <img class="room-bg-layer" src="/static/kyoukai_observation_room_20260602.png" alt="KYOUKAI observation room" />
+      <picture>
+        <source media="(min-width: 901px)" srcset="/static/kyoukai_observation_room_desktop_20260618.png" />
+        <img class="room-bg-layer" src="/static/kyoukai_observation_room_20260602.png" alt="KYOUKAI observation room" />
+      </picture>
       <div class="room-crt-noise" aria-hidden="true"></div>
 
       <section class="left-terminal" aria-label="Observation command">

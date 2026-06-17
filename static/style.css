@@ -3077,3 +3077,86 @@ body:has(.observation-room) {
   73% { opacity: 0.88; }
   73.4% { opacity: 0.3; }
 }
+
+/* /observation desktop 2026-06-18: wide midnight observation desk art. */
+@media (min-width: 901px) {
+  body:has(.observation-room) {
+    display: block;
+    min-height: 100svh;
+    overflow: hidden;
+    background: #040004;
+  }
+
+  .observation-room {
+    width: 100vw;
+    height: 100svh;
+    min-height: 100svh;
+    aspect-ratio: auto;
+  }
+
+  .room-bg-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    opacity: 1;
+    filter: saturate(1.08) contrast(1.08) brightness(0.9);
+  }
+
+  .left-terminal {
+    left: 16.8%;
+    top: 76.2%;
+    width: 28%;
+    z-index: 6;
+  }
+
+  .crt-stage {
+    left: 35.6%;
+    top: 31.6%;
+    width: 32.8%;
+    height: 26.9%;
+    z-index: 4;
+  }
+
+  .observation-room .creature-stage {
+    left: 50%;
+    top: 50%;
+    width: 68%;
+    height: 68%;
+  }
+
+  .observation-room .creature {
+    width: min(58%, 210px);
+    max-height: 76%;
+  }
+
+  .creature-id-readout {
+    bottom: 5.8%;
+    width: min(72%, 360px);
+  }
+
+  .observation-signal-residue {
+    left: 79.2%;
+    top: 74.4%;
+    width: 15.8%;
+    height: 17.2%;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 1.4% 0 0 1.3%;
+    font-size: clamp(7px, 0.64vw, 11px);
+    color: rgba(255, 73, 83, 0.38);
+    text-shadow: 0 0 8px rgba(255, 48, 79, 0.38);
+  }
+
+  .observation-signal-residue span {
+    width: 46%;
+    min-height: 14%;
+    padding: 2px 4px;
+    border-color: rgba(255, 48, 79, 0.18);
+    background:
+      linear-gradient(90deg, rgba(26, 0, 8, 0.58), rgba(47, 0, 0, 0.18)),
+      transparent;
+  }
+}

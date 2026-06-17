@@ -524,5 +524,28 @@
     ],
     "completedAt": "2026-06-17T23:45:38.526497+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260618-observation-desktop-bg",
+    "sourcePlanId": "manual-20260618-observation-desktop-bg",
+    "sourceTaskId": "",
+    "title": "観測域ブラウザ版背景差し替え",
+    "targetPages": [
+      "/observation"
+    ],
+    "status": "completed",
+    "summary": "観測域のブラウザ版背景を新しい16:9深夜観測デスク画像へ差し替え。スマホ版は既存9:16画像を維持し、PC版の中央モニターUIと右下信号ホットスポットを新背景上の同種位置へ引き継ぎ配置。style.css参照をv=2へ更新してキャッシュ反映を確実化。",
+    "artifacts": [
+      "templates/index.html",
+      "static/style.css",
+      "static/kyoukai_observation_room_desktop_20260618.png"
+    ],
+    "verification": [
+      "git diff --check 成功",
+      "unittest 15件成功",
+      "テンプレートでPC用sourceとスマホ用imgのpicture分岐を確認"
+    ],
+    "completedAt": "2026-06-17T23:57:28.156910+00:00",
+    "recordedBy": "codex"
   }
 ]
