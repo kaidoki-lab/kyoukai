@@ -2717,9 +2717,7 @@ async def outside_core(request: Request) -> HTMLResponse:
 async def ma_room(request: Request) -> HTMLResponse:
     return render_template(request, "ma.html")
 
-@app.get("/central", response_class=HTMLResponse)
-async def central_os_page(request: Request) -> HTMLResponse:
-    return render_template(request, "central.html")
+# /central route removed (Central OS isolated 2026-06-18)
 
 @app.get("/about", response_class=HTMLResponse)
 async def about_page(request: Request) -> HTMLResponse:
