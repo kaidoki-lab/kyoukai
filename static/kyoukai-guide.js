@@ -147,6 +147,66 @@
   let detectTimer = 0;
   let idleTimer = 0;
 
+  // ── 擬似言語音声（イントロと同じ仕組み） ─────────────────────────────────
+  const GUIDE_VOICE_CONFIGS = [
+    [275, "sine",     0.078, 0.005],
+    [338, "triangle", 0.060, 0.004],
+    [218, "sine",     0.098, 0.006],
+    [376, "triangle", 0.068, 0.004],
+    [258, "sine",     0.088, 0.005],
+    [308, "triangle", 0.075, 0.004],
+  ];
+
+  let _guideAudioCtx = null;
+
+  function getGuideAudioCtx() {
+    if (_guideAudioCtx) {
+      if (_guideAudioCtx.state === "suspended") _guideAudioCtx.resume().catch(() => {});
+      return _guideAudioCtx;
+    }
+    try { _guideAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (_) {}
+    return _guideAudioCtx;
+  }
+
+  function playGuideVoice() {
+    const ctx = getGuideAudioCtx();
+    if (!ctx) return;
+    const cfg = GUIDE_VOICE_CONFIGS[Math.floor(Math.random() * GUIDE_VOICE_CONFIGS.length)];
+    const [baseFreq, waveType, baseDur, atk] = cfg;
+    const pitch = 0.92 + Math.random() * 0.16;
+    const rate  = 0.95 + Math.random() * 0.10;
+    const freq  = baseFreq * pitch;
+    const dur   = baseDur * rate;
+    const osc    = ctx.createOscillator();
+    const gain   = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.value = freq * 1.6;
+    filter.Q.value = 3.2;
+    osc.type = waveType;
+    osc.frequency.value = freq;
+    const now = ctx.currentTime;
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.55, now + atk);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    osc.frequency.setValueAtTime(freq, now);
+    osc.frequency.linearRampToValueAtTime(freq * 0.965, now + dur);
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + dur + 0.015);
+  }
+
+  function playGuideVoiceSequence(charCount) {
+    const ctx = getGuideAudioCtx();
+    if (!ctx) return;
+    const count = Math.min(Math.max(Math.floor(charCount / 3), 1), 5);
+    for (let i = 0; i < count; i++) {
+      window.setTimeout(playGuideVoice, i * 90);
+    }
+  }
+
   function getSearchParams() {
     try {
       return new URLSearchParams(window.location.search || "");
@@ -435,6 +495,7 @@
     if (!options.silent) {
       trackGuideEvent("guide_follow_message", { message_text: message });
     }
+    playGuideVoiceSequence(message.length);
   }
 
   function resetIdleTimer(guide, bubble, state) {

@@ -92,7 +92,7 @@
 
     const now = ctx.currentTime;
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.85, now + atk);
+    gain.gain.linearRampToValueAtTime(0.55, now + atk);
     gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
 
     // わずかなピッチ変化で「話している」感を演出
