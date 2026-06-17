@@ -1,64 +1,36 @@
 """
-KYOUKAI Shorts Factory — 今日の収録シナリオ生成
-Central OS の proposals + YouTube analytics を読んで
-シナリオ（人間用）と操作手順JSON（マシン用）を出力する。
+KYOUKAI Shorts Factory — ブラウズステップ自動生成 v2
+Claude API不使用。ルートローテーション + kyoukai_hotspots.json から動的に生成する。
 """
 
 from __future__ import annotations
 
 import json
+import random
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
-CENTRAL_OS = ROOT.parent / "central-os"
-
-PROPOSALS_PATH = CENTRAL_OS / "proposals" / "proposals.json"
-ANALYTICS_PATH = CENTRAL_OS / "analytics" / "youtube_summary.json"
-LORE_PATH = CENTRAL_OS / "lore" / "kyoukai-world.md"
+ROOT         = Path(__file__).resolve().parent
 HOTSPOTS_PATH = ROOT / "kyoukai_hotspots.json"
+HISTORY_PATH  = ROOT / "session_history.json"
+BASE_URL      = "https://www.void-kyoukai.net"
 
-KYOUKAI_PAGES = [
-    "/", "/observation", "/signal", "/null",
-    "/observer", "/archive", "/hyougi", "/external-signal", "/outside",
-]
-
-HISTORY_PATH = ROOT / "session_history.json"
-
-# 4ルートを循環。毎回違う部屋の組み合わせを保証する
+# ── ルートセット（前回と絶対に被らない） ─────────────────────────────────────
 ROUTE_SETS = [
-    {
-        "label": "Route-A 深層",
-        "pages": ["/observer", "/ma", "/null", "/archive"],
-    },
-    {
-        "label": "Route-B 境界",
-        "pages": ["/exit", "/signal", "/outside", "/hyougi"],
-    },
-    {
-        "label": "Route-C 記録",
-        "pages": ["/archive", "/hyougi", "/observation", "/observer"],
-    },
-    {
-        "label": "Route-D 入口巡回",
-        "pages": ["/", "/signal", "/null", "/exit"],
-    },
+    {"label": "Route-A 深層",   "pages": ["/observer", "/ma", "/null", "/archive"]},
+    {"label": "Route-B 境界",   "pages": ["/exit", "/signal", "/outside", "/hyougi"]},
+    {"label": "Route-C 記録",   "pages": ["/archive", "/hyougi", "/observation", "/observer"]},
+    {"label": "Route-D 入口巡回", "pages": ["/", "/signal", "/null", "/exit"]},
 ]
 
-# 日替わりトーン指定（5種循環）
-TONE_ROTATIONS = [
-    "静寂と待機 — 演出が動くのをただ見守る映像。操作は最小限。「何かが起きている」感覚を時間で作る。",
-    "記録者の視点 — 感情を排して淡々と観測ログを残すような映像。派手な演出より「何かを記録している」感覚を優先する。",
-    "迷子の観察者 — 初めて来た人が手探りで動く感覚。クリックして反応を確かめる、戻る、また進む。",
-    "接続確認 — システム点検のような雰囲気。ページとホットスポットを順番に確かめていく淡々とした映像。",
-    "侵食 — 静かに始まり、後半にかけて画面の異常感が増す構成。演出の変化が映えるページを選ぶ。",
-]
 
-sys.path.insert(0, str(CENTRAL_OS / "lib"))
-from claude_client import ask
+# ── 日時 ─────────────────────────────────────────────────────────────────────
+def now_jst() -> datetime:
+    return datetime.now(timezone(timedelta(hours=9)))
 
 
+# ── JSON I/O ─────────────────────────────────────────────────────────────────
 def load_json(path: Path, default):
     if not path.exists():
         return default
@@ -66,62 +38,18 @@ def load_json(path: Path, default):
         return json.load(f)
 
 
-def load_text(path: Path) -> str:
-    if not path.exists():
-        return ""
-    return path.read_text(encoding="utf-8")
-
-
-def now_jst() -> datetime:
-    return datetime.now(timezone(timedelta(hours=9)))
-
-
+# ── 履歴管理 ──────────────────────────────────────────────────────────────────
 def load_history() -> list[dict]:
-    if not HISTORY_PATH.exists():
-        return []
-    try:
-        data = json.loads(HISTORY_PATH.read_text(encoding="utf-8"))
-        return data.get("sessions", [])
-    except Exception:
-        return []
+    return load_json(HISTORY_PATH, {}).get("sessions", [])
 
 
-def save_history(pages_visited: list[str], theme: str) -> None:
+def save_session(route_label: str, pages: list[str], clip_count: int) -> None:
     sessions = load_history()
     sessions.append({
-        "date": now_jst().strftime("%Y-%m-%d"),
-        "pages": pages_visited,
-        "theme": theme,
-    })
-    HISTORY_PATH.write_text(
-        json.dumps({"sessions": sessions[-30:]}, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-
-
-def pick_today_route() -> tuple[str, list[str], str]:
-    """最近使ったルートを避けて今日のルートを選ぶ。ラベル・推奨ページ・トーンを返す。"""
-    sessions = load_history()
-    recent_labels = [s.get("route_label") for s in sessions[-4:]]
-
-    # 最後に使ったルートを除外して選択
-    for route in ROUTE_SETS:
-        if route["label"] not in recent_labels:
-            break
-    else:
-        route = ROUTE_SETS[len(sessions) % len(ROUTE_SETS)]
-
-    tone = TONE_ROTATIONS[len(sessions) % len(TONE_ROTATIONS)]
-    return route["label"], route["pages"], tone
-
-
-def save_session(route_label: str, pages_visited: list[str], theme: str) -> None:
-    sessions = load_history()
-    sessions.append({
-        "date": now_jst().strftime("%Y-%m-%d"),
+        "date":        now_jst().strftime("%Y-%m-%d"),
         "route_label": route_label,
-        "pages": pages_visited,
-        "theme": theme,
+        "pages":       pages,
+        "clip_count":  clip_count,
     })
     HISTORY_PATH.write_text(
         json.dumps({"sessions": sessions[-30:]}, ensure_ascii=False, indent=2),
@@ -129,186 +57,249 @@ def save_session(route_label: str, pages_visited: list[str], theme: str) -> None
     )
 
 
-def get_recent_pages(n: int = 2) -> list[str]:
-    """直近n回のセッションで使われたページ一覧を返す。"""
-    sessions = load_history()[-n:]
-    recent: list[str] = []
-    for s in sessions:
-        for p in s.get("pages", []):
-            if p not in recent:
-                recent.append(p)
-    return recent
+# ── ルート選択（前回と同じラベルは絶対に選ばない） ──────────────────────────
+def pick_route() -> dict:
+    sessions   = load_history()
+    last_label = sessions[-1].get("route_label") if sessions else None
+    last_pages = set(sessions[-1].get("pages", [])) if sessions else set()
+
+    # 前回と同じラベルを除外
+    candidates = [r for r in ROUTE_SETS if r["label"] != last_label]
+    if not candidates:
+        candidates = list(ROUTE_SETS)
+
+    # 前回とのページ被りが最も少ないものを優先
+    candidates.sort(key=lambda r: len(set(r["pages"]) & last_pages))
+    min_overlap = len(set(candidates[0]["pages"]) & last_pages)
+    best = [r for r in candidates if len(set(r["pages"]) & last_pages) == min_overlap]
+    return random.choice(best)
 
 
-def make_session_dir() -> Path:
-    date_str = now_jst().strftime("%Y-%m-%d")
+# ── スクロールパターン 6種（毎回ランダム選択） ──────────────────────────────
+def _rnd(lo: float, hi: float, digits: int = 1) -> float:
+    return round(random.uniform(lo, hi), digits)
+
+
+def scroll_pattern_slow_reveal() -> list[dict]:
+    """ゆっくり下りながら世界を見せる"""
+    steps = []
+    for _ in range(random.randint(2, 4)):
+        steps += [
+            {"action": "scroll", "amount": random.randint(200, 450), "wait": _rnd(1.5, 2.5)},
+            {"action": "pause",  "seconds": _rnd(2.5, 4.5)},
+        ]
+    return steps
+
+
+def scroll_pattern_sweep() -> list[dict]:
+    """一気に底まで落とし、ゆっくり浮上する"""
+    return [
+        {"action": "pause",  "seconds": _rnd(1.5, 2.5)},
+        {"action": "scroll", "amount": random.randint(800, 1200), "wait": _rnd(1.0, 2.0)},
+        {"action": "pause",  "seconds": _rnd(2.5, 4.0)},
+        {"action": "scroll", "amount": random.randint(-700, -400), "wait": _rnd(2.0, 3.0)},
+        {"action": "pause",  "seconds": _rnd(1.5, 3.0)},
+        {"action": "scroll", "amount": random.randint(200, 450), "wait": _rnd(1.5, 2.0)},
+        {"action": "pause",  "seconds": _rnd(2.0, 3.5)},
+    ]
+
+
+def scroll_pattern_stutter() -> list[dict]:
+    """少しずつ止まりながら進む（迷っている感覚）"""
+    steps = []
+    for _ in range(random.randint(3, 5)):
+        steps += [
+            {"action": "scroll", "amount": random.randint(80, 230), "wait": _rnd(0.8, 1.5)},
+            {"action": "pause",  "seconds": _rnd(1.5, 3.5)},
+        ]
+    steps += [
+        {"action": "scroll", "amount": random.randint(-300, -120), "wait": _rnd(1.5, 2.5)},
+        {"action": "pause",  "seconds": _rnd(2.0, 3.5)},
+    ]
+    return steps
+
+
+def scroll_pattern_deep_dive() -> list[dict]:
+    """深く潜って長く滞在してから急浮上"""
+    return [
+        {"action": "pause",  "seconds": _rnd(2.0, 3.5)},
+        {"action": "scroll", "amount": random.randint(1000, 1500), "wait": _rnd(1.5, 2.5)},
+        {"action": "pause",  "seconds": _rnd(4.0, 6.5)},
+        {"action": "scroll", "amount": random.randint(-1200, -700), "wait": _rnd(1.2, 2.0)},
+        {"action": "pause",  "seconds": _rnd(1.5, 2.5)},
+    ]
+
+
+def scroll_pattern_float() -> list[dict]:
+    """浮かぶように小刻みに上下する（演出が動くのを待つ）"""
+    steps = []
+    direction = 1
+    for _ in range(random.randint(4, 6)):
+        amount = random.randint(80, 200) * direction
+        direction *= -1
+        steps += [
+            {"action": "scroll", "amount": amount, "wait": _rnd(1.5, 2.8)},
+            {"action": "pause",  "seconds": _rnd(2.5, 5.0)},
+        ]
+    return steps
+
+
+def scroll_pattern_zigzag() -> list[dict]:
+    """大きく下りて戻る を繰り返す"""
+    steps = []
+    for _ in range(random.randint(2, 3)):
+        steps += [
+            {"action": "scroll", "amount": random.randint(350, 650), "wait": _rnd(1.0, 1.8)},
+            {"action": "pause",  "seconds": _rnd(1.5, 3.0)},
+            {"action": "scroll", "amount": random.randint(-300, -150), "wait": _rnd(1.2, 2.0)},
+            {"action": "pause",  "seconds": _rnd(2.0, 3.5)},
+        ]
+    return steps
+
+
+SCROLL_PATTERNS = {
+    "slow_reveal": scroll_pattern_slow_reveal,
+    "sweep":       scroll_pattern_sweep,
+    "stutter":     scroll_pattern_stutter,
+    "deep_dive":   scroll_pattern_deep_dive,
+    "float":       scroll_pattern_float,
+    "zigzag":      scroll_pattern_zigzag,
+}
+
+
+def pick_scroll_pattern(used: set[str]) -> tuple[str, list[dict]]:
+    """セッション内で同じパターンを使いまわさないよう選択"""
+    available = [k for k in SCROLL_PATTERNS if k not in used]
+    if not available:
+        available = list(SCROLL_PATTERNS.keys())
+    name = random.choice(available)
+    return name, SCROLL_PATTERNS[name]()
+
+
+# ── インタラクション手順生成（必ず何かしらクリックする） ──────────────────
+def build_interaction_steps(interactions: list[dict]) -> list[dict]:
+    steps = []
+    if not interactions:
+        return steps
+
+    # 重複セレクタを除外
+    seen, valid = set(), []
+    for ia in interactions:
+        sel = ia.get("selector", "")
+        if sel and sel not in seen:
+            seen.add(sel)
+            valid.append(ia)
+
+    if not valid:
+        return steps
+
+    # 1〜3個ランダムに選択（多すぎると動画が長くなる）
+    count   = min(len(valid), random.randint(1, 3))
+    targets = random.sample(valid, count)
+
+    for ia in targets:
+        selector = ia.get("selector", "")
+        action   = ia.get("action", "click")
+
+        # クリック前にカーソルをふらりと動かす
+        steps += [
+            {
+                "action": "mouse_move",
+                "x": random.randint(80, 300),
+                "y": random.randint(200, 680),
+                "wait": _rnd(0.8, 1.5),
+            },
+            {"action": "pause", "seconds": _rnd(0.8, 1.8)},
+        ]
+
+        if action == "click":
+            steps += [
+                {"action": "hover",  "selector": selector, "wait": _rnd(0.5, 1.2)},
+                {"action": "pause",  "seconds": _rnd(0.8, 1.6)},
+                {"action": "click",  "selector": selector, "wait": _rnd(1.5, 2.5)},
+                {"action": "pause",  "seconds": _rnd(2.5, 5.0)},
+            ]
+        else:
+            steps += [
+                {"action": "hover",  "selector": selector, "wait": _rnd(2.0, 3.5)},
+                {"action": "pause",  "seconds": _rnd(2.0, 3.5)},
+            ]
+
+    return steps
+
+
+# ── クリップ生成 ──────────────────────────────────────────────────────────────
+def build_clip(page_path: str, page_info: dict, used_patterns: set[str]) -> tuple[dict, str]:
+    room_name    = page_info.get("room_name", page_path)
+    interactions = page_info.get("interactions", [])
+
+    steps = []
+
+    # 1. ページ移動＋着地待機
+    steps += [
+        {"action": "navigate", "url": f"{BASE_URL}{page_path}", "wait": 3},
+        {"action": "pause",    "seconds": _rnd(1.5, 3.0)},
+    ]
+
+    # 2. スクロールパターン（動的）
+    pattern_name, scroll_steps = pick_scroll_pattern(used_patterns)
+    steps.extend(scroll_steps)
+
+    # 3. インタラクション（必ず何かしら触れる）
+    if interactions:
+        steps.extend(build_interaction_steps(interactions))
+    else:
+        # ホットスポットなしでもカーソルを動かして「何かを探している」感を出す
+        for _ in range(random.randint(2, 3)):
+            steps += [
+                {
+                    "action": "mouse_move",
+                    "x": random.randint(60, 320),
+                    "y": random.randint(150, 750),
+                    "wait": _rnd(1.2, 2.2),
+                },
+                {"action": "pause", "seconds": _rnd(2.0, 4.0)},
+            ]
+
+    # 4. エンディング（毎回違う締め方）
+    ending = random.choice(["scroll_up", "linger", "scroll_more", "drift"])
+    if ending == "scroll_up":
+        steps += [
+            {"action": "scroll", "amount": random.randint(-500, -250), "wait": _rnd(1.5, 2.5)},
+            {"action": "pause",  "seconds": _rnd(2.0, 3.5)},
+        ]
+    elif ending == "linger":
+        steps += [{"action": "pause", "seconds": _rnd(3.5, 6.0)}]
+    elif ending == "scroll_more":
+        steps += [
+            {"action": "scroll", "amount": random.randint(200, 450), "wait": _rnd(1.0, 2.0)},
+            {"action": "pause",  "seconds": _rnd(2.5, 4.5)},
+        ]
+    elif ending == "drift":
+        for _ in range(2):
+            steps += [
+                {"action": "scroll", "amount": random.randint(-200, 300), "wait": _rnd(1.2, 2.0)},
+                {"action": "pause",  "seconds": _rnd(1.5, 3.0)},
+            ]
+
+    clip = {
+        "clip_title":     room_name,
+        "youtube_title":  f"KYOUKAI｜{room_name}",
+        "move_style":     pattern_name,
+        "steps":          steps,
+    }
+    return clip, pattern_name
+
+
+# ── セッションディレクトリ ────────────────────────────────────────────────────
+def make_session_dir() -> tuple[Path, str]:
+    date_str    = now_jst().strftime("%Y-%m-%d")
     session_dir = ROOT / "sessions" / date_str
     session_dir.mkdir(parents=True, exist_ok=True)
-    return session_dir
+    return session_dir, date_str
 
 
-def build_scenario_prompt(
-    proposals, analytics, lore: str,
-    route_label: str = "", required_pages: list[str] | None = None,
-    tone: str = "", recent_pages: list[str] | None = None,
-) -> tuple[str, str]:
-    items = proposals.get("items", []) if isinstance(proposals, dict) else proposals
-    pending = [p for p in items if p.get("status") in ("提案", "保留")][:5]
-
-    top_videos = analytics.get("topVideos", [])[:5]
-    strong_words = analytics.get("strongTitleWords", [])
-
-    today = now_jst().strftime("%Y-%m-%d (%A)")
-
-    hotspots = load_json(HOTSPOTS_PATH, {})
-    pages_summary = {
-        path: {
-            "room_name": info.get("room_name", ""),
-            "lore": info.get("lore", ""),
-            "narrative_purpose": info.get("narrative_purpose", ""),
-            "has_interactions": len(info.get("interactions", [])) > 0,
-        }
-        for path, info in hotspots.get("pages", {}).items()
-    }
-
-    system = f"""あなたはKYOUKAIというWebサイトのYouTube Shorts収録ディレクターです。
-KYOUKAIの核心テーマ：
-{lore[:800]}
-
-ルール：
-- 出力は必ず日本語
-- ブラウザで実際に見せられるページ・演出を具体的に指定する
-- 視聴者が「変なサイトを見ている40代」を想像できるネタを選ぶ
-- ホラー・怖い・不気味の強調は禁止。静かな異常感・違和感を優先する"""
-
-    required_str = "、".join(required_pages) if required_pages else "（指定なし）"
-    recent_str = "、".join(recent_pages) if recent_pages else "なし"
-    tone_str = tone if tone else "特になし"
-
-    user = f"""今日（{today}）の収録シナリオを作ってください。
-
-【今日の収録指定】（必ず従うこと）
-- 今日のルート: {route_label}
-- 必ず訪問するページ（全シーンを通じてこれらを全部使うこと）: {required_str}
-- 今日のアングル・トーン: {tone_str}
-- 最近訪問済み（できるだけ避ける、やむを得ない場合のみ使用可）: {recent_str}
-
-【未着手の企画案】
-{json.dumps(pending, ensure_ascii=False, indent=2)}
-
-【伸びた動画TOP5】
-{json.dumps(top_videos, ensure_ascii=False, indent=2)}
-
-【強いタイトルワード】
-{', '.join(strong_words)}
-
-【KYOUKAIの各部屋（世界観＋インタラクション有無）】
-{json.dumps(pages_summary, ensure_ascii=False, indent=2)}
-
-以下の形式で出力してください：
-
-## 今日のテーマ
-（一言で）
-
-## 見せるシーン（3〜5本分）
-各シーンを以下の形式で：
-
-### シーン1: （タイトル）
-- ページ: （URLパス）
-- 操作: （何をするか）
-- 見せ場: （どこが映える瞬間か）
-- 尺: （何秒くらい）
-
-### シーン2: ...
-
-## タイトル案（各シーンに対応）
-1.
-2.
-3.
-"""
-    return system, user
-
-
-def make_default_steps(scenario_text: str) -> dict:
-    """シナリオテキストからページを抽出してデフォルト手順を組む。"""
-    base = "https://www.void-kyoukai.net"
-    found = [p for p in KYOUKAI_PAGES if p in scenario_text]
-    if not found:
-        found = ["/", "/observation", "/signal"]
-
-    clips = []
-    for page in found[:5]:
-        clips.append({
-            "clip_title": page,
-            "youtube_title": f"KYOUKAI｜{page}を探索する",
-            "steps": [
-                {"action": "navigate", "url": f"{base}{page}", "wait": 3},
-                {"action": "pause", "seconds": 3},
-                {"action": "scroll", "amount": 400, "wait": 2},
-                {"action": "pause", "seconds": 4},
-                {"action": "scroll", "amount": 600, "wait": 2},
-                {"action": "pause", "seconds": 3},
-                {"action": "scroll", "amount": -1000, "wait": 2},
-                {"action": "pause", "seconds": 3},
-            ],
-        })
-    return {"title": "KYOUKAI自動巡回", "clips": clips}
-
-
-def build_steps_prompt(scenario_text: str, hotspots: dict) -> tuple[str, str]:
-    system = """あなたはPlaywrightブラウザ自動操作の手順JSONを生成するAIです。
-JSONのみ出力してください。コードブロック（```）は使わないこと。"""
-
-    hotspots_text = json.dumps(hotspots.get("pages", {}), ensure_ascii=False, indent=2)
-
-    user = f"""以下の収録シナリオを読んで、Playwrightで実行するブラウザ操作手順をJSONで出力してください。
-
-【シナリオ】
-{scenario_text}
-
-【ベースURL】
-https://www.void-kyoukai.net
-
-【KYOUKAIの全ホットスポット情報】
-各ページのインタラクティブ要素を必ず参照して、シーンに合ったホットスポット操作をstepsに組み込んでください。
-{hotspots_text}
-
-【出力形式】
-{{
-  "title": "今日のテーマ（一言）",
-  "clips": [
-    {{
-      "clip_title": "シーンのタイトル",
-      "youtube_title": "YouTubeタイトル案",
-      "steps": [
-        {{"action": "navigate", "url": "https://www.void-kyoukai.net/signal", "wait": 3}},
-        {{"action": "pause", "seconds": 2}},
-        {{"action": "click", "selector": ".signal-audio-hit", "wait": 1}},
-        {{"action": "pause", "seconds": 3}},
-        {{"action": "click", "selector": ".signal-channel-hit", "wait": 2}},
-        {{"action": "pause", "seconds": 4}}
-      ]
-    }}
-  ]
-}}
-
-actionの種類：
-- navigate: urlに移動してwait秒待つ
-- scroll: amountピクセルスクロールしてwait秒待つ（負の値で上スクロール）
-- pause: seconds秒そのまま待つ（演出が動く時間）
-- click: selectorのCSS要素をクリックしてwait秒待つ
-- hover: selectorのCSS要素にカーソルを乗せてwait秒待つ
-- mouse_move: x,y座標にカーソルを移動してwait秒待つ（ビューポートは393x852）
-- mouse_click: x,y座標をクリックしてwait秒待つ
-
-ルール：
-- ホットスポットがあるページでは必ずそのselectorを使ったclick/hoverを含める
-- 各クリップは30〜60秒程度になるよう手順を組む
-- ページ到着後すぐクリックせず、pause 2〜3秒で演出を見せてからクリックする"""
-
-    return system, user
-
-
+# ── main ─────────────────────────────────────────────────────────────────────
 def main() -> None:
     sys.stdout.reconfigure(encoding="utf-8")
 
@@ -319,92 +310,55 @@ def main() -> None:
     except Exception as exc:
         print(f"WARNING: ホットスポット同期失敗: {exc}")
 
-    print("シナリオ生成中...")
+    hotspots   = load_json(HOTSPOTS_PATH, {})
+    pages_data = hotspots.get("pages", {})
 
-    proposals = load_json(PROPOSALS_PATH, {"items": []})
-    analytics = load_json(ANALYTICS_PATH, {})
-    lore = load_text(LORE_PATH)
+    # ルート選択
+    route       = pick_route()
+    route_label = route["label"]
+    route_pages = route["pages"]
 
-    # 今日のルート・トーンを決定
-    route_label, required_pages, tone = pick_today_route()
-    recent_pages = get_recent_pages(n=2)
-    print(f"今日のルート: {route_label}")
-    print(f"必須ページ: {', '.join(required_pages)}")
-    print(f"アングル: {tone[:30]}...")
+    print(f"今日のルート : {route_label}")
+    print(f"対象ページ   : {', '.join(route_pages)}")
+    print()
 
-    # Step1: シナリオテキスト生成
-    system, user = build_scenario_prompt(
-        proposals, analytics, lore,
-        route_label=route_label,
-        required_pages=required_pages,
-        tone=tone,
-        recent_pages=recent_pages,
+    # ブラウズステップ生成
+    clips, used_patterns = [], set()
+    for page_path in route_pages:
+        page_info = pages_data.get(page_path, {})
+        clip, pattern_name = build_clip(page_path, page_info, used_patterns)
+        used_patterns.add(pattern_name)
+        clips.append(clip)
+        ia_count = len(page_info.get("interactions", []))
+        print(f"  {page_path:<16} pattern={pattern_name:<12} hotspots={ia_count}")
+
+    browse_steps = {
+        "title":       f"{route_label} — {now_jst().strftime('%Y-%m-%d')}",
+        "route_label": route_label,
+        "clips":       clips,
+    }
+
+    # 保存
+    session_dir, date_str = make_session_dir()
+
+    scenario_lines = [f"# {route_label}  {date_str}\n"]
+    for clip in clips:
+        scenario_lines.append(f"### {clip['clip_title']}  [{clip['move_style']}]")
+    scenario_text = "\n".join(scenario_lines) + "\n"
+
+    (session_dir / "scenario.txt").write_text(scenario_text, encoding="utf-8")
+    (session_dir / "browse_steps.json").write_text(
+        json.dumps(browse_steps, ensure_ascii=False, indent=2), encoding="utf-8"
     )
-    try:
-        scenario_text = ask(system, user, max_tokens=1500)
-    except Exception as exc:
-        print(f"ERROR: シナリオ生成失敗: {exc}")
-        sys.exit(1)
+    (ROOT / "today_scenario.txt").write_text(scenario_text, encoding="utf-8")
 
-    # Step2: 操作手順JSON生成
-    print("操作手順を生成中...")
-    hotspots = load_json(HOTSPOTS_PATH, {})
-    sys_s, usr_s = build_steps_prompt(scenario_text, hotspots)
-    browse_steps = {}
-    try:
-        steps_raw = ask(sys_s, usr_s, max_tokens=2000)
-        # コードブロックを除去
-        steps_clean = steps_raw.strip()
-        if steps_clean.startswith("```"):
-            steps_clean = "\n".join(steps_clean.split("\n")[1:])
-        if steps_clean.endswith("```"):
-            steps_clean = "\n".join(steps_clean.split("\n")[:-1])
-        browse_steps = json.loads(steps_clean.strip())
-    except Exception as exc:
-        print(f"WARNING: 操作手順の生成失敗 ({exc})。デフォルト手順を使用します。")
-        browse_steps = make_default_steps(scenario_text)
+    # 履歴保存
+    save_session(route_label, route_pages, len(clips))
 
-    # セッションフォルダに保存
-    session_dir = make_session_dir()
-    date_str = now_jst().strftime("%Y-%m-%d")
-
-    scenario_output = f"# 収録シナリオ — {date_str}\n\n{scenario_text}\n"
-    (session_dir / "scenario.txt").write_text(scenario_output, encoding="utf-8")
-
-    if browse_steps:
-        (session_dir / "browse_steps.json").write_text(
-            json.dumps(browse_steps, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
-
-    # 後方互換でルートにも置く
-    (ROOT / "today_scenario.txt").write_text(scenario_output, encoding="utf-8")
-
-    # セッション履歴を保存（次回のルート選択に使用）
-    theme_line = next(
-        (line.replace("## 今日のテーマ", "").strip()
-         for line in scenario_text.splitlines()
-         if "今日のテーマ" in line),
-        route_label,
-    )
-    # browse_steps から実際に使ったページを抽出
-    used_pages: list[str] = []
-    for clip in browse_steps.get("clips", []):
-        for step in clip.get("steps", []):
-            url = step.get("url", "")
-            if url:
-                path = "/" + url.split("void-kyoukai.net/", 1)[-1].split("?")[0].lstrip("/")
-                if path not in used_pages:
-                    used_pages.append(path)
-    save_session(route_label, used_pages or required_pages, theme_line)
-
-    print("\n" + "=" * 50)
-    print(scenario_output)
-    print("=" * 50)
-    print(f"\nセッションフォルダ: {session_dir}")
-    print(f"  scenario.txt     — 編集時の参考")
-    if browse_steps:
-        clip_count = len(browse_steps.get("clips", []))
-        print(f"  browse_steps.json — {clip_count}クリップ分の操作手順")
+    print(f"\nセッションフォルダ : {session_dir}")
+    print(f"browse_steps.json  : {len(clips)}クリップ 生成完了")
+    print()
+    print(scenario_text)
 
 
 if __name__ == "__main__":
