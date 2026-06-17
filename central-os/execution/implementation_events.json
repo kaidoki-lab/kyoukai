@@ -474,5 +474,26 @@
     ],
     "completedAt": "2026-06-17T04:02:47.167193+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260618-null-controls-center",
+    "sourcePlanId": "manual-20260618-null-controls-center",
+    "sourceTaskId": "",
+    "title": "崩落域コントロール中央寄せとボタン拡大",
+    "targetPages": [
+      "/null"
+    ],
+    "status": "completed",
+    "summary": "/nullのブラウザ版で右端に寄っていたSTARTボタンとステータス/カウントダウンカードを画面下中央へ移動。スマホ版・ブラウザ版のSTARTボタン表示を約ふた回り大きくし、CSSキャッシュ対策として/nullのspace.css参照をv=3へ更新。",
+    "artifacts": [
+      "static/space.css",
+      "templates/null.html"
+    ],
+    "verification": [
+      "git diff --check 成功",
+      "unittest 15件成功"
+    ],
+    "completedAt": "2026-06-17T23:37:02.742033+00:00",
+    "recordedBy": "codex"
   }
 ]
