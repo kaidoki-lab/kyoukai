@@ -1464,6 +1464,7 @@ KYOUKAI_CUSTOM_EVENTS = [
     "ofuse_click", "booth_click", "amazon_click", "affiliate_click", "outside_link_click",
     "signal_hotspot_click", "external_connection_start", "external_connection_choice_show",
     "external_connection_follow", "external_connection_cancel",
+    "guide_intro_show", "guide_intro_complete", "guide_intro_skip", "guide_follow_message",
 ]
 
 KYOUKAI_ROOM_LABELS = {

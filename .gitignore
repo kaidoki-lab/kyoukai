@@ -33,6 +33,7 @@ shorts_factory/input_audio/
 shorts_factory/logs/
 shorts_factory/temp/
 shorts_factory/status.json
+shorts_factory/session_history.json
 shorts_factory/recording_markers.json
 shorts_factory/today_scenario.txt
 shorts_factory/config.json

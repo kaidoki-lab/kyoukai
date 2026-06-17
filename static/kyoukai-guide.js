@@ -29,52 +29,88 @@
 
   const GUIDE_TARGET_ROOM_IDS = KYOUKAI_ROOMS.map((room) => room.id);
 
+  // 通常待機（探索を促す / 寄り添う）
   const BASE_MESSAGES = [
+    "迷いました？",
+    "どこから見ても大丈夫",
+    "全部見る必要はない",
+    "気になる場所から",
+    "今日は見るだけでも",
+    "私も全部は知らない",
+    "少し静かですね",
     "微弱反応",
-    "此処、鳴ル",
     "気配ガアル",
-    "ソコ、見タヨ",
-    "未確認"
+    "未確認",
   ];
 
+  // トップへ戻ってきた
   const RETURN_MESSAGES = [
-    "戻レルヨ",
-    "戻ッタネ",
+    "また来ましたね",
+    "戻ってきましたか",
     "帰還反応",
-    "記録アリ"
+    "戻レルヨ",
   ];
 
+  // 訪問済みの部屋に関するメッセージ
   const VISITED_MESSAGES = [
-    "ソコ、見タヨ",
+    "そこは見ましたね",
+    "また行きますか？",
     "歩行記録アリ",
-    "気配ガ増エタ"
   ];
 
+  // 未訪問の部屋がある
   const UNVISITED_MESSAGES = [
-    "未ダ見テイナイ場所",
-    "反応、薄イ",
+    "まだ見ていない場所があります",
     "奥ニアル",
-    "未確認"
+    "反応、薄イ",
+    "未確認の場所",
   ];
 
+  // /outside ヒント
   const OUTSIDE_HINT_MESSAGES = [
+    "境界の外まで来ましたね",
     "外ノ気配ガアル",
-    "外ニツナガル",
     "棚ノ気配",
-    "外部接続"
+    "外部接続",
   ];
 
+  // /support ヒント
   const SUPPORT_HINT_MESSAGES = [
     "箱、アルネ",
     "置ケル場所",
     "小サナ反応",
-    "気配ガ残ル"
+    "気配ガ残ル",
   ];
 
+  // 全部屋巡回済み
   const COMPLETE_MESSAGES = [
-    "巡回済み",
+    "全部見ましたね",
+    "まだ変わる場所があります",
     "記録あり",
-    "まだ変わる"
+  ];
+
+  // 一定時間操作なし
+  const IDLE_MESSAGES = [
+    "まだいますか？",
+    "気になる場所はありましたか？",
+    "動かなくても大丈夫です",
+    "接続、継続中",
+    "まだ観測中",
+  ];
+
+  // /signal 到達後
+  const SIGNAL_MESSAGES = [
+    "通信が始まっていますね",
+    "信号、受信中",
+    "何かを受け取りましたか？",
+  ];
+
+  // 再訪問（visitCount >= 3）
+  const REVISIT_MESSAGES = [
+    "また観測しに来ましたか",
+    "記録が増えています",
+    "今日は違う場所も",
+    "再接続、確認",
   ];
 
   const DETECTION_MESSAGES = {
@@ -86,9 +122,10 @@
     external: ["外部接続", "外ノ気配", "遠イ反応"]
   };
 
-  const MESSAGE_HIDE_MS = 3000;
+  const MESSAGE_HIDE_MS = 3400;
   const AUTO_MESSAGE_DELAY_MS = 850;
-  const MAX_MESSAGE_LENGTH = 18;
+  const MAX_MESSAGE_LENGTH = 22;
+  const IDLE_TRIGGER_MS = 38000;
   const DETECTION_COOLDOWN_MS = 1600;
   const DESKTOP_OFFSET_X = 18;
   const DESKTOP_OFFSET_Y = 14;
@@ -108,6 +145,7 @@
 
   let messageTimer = 0;
   let detectTimer = 0;
+  let idleTimer = 0;
 
   function getSearchParams() {
     try {
@@ -285,8 +323,11 @@
   }
 
   function getGuideMessagesByState(state, options = {}) {
+    if (options.idle) return IDLE_MESSAGES;
+    if (state.currentRoomId === "signal") return SIGNAL_MESSAGES.concat(BASE_MESSAGES);
     if (state.returnedToTop && options.auto) return RETURN_MESSAGES;
     if (state.unvisitedRooms.length === 0) return COMPLETE_MESSAGES;
+    if (state.visitCount >= 3 && options.auto) return REVISIT_MESSAGES.concat(BASE_MESSAGES);
     if (state.visitedRooms.filter((roomId) => GUIDE_TARGET_ROOM_IDS.includes(roomId)).length >= 3) {
       return VISITED_MESSAGES.concat(UNVISITED_MESSAGES);
     }
@@ -376,6 +417,14 @@
     guide.classList.remove("kyoukai-guide--speaking");
   }
 
+  function trackGuideEvent(name, params) {
+    if (typeof window.trackKyoukaiEvent === "function") {
+      window.trackKyoukaiEvent(name, params || {});
+    } else if (typeof window.gtag === "function") {
+      window.gtag("event", name, params || {});
+    }
+  }
+
   function showGuideMessage(guide, bubble, state, options = {}) {
     window.clearTimeout(messageTimer);
     const message = options.message || pickGuideMessage(state, options);
@@ -383,6 +432,16 @@
     markHintSeen(message);
     guide.classList.add("kyoukai-guide--speaking");
     messageTimer = window.setTimeout(() => hideGuideMessage(guide), MESSAGE_HIDE_MS);
+    if (!options.silent) {
+      trackGuideEvent("guide_follow_message", { message_text: message });
+    }
+  }
+
+  function resetIdleTimer(guide, bubble, state) {
+    window.clearTimeout(idleTimer);
+    idleTimer = window.setTimeout(() => {
+      showGuideMessage(guide, bubble, state, { idle: true });
+    }, IDLE_TRIGGER_MS);
   }
 
   function clamp(value, min, max) {
@@ -482,11 +541,14 @@
       targetY = event.clientY;
       window.clearTimeout(detectTimer);
       detectTimer = window.setTimeout(() => updateDetection(event), 24);
+      resetIdleTimer(guide, bubble, state);
     }
 
+    resetIdleTimer(guide, bubble, state);
     window.addEventListener("mousemove", onMouseMove, { passive: true });
     window.addEventListener("pagehide", () => {
       window.cancelAnimationFrame(frameId);
+      window.clearTimeout(idleTimer);
       window.removeEventListener("mousemove", onMouseMove);
     }, { once: true });
     moveGuide();
@@ -545,19 +607,25 @@
     function onPointerMove(event) {
       if (event.pointerType === "mouse" || event.pointerType === "pen") {
         follow(event.clientX, event.clientY);
+        resetIdleTimer(guide, bubble, state);
       }
     }
 
     function onTouchMove(event) {
       const touch = event.touches[0];
-      if (touch) follow(touch.clientX, touch.clientY);
+      if (touch) {
+        follow(touch.clientX, touch.clientY);
+        resetIdleTimer(guide, bubble, state);
+      }
     }
 
+    resetIdleTimer(guide, bubble, state);
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("touchstart", onTouchMove, { passive: true });
     window.addEventListener("touchmove", onTouchMove, { passive: true });
     window.addEventListener("pagehide", () => {
       window.cancelAnimationFrame(frameId);
+      window.clearTimeout(idleTimer);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("touchstart", onTouchMove);
       window.removeEventListener("touchmove", onTouchMove);
@@ -581,11 +649,11 @@
     });
   }
 
-  function initKyoukaiGuide() {
+  function initKyoukaiGuide(force = false) {
     const state = getGuideState();
     logGuideState(state);
 
-    if (!shouldShowGuide(state.visitCount)) return;
+    if (!force && !shouldShowGuide(state.visitCount)) return;
 
     const desktopPointer = isDesktopPointer();
     const elements = createGuideElement(state, desktopPointer);
@@ -598,13 +666,19 @@
     }
 
     if (state.returnedToTop) {
-      window.setTimeout(() => showGuideMessage(elements.guide, elements.bubble, state, { auto: true }), AUTO_MESSAGE_DELAY_MS);
+      window.setTimeout(() => showGuideMessage(elements.guide, elements.bubble, state, { auto: true, silent: true }), AUTO_MESSAGE_DELAY_MS);
     }
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initKyoukaiGuide, { once: true });
+  // intro.js（defer順で先に実行）が pending フラグを設定している場合は待機
+  if (window.__kyoukaiIntroPending) {
+    // intro完了後に呼ばれるフック
+    window.__kyoukaiStartFollowGuide = () => initKyoukaiGuide(true);
   } else {
-    initKyoukaiGuide();
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => initKyoukaiGuide(), { once: true });
+    } else {
+      initKyoukaiGuide();
+    }
   }
 })();

@@ -495,3 +495,183 @@
   0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
   50% { transform: translate3d(1px, -1px, 0) scale(1.03); }
 }
+
+/* ════════════════════════════════════════════════════════
+   GUIDE INTRO OVERLAY  (kyoukai-guide-intro.js)
+════════════════════════════════════════════════════════ */
+.kgi-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.90);
+  opacity: 0;
+  transition: opacity 480ms ease;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.kgi-overlay--in  { opacity: 1; }
+.kgi-overlay--out { opacity: 0; }
+
+.kgi-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  width: 100%;
+  max-width: 360px;
+}
+
+/* 案内人フィギュア（既存 .kyoukai-guide CSS を流用） */
+.kgi-figure {
+  position: relative !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  top: auto !important;
+  width: 72px;
+  height: 72px;
+  opacity: 0;
+  transform: scale(0.78) translateY(10px);
+  transition: opacity 560ms ease, transform 560ms ease;
+}
+
+.kgi-figure--in {
+  opacity: 0.94;
+  transform: scale(1) translateY(0);
+}
+
+/* 会話ボックス */
+.kgi-dialogue {
+  width: 100%;
+  min-height: 160px;
+  max-height: 58vh;
+  overflow-y: auto;
+  padding: 15px 17px 15px;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 255, 225, 0.26);
+  border-radius: 4px;
+  background:
+    linear-gradient(180deg, rgba(5, 7, 11, 0.97), rgba(2, 3, 6, 0.92)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 6px);
+  box-shadow: 0 0 0 1px rgba(255, 38, 197, 0.09), 0 0 32px rgba(0,0,0,0.7);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,255,225,0.2) transparent;
+}
+
+.kgi-dialogue::before {
+  content: "GUIDE_SYS";
+  display: block;
+  margin-bottom: 9px;
+  color: rgba(255, 249, 84, 0.80);
+  font-family: "Courier New", Consolas, monospace;
+  font-size: 8px;
+  letter-spacing: 3px;
+}
+
+.kgi-dialogue__text {
+  margin: 0;
+  color: rgba(228, 248, 240, 0.92);
+  font-family: "Courier New", Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.95;
+  letter-spacing: 0.025em;
+  white-space: pre-wrap;
+  text-shadow: 0 0 7px rgba(0, 255, 225, 0.42), 1px 0 rgba(255, 0, 190, 0.26);
+}
+
+/* タイプライターカーソル */
+.kgi-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 0.85em;
+  vertical-align: text-bottom;
+  margin-left: 1px;
+  background: rgba(0, 255, 225, 0.85);
+  animation: kgiCursorBlink 0.68s steps(1) infinite;
+}
+
+/* ボタン群 */
+.kgi-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 380ms ease, transform 380ms ease;
+  pointer-events: none;
+}
+
+.kgi-actions--in {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.kgi-btn {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-family: "Courier New", Consolas, monospace;
+  background: transparent;
+}
+
+.kgi-btn--primary {
+  display: block;
+  padding: 11px 30px;
+  border: 1px solid rgba(0, 255, 225, 0.46);
+  border-radius: 2px;
+  background: rgba(0, 255, 225, 0.07);
+  color: rgba(200, 255, 248, 0.95);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 10px rgba(0, 255, 225, 0.7);
+  box-shadow: 0 0 16px rgba(0, 255, 225, 0.14);
+  transition: background 160ms ease, box-shadow 160ms ease;
+}
+
+.kgi-btn--primary:hover,
+.kgi-btn--primary:focus-visible {
+  background: rgba(0, 255, 225, 0.15);
+  box-shadow: 0 0 24px rgba(0, 255, 225, 0.28);
+  outline: 1px dashed rgba(0, 255, 225, 0.5);
+  outline-offset: 3px;
+}
+
+.kgi-btn--primary:active { transform: scale(0.97); }
+
+.kgi-btn--skip {
+  color: rgba(170, 192, 188, 0.44);
+  font-size: 11px;
+  padding: 4px 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 380ms ease, color 160ms ease;
+}
+
+.kgi-btn--skip.kgi-skip--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.kgi-btn--skip:hover { color: rgba(190, 215, 208, 0.78); }
+
+@keyframes kgiCursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kgi-overlay, .kgi-figure, .kgi-actions, .kgi-btn { transition-duration: 1ms; }
+  .kgi-cursor { animation: none; opacity: 1; }
+}
+
+@media (max-width: 400px) {
+  .kgi-dialogue__text { font-size: 12px; }
+  .kgi-btn--primary   { font-size: 12px; padding: 10px 22px; }
+}
