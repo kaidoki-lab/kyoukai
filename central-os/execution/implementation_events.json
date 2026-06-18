@@ -568,5 +568,26 @@
     ],
     "completedAt": "2026-06-18T00:05:57.684521+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260618-observation-creature-cover",
+    "sourcePlanId": "manual-20260618-observation-creature-cover",
+    "sourceTaskId": "",
+    "title": "観測域PCキャラクター上移動と追加拡大",
+    "targetPages": [
+      "/observation"
+    ],
+    "status": "completed",
+    "summary": "観測域ブラウザ版で背景モニター内の元キャラクターが残って見えていたため、黒塗りモニター領域を上へ拡張し、観測キャラクター本体を上へ移動。さらに本体サイズを一回り拡大し、style.css参照をv=4へ更新。",
+    "artifacts": [
+      "static/style.css",
+      "templates/index.html"
+    ],
+    "verification": [
+      "git diff --check 成功",
+      "unittest 15件成功"
+    ],
+    "completedAt": "2026-06-18T00:19:32.038120+00:00",
+    "recordedBy": "codex"
   }
 ]
