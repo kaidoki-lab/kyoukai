@@ -798,5 +798,25 @@
     ],
     "completedAt": "2026-06-18T17:14:49.033119+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-plan-202606190210-home-rakuten-placement-override",
+    "sourcePlanId": "plan-202606190210-home-rakuten-placement-override",
+    "sourceTaskId": "",
+    "title": "トップPC版楽天ウィジェット配置CSS分離",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "space.cssのCDNキャッシュ影響を避けるため、楽天ウィジェットの位置調整だけを専用CSSへ分離し、後読みで確実に適用されるようにした。サイズは元の21%/22%に戻し、top=72.3%へ下げる設定。",
+    "artifacts": [
+      "templates/home.html",
+      "static/rakuten-placement.css"
+    ],
+    "verification": [
+      "git diff --check 成功; rakuten-placement.css に top=72.3%, width=21%, height=22% を確認"
+    ],
+    "completedAt": "2026-06-18T17:23:54.313949+00:00",
+    "recordedBy": "codex"
   }
 ]
