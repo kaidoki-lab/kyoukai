@@ -3,23 +3,28 @@
 
   var style = document.createElement("style");
   style.textContent = [
-    // フェードイン（ページロード時）
-    "html.k-tr{opacity:0}",
-    "html.k-tr-in{opacity:1;transition:opacity 0.32s ease}",
-    // CRTシャットダウン — 明るいオーバーレイが縦に潰れる
+    // フェードイン（ページロード時）— 黒背景から明けるように見せる
+    "html.k-tr{opacity:0;background:#000}",
+    "html.k-tr-in{opacity:1;transition:opacity 0.36s ease}",
+    // CRTシャットダウン
+    // 1. 明るいオーバーレイが画面全体をフラッシュ
+    // 2. 縦に潰れて細い光の線になる
+    // 3. 線が黒に変わり、全画面に広がって暗転
     "#k-crt-overlay{",
     "  position:fixed;inset:0;z-index:2147483647;pointer-events:none;",
     "  background:#b8cfe0;",
     "  transform-origin:50% 50%;",
     "  will-change:transform,opacity;",
-    "  animation:k-crt-off 0.62s ease-in forwards;",
+    "  animation:k-crt-off 0.82s ease-in forwards;",
     "}",
     "@keyframes k-crt-off{",
-    "  0%  {opacity:0;   transform:scaleY(1)   }",
-    "  9%  {opacity:0.93;transform:scaleY(1)   }",
-    "  46% {opacity:0.93;transform:scaleY(0.055)}",
-    "  67% {opacity:1;   transform:scaleY(0.012)}",
-    "  100%{opacity:0;   transform:scaleY(0.012)}",
+    "  0%  {opacity:0;   transform:scaleY(1);    background:#b8cfe0}",
+    "  7%  {opacity:0.94;transform:scaleY(1);    background:#b8cfe0}",
+    "  50% {opacity:0.94;transform:scaleY(0.05); background:#b8cfe0}",
+    "  64% {opacity:1;   transform:scaleY(0.01); background:#b8cfe0}",
+    "  71% {opacity:1;   transform:scaleY(0.01); background:#000}",
+    "  80% {opacity:1;   transform:scaleY(1);    background:#000}",
+    "  100%{opacity:1;   transform:scaleY(1);    background:#000}",
     "}",
   ].join("");
   document.head.appendChild(style);
@@ -50,7 +55,8 @@
     var overlay = document.createElement("div");
     overlay.id = "k-crt-overlay";
     document.body.appendChild(overlay);
-    setTimeout(function () { window.location.href = url; }, 560);
+    // 画面が暗転してから遷移（0.82s の 80% = 0.656s）
+    setTimeout(function () { window.location.href = url; }, 700);
   }
 
   document.addEventListener("click", function (e) {
