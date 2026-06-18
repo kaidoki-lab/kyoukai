@@ -1173,13 +1173,12 @@ a.sp-link:hover,
 
 .home-rakuten-widget {
   position: absolute;
-  left: 75.1%;
-  top: 66.7%;
+  left: 72%;
+  top: 66%;
   z-index: 4;
-  width: 14.9%;
-  aspect-ratio: 300 / 250;
+  width: 21%;
+  height: 22%;
   overflow: hidden;
-  display: grid;
   border: 1px solid rgba(255, 245, 150, 0.18);
   background:
     radial-gradient(circle at 50% 50%, rgba(255, 0, 150, 0.12), transparent 62%),
@@ -1192,9 +1191,12 @@ a.sp-link:hover,
 
 .home-rakuten-widget iframe {
   width: 300px;
-  height: 250px;
+  height: 160px;
   border: 0;
   display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
   background: #050505;
   transform-origin: left top;
 }

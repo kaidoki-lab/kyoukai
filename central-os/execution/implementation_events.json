@@ -737,5 +737,26 @@
     ],
     "completedAt": "2026-06-18T16:30:25.965078+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-plan-202606190145-home-rakuten-300x160",
+    "sourcePlanId": "plan-202606190145-home-rakuten-300x160",
+    "sourceTaskId": "",
+    "title": "トップPC版楽天ウィジェット300x160適用",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "楽天アフィリエイトウィジェットをユーザー指定の300x160コードへ差し替えた。黒枠側はトップ画像内AD SPACEの実測位置へ合わせ、300x160ウィジェットを中央フィットする方式に調整した。スマホ版は引き続き対象外。",
+    "artifacts": [
+      "templates/home.html",
+      "static/space.css",
+      "static/rakuten-home-widget.js"
+    ],
+    "verification": [
+      "node --check static/rakuten-home-widget.js 成功; git diff --check 成功; rakuten_size=300x160 と rakuten_ts=1781800988556 を確認"
+    ],
+    "completedAt": "2026-06-18T16:49:13.570271+00:00",
+    "recordedBy": "codex"
   }
 ]
