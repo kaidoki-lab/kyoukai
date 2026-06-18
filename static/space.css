@@ -858,14 +858,31 @@ a.sp-link:hover,
   7.5%, 46.5%, 83.6% { opacity: 0.28; }
 }
 
-@keyframes altarImageCut {
+@keyframes altarImageFade {
   0%,
-  24.999% {
+  18% {
     opacity: 1;
   }
   25%,
-  100% {
+  93% {
     opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes altarMobileFade {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  55%,
+  95% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
 
@@ -1054,7 +1071,7 @@ a.sp-link:hover,
 
 .altar-image--cycle {
   opacity: 0;
-  animation: altarImageCut 20s steps(1, end) infinite;
+  animation: altarImageFade 20s ease-in-out infinite;
 }
 
 .altar-image--cycle-1 {
@@ -1071,6 +1088,10 @@ a.sp-link:hover,
 
 .altar-image--cycle-4 {
   animation-delay: -15s;
+}
+
+.altar-image--mobile {
+  display: none;
 }
 
 .altar-noise {
@@ -2987,10 +3008,10 @@ a.sp-link:hover,
 
   .altar-frame {
     order: 1;
-    width: min(100vw, 175svh);
+    width: min(100vw, 56.28svh);
     height: auto;
-    max-height: calc(100svh - 12px);
-    aspect-ratio: 7 / 4;
+    max-height: none;
+    aspect-ratio: 941 / 1672;
     margin-inline: auto;
     border-left: 0;
     border-right: 0;
@@ -3019,8 +3040,7 @@ a.sp-link:hover,
     object-position: center center;
   }
 
-  .altar-image--base,
-  .altar-image--aha {
+  .altar-image--cycle {
     display: none;
   }
 
@@ -3031,29 +3051,25 @@ a.sp-link:hover,
 
   .altar-image--mobile-blue {
     opacity: 1;
-    animation:
-      altarRoomBreathe 13s ease-in-out infinite,
-      altarAhaBaseFade 60s ease-in-out infinite;
+    animation: altarMobileFade 24s ease-in-out infinite;
   }
 
   .altar-image--mobile-red {
     opacity: 0;
-    animation:
-      altarRoomBreathe 13s ease-in-out infinite,
-      altarAhaReveal 60s ease-in-out infinite;
+    animation: altarMobileFade 24s ease-in-out infinite reverse;
   }
 
-  .hotspot-observation { left: 38%; top: 39%; width: 20%; height: 18%; }
-  .hotspot-archive { left: 62%; top: 30%; width: 9%; height: 24%; }
-  .hotspot-hyougi { left: 56%; top: 42%; width: 7%; height: 18%; }
-  .hotspot-signal-alt { left: 90%; top: 30%; width: 8%; height: 31%; }
-  .hotspot-exit { left: 17%; top: 25%; width: 9%; height: 20%; }
-  .hotspot-null { left: 1%; top: 23%; width: 10%; height: 30%; }
-  .hotspot-girl-film { left: 1%; top: 55%; width: 15%; height: 19%; }
-  .hotspot-gokuraku { left: 22%; top: 83%; width: 10%; height: 10%; }
-  .hotspot-particles { left: 2%; top: 80%; width: 12%; height: 11%; }
-  .hotspot-daimyojin { left: 72%; top: 9%; width: 15%; height: 35%; }
-  .hotspot-ofuse { left: 42%; top: 59%; width: 17%; height: 18%; }
+  .hotspot-observation { left: 38%; top: 31%; width: 24%; height: 14%; }
+  .hotspot-archive { left: 70%; top: 24%; width: 17%; height: 17%; }
+  .hotspot-hyougi { left: 72%; top: 46%; width: 18%; height: 17%; }
+  .hotspot-signal-alt { left: 2%; top: 39%; width: 23%; height: 11%; }
+  .hotspot-exit { left: 9%; top: 31%; width: 22%; height: 13%; }
+  .hotspot-null { left: 0%; top: 17%; width: 18%; height: 20%; }
+  .hotspot-girl-film { left: 0%; top: 45%; width: 22%; height: 19%; }
+  .hotspot-gokuraku { left: 76%; top: 76%; width: 18%; height: 16%; }
+  .hotspot-particles { left: 56%; top: 72%; width: 16%; height: 15%; }
+  .hotspot-daimyojin { left: 82%; top: 60%; width: 17%; height: 14%; }
+  .hotspot-ofuse { left: 36%; top: 47%; width: 31%; height: 16%; }
 }
 
 /* Shared crawlable footer navigation */

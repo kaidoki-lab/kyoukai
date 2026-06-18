@@ -654,5 +654,25 @@
     ],
     "completedAt": "2026-06-18T08:12:05.972174+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-plan-202606181720-home-responsive-fade",
+    "sourcePlanId": "plan-202606181720-home-responsive-fade",
+    "sourceTaskId": "",
+    "title": "トップ画像のPCフェード化とスマホ旧9:16復帰",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "トップのブラウザ版4枚切替を即時カットから重ねフェードへ変更し、スマホ版は旧9:16画像2枚を使用する構成へ戻した。スマホ側のフレーム比率とホットスポット座標も旧9:16向けに復帰した。",
+    "artifacts": [
+      "templates/home.html",
+      "static/space.css"
+    ],
+    "verification": [
+      "git diff --check 成功; ローカルHTMLでPC用4枚とスマホ旧9:16画像2枚の参照を確認; CSSでaltarImageFade/altarMobileFade、PCフェード、スマホ941/1672比率と旧座標を確認"
+    ],
+    "completedAt": "2026-06-18T09:56:49.149203+00:00",
+    "recordedBy": "codex"
   }
 ]
