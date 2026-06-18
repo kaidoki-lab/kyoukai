@@ -3,7 +3,7 @@
 
   var SESSION_KEY = "kyoukai_divine_count";
   var VISIT_KEY   = "kyoukai_visit_count";
-  var MAX_PER_SESSION = 2;
+  var MAX_PER_SESSION = 5;
 
   var visits = parseInt(localStorage.getItem(VISIT_KEY) || "0", 10);
   if (!sessionStorage.getItem("kyoukai_visit_counted")) {
@@ -21,7 +21,7 @@
   style.textContent = [
     "#k-divine-terminal{",
     "  position:fixed;top:1.5rem;right:1.5rem;",
-    "  width:min(28vw,360px);min-width:220px;",
+    "  width:min(42vw,480px);min-width:280px;",
     "  z-index:99999;pointer-events:none;",
     "  background:#02030a;",
     "  border:1px solid rgba(70,130,170,0.3);",
@@ -45,7 +45,7 @@
     "}",
     "#k-divine-text{",
     "  color:#8ab4c8;",
-    "  font-size:clamp(0.8rem,1.4vw,1rem);",
+    "  font-size:clamp(1rem,1.8vw,1.3rem);",
     "  letter-spacing:0.1em;line-height:1.7;",
     "  white-space:pre-wrap;word-break:break-all;",
     "}",
@@ -145,7 +145,7 @@
     setTimeout(function () {
       fetchAndShow();
       if (count + 1 < MAX_PER_SESSION) {
-        setTimeout(function () { scheduleNext(count + 1); }, (90 + Math.floor(Math.random() * 60)) * 1000);
+        setTimeout(function () { scheduleNext(count + 1); }, (60 + Math.floor(Math.random() * 30)) * 1000);
       }
     }, delay);
   }
