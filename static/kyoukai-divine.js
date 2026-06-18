@@ -5,7 +5,6 @@
   var VISIT_KEY   = "kyoukai_visit_count";
   var MAX_PER_SESSION = 2;
 
-  // 訪問回数をカウントアップ（セッション跨ぎ）
   var visits = parseInt(localStorage.getItem(VISIT_KEY) || "0", 10);
   if (!sessionStorage.getItem("kyoukai_visit_counted")) {
     visits += 1;
@@ -18,70 +17,107 @@
 
   var startTime = Date.now();
 
-  // スタイルを注入
   var style = document.createElement("style");
   style.textContent = [
-    "#k-divine-overlay{",
-    "  position:fixed;inset:0;z-index:99999;",
-    "  background:rgba(0,0,0,0.82);",
-    "  display:flex;align-items:center;justify-content:center;",
-    "  pointer-events:none;",
-    "  opacity:0;transition:opacity 0.6s ease;",
-    "}",
-    "#k-divine-overlay.k-divine-in{opacity:1}",
-    "#k-divine-overlay.k-divine-out{opacity:0}",
-    "#k-divine-text{",
-    "  color:#d8e8f0;",
-    "  font-size:clamp(1.8rem,5vw,3.2rem);",
+    "#k-divine-terminal{",
+    "  position:fixed;top:1.5rem;right:1.5rem;",
+    "  width:min(28vw,360px);min-width:220px;",
+    "  z-index:99999;pointer-events:none;",
+    "  background:#02030a;",
+    "  border:1px solid rgba(70,130,170,0.3);",
+    "  box-shadow:0 0 28px rgba(30,80,140,0.18);",
     "  font-family:'Courier New',Courier,monospace;",
-    "  letter-spacing:0.12em;",
-    "  text-align:center;",
-    "  text-shadow:0 0 24px rgba(160,210,240,0.6);",
-    "  max-width:80vw;",
-    "  line-height:1.5;",
+    "  opacity:0;transform:translateY(-10px);",
+    "  transition:opacity 0.45s ease,transform 0.45s ease;",
     "}",
+    "#k-divine-terminal.k-dv-in{opacity:1;transform:translateY(0)}",
+    "#k-divine-terminal.k-dv-out{opacity:0;transform:translateY(-10px)}",
+    "#k-divine-hdr{",
+    "  padding:0.35rem 0.7rem;",
+    "  border-bottom:1px solid rgba(70,130,170,0.18);",
+    "  color:#2a4050;font-size:0.6rem;letter-spacing:0.12em;",
+    "  display:flex;align-items:center;gap:0.4rem;",
+    "}",
+    "#k-divine-hdr::before{content:'●';color:rgba(70,130,170,0.45);font-size:0.45rem}",
+    "#k-divine-body{padding:0.7rem 0.9rem 0.85rem}",
+    "#k-divine-prompt{",
+    "  color:#243540;font-size:0.6rem;letter-spacing:0.08em;margin-bottom:0.35rem;",
+    "}",
+    "#k-divine-text{",
+    "  color:#8ab4c8;",
+    "  font-size:clamp(0.8rem,1.4vw,1rem);",
+    "  letter-spacing:0.1em;line-height:1.7;",
+    "  white-space:pre-wrap;word-break:break-all;",
+    "}",
+    "#k-divine-cursor{",
+    "  display:inline-block;width:0.5em;height:0.9em;",
+    "  background:#5888a0;vertical-align:text-bottom;",
+    "  margin-left:2px;",
+    "  animation:k-dv-blink 1s step-end infinite;",
+    "}",
+    "@keyframes k-dv-blink{50%{opacity:0}}",
   ].join("");
   document.head.appendChild(style);
 
-  function buildOverlay() {
-    var overlay = document.createElement("div");
-    overlay.id = "k-divine-overlay";
-    var text = document.createElement("div");
+  function buildTerminal() {
+    var wrap = document.createElement("div");
+    wrap.id = "k-divine-terminal";
+
+    var hdr = document.createElement("div");
+    hdr.id = "k-divine-hdr";
+    hdr.textContent = "KYOUKAI://ADMIN";
+
+    var body = document.createElement("div");
+    body.id = "k-divine-body";
+
+    var prompt = document.createElement("div");
+    prompt.id = "k-divine-prompt";
+    prompt.textContent = "> sys.voice —";
+
+    var text = document.createElement("span");
     text.id = "k-divine-text";
-    overlay.appendChild(text);
-    document.body.appendChild(overlay);
-    return { overlay: overlay, text: text };
+
+    var cursor = document.createElement("span");
+    cursor.id = "k-divine-cursor";
+
+    body.appendChild(prompt);
+    body.appendChild(text);
+    body.appendChild(cursor);
+    wrap.appendChild(hdr);
+    wrap.appendChild(body);
+    document.body.appendChild(wrap);
+    return { wrap: wrap, text: text, cursor: cursor };
   }
 
-  function typeText(el, str, cb) {
-    el.textContent = "";
+  function typeText(textEl, cursorEl, str, cb) {
+    textEl.textContent = "";
     var i = 0;
     var iv = setInterval(function () {
-      el.textContent += str[i];
+      textEl.textContent += str[i];
       i++;
       if (i >= str.length) {
         clearInterval(iv);
         if (cb) cb();
       }
-    }, 80);
+    }, 90);
   }
 
   function showVoice(voice) {
-    var els = buildOverlay();
+    var els = buildTerminal();
 
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
-        els.overlay.classList.add("k-divine-in");
-        typeText(els.text, voice, function () {
-          // タイプ完了後 2.4 秒でフェードアウト
-          setTimeout(function () {
-            els.overlay.classList.remove("k-divine-in");
-            els.overlay.classList.add("k-divine-out");
+        els.wrap.classList.add("k-dv-in");
+        setTimeout(function () {
+          typeText(els.text, els.cursor, voice, function () {
+            // タイプ完了後 3 秒でフェードアウト
             setTimeout(function () {
-              els.overlay.remove();
-            }, 700);
-          }, 2400);
-        });
+              els.wrap.classList.remove("k-dv-in");
+              els.wrap.classList.add("k-dv-out");
+              setTimeout(function () { els.wrap.remove(); }, 500);
+            }, 3000);
+          });
+        }, 300);
       });
     });
 
@@ -102,16 +138,14 @@
 
   function scheduleNext(count) {
     if (count >= MAX_PER_SESSION) return;
-    // 初回: リピーターほど早く（最短30秒、最長90秒）
     var base = visits >= 3 ? 30 : visits >= 2 ? 45 : 70;
     var jitter = Math.floor(Math.random() * 25);
     var delay = (base + jitter) * 1000;
 
     setTimeout(function () {
       fetchAndShow();
-      // 2回目があるなら 90〜150 秒後
       if (count + 1 < MAX_PER_SESSION) {
-        scheduleNext(count + 1);
+        setTimeout(function () { scheduleNext(count + 1); }, (90 + Math.floor(Math.random() * 60)) * 1000);
       }
     }, delay);
   }
