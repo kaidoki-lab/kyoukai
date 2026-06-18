@@ -138,7 +138,7 @@
 
   function scheduleNext(count) {
     if (count >= MAX_PER_SESSION) return;
-    var base = visits >= 3 ? 30 : visits >= 2 ? 45 : 70;
+    var base = visits >= 3 ? 20 : visits >= 2 ? 25 : 30;
     var jitter = Math.floor(Math.random() * 25);
     var delay = (base + jitter) * 1000;
 
