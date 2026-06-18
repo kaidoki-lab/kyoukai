@@ -674,5 +674,26 @@
     ],
     "completedAt": "2026-06-18T09:56:49.149203+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-plan-202606191900-home-rakuten-desktop",
+    "sourcePlanId": "plan-202606191900-home-rakuten-desktop",
+    "sourceTaskId": "",
+    "title": "トップPC版楽天ウィジェット追加",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "トップ右下の広告予定枠に楽天アフィリエイトウィジェットを追加。スマホでは枠を非表示にし、外部楽天スクリプトを読み込まないようPC幅判定で制御した。自動翻訳対策としてnotranslateメタも追加した。",
+    "artifacts": [
+      "templates/home.html",
+      "static/space.css",
+      "static/rakuten-home-widget.js"
+    ],
+    "verification": [
+      "node --check static/rakuten-home-widget.js 成功; git diff --check 成功; ローカルHTMLにnotranslate、home-rakuten-widget、rakuten-home-widget.js、space.css?v=20260619rakutenが出力され、ハングル文字が含まれないことを確認"
+    ],
+    "completedAt": "2026-06-18T15:57:11.181244+00:00",
+    "recordedBy": "codex"
   }
 ]

@@ -1171,6 +1171,35 @@ a.sp-link:hover,
 .hotspot-daimyojin { left: 72%; top: 9%; width: 15%; height: 35%; }
 .hotspot-ofuse { left: 42%; top: 59%; width: 17%; height: 18%; }
 
+.home-rakuten-widget {
+  position: absolute;
+  right: 5.2%;
+  bottom: 4.5%;
+  z-index: 4;
+  width: clamp(220px, 17.2%, 300px);
+  aspect-ratio: 300 / 250;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 245, 150, 0.18);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 0, 150, 0.12), transparent 62%),
+    rgba(2, 0, 5, 0.82);
+  box-shadow:
+    0 0 18px rgba(255, 42, 174, 0.28),
+    0 0 28px rgba(23, 241, 255, 0.14),
+    inset 0 0 24px rgba(0, 0, 0, 0.68);
+}
+
+.home-rakuten-widget:empty::before {
+  content: "AD CONNECTING";
+  color: rgba(255, 238, 160, 0.64);
+  font-family: var(--sp-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-shadow: 0 0 8px rgba(255, 0, 160, 0.55);
+}
+
 /* KYOUKAI /hyougi council chamber */
 .hyougi-room-body {
   width: 100vw;
@@ -3041,6 +3070,10 @@ a.sp-link:hover,
   }
 
   .altar-image--cycle {
+    display: none;
+  }
+
+  .home-rakuten-widget {
     display: none;
   }
 
