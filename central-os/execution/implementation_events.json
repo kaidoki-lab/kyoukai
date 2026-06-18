@@ -631,5 +631,28 @@
     ],
     "completedAt": "2026-06-18T01:17:00.958924+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-plan-202606181650-home-hero-rotation",
+    "sourcePlanId": "plan-202606181650-home-hero-rotation",
+    "sourceTaskId": "",
+    "title": "トップ画像4パターン即時切替と広告枠回避",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "トップの16:9系画像4枚を取り込み、5秒ごとにフェードなしで即時切替するCSSへ変更。横長画像が画面内に収まるようcontain表示にし、右下の楽天エモーションウィジェット予定地を避けるようホットスポットを移動した。",
+    "artifacts": [
+      "static/space.css",
+      "static/kyoukai_home_20260618_neon.png",
+      "static/kyoukai_home_20260618_gold.png",
+      "static/kyoukai_home_20260618_blue.png",
+      "static/kyoukai_home_20260618_red.png"
+    ],
+    "verification": [
+      "git diff --check 成功; ローカルでトップHTMLが4枚の新画像を参照することを確認; /static/kyoukai_home_20260618_neon.png がHTTP 200; CSSにaltarImageCut、steps(1,end)、contain、横長aspect、移動済みhotspot-gokurakuを確認"
+    ],
+    "completedAt": "2026-06-18T08:12:05.972174+00:00",
+    "recordedBy": "codex"
   }
 ]
