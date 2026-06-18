@@ -6,18 +6,20 @@
     // フェードイン（ページロード時）
     "html.k-tr{opacity:0}",
     "html.k-tr-in{opacity:1;transition:opacity 0.32s ease}",
-    // CRTシャットダウン（退場時）— body を縦方向に圧縮
-    "html.k-tr-out body{",
-    "  animation:k-crt-off 0.44s ease-in forwards;",
+    // CRTシャットダウン — 明るいオーバーレイが縦に潰れる
+    "#k-crt-overlay{",
+    "  position:fixed;inset:0;z-index:2147483647;pointer-events:none;",
+    "  background:#b8cfe0;",
     "  transform-origin:50% 50%;",
-    "  will-change:transform,filter,opacity;",
+    "  will-change:transform,opacity;",
+    "  animation:k-crt-off 0.62s ease-in forwards;",
     "}",
     "@keyframes k-crt-off{",
-    "  0%  {transform:scaleY(1);   filter:brightness(1);              opacity:1}",
-    "  18% {transform:scaleY(1);   filter:brightness(3.2);            opacity:1}",
-    "  46% {transform:scaleY(0.06);filter:brightness(4) saturate(0.1);opacity:1}",
-    "  66% {transform:scaleY(0.02);filter:brightness(5.5);            opacity:1}",
-    "  100%{transform:scaleY(0.02);filter:brightness(0);              opacity:0}",
+    "  0%  {opacity:0;   transform:scaleY(1)   }",
+    "  9%  {opacity:0.93;transform:scaleY(1)   }",
+    "  46% {opacity:0.93;transform:scaleY(0.055)}",
+    "  67% {opacity:1;   transform:scaleY(0.012)}",
+    "  100%{opacity:0;   transform:scaleY(0.012)}",
     "}",
   ].join("");
   document.head.appendChild(style);
@@ -37,10 +39,19 @@
 
   window.addEventListener("pageshow", function (e) {
     if (e.persisted) {
-      document.documentElement.classList.remove("k-tr-out");
+      var old = document.getElementById("k-crt-overlay");
+      if (old) old.remove();
       document.documentElement.classList.add("k-tr-in");
     }
   });
+
+  function crtNavigate(url) {
+    if (document.getElementById("k-crt-overlay")) return;
+    var overlay = document.createElement("div");
+    overlay.id = "k-crt-overlay";
+    document.body.appendChild(overlay);
+    setTimeout(function () { window.location.href = url; }, 560);
+  }
 
   document.addEventListener("click", function (e) {
     var a = e.target.closest("a[href]");
@@ -53,10 +64,6 @@
     if (href.charAt(0) !== "/") return;
 
     e.preventDefault();
-    document.documentElement.classList.remove("k-tr-in");
-    document.documentElement.classList.add("k-tr-out");
-    setTimeout(function () {
-      window.location.href = href;
-    }, 430);
+    crtNavigate(href);
   });
 })();
