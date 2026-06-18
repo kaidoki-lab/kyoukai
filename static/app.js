@@ -4,6 +4,8 @@ const state = {
   creature: null,
   summary: null,
   impulse: 0,
+  impulseTimer: null,
+  faceTimer: null,
   lastMutationEventId: 0,
   lastPhaseUpEventId: 0,
   contaminationTimer: null,
@@ -56,6 +58,10 @@ const elements = {
   organRight: document.querySelector("#organRight"),
   organCrown: document.querySelector("#organCrown"),
   organTail: document.querySelector("#organTail"),
+  organOrbA: document.querySelector("#organOrbA"),
+  organOrbB: document.querySelector("#organOrbB"),
+  organOrbC: document.querySelector("#organOrbC"),
+  organOrbD: document.querySelector("#organOrbD"),
   creatureName: document.querySelector("#creatureName"),
   creatureSpecies: document.querySelector("#creatureSpecies"),
   creaturePanelName: document.querySelector("#creaturePanelName"),
@@ -199,20 +205,21 @@ function updateCreature(genome, summary) {
   if (elements.creature) elements.creature.style.animationDuration = `${breath}s`;
   elements.turbulence?.setAttribute("baseFrequency", String(noiseFrequency));
   elements.displace?.setAttribute("scale", String(displacement));
+  updateOrganVisibility(genome, state.creature || {});
 }
 
 const bodyPlanPaths = {
   larva_soft: "M130 42 C172 42 207 82 207 132 C207 189 176 224 130 224 C84 224 53 189 53 132 C53 82 88 42 130 42 Z",
-  spiked_predator: "M130 30 L151 58 L188 47 L184 88 L221 108 L190 134 L204 184 L158 181 L130 232 L102 181 L56 184 L70 134 L39 108 L76 88 L72 47 L109 58 Z",
-  tentacled: "M130 54 C178 54 203 88 194 130 C186 166 207 204 177 221 C154 235 148 201 130 201 C112 201 106 235 83 221 C53 204 74 166 66 130 C57 88 82 54 130 54 Z",
-  rift_serpent: "M80 52 C156 31 218 72 190 125 C172 159 116 141 107 177 C101 203 135 221 164 203 C142 235 91 235 66 200 C39 162 82 139 114 129 C153 116 173 77 80 52 Z",
-  raptor: "M125 35 C174 43 204 83 191 124 C219 140 215 184 174 180 C159 215 104 226 83 190 C51 184 49 142 78 126 C60 78 84 42 125 35 Z",
+  spiked_predator: "M130 36 C170 35 206 71 213 116 C223 176 181 225 130 225 C79 225 37 176 47 116 C54 71 90 35 130 36 Z",
+  tentacled: "M130 53 C178 53 205 87 197 130 C190 171 211 209 178 222 C153 232 146 202 130 202 C114 202 107 232 82 222 C49 209 70 171 63 130 C55 87 82 53 130 53 Z",
+  rift_serpent: "M74 65 C144 31 214 73 202 126 C190 179 142 220 86 205 C43 193 45 143 88 126 C126 111 149 78 74 65 Z",
+  raptor: "M126 36 C176 41 207 80 198 124 C225 149 210 191 172 190 C155 220 104 226 82 195 C47 190 39 148 66 126 C58 81 82 42 126 36 Z",
   many_eyed: "M130 38 C184 38 217 81 217 131 C217 188 181 226 130 226 C79 226 43 188 43 131 C43 81 76 38 130 38 Z",
-  cathedral_throat: "M130 35 C179 35 214 72 214 122 C214 181 181 229 130 229 C79 229 46 181 46 122 C46 72 81 35 130 35 Z M89 156 C111 136 149 136 171 156 C157 189 104 189 89 156 Z",
-  void_leviathan: "M44 130 C74 43 180 31 216 93 C244 142 196 209 125 226 C152 190 147 155 112 150 C84 146 62 159 44 130 Z",
+  cathedral_throat: "M130 35 C179 35 214 72 214 122 C214 181 181 229 130 229 C79 229 46 181 46 122 C46 72 81 35 130 35 Z",
+  void_leviathan: "M50 129 C75 45 177 33 213 94 C242 143 194 209 124 226 C82 216 51 174 50 129 Z",
   amorphous: "M127 43 C169 24 214 69 202 112 C239 153 194 229 143 213 C102 246 33 203 60 153 C23 107 77 34 127 43 Z",
-  eye_cathedral: "M130 25 C166 61 198 52 214 101 C192 119 205 168 175 201 C150 188 119 237 88 204 C108 174 54 164 47 117 C82 112 78 62 130 25 Z",
-  halo_titan: "M130 26 C189 26 229 75 229 132 C229 197 188 238 130 238 C72 238 31 197 31 132 C31 75 71 26 130 26 Z M84 76 C110 57 151 57 176 76",
+  eye_cathedral: "M130 25 C166 61 198 52 214 101 C207 152 181 208 130 226 C79 208 53 152 47 117 C82 112 78 62 130 25 Z",
+  halo_titan: "M130 26 C189 26 229 75 229 132 C229 197 188 238 130 238 C72 238 31 197 31 132 C31 75 71 26 130 26 Z",
 };
 
 function renderCreature(creature) {
@@ -243,11 +250,49 @@ function renderCreature(creature) {
     elements.facility.style.setProperty("--creature-danger", String(Math.min(1, danger / 40)));
   }
 
-  const organText = organs.join(" ").toLowerCase();
-  elements.organLeft?.classList.toggle("is-active", /wing|antenna|tentacle|antler|spike|crown/.test(organText));
-  elements.organRight?.classList.toggle("is-active", /wing|antenna|tentacle|antler|spike|crown/.test(organText));
-  elements.organCrown?.classList.toggle("is-active", /crown|antler|halo|eye/.test(organText) || branch === "attention");
-  elements.organTail?.classList.toggle("is-active", /tentacle|spine|limb|asymmetry/.test(organText) || branch === "chaos");
+  updateOrganVisibility(state.genome, { branch, organs });
+}
+
+function observationOrganCount(genome) {
+  if (!genome) return 2;
+  const observerCount = Number(genome.observer_count || 0);
+  const mutationCount = Number(genome.mutation_count || 0);
+  const phase = Number(genome.phase || 0);
+  const pressure = Number(genome.boundary_pressure || 0);
+  const noise = Number(genome.noise_level || 0);
+  const visual = Number(genome.visual_instability || 0);
+  const score = 2 + phase + Math.floor(mutationCount / 2) + Math.floor(observerCount / 4);
+  const anomalyBonus = [pressure >= 30, pressure >= 60, noise >= 45, visual >= 50].filter(Boolean).length;
+  return Math.max(2, Math.min(8, score + anomalyBonus));
+}
+
+function updateOrganVisibility(genome, creatureMeta = {}) {
+  const organs = [
+    elements.organLeft,
+    elements.organRight,
+    elements.organCrown,
+    elements.organTail,
+    elements.organOrbA,
+    elements.organOrbB,
+    elements.organOrbC,
+    elements.organOrbD,
+  ];
+  const count = observationOrganCount(genome);
+  const organText = Array.isArray(creatureMeta.organs) ? creatureMeta.organs.join(" ").toLowerCase() : "";
+  const branch = creatureMeta.branch || document.body.dataset.creatureBranch || "";
+  const forced = {
+    organLeft: /wing|antenna|tentacle|antler|spike|crown/.test(organText),
+    organRight: /wing|antenna|tentacle|antler|spike|crown/.test(organText),
+    organCrown: /crown|antler|halo|eye/.test(organText) || branch === "attention",
+    organTail: /tentacle|spine|limb|asymmetry/.test(organText) || branch === "chaos",
+  };
+
+  if (elements.facility) elements.facility.style.setProperty("--organ-count", String(count));
+  organs.forEach((organ, index) => {
+    if (!organ) return;
+    const isForced = Boolean(forced[organ.id]);
+    organ.classList.toggle("is-active", index < count || isForced);
+  });
 }
 
 function renderObservationRuntime(genome, summary) {
@@ -293,11 +338,12 @@ function setClassGroup(element, prefix, nextClass) {
 }
 
 function triggerMutationFlash(mutationType, duration = 920) {
-  if (!elements.facility || !elements.eventBand) return;
+  if (!elements.facility) return;
   elements.facility.style.setProperty("--impulse", "1");
   elements.facility.dataset.event = mutationType;
   document.body.classList.add("mutation-flash");
-  elements.eventBand.classList.add("event-active");
+  elements.eventBand?.classList.add("event-active");
+  pulseCreature({ duration: Math.min(duration, 720), face: true });
   if (state.audio.enabled && state.audio.context) playMutationAccent(mutationType);
   if (state.pendingPopupSignals?.length) {
     showContaminationOverlay(state.pendingPopupSignals[0]);
@@ -306,8 +352,28 @@ function triggerMutationFlash(mutationType, duration = 920) {
   window.setTimeout(() => {
     elements.facility.style.setProperty("--impulse", "0");
     document.body.classList.remove("mutation-flash");
-    elements.eventBand.classList.remove("event-active");
+    elements.eventBand?.classList.remove("event-active");
   }, duration);
+}
+
+function pulseCreature({ duration = 520, face = false } = {}) {
+  if (!elements.facility) return;
+  window.clearTimeout(state.impulseTimer);
+  window.clearTimeout(state.faceTimer);
+  document.body.classList.remove("creature-impulse", "face-glimpse");
+  void document.body.offsetWidth;
+  document.body.classList.add("creature-impulse");
+  elements.facility.style.setProperty("--impulse", "1");
+  if (face) document.body.classList.add("face-glimpse");
+  state.impulseTimer = window.setTimeout(() => {
+    document.body.classList.remove("creature-impulse");
+    elements.facility?.style.setProperty("--impulse", "0");
+  }, duration);
+  if (face) {
+    state.faceTimer = window.setTimeout(() => {
+      document.body.classList.remove("face-glimpse");
+    }, Math.min(duration, 640));
+  }
 }
 
 function triggerPhaseUpFlash(duration = 1400) {
@@ -639,8 +705,13 @@ elements.form?.addEventListener("submit", (event) => {
   event.preventDefault();
   const action = elements.input?.value || "";
   if (!action.trim()) return;
+  pulseCreature({ duration: 500 });
   sendAction(action);
   elements.input.value = "";
+});
+
+elements.creature?.addEventListener("pointerdown", () => {
+  pulseCreature({ duration: 460 });
 });
 
 elements.audioToggle?.addEventListener("click", startAudio);

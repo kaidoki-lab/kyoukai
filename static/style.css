@@ -38,6 +38,7 @@ body {
   --impulse: 0;
   --core-scale: 1;
   --trait-distance: 0;
+  --organ-count: 2;
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 380px;
@@ -185,6 +186,13 @@ h2 {
   transition: fill 480ms ease, transform 420ms ease;
 }
 
+.membrane {
+  fill-opacity: 0.74;
+  stroke: hsla(var(--phase-hue), 74%, 68%, 0.22);
+  stroke-width: 3;
+  stroke-dasharray: 1 0;
+}
+
 .organ {
   fill: hsla(var(--phase-hue), 82%, 64%, 0.42);
   stroke: rgba(231, 255, 249, 0.22);
@@ -214,10 +222,34 @@ h2 {
   transform: translateY(calc(var(--creature-danger) * 6px)) scaleY(calc(1 + var(--creature-danger) * 0.18));
 }
 
+.organ-orb {
+  fill: hsla(calc(var(--phase-hue) + 36), 92%, 68%, 0.5);
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.organ-orb-a.is-active {
+  transform: translate(-5px, 4px) scale(calc(1 + var(--creature-danger) * 0.18));
+}
+
+.organ-orb-b.is-active {
+  transform: translate(6px, -2px) scale(calc(1 + var(--creature-danger) * 0.12));
+}
+
+.organ-orb-c.is-active,
+.organ-orb-d.is-active {
+  fill: hsla(calc(var(--phase-hue) - 22), 96%, 76%, 0.44);
+  transform: translateY(calc(var(--creature-danger) * -4px)) scale(calc(1 + var(--creature-danger) * 0.2));
+}
+
 .core-ring {
   fill: none;
   stroke: rgba(5, 14, 16, 0.36);
   stroke-width: 4;
+  stroke-dasharray: 7 9;
+  transform-origin: 130px 130px;
+  animation: ringScan 4.8s linear infinite;
 }
 
 .core {
@@ -228,27 +260,41 @@ h2 {
   animation: coreBlink 3.4s ease-in-out infinite;
 }
 
-.eye {
-  fill: #061014;
-  opacity: 0.78;
-}
-
-.eye.extra {
+.face-mirage {
   opacity: 0;
-  transition: opacity 360ms ease;
+  filter:
+    blur(0.2px)
+    drop-shadow(0 0 8px rgba(231, 255, 249, 0.34));
+  pointer-events: none;
+  transition: opacity 90ms steps(1, end);
 }
 
-body[data-creature-branch="attention"] .eye.extra,
-body[data-creature-branch="chaos"] .eye.extra {
-  opacity: 0.72;
+.face-dot {
+  fill: #061014;
+  opacity: 0.74;
 }
 
-.mouth {
+.face-curve {
   fill: none;
   stroke: #061014;
   stroke-linecap: round;
-  stroke-width: 7;
-  opacity: 0.54;
+  stroke-width: 6;
+  opacity: 0.58;
+}
+
+.face-glimpse .face-mirage,
+.mutation-flash .face-mirage,
+.phase-up-flash .face-mirage {
+  opacity: 0.72;
+  animation: faceMisread 640ms steps(2, end) both;
+}
+
+.creature-impulse .creature {
+  animation: organismImpulse 520ms cubic-bezier(0.2, 0.82, 0.2, 1) 1 !important;
+}
+
+.creature-impulse #bodyShape {
+  filter: url("#softNoise") drop-shadow(0 0 14px hsla(var(--phase-hue), 96%, 66%, 0.42));
 }
 
 @keyframes breathe {
@@ -273,6 +319,47 @@ body[data-creature-branch="chaos"] .eye.extra {
   52% {
     transform: scale(calc(var(--core-scale) * 1.18));
     opacity: 0.96;
+  }
+}
+
+@keyframes faceMisread {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.98);
+  }
+  18% {
+    opacity: 0.8;
+    transform: translate(2px, -1px) scale(1.02, 0.96);
+  }
+  44% {
+    opacity: 0.28;
+    transform: translate(-3px, 1px) scale(0.94, 1.05);
+  }
+  68% {
+    opacity: 0.68;
+    transform: translate(1px, 2px) scale(1.04);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes organismImpulse {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  18% {
+    transform: scale(1.14, 0.88) rotate(-2deg);
+  }
+  42% {
+    transform: scale(0.92, 1.1) rotate(2deg);
+  }
+  70% {
+    transform: scale(1.04, 0.98) rotate(-0.8deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
   }
 }
 
@@ -535,7 +622,7 @@ body[data-mutation="distorted_pulse"] .creature {
   animation-timing-function: steps(5, end);
 }
 
-body[data-mutation="gaze_lock"] .eye {
+body[data-mutation="gaze_lock"] .face-dot {
   fill: #d8fff6;
 }
 
@@ -606,7 +693,7 @@ body[data-mutation="silent_growth"] .halo {
 }
 
 .trait-gaze .core,
-.trait-gaze .eye {
+.trait-gaze .face-dot {
   filter: drop-shadow(0 0 10px rgba(118, 245, 222, 0.5));
 }
 
@@ -660,7 +747,7 @@ body[data-mutation="silent_growth"] .halo {
   filter: drop-shadow(0 0 18px rgba(118, 245, 222, 0.72));
 }
 
-.mutation-gaze-lock .eye {
+.mutation-gaze-lock .face-dot {
   fill: #e7fff9;
 }
 
