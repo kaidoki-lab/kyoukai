@@ -758,5 +758,25 @@
     ],
     "completedAt": "2026-06-18T16:49:13.570271+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-plan-202606190155-home-rakuten-position-tune",
+    "sourcePlanId": "plan-202606190155-home-rakuten-position-tune",
+    "sourceTaskId": "",
+    "title": "トップPC版楽天ウィジェット位置微調整",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "スクリーンショット確認に基づき、トップPC版の楽天300x160ウィジェットを少し小さくし、黒枠内で下へ寄せた。スマホ版は引き続き対象外。",
+    "artifacts": [
+      "templates/home.html",
+      "static/space.css"
+    ],
+    "verification": [
+      "git diff --check 成功; CSS位置 left=73.1%, top=68.4%, width=18.4%, height=18.8% を確認"
+    ],
+    "completedAt": "2026-06-18T16:55:51.764362+00:00",
+    "recordedBy": "codex"
   }
 ]
