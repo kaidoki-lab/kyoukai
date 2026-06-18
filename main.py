@@ -2896,6 +2896,67 @@ async def api_test_ai() -> JSONResponse:
     return JSONResponse(results)
 
 
+@app.get("/api/divine-voice")
+async def divine_voice(visits: int = 1, hour: int = 12, elapsed: int = 60):
+    import os as _os
+    import json
+    from urllib.request import Request as _Req, urlopen as _open
+
+    SYSTEM = (
+        "あなたはKYOUKAIという不思議なウェブサイトを静かに監視している存在です。"
+        "訪問者のデータを見て、神の声として短い一言を日本語で生成してください。"
+        "謎めいていて、不気味で、しかし穏やかな言葉で。"
+        "句読点なし、10〜20文字程度の短文を一つだけ出力してください。"
+        "説明や補足は不要です。セリフだけ出力してください。"
+    )
+    USER = f"訪問回数:{visits}回 / 現在時刻:{hour}時 / 滞在:{elapsed}秒"
+
+    FALLBACK = [
+        "また来た",
+        "知っている",
+        "ここは覚えている",
+        "深く来すぎた",
+        "見ている",
+        "もう少しだ",
+        "戻れる",
+        "記録した",
+    ]
+
+    or_key = _os.environ.get("OPENROUTER_API_KEY", "")
+    if not or_key:
+        import random
+        return JSONResponse({"voice": random.choice(FALLBACK), "source": "fallback"})
+
+    payload = json.dumps({
+        "model": "google/gemma-4-26b-a4b-it:free",
+        "messages": [
+            {"role": "system", "content": SYSTEM},
+            {"role": "user", "content": USER},
+        ],
+        "max_tokens": 40,
+        "temperature": 0.9,
+    }).encode()
+
+    try:
+        req = _Req(
+            "https://openrouter.ai/api/v1/chat/completions",
+            data=payload,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {or_key}",
+                "HTTP-Referer": "https://www.void-kyoukai.net",
+            },
+            method="POST",
+        )
+        with _open(req, timeout=15) as r:
+            d = json.loads(r.read())
+        voice = d["choices"][0]["message"]["content"].strip().split("\n")[0]
+        return JSONResponse({"voice": voice, "source": "openrouter"})
+    except Exception as e:
+        import random
+        return JSONResponse({"voice": random.choice(FALLBACK), "source": "fallback", "error": str(e)[:60]})
+
+
 @app.post("/api/plan-proposals/run")
 async def api_run_plan_proposals() -> JSONResponse:
     try:
