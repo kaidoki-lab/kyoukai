@@ -46,4 +46,12 @@
   ].join("");
 
   mount.replaceChildren(iframe);
+
+  function fitWidget() {
+    var scale = Math.min(mount.clientWidth / 300, mount.clientHeight / 250);
+    iframe.style.transform = "scale(" + scale.toFixed(4) + ")";
+  }
+
+  fitWidget();
+  window.addEventListener("resize", fitWidget);
 })();

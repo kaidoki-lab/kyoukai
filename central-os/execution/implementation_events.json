@@ -716,5 +716,26 @@
     ],
     "completedAt": "2026-06-18T16:19:56.580555+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-plan-202606190130-home-rakuten-size-fit",
+    "sourcePlanId": "plan-202606190130-home-rakuten-size-fit",
+    "sourceTaskId": "",
+    "title": "トップPC版楽天ウィジェット実寸調整",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "トップ画像の実寸1672x941pxと広告枠の実測に合わせ、楽天300x250ウィジェットを背景内AD SPACEへ縮小フィットするよう位置とサイズを再調整した。PC版のみ対象で、スマホ版は引き続き非表示。",
+    "artifacts": [
+      "templates/home.html",
+      "static/space.css",
+      "static/rakuten-home-widget.js"
+    ],
+    "verification": [
+      "トップ画像実寸1672x941pxを確認; 広告枠の目安を351x207px前後として測定; node --check static/rakuten-home-widget.js 成功; git diff --check 成功"
+    ],
+    "completedAt": "2026-06-18T16:30:25.965078+00:00",
+    "recordedBy": "codex"
   }
 ]
