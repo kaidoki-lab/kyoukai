@@ -15,7 +15,7 @@
     "  background:#b8cfe0;",
     "  transform-origin:50% 50%;",
     "  will-change:transform,opacity;",
-    "  animation:k-crt-off 0.82s ease-in forwards;",
+    "  animation:k-crt-off 0.95s ease-in forwards;",
     "}",
     "@keyframes k-crt-off{",
     "  0%  {opacity:0;   transform:scaleY(1);    background:#b8cfe0}",
@@ -55,7 +55,7 @@
     overlay.id = "k-crt-overlay";
     document.body.appendChild(overlay);
     // 画面が暗転してから遷移（0.82s の 80% = 0.656s）
-    setTimeout(function () { window.location.href = url; }, 700);
+    setTimeout(function () { window.location.href = url; }, 860);
   }
 
   document.addEventListener("click", function (e) {
