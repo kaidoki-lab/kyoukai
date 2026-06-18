@@ -2896,6 +2896,29 @@ async def api_test_ai() -> JSONResponse:
     return JSONResponse(results)
 
 
+# 神様リレーメッセージ（インメモリ、最大100件FIFO）
+import collections as _collections
+_divine_relay: _collections.deque = _collections.deque(maxlen=100)
+
+
+@app.get("/api/divine-relay")
+async def divine_relay_get():
+    if not _divine_relay:
+        return JSONResponse({"message": None})
+    import random
+    return JSONResponse({"message": random.choice(list(_divine_relay))})
+
+
+@app.post("/api/divine-relay")
+async def divine_relay_post(request: Request):
+    body = await request.json()
+    text = str(body.get("message", "")).strip()
+    if 1 <= len(text) <= 60:
+        _divine_relay.appendleft(text)
+        return JSONResponse({"ok": True})
+    return JSONResponse({"ok": False, "reason": "invalid length"}, status_code=400)
+
+
 @app.get("/api/divine-voice")
 async def divine_voice(visits: int = 1, hour: int = 12, elapsed: int = 60):
     import os as _os
