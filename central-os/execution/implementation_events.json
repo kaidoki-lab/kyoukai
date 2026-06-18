@@ -818,5 +818,24 @@
     ],
     "completedAt": "2026-06-18T17:23:54.313949+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-plan-202606190215-home-rakuten-inline-override",
+    "sourcePlanId": "plan-202606190215-home-rakuten-inline-override",
+    "sourceTaskId": "",
+    "title": "トップPC版楽天ウィジェット配置インライン化",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "新規CSSファイルが本番で500になるため、楽天ウィジェットの最終配置指定をトップHTML内のインラインCSSへ移した。サイズは21%/22%、位置はleft=73.1%, top=72.3%。",
+    "artifacts": [
+      "templates/home.html"
+    ],
+    "verification": [
+      "git diff --check 成功; templates/home.html に top=72.3%, width=21%, height=22% の後勝ち指定を確認"
+    ],
+    "completedAt": "2026-06-18T17:29:28.490640+00:00",
+    "recordedBy": "codex"
   }
 ]
