@@ -547,5 +547,26 @@
     ],
     "completedAt": "2026-06-17T23:57:28.156910+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260618-observation-monitor-blackout",
+    "sourcePlanId": "manual-20260618-observation-monitor-blackout",
+    "sourceTaskId": "",
+    "title": "観測域PCモニター黒塗りとキャラクター拡大",
+    "targetPages": [
+      "/observation"
+    ],
+    "status": "completed",
+    "summary": "観測域ブラウザ版の背景画像内モニターに重なる観測UI領域を黒背景化し、背景画に描かれているキャラクターを隠すよう調整。あわせて観測キャラクター表示をふた回り大きくし、style.css参照をv=3へ更新。",
+    "artifacts": [
+      "static/style.css",
+      "templates/index.html"
+    ],
+    "verification": [
+      "git diff --check 成功",
+      "unittest 15件成功"
+    ],
+    "completedAt": "2026-06-18T00:05:57.684521+00:00",
+    "recordedBy": "codex"
   }
 ]

@@ -3118,18 +3118,21 @@ body:has(.observation-room) {
     width: 32.8%;
     height: 26.9%;
     z-index: 4;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(26, 255, 170, 0.1), transparent 46%),
+      #010101;
   }
 
   .observation-room .creature-stage {
     left: 50%;
     top: 50%;
-    width: 68%;
-    height: 68%;
+    width: 86%;
+    height: 86%;
   }
 
   .observation-room .creature {
-    width: min(58%, 210px);
-    max-height: 76%;
+    width: min(76%, 310px);
+    max-height: 88%;
   }
 
   .creature-id-readout {
