@@ -3125,7 +3125,7 @@ body:has(.observation-room) {
 
   .observation-room .creature-stage {
     left: 50%;
-    top: 42%;
+    top: 39%;
     width: 96%;
     height: 96%;
   }

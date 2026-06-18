@@ -589,5 +589,26 @@
     ],
     "completedAt": "2026-06-18T00:19:32.038120+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260618-observation-creature-nudge-up",
+    "sourcePlanId": "manual-20260618-observation-creature-nudge-up",
+    "sourceTaskId": "",
+    "title": "観測域PCキャラクター微調整",
+    "targetPages": [
+      "/observation"
+    ],
+    "status": "completed",
+    "summary": "観測域ブラウザ版の観測キャラクター本体を少しだけ上へ移動。style.css参照をv=5へ更新してキャッシュ反映を確実化。",
+    "artifacts": [
+      "static/style.css",
+      "templates/index.html"
+    ],
+    "verification": [
+      "git diff --check 成功",
+      "unittest 15件成功"
+    ],
+    "completedAt": "2026-06-18T00:30:13.451734+00:00",
+    "recordedBy": "codex"
   }
 ]
