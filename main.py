@@ -28,6 +28,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from fastapi.exception_handlers import http_exception_handler
 
 from auto_generator import build_codex_context, build_daimyojin_config
 from data_migration import migrate as migrate_altar_markdown
@@ -2626,6 +2628,12 @@ except OSError:
 if videos_dir.exists():
     app.mount("/videos", StaticFiles(directory=videos_dir), name="videos")
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
+
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == 404:
+        return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
+    return await http_exception_handler(request, exc)
 
 from fastapi import Body
 from fastapi.responses import JSONResponse

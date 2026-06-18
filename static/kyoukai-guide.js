@@ -113,6 +113,18 @@
     "再接続、確認",
   ];
 
+  // 部屋別ベースメッセージ（その部屋ならではの雰囲気）
+  const ROOM_BASE_MESSAGES = {
+    null:        ["崩れています", "接続░░░", "信号、断絶", "データ、欠損", "戻れます、たぶん", "░░░░░", "こ░でではない"],
+    signal:      ["受信中…", "ノイズ、多め", "チャンネルを変えてみて", "信号、弱い", "何かが届いています"],
+    archive:     ["記録があります", "誰かがここにいました", "記録、確認中", "過去の観測", "ここに残していけます"],
+    exit:        ["出口、ですか", "ここが境界です", "どちらへ？", "戻ることもできます", "外が見えます"],
+    outside:     ["外とつながっています", "外部信号、確認", "棚の気配", "別の場所への接続点"],
+    ma:          ["ここには近づかない方が…", "何かがいます", "見られています", "静かすぎる"],
+    observation: ["観測中", "何を見ていますか", "反応、あります", "データ収集中", "もう少し観測を"],
+    hyougi:      ["声が聞こえますか", "何かが決まりそうです", "誰かが話しています", "評議、継続中"],
+  };
+
   const DETECTION_MESSAGES = {
     default: ["反応アリ", "此処、触レル", "接続点", "開ク場所"],
     outside: ["外ノ気配ガアル", "外ニツナガル", "棚ノ気配", "外部接続"],
@@ -383,8 +395,9 @@
   }
 
   function getGuideMessagesByState(state, options = {}) {
+    const roomFallback = ROOM_BASE_MESSAGES[state.currentRoomId] || BASE_MESSAGES;
     if (options.idle) return IDLE_MESSAGES;
-    if (state.currentRoomId === "signal") return SIGNAL_MESSAGES.concat(BASE_MESSAGES);
+    if (state.currentRoomId === "signal") return SIGNAL_MESSAGES.concat(roomFallback);
     if (state.returnedToTop && options.auto) return RETURN_MESSAGES;
     if (state.unvisitedRooms.length === 0) return COMPLETE_MESSAGES;
     if (state.visitCount >= 3 && options.auto) return REVISIT_MESSAGES.concat(BASE_MESSAGES);
@@ -405,7 +418,7 @@
       if (roomHint) messages.push(roomHint);
     }
     if (state.visitedRooms.length > 1) messages.push(...VISITED_MESSAGES);
-    messages.push(...BASE_MESSAGES);
+    messages.push(...roomFallback);
     return messages;
   }
 
