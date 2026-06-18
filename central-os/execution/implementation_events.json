@@ -695,5 +695,26 @@
     ],
     "completedAt": "2026-06-18T15:57:11.181244+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-plan-202606190120-home-rakuten-widget-fix",
+    "sourcePlanId": "plan-202606190120-home-rakuten-widget-fix",
+    "sourceTaskId": "",
+    "title": "トップPC版楽天ウィジェット表示修正",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "トップPC版の楽天広告枠が黒いままになる問題に対し、楽天ウィジェットを専用iframe内で通常の貼り付け順に実行する方式へ変更。広告枠位置も背景画像内のAD SPACEへ寄るよう右下へ調整した。スマホ版では引き続き非表示かつ外部楽天スクリプトを読み込まない。",
+    "artifacts": [
+      "templates/home.html",
+      "static/space.css",
+      "static/rakuten-home-widget.js"
+    ],
+    "verification": [
+      "node --check static/rakuten-home-widget.js 成功; git diff --check 成功; 楽天ウィジェット外部JSがHTTP 200で取得可能なことを確認"
+    ],
+    "completedAt": "2026-06-18T16:19:56.580555+00:00",
+    "recordedBy": "codex"
   }
 ]
