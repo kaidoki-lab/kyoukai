@@ -1019,7 +1019,11 @@ a.sp-link:hover,
     0 0 22px rgba(255, 42, 174, 0.48),
     0 0 44px rgba(23, 241, 255, 0.24),
     inset 0 0 60px rgba(0, 0, 0, 0.78);
-  animation: altarFrameGlow 8.8s ease-in-out infinite;
+  transform-origin: center center;
+  will-change: transform, box-shadow;
+  animation:
+    altarFrameGlow 8.8s ease-in-out infinite,
+    altarFrameBreath 13.6s ease-in-out infinite;
 }
 
 .altar-frame::before {
@@ -1598,6 +1602,18 @@ a.sp-link:hover,
       0 0 26px rgba(255, 42, 174, 0.56),
       0 0 50px rgba(23, 241, 255, 0.27),
       inset 0 0 66px rgba(0, 0, 0, 0.7);
+  }
+}
+
+@keyframes altarFrameBreath {
+  0%, 100% {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  46% {
+    transform: scale(1.006) translate3d(0.08%, -0.06%, 0);
+  }
+  72% {
+    transform: scale(1.003) translate3d(-0.05%, 0.04%, 0);
   }
 }
 

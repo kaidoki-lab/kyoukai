@@ -894,5 +894,25 @@
     ],
     "completedAt": "2026-06-19T02:12:24.016526+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-plan-202606191115-home-breath-motion",
+    "sourcePlanId": "plan-202606191115-home-breath-motion",
+    "sourceTaskId": "",
+    "title": "トップページ呼吸感アニメーション復帰",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "トップページの画像変更後に弱くなっていた呼吸感を戻すため、トップ額縁全体にごく薄い拡大縮小アニメーションを追加した。広告やホットスポットも一緒に動くため、配置ズレを起こしにくい。",
+    "artifacts": [
+      "templates/home.html",
+      "static/space.css"
+    ],
+    "verification": [
+      "git diff --check 成功; space.css に altarFrameBreath と scale(1.006) の微細呼吸を確認; home.html のCSSキャッシュキーを20260619breath1へ更新"
+    ],
+    "completedAt": "2026-06-19T02:35:48.589085+00:00",
+    "recordedBy": "codex"
   }
 ]
