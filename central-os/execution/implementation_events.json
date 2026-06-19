@@ -914,5 +914,25 @@
     ],
     "completedAt": "2026-06-19T02:35:48.589085+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-plan-202606191125-home-breath-stronger",
+    "sourcePlanId": "plan-202606191125-home-breath-stronger",
+    "sourceTaskId": "",
+    "title": "トップページ呼吸感強化",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "トップページ額縁全体の呼吸アニメーションを強化した。周期を13.6秒から9.8秒へ短縮し、最大拡大をscale(1.006)からscale(1.024)へ変更。広告とホットスポットは一緒に動く構造を維持。",
+    "artifacts": [
+      "templates/home.html",
+      "static/space.css"
+    ],
+    "verification": [
+      "git diff --check 成功; space.css に altarFrameBreath 9.8s, scale(1.024), scale(1.012) を確認; home.html のCSSキャッシュキーを20260619breath2へ更新"
+    ],
+    "completedAt": "2026-06-19T06:38:49.569784+00:00",
+    "recordedBy": "codex"
   }
 ]
