@@ -875,5 +875,24 @@
     ],
     "completedAt": "2026-06-19T01:53:18.261256+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-plan-202606191105-home-rakuten-blend-effect",
+    "sourcePlanId": "plan-202606191105-home-rakuten-blend-effect",
+    "sourceTaskId": "",
+    "title": "トップPC版楽天ウィジェット馴染ませエフェクト追加",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "トップPC版の楽天広告ウィジェットに、白浮きを抑えるための薄い暗さ・彩度調整・赤青環境光・CRT走査線オーバーレイを追加した。広告本体は変更せず、外側表示枠のCSSのみで処理。スマホ版は引き続き対象外。",
+    "artifacts": [
+      "templates/home.html"
+    ],
+    "verification": [
+      "git diff --check 成功; templates/home.html に brightness/contrast/saturate filter と mix-blend-mode overlay を確認"
+    ],
+    "completedAt": "2026-06-19T02:12:24.016526+00:00",
+    "recordedBy": "codex"
   }
 ]

@@ -20,6 +20,28 @@
       width: 21%;
       height: 22%;
     }
+
+    .home-rakuten-widget iframe {
+      filter: brightness(0.82) contrast(1.08) saturate(0.88);
+    }
+
+    .home-rakuten-widget::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(255, 36, 124, 0.12), rgba(0, 35, 255, 0.1)),
+        repeating-linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.08) 0,
+          rgba(255, 255, 255, 0.08) 1px,
+          rgba(0, 0, 0, 0.12) 2px,
+          rgba(0, 0, 0, 0.12) 4px
+        );
+      mix-blend-mode: multiply;
+    }
   </style>
   <link rel="stylesheet" href="/static/kyoukai-guide.css?v=3" />
   <link rel="stylesheet" href="/static/outside-hotspots.css?v=3" />
