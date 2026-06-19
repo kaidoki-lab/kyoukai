@@ -934,5 +934,26 @@
     ],
     "completedAt": "2026-06-19T06:38:49.569784+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-plan-202606191145-home-electric-edge",
+    "sourcePlanId": "plan-202606191145-home-electric-edge",
+    "sourceTaskId": "",
+    "title": "トップページ電気エッジエフェクト追加",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "トップ画像のモチーフのエッジに沿って見えるよう、PC版トップに透明な電気レイヤーを追加し、看板や枠の位置候補にランダムな短い稲妻を走らせる軽量JS/CSSエフェクトを実装した。スマホ版ではJSが起動しない。",
+    "artifacts": [
+      "templates/home.html",
+      "static/space.css",
+      "static/home-electric.js"
+    ],
+    "verification": [
+      "node --check static/home-electric.js 成功; git diff --check 成功; home-electric.js は min-width:769px のPC幅のみで起動することを確認"
+    ],
+    "completedAt": "2026-06-19T06:54:16.697749+00:00",
+    "recordedBy": "codex"
   }
 ]

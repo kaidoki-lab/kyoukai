@@ -1098,6 +1098,77 @@ a.sp-link:hover,
   display: none;
 }
 
+.altar-electric-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+  mix-blend-mode: screen;
+}
+
+.altar-electric-bolt {
+  position: absolute;
+  left: var(--bolt-x, 50%);
+  top: var(--bolt-y, 50%);
+  width: var(--bolt-w, 12%);
+  height: 2px;
+  opacity: 0;
+  transform: rotate(var(--bolt-r, 0deg));
+  transform-origin: left center;
+  background:
+    linear-gradient(90deg, transparent 0 4%, rgba(255, 255, 255, 0.96) 8%, rgba(0, 246, 255, 0.94) 18%, transparent 24% 34%, rgba(255, 55, 220, 0.85) 42%, rgba(255, 255, 255, 0.96) 54%, transparent 62% 100%);
+  filter:
+    drop-shadow(0 0 3px rgba(255, 255, 255, 0.95))
+    drop-shadow(0 0 9px rgba(0, 238, 255, 0.86))
+    drop-shadow(0 0 16px rgba(255, 22, 180, 0.68));
+  clip-path: polygon(0 50%, 10% 20%, 19% 55%, 30% 12%, 42% 58%, 56% 22%, 70% 64%, 84% 32%, 100% 50%, 84% 70%, 70% 44%, 56% 78%, 42% 42%, 30% 86%, 19% 45%, 10% 80%);
+  animation: altarElectricRun var(--bolt-d, 520ms) steps(3, end) forwards;
+}
+
+.altar-electric-bolt::before,
+.altar-electric-bolt::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  top: 50%;
+  width: 42%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.88);
+  transform: rotate(var(--branch-r, -24deg));
+  transform-origin: left center;
+  opacity: 0.8;
+}
+
+.altar-electric-bolt::after {
+  left: 52%;
+  width: 32%;
+  transform: rotate(calc(var(--branch-r, -24deg) * -0.7));
+  opacity: 0.58;
+}
+
+@keyframes altarElectricRun {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--bolt-r, 0deg)) scaleX(0.08) translateX(-1%);
+  }
+  14%,
+  38% {
+    opacity: var(--bolt-o, 0.9);
+  }
+  52% {
+    opacity: 0.52;
+    transform: rotate(var(--bolt-r, 0deg)) scaleX(1) translateX(1.5%);
+  }
+  74% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--bolt-r, 0deg)) scaleX(0.18) translateX(4%);
+  }
+}
+
 .altar-noise {
   position: fixed;
   inset: 0;
