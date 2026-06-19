@@ -856,5 +856,24 @@
     ],
     "completedAt": "2026-06-19T01:46:00.554842+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-plan-202606191050-home-rakuten-left",
+    "sourcePlanId": "plan-202606191050-home-rakuten-left",
+    "sourceTaskId": "",
+    "title": "トップPC版楽天ウィジェット左移動",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "トップPC版の楽天300x160ウィジェットを、ユーザー視点で左へ移動した。サイズと縦位置は維持し、leftを73.1%から71.6%へ変更。スマホ版は引き続き対象外。",
+    "artifacts": [
+      "templates/home.html"
+    ],
+    "verification": [
+      "git diff --check 成功; templates/home.html に left=71.6%, top=74.2%, width=21%, height=22% を確認"
+    ],
+    "completedAt": "2026-06-19T01:53:18.261256+00:00",
+    "recordedBy": "codex"
   }
 ]
