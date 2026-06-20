@@ -996,5 +996,26 @@
     ],
     "completedAt": "2026-06-20T01:53:34.486027+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260620-ripple-home-link",
+    "sourcePlanId": "manual-20260620-ripple-home-link",
+    "sourceTaskId": "",
+    "title": "トップ画面へRipple導線追加",
+    "targetPages": [
+      "/",
+      "/ripple"
+    ],
+    "status": "completed",
+    "summary": "トップ画面のホットスポットに/rippleへのリンクを追加し、PC/スマホそれぞれの配置を調整。",
+    "artifacts": [
+      "templates/home.html",
+      "static/space.css"
+    ],
+    "verification": [
+      "npm run build 成功。py_compile 成功。unittest tests.test_ripple_page 成功。"
+    ],
+    "completedAt": "2026-06-20T06:33:08.979517+00:00",
+    "recordedBy": "codex"
   }
 ]

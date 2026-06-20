@@ -21,6 +21,13 @@ class RipplePageTests(unittest.TestCase):
         self.assertNotIn("<button", html)
         self.assertNotIn("score", html.lower())
 
+    def test_home_links_to_ripple_observer(self):
+        html = (BASE_DIR / "templates" / "home.html").read_text(encoding="utf-8")
+        css = (BASE_DIR / "static" / "space.css").read_text(encoding="utf-8")
+
+        self.assertIn('href="/ripple"', html)
+        self.assertIn("hotspot-ripple", css)
+
     def test_ripple_script_contains_rebel_dot_and_idle_ripples(self):
         script = (BASE_DIR / "static" / "ripple.js").read_text(encoding="utf-8")
         css = (BASE_DIR / "static" / "ripple.css").read_text(encoding="utf-8")
