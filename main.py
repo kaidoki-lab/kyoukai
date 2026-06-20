@@ -2758,6 +2758,10 @@ async def sns_entry_page(request: Request) -> HTMLResponse:
 async def particles_page(request: Request) -> HTMLResponse:
     return render_template(request, "particles.html")
 
+@app.get("/ripple", response_class=HTMLResponse)
+async def ripple_page(request: Request) -> HTMLResponse:
+    return render_template(request, "ripple.html")
+
 # ─── API ────────────────────────────────────────────────
 
 @app.get("/api/genome")

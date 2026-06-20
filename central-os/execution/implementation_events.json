@@ -955,5 +955,26 @@
     ],
     "completedAt": "2026-06-19T06:54:16.697749+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260620-dot-ripple",
+    "sourcePlanId": "manual-20260620-dot-ripple",
+    "sourceTaskId": "",
+    "title": "ドット波紋観測システム",
+    "targetPages": [
+      "/ripple"
+    ],
+    "status": "completed",
+    "summary": "全画面Canvasのドット波紋観測ページを追加。タップ/ドラッグ波紋、色遷移、放置波紋、異常ドット挙動を実装。",
+    "artifacts": [
+      "templates/ripple.html",
+      "static/ripple.css",
+      "static/ripple.js"
+    ],
+    "verification": [
+      "npm run build 成功。py_compile 成功。unittest tests.test_ripple_page 成功。Playwright/Chromeでdesktop/mobileのCanvas非空・操作後変化・JSエラーなしを確認。"
+    ],
+    "completedAt": "2026-06-20T01:04:39.121064+00:00",
+    "recordedBy": "codex"
   }
 ]
