@@ -31,20 +31,24 @@
     idleMs: 0,
     lastFrame: 0,
     nextIdleRipple: 1500,
+    nextBlackoutRipple: 60000,
     rippleId: 1,
     grid: new Map(),
   };
 
   class Ripple {
-    constructor(x, y, strength, idle) {
+    constructor(x, y, strength, idle, mode) {
       this.id = state.rippleId++;
       this.x = x;
       this.y = y;
+      this.mode = mode || 'color';
       this.radius = 0;
-      this.speed = idle ? 1.1 : 2.25 + Math.random() * 0.45;
-      this.maxRadius = Math.min(Math.max(state.width, state.height) * (idle ? 0.34 : 0.62), 680);
+      this.speed = this.mode === 'blackout' ? 2.85 : idle ? 1.1 : 2.25 + Math.random() * 0.45;
+      this.maxRadius = this.mode === 'blackout'
+        ? Math.hypot(state.width, state.height) * 0.62
+        : Math.min(Math.max(state.width, state.height) * (idle ? 0.34 : 0.62), 680);
       this.strength = strength;
-      this.band = Math.max(7, state.step * 0.92);
+      this.band = this.mode === 'blackout' ? Math.max(28, state.step * 4.4) : Math.max(7, state.step * 0.92);
       this.seen = new Set();
     }
 
@@ -117,6 +121,7 @@
           state: Math.random() < 0.015 ? 1 : 0,
           glow: Math.random() * 0.08,
           scale: 0,
+          blackout: 0,
           rebelTone: 0,
           isRebelDot: false,
         });
@@ -172,9 +177,13 @@
     if (Math.random() < 0.34) moveRebel();
   }
 
-  function spawnRipple(x, y, strength, idle) {
-    state.ripples.push(new Ripple(x, y, strength || 1, !!idle));
+  function spawnRipple(x, y, strength, idle, mode) {
+    state.ripples.push(new Ripple(x, y, strength || 1, !!idle, mode));
     if (state.ripples.length > 18) state.ripples.splice(0, state.ripples.length - 18);
+  }
+
+  function spawnBlackoutRipple() {
+    spawnRipple(state.width * 0.5, state.height * 0.5, 1, false, 'blackout');
   }
 
   function pointerPosition(event) {
@@ -230,6 +239,18 @@
         if (distSq < innerSq || distSq > outerSq) continue;
 
         ripple.seen.add(i);
+        if (ripple.mode === 'blackout') {
+          dot.state = 0;
+          dot.blackout = 1;
+          dot.scale = Math.max(dot.scale, 0.38);
+          dot.glow = 0;
+          if (dot.isRebelDot) {
+            dot.rebelTone = 0;
+            if (Math.random() < 0.18) moveRebel();
+          }
+          continue;
+        }
+
         if (dot.isRebelDot) {
           rebelAction(dot);
           continue;
@@ -245,15 +266,17 @@
   function drawDot(dot, dt) {
     dot.scale *= Math.pow(0.91, dt / 16.67);
     dot.glow *= Math.pow(0.985, dt / 16.67);
+    dot.blackout *= Math.pow(0.996, dt / 16.67);
     if (state.idleMs > 900) dot.glow *= Math.pow(0.988, dt / 16.67);
 
     const color = dot.isRebelDot ? rebelPalette[dot.rebelTone] : palette[dot.state];
     const sink = clamp(state.idleMs / 9000, 0, 0.78);
     const pulse = 1 + dot.scale * 0.55;
     const alpha = clamp(0.46 + dot.glow * 0.42 - sink * 0.28, 0.12, 0.96);
-    const red = Math.round(lerp(color[0], 3, sink));
-    const green = Math.round(lerp(color[1], 3, sink));
-    const blue = Math.round(lerp(color[2], 4, sink));
+    const black = clamp(dot.blackout, 0, 1);
+    const red = Math.round(lerp(lerp(color[0], 3, sink), 0, black));
+    const green = Math.round(lerp(lerp(color[1], 3, sink), 0, black));
+    const blue = Math.round(lerp(lerp(color[2], 4, sink), 0, black));
 
     ctx.globalAlpha = alpha;
     ctx.fillStyle = 'rgb(' + red + ',' + green + ',' + blue + ')';
@@ -267,8 +290,13 @@
     for (let i = 0; i < state.ripples.length; i++) {
       const ripple = state.ripples[i];
       const fade = 1 - ripple.radius / ripple.maxRadius;
-      ctx.strokeStyle = 'rgba(170, 18, 28, ' + (0.04 * fade).toFixed(3) + ')';
-      ctx.lineWidth = 1;
+      if (ripple.mode === 'blackout') {
+        ctx.strokeStyle = 'rgba(0, 0, 0, ' + (0.4 * fade).toFixed(3) + ')';
+        ctx.lineWidth = Math.max(10, state.step * 1.5);
+      } else {
+        ctx.strokeStyle = 'rgba(170, 18, 28, ' + (0.04 * fade).toFixed(3) + ')';
+        ctx.lineWidth = 1;
+      }
       ctx.beginPath();
       ctx.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
       ctx.stroke();
@@ -291,6 +319,10 @@
         0.55,
         true
       );
+    }
+    if (ts > state.nextBlackoutRipple) {
+      state.nextBlackoutRipple = ts + 60000;
+      spawnBlackoutRipple();
     }
 
     for (let i = state.ripples.length - 1; i >= 0; i--) {

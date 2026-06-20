@@ -976,5 +976,25 @@
     ],
     "completedAt": "2026-06-20T01:04:39.121064+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260620-ripple-blackout",
+    "sourcePlanId": "manual-20260620-ripple-blackout",
+    "sourceTaskId": "",
+    "title": "ドット波紋の定期黒戻し",
+    "targetPages": [
+      "/ripple"
+    ],
+    "status": "completed",
+    "summary": "1分に一回、中央から広がる黒戻し波紋を発生させ、通過したドットを強制的に黒へ沈める挙動を追加。",
+    "artifacts": [
+      "static/ripple.js",
+      "templates/ripple.html"
+    ],
+    "verification": [
+      "npm run build 成功。py_compile 成功。unittest tests.test_ripple_page 成功。"
+    ],
+    "completedAt": "2026-06-20T01:53:34.486027+00:00",
+    "recordedBy": "codex"
   }
 ]
