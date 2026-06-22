@@ -370,6 +370,15 @@
     document.removeEventListener("keydown", enableAudio, true);
   }
 
+  function shouldAutoTriggerFromUrl() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      return params.get("mlw") === "1" || params.get("momentLayerWindow") === "1";
+    } catch (error) {
+      return false;
+    }
+  }
+
   function init() {
     config = mergeConfig();
     if (!config.enabled || document.documentElement.dataset.momentLayerWindow === "off") {
@@ -378,6 +387,9 @@
     document.addEventListener("pointerdown", enableAudio, true);
     document.addEventListener("keydown", enableAudio, true);
     scheduleNext();
+    if (shouldAutoTriggerFromUrl()) {
+      window.setTimeout(createWindow, 900);
+    }
     log("ready", config);
   }
 

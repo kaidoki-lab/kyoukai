@@ -1042,5 +1042,25 @@
     ],
     "completedAt": "2026-06-22T04:34:56.063554+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260622-moment-layer-window-url-trigger",
+    "sourcePlanId": "manual-20260622-moment-layer-window-url-trigger",
+    "sourceTaskId": "",
+    "title": "Moment Layer Window URL trigger",
+    "targetPages": [
+      "/null"
+    ],
+    "status": "completed",
+    "summary": "コンソール操作なしで確認できるよう、URLに ?mlw=1 または ?momentLayerWindow=1 を付けた場合にMoment Layer Windowを自動で1回発生させるテスト用トリガーを追加。",
+    "artifacts": [
+      "static/js/moment-layer-window.js"
+    ],
+    "verification": [
+      "node --check static/js/moment-layer-window.js 成功",
+      "npm run build 成功"
+    ],
+    "completedAt": "2026-06-22T05:57:48.112193+00:00",
+    "recordedBy": "codex"
   }
 ]
