@@ -8,6 +8,7 @@
     chance: 0.3,
     cooldown: 60000,
     duration: 5000,
+    layerCount: 20,
     soundDelay: 700,
     maxWindows: 1,
     useHtml2Canvas: false,
@@ -208,11 +209,14 @@
     var viewportHeight = window.innerHeight || document.documentElement.clientHeight || 768;
     var isSmall = viewportWidth <= 640;
     var width = isSmall
-      ? randomBetween(viewportWidth * 0.55, viewportWidth * 0.85)
-      : randomBetween(220, 420);
-    width = clamp(width, 180, Math.max(180, viewportWidth - 24));
-    var height = clamp(width * randomBetween(0.52, 0.64), 116, Math.max(116, viewportHeight - 24));
-    var margin = isSmall ? 12 : 22;
+      ? viewportWidth * randomBetween(0.84, 0.94)
+      : viewportWidth * randomBetween(0.46, 0.58);
+    width = clamp(width, 300, Math.max(300, viewportWidth - 32));
+    var height = isSmall
+      ? viewportHeight * randomBetween(0.42, 0.54)
+      : viewportHeight * randomBetween(0.46, 0.58);
+    height = clamp(height, 220, Math.max(220, viewportHeight - 32));
+    var margin = isSmall ? 12 : 24;
     var left = randomBetween(margin, Math.max(margin, viewportWidth - width - margin));
     var top = randomBetween(margin, Math.max(margin, viewportHeight - height - margin));
 
@@ -240,17 +244,30 @@
 
     var viewport = document.createElement("div");
     viewport.className = "mlw-viewport";
+    var tunnel = document.createElement("div");
+    tunnel.className = "mlw-tunnel";
     var capture = createCaptureLayer(geometry.width, geometry.height);
     var noise = document.createElement("div");
     var skip = document.createElement("div");
     var text = document.createElement("div");
+    var layerCount = clamp(Number(config.layerCount) || DEFAULT_CONFIG.layerCount, 8, 28);
 
     noise.className = "mlw-noise";
     skip.className = "mlw-skip";
     text.className = "mlw-text-fragment";
     text.textContent = collectTextFragment(capture.source);
 
-    viewport.appendChild(capture.element);
+    for (var index = layerCount - 1; index >= 0; index -= 1) {
+      var pane = document.createElement("div");
+      var paneCapture = index === 0 ? capture.element : capture.element.cloneNode(true);
+      pane.className = "mlw-pane";
+      pane.style.setProperty("--mlw-depth", String(index));
+      pane.style.setProperty("--mlw-pane-delay", "-" + Math.round(index * 76) + "ms");
+      pane.appendChild(paneCapture);
+      tunnel.appendChild(pane);
+    }
+
+    viewport.appendChild(tunnel);
     viewport.appendChild(noise);
     viewport.appendChild(skip);
     if (text.textContent) {
@@ -279,24 +296,31 @@
     }
 
     timers.push(window.setTimeout(function () {
-      freezeWindow(shell);
+      freezeWindow(shell, duration);
     }, duration));
 
     shell._mlwTimers = timers;
   }
 
-  function freezeWindow(shell) {
+  function freezeWindow(shell, duration) {
     if (!shell.isConnected) {
       return;
     }
     shell.dataset.phase = "7";
     shell.classList.add("is-frozen");
 
+    var panes = Array.prototype.slice.call(shell.querySelectorAll(".mlw-pane"));
+    panes.reverse().forEach(function (pane, index) {
+      window.setTimeout(function () {
+        pane.classList.add("is-stopped");
+      }, index * 46);
+    });
+
     window.setTimeout(function () {
       playDelayedSound().finally(function () {
         fadeAndRemove(shell);
       });
-    }, Math.max(0, Number(config.soundDelay) || DEFAULT_CONFIG.soundDelay));
+    }, Math.max(0, Number(config.soundDelay) || DEFAULT_CONFIG.soundDelay) + panes.length * 46);
   }
 
   function playDelayedSound() {

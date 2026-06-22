@@ -1062,5 +1062,27 @@
     ],
     "completedAt": "2026-06-22T05:57:48.112193+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260622-moment-layer-window-tunnel",
+    "sourcePlanId": "manual-20260622-moment-layer-window-tunnel",
+    "sourceTaskId": "",
+    "title": "Moment Layer Window tunnel acceleration",
+    "targetPages": [
+      "/null"
+    ],
+    "status": "completed",
+    "summary": "小窓の単純な揺れ演出から、画面半分程度の大きなウィンドウ内に20枚の鏡合わせ風レイヤーが奥へ加速し、最後に順番停止する演出へ変更。キャッシュ回避のため読み込みバージョンもv2へ更新。",
+    "artifacts": [
+      "static/js/moment-layer-window.js",
+      "static/css/moment-layer-window.css"
+    ],
+    "verification": [
+      "node --check static/js/moment-layer-window.js 成功",
+      "npm run build 成功",
+      "py_compile main.py api/index.py 成功"
+    ],
+    "completedAt": "2026-06-22T10:22:02.277572+00:00",
+    "recordedBy": "codex"
   }
 ]
