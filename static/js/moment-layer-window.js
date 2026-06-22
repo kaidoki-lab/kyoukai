@@ -85,6 +85,12 @@
     if (element.closest(".mlw-window")) {
       return false;
     }
+    if (element.matches("button, a, input, select, textarea")) {
+      return false;
+    }
+    if (element.closest(".collapse-start-panel, .collapse-status-card, .collapse-hud")) {
+      return false;
+    }
     if (/^(SCRIPT|STYLE|LINK|META|HEAD|NOSCRIPT|IFRAME|CANVAS|VIDEO|AUDIO)$/.test(element.tagName)) {
       return false;
     }
@@ -92,8 +98,41 @@
     return rect.width >= 120 && rect.height >= 90 && rect.bottom > 0 && rect.right > 0;
   }
 
+  function backgroundScore(element) {
+    var style = window.getComputedStyle(element);
+    var image = style.backgroundImage || "";
+    if (!image || image === "none") {
+      return 0;
+    }
+    return image.indexOf("url(") !== -1 ? 900000 : 180000;
+  }
+
+  function elementScore(element) {
+    var rect = element.getBoundingClientRect();
+    var className = String(element.className || "");
+    var score = rect.width * rect.height;
+    score += backgroundScore(element);
+    if (element.tagName === "IMG") {
+      score += 900000;
+    }
+    if (/image|photo|visual|feed|camera|arcade|stage|frame/i.test(className)) {
+      score += 420000;
+    }
+    if (/button|status|hud|panel|nav|footer|return/i.test(className)) {
+      score -= 520000;
+    }
+    return score;
+  }
+
   function findSourceElement() {
     var selectors = [
+      ".collapse-arcade-image",
+      ".collapse-feed",
+      "[class*='image']",
+      "[class*='visual']",
+      "[class*='feed']",
+      "[class*='camera']",
+      "img",
       "main",
       "section",
       "article",
@@ -117,11 +156,12 @@
       return null;
     }
     candidates.sort(function (a, b) {
-      var ar = a.getBoundingClientRect();
-      var br = b.getBoundingClientRect();
-      return (br.width * br.height) - (ar.width * ar.height);
+      return elementScore(b) - elementScore(a);
     });
-    var pool = candidates.slice(0, Math.min(6, candidates.length));
+    if (backgroundScore(candidates[0]) > 0 || candidates[0].tagName === "IMG") {
+      return candidates[0];
+    }
+    var pool = candidates.slice(0, Math.min(3, candidates.length));
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
@@ -175,6 +215,30 @@
     return fragment;
   }
 
+  function copyVisualStyles(source, clone) {
+    var rect = source.getBoundingClientRect();
+    var style = window.getComputedStyle(source);
+    clone.style.width = Math.ceil(rect.width) + "px";
+    clone.style.height = Math.ceil(rect.height) + "px";
+    clone.style.minWidth = Math.ceil(rect.width) + "px";
+    clone.style.minHeight = Math.ceil(rect.height) + "px";
+    clone.style.background = style.background;
+    clone.style.backgroundImage = style.backgroundImage;
+    clone.style.backgroundSize = style.backgroundSize;
+    clone.style.backgroundPosition = style.backgroundPosition;
+    clone.style.backgroundRepeat = style.backgroundRepeat;
+    clone.style.backgroundColor = style.backgroundColor;
+    clone.style.position = "relative";
+    clone.style.left = "auto";
+    clone.style.top = "auto";
+    clone.style.right = "auto";
+    clone.style.bottom = "auto";
+    clone.style.margin = "0";
+    clone.style.transform = "none";
+    clone.style.opacity = "1";
+    clone.style.visibility = "visible";
+  }
+
   function createCaptureLayer(width, height) {
     var source = findSourceElement();
     var wrapper = document.createElement("div");
@@ -189,9 +253,11 @@
     var rect = source.getBoundingClientRect();
     var clone = source.cloneNode(true);
     sanitizeClone(clone);
+    copyVisualStyles(source, clone);
     wrapper.appendChild(clone);
 
-    var scale = clamp(randomBetween(0.28, 0.48), 0.24, 0.56);
+    var fitScale = Math.max(width / Math.max(1, rect.width), height / Math.max(1, rect.height));
+    var scale = clamp(fitScale * randomBetween(1.02, 1.22), 0.24, 1.65);
     var cropX = randomBetween(0, Math.max(0, rect.width * scale - width));
     var cropY = randomBetween(0, Math.max(0, rect.height * scale - height));
 

@@ -1084,5 +1084,26 @@
     ],
     "completedAt": "2026-06-22T10:22:02.277572+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260622-moment-layer-window-visible-capture",
+    "sourcePlanId": "manual-20260622-moment-layer-window-visible-capture",
+    "sourceTaskId": "",
+    "title": "Moment Layer Window visible capture fix",
+    "targetPages": [
+      "/null"
+    ],
+    "status": "completed",
+    "summary": "Moment Layer Windowで黒いレイヤーやボタンだけが出る問題に対応。背景画像を持つ映像面を優先選択し、CSS背景をインライン化した視覚コピーとして20枚レイヤーへ使うよう修正。読み込みバージョンをv3へ更新。",
+    "artifacts": [
+      "static/js/moment-layer-window.js"
+    ],
+    "verification": [
+      "node --check static/js/moment-layer-window.js 成功",
+      "npm run build 成功",
+      "py_compile main.py api/index.py 成功"
+    ],
+    "completedAt": "2026-06-22T10:42:20.106977+00:00",
+    "recordedBy": "codex"
   }
 ]
