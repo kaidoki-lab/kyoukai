@@ -2631,8 +2631,8 @@ if videos_dir.exists():
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 MOMENT_LAYER_WINDOW_ASSETS = (
-    '  <link rel="stylesheet" href="/static/css/moment-layer-window.css?v=3">\n'
-    '  <script src="/static/js/moment-layer-window.js?v=3" defer></script>\n'
+    '  <link rel="stylesheet" href="/static/css/moment-layer-window.css?v=4">\n'
+    '  <script src="/static/js/moment-layer-window.js?v=4" defer></script>\n'
 )
 
 

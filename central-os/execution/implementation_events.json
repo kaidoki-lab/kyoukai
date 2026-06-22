@@ -1105,5 +1105,26 @@
     ],
     "completedAt": "2026-06-22T10:42:20.106977+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260623-moment-layer-window-production",
+    "sourcePlanId": "manual-20260623-moment-layer-window-production",
+    "sourceTaskId": "",
+    "title": "Moment Layer Window production settings",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "Moment Layer Windowのテスト用URL即時発火を削除し、本番用に発生頻度を低下。初回90〜240秒、発生確率18%、クールダウン180秒に変更し、読み込みバージョンをv4へ更新。",
+    "artifacts": [
+      "static/js/moment-layer-window.js"
+    ],
+    "verification": [
+      "node --check static/js/moment-layer-window.js 成功",
+      "npm run build 成功",
+      "py_compile main.py api/index.py 成功"
+    ],
+    "completedAt": "2026-06-22T15:12:57.834685+00:00",
+    "recordedBy": "codex"
   }
 ]

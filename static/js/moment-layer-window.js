@@ -3,10 +3,10 @@
 
   var DEFAULT_CONFIG = {
     enabled: true,
-    minDelay: 20000,
-    maxDelay: 90000,
-    chance: 0.3,
-    cooldown: 60000,
+    minDelay: 90000,
+    maxDelay: 240000,
+    chance: 0.18,
+    cooldown: 180000,
     duration: 5000,
     layerCount: 20,
     soundDelay: 700,
@@ -460,15 +460,6 @@
     document.removeEventListener("keydown", enableAudio, true);
   }
 
-  function shouldAutoTriggerFromUrl() {
-    try {
-      var params = new URLSearchParams(window.location.search);
-      return params.get("mlw") === "1" || params.get("momentLayerWindow") === "1";
-    } catch (error) {
-      return false;
-    }
-  }
-
   function init() {
     config = mergeConfig();
     if (!config.enabled || document.documentElement.dataset.momentLayerWindow === "off") {
@@ -477,9 +468,6 @@
     document.addEventListener("pointerdown", enableAudio, true);
     document.addEventListener("keydown", enableAudio, true);
     scheduleNext();
-    if (shouldAutoTriggerFromUrl()) {
-      window.setTimeout(createWindow, 900);
-    }
     log("ready", config);
   }
 
