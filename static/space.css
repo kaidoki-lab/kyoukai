@@ -1252,6 +1252,7 @@ a.sp-link:hover,
 .hotspot-ripple { left: 13%; top: 77%; width: 8%; height: 10%; }
 .hotspot-daimyojin { left: 72%; top: 9%; width: 15%; height: 35%; }
 .hotspot-ofuse { left: 42%; top: 59%; width: 17%; height: 18%; }
+.hotspot-city { left: 40%; top: 39%; width: 18%; height: 16%; }
 .hotspot-city-return { left: 31%; top: 78%; width: 28%; height: 16%; }
 
 .altar-city-debug {
@@ -3229,6 +3230,7 @@ a.sp-link:hover,
   .hotspot-ripple { left: 43%; top: 72%; width: 12%; height: 15%; }
   .hotspot-daimyojin { left: 82%; top: 60%; width: 17%; height: 14%; }
   .hotspot-ofuse { left: 36%; top: 47%; width: 31%; height: 16%; }
+  .hotspot-city { left: 38%; top: 31%; width: 24%; height: 14%; }
   .hotspot-city-return { left: 30%; top: 83%; width: 38%; height: 12%; }
 }
 
