@@ -20,17 +20,21 @@ HOTSPOTS_PATH = ROOT / "kyoukai_hotspots.json"
 
 # ページルート → テンプレートファイルのマッピング
 ROUTE_TO_TEMPLATE = {
-    "/":                "index.html",
-    "/observation":     "observer.html",  # 観測域
+    "/":                "home.html",
+    "/observation":     "index.html",
     "/signal":          "signal.html",
     "/external-signal": "external-signal.html",
     "/null":            "null.html",
-    "/observer":        "observer.html",  # 逆観測室
+    "/observer":        "observer.html",
     "/exit":            "exit.html",
     "/archive":         "archive.html",
     "/outside":         "outside.html",
     "/ma":              "ma.html",
     "/hyougi":          "hyougi.html",
+    "/gokuraku":        "gokuraku.html",
+    "/daimyojin":       "daimyojin.html",
+    "/particles":       "particles.html",
+    "/ripple":          "ripple.html",
 }
 
 # 観測域は observation.html がない場合 observer.html を確認
@@ -198,6 +202,11 @@ def sync(verbose: bool = True) -> None:
     existing_pages = existing.get("pages", {})
 
     new_pages: dict = {}
+
+    # ROUTE_TO_TEMPLATE にあるが lore_map にないルートも追加
+    for route in ROUTE_TO_TEMPLATE:
+        if route not in lore_map:
+            lore_map[route] = {"room_name": route.strip("/") or "home", "lore": "", "narrative_purpose": ""}
 
     for route, lore_data in lore_map.items():
         # テンプレートファイルを探す

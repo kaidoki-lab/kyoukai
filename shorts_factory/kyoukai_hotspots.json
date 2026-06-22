@@ -22,6 +22,12 @@
           "action": "click",
           "selector": ".observation-signal-residue",
           "effect": "/signal へ遷移する"
+        },
+        {
+          "name": "fragment-001",
+          "action": "click",
+          "selector": ".hotspot",
+          "effect": "/observation へ遷移する"
         }
       ]
     },
@@ -268,6 +274,68 @@
           "lore": "大魔将との会話を進める。沈黙と短い応答が距離の変化を示す。"
         }
       ]
+    },
+    "/external-signal": {
+      "room_name": "external-signal",
+      "lore": "",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "中央の白い裂け目に触れる",
+          "action": "click",
+          "selector": ".boundary-hotspot",
+          "effect": "中央の白い裂け目に触れる が実行される"
+        },
+        {
+          "name": "追いかけない",
+          "action": "click",
+          "selector": ".boundary-command__option",
+          "effect": "追いかけない が実行される"
+        },
+        {
+          "name": "受信域へ戻る",
+          "action": "click",
+          "selector": ".boundary-return",
+          "effect": "/signal へ遷移する"
+        }
+      ]
+    },
+    "/gokuraku": {
+      "room_name": "gokuraku",
+      "lore": "",
+      "narrative_purpose": "",
+      "interactions": []
+    },
+    "/daimyojin": {
+      "room_name": "daimyojin",
+      "lore": "",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "もう一度占う\n          神託を再受信します",
+          "action": "click",
+          "selector": ".oracle-button",
+          "effect": "もう一度占う\n          神託を再受信します が実行される"
+        },
+        {
+          "name": "000 / return",
+          "action": "click",
+          "selector": ".daimyojin-return",
+          "effect": "/ へ遷移する"
+        }
+      ]
+    },
+    "/particles": {
+      "room_name": "particles",
+      "lore": "",
+      "narrative_purpose": "",
+      "interactions": []
+    },
+    "/ripple": {
+      "room_name": "ripple",
+      "lore": "",
+      "narrative_purpose": "",
+      "interactions": []
     }
   }
 }
