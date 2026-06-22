@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>{{ location.name }} / KYOUKAI CITY</title>
+  <link rel="stylesheet" href="/static/city/css/city.css" />
+  <script defer src="/static/analytics.js"></script>
+  <script defer src="/static/city/js/city.js"></script>
+</head>
+<body class="city-body" data-city-debug="{{ '1' if debug_mode else '0' }}">
+  <main
+    class="city-location"
+    data-location-id="{{ location.id }}"
+    data-location-slug="{{ location.slug }}"
+    data-location-name="{{ location.name }}"
+  >
+    <picture class="city-background">
+      <source media="(max-width: 768px)" srcset="{{ location.images.sp }}" />
+      <img
+        src="{{ location.images.pc }}"
+        alt="{{ location.images.alt }}"
+        style="object-position: {{ location.visual_context.object_position.pc if location.visual_context and location.visual_context.object_position else 'center center' }};"
+      />
+    </picture>
+
+    <div class="city-vignette" aria-hidden="true"></div>
+
+    <nav class="city-hotspot-layer" aria-label="街路接続">
+      {% for hotspot in hotspots %}
+        <a
+          class="city-hotspot"
+          href="{{ hotspot.href }}"
+          aria-label="{{ hotspot.label }}"
+          data-hotspot-id="{{ hotspot.id }}"
+          data-hotspot-type="{{ hotspot.type }}"
+          data-pc-x="{{ hotspot.pc.x }}"
+          data-pc-y="{{ hotspot.pc.y }}"
+          data-pc-width="{{ hotspot.pc.width }}"
+          data-pc-height="{{ hotspot.pc.height }}"
+          data-sp-x="{{ hotspot.sp.x }}"
+          data-sp-y="{{ hotspot.sp.y }}"
+          data-sp-width="{{ hotspot.sp.width }}"
+          data-sp-height="{{ hotspot.sp.height }}"
+          {% if hotspot.external %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >
+          <span>{{ hotspot.label }}</span>
+        </a>
+      {% endfor %}
+    </nav>
+
+    <footer class="city-footer">
+      <a href="/city" aria-label="街路の起点へ戻る">CITY</a>
+      <a href="/" aria-label="KYOUKAI入口へ戻る">EXIT</a>
+    </footer>
+
+    {% if debug_mode %}
+      <aside class="city-debug" aria-live="polite">
+        <strong>{{ location.id }}</strong>
+        <span>{{ location.slug }}</span>
+        <span data-city-debug-point>click: --</span>
+      </aside>
+    {% endif %}
+  </main>
+</body>
+</html>

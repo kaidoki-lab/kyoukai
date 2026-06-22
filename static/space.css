@@ -1098,6 +1098,12 @@ a.sp-link:hover,
   display: none;
 }
 
+.altar-page--city .altar-image--city-static {
+  object-fit: cover;
+  opacity: 1;
+  filter: saturate(1.08) contrast(1.03) brightness(1);
+}
+
 .altar-electric-layer {
   position: absolute;
   inset: 0;
@@ -1246,6 +1252,27 @@ a.sp-link:hover,
 .hotspot-ripple { left: 13%; top: 77%; width: 8%; height: 10%; }
 .hotspot-daimyojin { left: 72%; top: 9%; width: 15%; height: 35%; }
 .hotspot-ofuse { left: 42%; top: 59%; width: 17%; height: 18%; }
+.hotspot-city-return { left: 31%; top: 78%; width: 28%; height: 16%; }
+
+.altar-city-debug {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 20;
+  display: grid;
+  gap: 4px;
+  max-width: calc(100vw - 24px);
+  padding: 10px 12px;
+  border: 1px solid rgba(65, 220, 190, 0.55);
+  background: rgba(0, 0, 0, 0.72);
+  color: #b7fff0;
+  font: 12px/1.4 Consolas, monospace;
+}
+
+.altar-page[data-city-debug="1"] .hotspot-city-return {
+  background: rgba(65, 220, 190, 0.24);
+  outline: 1px solid rgba(183, 255, 240, 0.55);
+}
 
 .home-rakuten-widget {
   position: absolute;
@@ -3202,6 +3229,7 @@ a.sp-link:hover,
   .hotspot-ripple { left: 43%; top: 72%; width: 12%; height: 15%; }
   .hotspot-daimyojin { left: 82%; top: 60%; width: 17%; height: 14%; }
   .hotspot-ofuse { left: 36%; top: 47%; width: 31%; height: 16%; }
+  .hotspot-city-return { left: 30%; top: 83%; width: 38%; height: 12%; }
 }
 
 /* Shared crawlable footer navigation */

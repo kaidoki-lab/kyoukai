@@ -1,0 +1,872 @@
+[
+  {
+    "id": "CITY-001",
+    "slug": "city-001",
+    "name": "中心街路",
+    "district": "central",
+    "description": "町の基点となる中心街路。現在は仮背景で構成しています。",
+    "enabled": true,
+    "images": {
+      "pc": "/static/city/images/city-001/city-001-pc.webp",
+      "sp": "/static/city/images/city-001/city-001-sp.webp",
+      "alt": "KYOUKAI中心街路の仮背景"
+    },
+    "visual_context": {
+      "time": "evening",
+      "object_position": {
+        "pc": "center center",
+        "sp": "center center"
+      }
+    },
+    "hotspots": [
+      {
+        "id": "to-city-002",
+        "label": "神社脇路地へ",
+        "type": "city",
+        "target": "city-002",
+        "pc": {
+          "x": 2,
+          "y": 36,
+          "width": 11,
+          "height": 34
+        },
+        "sp": {
+          "x": 2,
+          "y": 48,
+          "width": 15,
+          "height": 28
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-city-009",
+        "label": "階段上の入口へ",
+        "type": "city",
+        "target": "city-009",
+        "pc": {
+          "x": 26,
+          "y": 18,
+          "width": 17,
+          "height": 28
+        },
+        "sp": {
+          "x": 19,
+          "y": 28,
+          "width": 24,
+          "height": 24
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-city-003",
+        "label": "宿泊街入口へ",
+        "type": "city",
+        "target": "city-003",
+        "pc": {
+          "x": 38,
+          "y": 20,
+          "width": 25,
+          "height": 55
+        },
+        "sp": {
+          "x": 33,
+          "y": 25,
+          "width": 34,
+          "height": 48
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-city-004",
+        "label": "自販機横丁へ",
+        "type": "city",
+        "target": "city-004",
+        "pc": {
+          "x": 72,
+          "y": 26,
+          "width": 18,
+          "height": 46
+        },
+        "sp": {
+          "x": 70,
+          "y": 34,
+          "width": 23,
+          "height": 39
+        },
+        "enabled": true
+      }
+    ],
+    "fallback_location": "city-001",
+    "tags": [
+      "central",
+      "street",
+      "loop-start",
+      "prototype"
+    ],
+    "debug_notes": "正式な街路画像へ差し替えるまでの仮背景。"
+  },
+  {
+    "id": "CITY-009",
+    "slug": "city-009",
+    "name": "階段上の入口",
+    "district": "central",
+    "description": "中心街路の階段を上がった先にある二階入口。",
+    "enabled": true,
+    "images": {
+      "pc": "/static/city/images/city-009/city-009-pc.png",
+      "sp": "/static/city/images/city-009/city-009-sp.png",
+      "alt": "中心街路の階段上にある二階入口の扉"
+    },
+    "visual_context": {
+      "time": "evening",
+      "object_position": {
+        "pc": "center center",
+        "sp": "center center"
+      }
+    },
+    "hotspots": [
+      {
+        "id": "to-city-001",
+        "label": "中心街路へ戻る",
+        "type": "city",
+        "target": "city-001",
+        "pc": {
+          "x": 4,
+          "y": 62,
+          "width": 22,
+          "height": 26
+        },
+        "sp": {
+          "x": 4,
+          "y": 68,
+          "width": 28,
+          "height": 24
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-observation",
+        "label": "観測室へ接続する",
+        "type": "route",
+        "target": "/observation",
+        "pc": {
+          "x": 39,
+          "y": 20,
+          "width": 24,
+          "height": 48
+        },
+        "sp": {
+          "x": 35,
+          "y": 30,
+          "width": 32,
+          "height": 42
+        },
+        "enabled": true
+      }
+    ],
+    "fallback_location": "city-001",
+    "tags": [
+      "central",
+      "stairs",
+      "door",
+      "prototype"
+    ],
+    "debug_notes": "city-001階段上ドアの16:9仮ページ。9:16画像待ち。"
+  },
+  {
+    "id": "CITY-002",
+    "slug": "city-002",
+    "name": "神社脇路地",
+    "district": "shrine",
+    "description": "中心街路から枝分かれする神社脇の通路。現在は仮背景で構成しています。",
+    "enabled": true,
+    "images": {
+      "pc": "/static/city/images/city-002/city-002-pc.webp",
+      "sp": "/static/city/images/city-002/city-002-sp.webp",
+      "alt": "KYOUKAI神社脇路地の仮背景"
+    },
+    "visual_context": {
+      "time": "night",
+      "object_position": {
+        "pc": "center center",
+        "sp": "center center"
+      }
+    },
+    "hotspots": [
+      {
+        "id": "to-city-001",
+        "label": "中心街路へ戻る",
+        "type": "city",
+        "target": "city-001",
+        "pc": {
+          "x": 82,
+          "y": 42,
+          "width": 16,
+          "height": 40
+        },
+        "sp": {
+          "x": 72,
+          "y": 45,
+          "width": 24,
+          "height": 38
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-daimyojin",
+        "label": "AI大明神室へ接続する",
+        "type": "route",
+        "target": "/daimyojin",
+        "pc": {
+          "x": 4,
+          "y": 42,
+          "width": 22,
+          "height": 40
+        },
+        "sp": {
+          "x": 3,
+          "y": 45,
+          "width": 27,
+          "height": 38
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-city-005",
+        "label": "裏路地へ",
+        "type": "city",
+        "target": "city-005",
+        "pc": {
+          "x": 41,
+          "y": 50,
+          "width": 18,
+          "height": 36
+        },
+        "sp": {
+          "x": 39,
+          "y": 58,
+          "width": 22,
+          "height": 32
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-signal",
+        "label": "信号室へ接続する",
+        "type": "route",
+        "target": "/signal",
+        "pc": {
+          "x": 34,
+          "y": 18,
+          "width": 18,
+          "height": 34
+        },
+        "sp": {
+          "x": 36,
+          "y": 18,
+          "width": 24,
+          "height": 32
+        },
+        "enabled": true
+      }
+    ],
+    "tags": [
+      "shrine",
+      "street",
+      "prototype"
+    ],
+    "debug_notes": "正式な街路画像へ差し替えるまでの仮背景。"
+  },
+  {
+    "id": "CITY-003",
+    "slug": "city-003",
+    "name": "宿泊街入口",
+    "district": "lodging",
+    "description": "宿泊街区へ入る境目の通路。現在は仮背景で構成しています。",
+    "enabled": true,
+    "images": {
+      "pc": "/static/city/images/city-003/city-003-pc.webp",
+      "sp": "/static/city/images/city-003/city-003-sp.webp",
+      "alt": "KYOUKAI宿泊街入口の仮背景"
+    },
+    "visual_context": {
+      "time": "late-night",
+      "object_position": {
+        "pc": "center center",
+        "sp": "center center"
+      }
+    },
+    "hotspots": [
+      {
+        "id": "to-city-001",
+        "label": "中心街路へ戻る",
+        "type": "city",
+        "target": "city-001",
+        "pc": {
+          "x": 8,
+          "y": 32,
+          "width": 20,
+          "height": 44
+        },
+        "sp": {
+          "x": 5,
+          "y": 36,
+          "width": 28,
+          "height": 42
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-city-010",
+        "label": "宿泊街の奥へ",
+        "type": "city",
+        "target": "city-010",
+        "pc": {
+          "x": 38,
+          "y": 50,
+          "width": 20,
+          "height": 34
+        },
+        "sp": {
+          "x": 35,
+          "y": 56,
+          "width": 30,
+          "height": 32
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-city-005",
+        "label": "裏路地へ",
+        "type": "city",
+        "target": "city-005",
+        "pc": {
+          "x": 64,
+          "y": 30,
+          "width": 22,
+          "height": 42
+        },
+        "sp": {
+          "x": 62,
+          "y": 34,
+          "width": 28,
+          "height": 39
+        },
+        "enabled": true
+      }
+    ],
+    "tags": [
+      "lodging",
+      "street",
+      "prototype"
+    ],
+    "debug_notes": "正式な街路画像へ差し替えるまでの仮背景。"
+  },
+  {
+    "id": "CITY-010",
+    "slug": "city-010",
+    "name": "宿泊街内通路",
+    "district": "lodging",
+    "description": "宿泊街の奥へ続く、地続きの通路。",
+    "enabled": true,
+    "images": {
+      "pc": "/static/city/images/city-010/city-010-pc.png",
+      "sp": "/static/city/images/city-010/city-010-sp.png",
+      "alt": "宿泊街の奥へ続くホテル街の通路"
+    },
+    "visual_context": {
+      "time": "late-night",
+      "object_position": {
+        "pc": "center center",
+        "sp": "center center"
+      }
+    },
+    "hotspots": [
+      {
+        "id": "to-city-003",
+        "label": "宿泊街入口へ戻る",
+        "type": "city",
+        "target": "city-003",
+        "pc": {
+          "x": 2,
+          "y": 48,
+          "width": 22,
+          "height": 40
+        },
+        "sp": {
+          "x": 2,
+          "y": 58,
+          "width": 26,
+          "height": 34
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-observer",
+        "label": "逆観測室へ接続する",
+        "type": "route",
+        "target": "/observer",
+        "pc": {
+          "x": 64,
+          "y": 22,
+          "width": 22,
+          "height": 52
+        },
+        "sp": {
+          "x": 55,
+          "y": 28,
+          "width": 34,
+          "height": 48
+        },
+        "enabled": true
+      }
+    ],
+    "fallback_location": "city-003",
+    "tags": [
+      "lodging",
+      "hotel",
+      "street",
+      "prototype"
+    ],
+    "debug_notes": "city-003宿泊街の奥。16:9画像登録済み、9:16画像待ち。"
+  },
+  {
+    "id": "CITY-004",
+    "slug": "city-004",
+    "name": "自販機横丁",
+    "district": "machine",
+    "description": "外部領域への接続が混じる横丁。現在は仮背景で構成しています。",
+    "enabled": true,
+    "images": {
+      "pc": "/static/city/images/city-004/city-004-pc.webp",
+      "sp": "/static/city/images/city-004/city-004-sp.webp",
+      "alt": "KYOUKAI自販機横丁の仮背景"
+    },
+    "visual_context": {
+      "time": "night",
+      "object_position": {
+        "pc": "center center",
+        "sp": "center center"
+      }
+    },
+    "hotspots": [
+      {
+        "id": "to-city-001",
+        "label": "中心街路へ戻る",
+        "type": "city",
+        "target": "city-001",
+        "pc": {
+          "x": 6,
+          "y": 38,
+          "width": 22,
+          "height": 42
+        },
+        "sp": {
+          "x": 5,
+          "y": 42,
+          "width": 27,
+          "height": 40
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-city-005",
+        "label": "裏路地へ",
+        "type": "city",
+        "target": "city-005",
+        "pc": {
+          "x": 56,
+          "y": 24,
+          "width": 25,
+          "height": 46
+        },
+        "sp": {
+          "x": 55,
+          "y": 30,
+          "width": 30,
+          "height": 44
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-outside",
+        "label": "OUTSIDEへ接続する",
+        "type": "route",
+        "target": "/outside",
+        "pc": {
+          "x": 34,
+          "y": 18,
+          "width": 18,
+          "height": 32
+        },
+        "sp": {
+          "x": 34,
+          "y": 20,
+          "width": 25,
+          "height": 30
+        },
+        "enabled": true
+      }
+    ],
+    "tags": [
+      "machine",
+      "street",
+      "prototype"
+    ],
+    "debug_notes": "正式な街路画像へ差し替えるまでの仮背景。"
+  },
+  {
+    "id": "CITY-005",
+    "slug": "city-005",
+    "name": "裏路地",
+    "district": "backstreet",
+    "description": "各街区を循環させる裏側の通路。現在は仮背景で構成しています。",
+    "enabled": true,
+    "images": {
+      "pc": "/static/city/images/city-005/city-005-pc.webp",
+      "sp": "/static/city/images/city-005/city-005-sp.webp",
+      "alt": "KYOUKAI裏路地の仮背景"
+    },
+    "visual_context": {
+      "time": "unknown",
+      "object_position": {
+        "pc": "center center",
+        "sp": "center center"
+      }
+    },
+    "hotspots": [
+      {
+        "id": "to-city-001",
+        "label": "中心街路へ",
+        "type": "city",
+        "target": "city-001",
+        "pc": {
+          "x": 6,
+          "y": 34,
+          "width": 18,
+          "height": 42
+        },
+        "sp": {
+          "x": 4,
+          "y": 38,
+          "width": 24,
+          "height": 40
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-city-002",
+        "label": "神社脇路地へ",
+        "type": "city",
+        "target": "city-002",
+        "pc": {
+          "x": 28,
+          "y": 20,
+          "width": 18,
+          "height": 46
+        },
+        "sp": {
+          "x": 27,
+          "y": 26,
+          "width": 24,
+          "height": 42
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-city-003",
+        "label": "宿泊街入口へ",
+        "type": "city",
+        "target": "city-003",
+        "pc": {
+          "x": 52,
+          "y": 22,
+          "width": 18,
+          "height": 44
+        },
+        "sp": {
+          "x": 51,
+          "y": 28,
+          "width": 24,
+          "height": 40
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-city-004",
+        "label": "自販機横丁へ",
+        "type": "city",
+        "target": "city-004",
+        "pc": {
+          "x": 75,
+          "y": 30,
+          "width": 18,
+          "height": 42
+        },
+        "sp": {
+          "x": 72,
+          "y": 34,
+          "width": 24,
+          "height": 40
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-null",
+        "label": "NULLへ接続する",
+        "type": "route",
+        "target": "/null",
+        "pc": {
+          "x": 40,
+          "y": 70,
+          "width": 20,
+          "height": 20
+        },
+        "sp": {
+          "x": 36,
+          "y": 70,
+          "width": 28,
+          "height": 20
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-city-006",
+        "label": "参道裏口へ",
+        "type": "city",
+        "target": "city-006",
+        "pc": {
+          "x": 42,
+          "y": 27,
+          "width": 14,
+          "height": 36
+        },
+        "sp": {
+          "x": 40,
+          "y": 26,
+          "width": 20,
+          "height": 40
+        },
+        "enabled": true
+      }
+    ],
+    "tags": [
+      "backstreet",
+      "street",
+      "prototype"
+    ],
+    "debug_notes": "正式な街路画像へ差し替えるまでの仮背景。"
+  },
+  {
+    "id": "CITY-006",
+    "slug": "city-006",
+    "name": "参道裏口",
+    "district": "altar-approach",
+    "description": "生活区から奉納街へ続く参道裏口。画像未配置のため準備中です。",
+    "enabled": true,
+    "images": {
+      "pc": "/static/city/images/city-006/city-006-pc.webp",
+      "sp": "/static/city/images/city-006/city-006-sp.webp",
+      "alt": "生活区と信仰区画が重なる参道裏口"
+    },
+    "visual_context": {
+      "time": "night",
+      "object_position": {
+        "pc": "center center",
+        "sp": "center center"
+      },
+      "altar_ratio": {
+        "life": 70,
+        "faith": 30
+      }
+    },
+    "hotspots": [
+      {
+        "id": "to-city-005",
+        "label": "裏路地へ戻る",
+        "type": "city",
+        "target": "city-005",
+        "pc": {
+          "x": 39,
+          "y": 72,
+          "width": 20,
+          "height": 18
+        },
+        "sp": {
+          "x": 36,
+          "y": 78,
+          "width": 28,
+          "height": 15
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-city-007",
+        "label": "奉納街へ進む",
+        "type": "city",
+        "target": "city-007",
+        "pc": {
+          "x": 45,
+          "y": 23,
+          "width": 14,
+          "height": 32
+        },
+        "sp": {
+          "x": 40,
+          "y": 25,
+          "width": 20,
+          "height": 30
+        },
+        "enabled": true
+      }
+    ],
+    "tags": [
+      "altar-approach",
+      "prototype",
+      "disabled"
+    ],
+    "debug_notes": "画像と座標が揃うまでenabled=false。CITY-005からは未接続。"
+  },
+  {
+    "id": "CITY-007",
+    "slug": "city-007",
+    "name": "奉納街",
+    "district": "altar-approach",
+    "description": "生活と奉納が混ざる、祭壇へ向かう街区。画像未配置のため準備中です。",
+    "enabled": true,
+    "images": {
+      "pc": "/static/city/images/city-007/city-007-pc.webp",
+      "sp": "/static/city/images/city-007/city-007-sp.webp",
+      "alt": "生活用品と奉納物が混在する奉納街"
+    },
+    "visual_context": {
+      "time": "night",
+      "object_position": {
+        "pc": "center center",
+        "sp": "center center"
+      },
+      "altar_ratio": {
+        "life": 40,
+        "faith": 60
+      }
+    },
+    "hotspots": [
+      {
+        "id": "to-city-006",
+        "label": "参道裏口へ戻る",
+        "type": "city",
+        "target": "city-006",
+        "pc": {
+          "x": 39,
+          "y": 72,
+          "width": 20,
+          "height": 16
+        },
+        "sp": {
+          "x": 36,
+          "y": 78,
+          "width": 28,
+          "height": 14
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-city-008",
+        "label": "祭壇前通路へ進む",
+        "type": "city",
+        "target": "city-008",
+        "pc": {
+          "x": 43,
+          "y": 22,
+          "width": 16,
+          "height": 36
+        },
+        "sp": {
+          "x": 38,
+          "y": 24,
+          "width": 24,
+          "height": 38
+        },
+        "enabled": true
+      }
+    ],
+    "tags": [
+      "altar-approach",
+      "offering-street",
+      "prototype",
+      "disabled"
+    ],
+    "debug_notes": "画像と座標が揃うまでenabled=false。"
+  },
+  {
+    "id": "CITY-008",
+    "slug": "city-008",
+    "name": "祭壇前通路",
+    "district": "altar-approach",
+    "description": "祭壇域へ入る直前の通路。画像未配置のため準備中です。",
+    "enabled": true,
+    "images": {
+      "pc": "/static/city/images/city-008/city-008-pc.webp",
+      "sp": "/static/city/images/city-008/city-008-sp.webp",
+      "alt": "祭壇域から漏れる光と装飾が密集する祭壇前通路"
+    },
+    "visual_context": {
+      "time": "night",
+      "object_position": {
+        "pc": "center center",
+        "sp": "center center"
+      },
+      "altar_ratio": {
+        "life": 10,
+        "faith": 90
+      }
+    },
+    "hotspots": [
+      {
+        "id": "to-city-007",
+        "label": "奉納街へ戻る",
+        "type": "city",
+        "target": "city-007",
+        "pc": {
+          "x": 82,
+          "y": 50,
+          "width": 12,
+          "height": 32
+        },
+        "sp": {
+          "x": 8,
+          "y": 78,
+          "width": 18,
+          "height": 14
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-altar",
+        "label": "祭壇域へ入る",
+        "type": "route",
+        "target": "/altar",
+        "pc": {
+          "x": 42,
+          "y": 18,
+          "width": 20,
+          "height": 44
+        },
+        "sp": {
+          "x": 34,
+          "y": 20,
+          "width": 32,
+          "height": 44
+        },
+        "enabled": true
+      }
+    ],
+    "tags": [
+      "altar-approach",
+      "altar-gate",
+      "prototype",
+      "disabled"
+    ],
+    "debug_notes": "画像と座標が揃うまでenabled=false。/altarへの接続準備地点。"
+  }
+]

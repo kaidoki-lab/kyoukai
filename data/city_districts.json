@@ -1,0 +1,38 @@
+{
+  "central": {
+    "name": "中心街区",
+    "description": "信仰、商売、生活が集中する基点",
+    "default_location": "city-001",
+    "enabled": true
+  },
+  "shrine": {
+    "name": "神社路地区",
+    "description": "祠、商店、住宅が重なる区画",
+    "default_location": "city-002",
+    "enabled": true
+  },
+  "lodging": {
+    "name": "宿泊街区",
+    "description": "宿泊施設と生活路地が密集する区画",
+    "default_location": "city-003",
+    "enabled": true
+  },
+  "machine": {
+    "name": "自販機横丁",
+    "description": "外部との接点が点在する商店路",
+    "default_location": "city-004",
+    "enabled": true
+  },
+  "backstreet": {
+    "name": "裏路地",
+    "description": "街区同士をつなぐ薄暗い通路",
+    "default_location": "city-005",
+    "enabled": true
+  },
+  "altar-approach": {
+    "name": "祭壇接続区",
+    "description": "町の生活区から祭壇域へ続く区画",
+    "default_location": "city-006",
+    "enabled": true
+  }
+}

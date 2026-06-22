@@ -24,7 +24,7 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
@@ -36,6 +36,7 @@ from auto_generator import build_codex_context, build_daimyojin_config
 from data_migration import migrate as migrate_altar_markdown
 from implementation_events import load_events, planner_completed_context
 from schema import AltarRepository
+from services.city_service import CityDataError, CityService
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -2629,6 +2630,7 @@ except OSError:
 if videos_dir.exists():
     app.mount("/videos", StaticFiles(directory=videos_dir), name="videos")
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
+city_service = CityService(BASE_DIR)
 
 MOMENT_LAYER_WINDOW_ASSETS = (
     '  <link rel="stylesheet" href="/static/css/moment-layer-window.css?v=4">\n'
@@ -2673,7 +2675,6 @@ async def moment_layer_window_middleware(request: Request, call_next: Any) -> Re
         background=response.background,
     )
 
-
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
     if exc.status_code == 404:
@@ -2683,16 +2684,17 @@ async def custom_http_exception_handler(request: Request, exc: StarletteHTTPExce
 from fastapi import Body
 from fastapi.responses import JSONResponse
 
-def render_template(request: Request, name: str, **extra_context: Any) -> HTMLResponse:
+def render_template(request: Request, name: str, status_code: int = 200, **extra_context: Any) -> HTMLResponse:
     context = {"request": request, **extra_context}
     try:
         return templates.TemplateResponse(
             request=request,
             name=name,
             context=context,
+            status_code=status_code,
         )
     except TypeError:
-        return templates.TemplateResponse(name, context)
+        return templates.TemplateResponse(name, context, status_code=status_code)
 
 # ─── Pages ──────────────────────────────────────────────────────────────
 
@@ -2806,6 +2808,63 @@ async def particles_page(request: Request) -> HTMLResponse:
 @app.get("/ripple", response_class=HTMLResponse)
 async def ripple_page(request: Request) -> HTMLResponse:
     return render_template(request, "ripple.html")
+
+@app.get("/city", response_class=HTMLResponse)
+async def city_index(request: Request) -> Any:
+    try:
+        location = city_service.first_location()
+    except CityDataError:
+        location = None
+    if location is None:
+        return render_template(
+            request,
+            "city/error.html",
+            title="街路は準備中です",
+            message="有効な街路画像がまだ登録されていません。",
+            status_code=503,
+        )
+    return RedirectResponse(url=f"/city/{location['slug']}")
+
+@app.get("/city/{slug}", response_class=HTMLResponse)
+async def city_location(request: Request, slug: str) -> HTMLResponse:
+    try:
+        location = city_service.get_location(slug)
+        districts = city_service.load_districts()
+    except CityDataError:
+        return render_template(
+            request,
+            "city/error.html",
+            title="街路データを読めません",
+            message="city_locations.json または city_districts.json を確認してください。",
+            status_code=503,
+        )
+    if location is None:
+        return render_template(
+            request,
+            "city/error.html",
+            title="街路が見つかりません",
+            message="未登録、無効、または画像未配置の地点です。",
+            status_code=404,
+        )
+    district = districts.get(str(location.get("district")), {})
+    return render_template(
+        request,
+        "city/location.html",
+        location=location,
+        images=location.get("images", {}),
+        hotspots=location.get("hotspots", []),
+        district=district,
+        visit_state={},
+        debug_mode=request.query_params.get("debug") == "1",
+    )
+
+@app.get("/altar", response_class=HTMLResponse)
+async def altar_room(request: Request) -> HTMLResponse:
+    return render_template(
+        request,
+        "city/altar.html",
+        debug_mode=request.query_params.get("debug") == "1",
+    )
 
 # ─── API ────────────────────────────────────────────────
 

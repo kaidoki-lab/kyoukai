@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="google" content="notranslate" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>ALTAR / KYOUKAI CITY</title>
+  <link rel="stylesheet" href="/static/space.css?v=20260620ripple1" />
+  <script src="/static/kyoukai-transition.js"></script>
+  <script defer src="/static/analytics.js"></script>
+  <script defer src="/static/city/js/altar.js"></script>
+</head>
+<body class="altar-page altar-page--city" data-city-debug="{{ '1' if debug_mode else '0' }}">
+  <div class="sp-scanline" aria-hidden="true"></div>
+  <div class="altar-noise" aria-hidden="true"></div>
+
+  <main class="altar-shell" data-location-slug="altar" data-location-id="ALTAR">
+    <section class="altar-frame" aria-label="ALTAR / KYOUKAI">
+      <div class="altar-image-stack" aria-hidden="true">
+        <img class="altar-image altar-image--city-static" src="/static/city/images/altar/altar-pc.png" alt="" />
+      </div>
+      <div class="altar-electric-layer" data-altar-electric aria-hidden="true"></div>
+
+      <a class="hotspot hotspot-city-return" href="/city/city-008" aria-label="祭壇前通路へ戻る"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-observation" href="/observation" aria-label="fragment-001"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-archive" href="/archive" aria-label="fragment-002"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-hyougi" href="/hyougi" aria-label="評議"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-signal-alt" href="/signal" aria-label="fragment-004"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-exit" href="/exit" aria-label="fragment-005"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-null" href="/null" aria-label="fragment-006"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-girl-film" href="/observer" aria-label="fragment-007"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-gokuraku" href="/gokuraku" aria-label="極楽域"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-particles" href="/particles" aria-label="粒子観測"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-ripple" href="/ripple" aria-label="ripple observer"><span aria-hidden="true"></span></a>
+      <a class="hotspot hotspot-daimyojin" href="/daimyojin" aria-label="AI大明神室"><span aria-hidden="true"></span></a>
+
+      {% if debug_mode %}
+        <aside class="altar-city-debug" aria-live="polite">
+          <strong>ALTAR</strong>
+          <span>return: /city/city-008</span>
+          <span data-altar-debug-point>click: --</span>
+        </aside>
+      {% endif %}
+    </section>
+  </main>
+
+  <script defer src="/static/kyoukai-divine.js"></script>
+  <script>window.KYOUKAI_ROOM = 'altar';</script>
+  <script src="/static/bgm.js"></script>
+  <script defer src="/static/home-electric.js?v=20260619a"></script>
+</body>
+</html>
