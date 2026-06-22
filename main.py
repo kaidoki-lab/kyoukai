@@ -29,6 +29,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.responses import Response
 from fastapi.exception_handlers import http_exception_handler
 
 from auto_generator import build_codex_context, build_daimyojin_config
@@ -2628,6 +2629,50 @@ except OSError:
 if videos_dir.exists():
     app.mount("/videos", StaticFiles(directory=videos_dir), name="videos")
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
+
+MOMENT_LAYER_WINDOW_ASSETS = (
+    '  <link rel="stylesheet" href="/static/css/moment-layer-window.css?v=1">\n'
+    '  <script src="/static/js/moment-layer-window.js?v=1" defer></script>\n'
+)
+
+
+def inject_moment_layer_window_assets(html: str) -> str:
+    if "/static/js/moment-layer-window.js" in html:
+        return html
+    closing_head = re.search(r"</head\s*>", html, flags=re.IGNORECASE)
+    if closing_head is None:
+        return html
+    return html[: closing_head.start()] + MOMENT_LAYER_WINDOW_ASSETS + html[closing_head.start() :]
+
+
+@app.middleware("http")
+async def moment_layer_window_middleware(request: Request, call_next: Any) -> Response:
+    response = await call_next(request)
+    content_type = response.headers.get("content-type", "")
+    if "text/html" not in content_type.lower():
+        return response
+
+    body = b""
+    async for chunk in response.body_iterator:
+        body += chunk
+
+    charset = "utf-8"
+    charset_match = re.search(r"charset=([^;]+)", content_type, flags=re.IGNORECASE)
+    if charset_match:
+        charset = charset_match.group(1).strip()
+
+    html = body.decode(charset, errors="replace")
+    updated_html = inject_moment_layer_window_assets(html)
+    headers = dict(response.headers)
+    headers.pop("content-length", None)
+    return Response(
+        content=updated_html.encode(charset),
+        status_code=response.status_code,
+        headers=headers,
+        media_type=None,
+        background=response.background,
+    )
+
 
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):

@@ -1017,5 +1017,30 @@
     ],
     "completedAt": "2026-06-20T06:33:08.979517+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260622-moment-layer-window",
+    "sourcePlanId": "manual-20260622-moment-layer-window",
+    "sourceTaskId": "",
+    "title": "Moment Layer Window implementation",
+    "targetPages": [
+      "/",
+      "/observation"
+    ],
+    "status": "completed",
+    "summary": "独立モジュールとしてMoment Layer WindowのCSS/JSを追加し、HTMLレスポンスへ読み込みを注入するミドルウェアを実装。低頻度ランダム発生、DOM断片クローン、加速フェーズ、停止後の遅延Web Audio音、自然消滅を追加。",
+    "artifacts": [
+      "static/js/moment-layer-window.js",
+      "static/css/moment-layer-window.css"
+    ],
+    "verification": [
+      "npm run build 成功",
+      "py_compile main.py api/index.py 成功",
+      "node --check static/js/moment-layer-window.js 成功",
+      "pytest tests/test_city_routes.py tests/test_implementation_events.py 成功",
+      "ブラウザ確認はnode_repl起動がサンドボックス制限で失敗したため未実施"
+    ],
+    "completedAt": "2026-06-22T04:34:56.063554+00:00",
+    "recordedBy": "codex"
   }
 ]
