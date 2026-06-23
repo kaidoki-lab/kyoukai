@@ -1098,6 +1098,10 @@ a.sp-link:hover,
   display: none;
 }
 
+.altar-image--city-mobile {
+  display: none;
+}
+
 .altar-page--city .altar-image--city-static {
   object-fit: cover;
   opacity: 1;
@@ -3036,6 +3040,18 @@ a.sp-link:hover,
     object-position: center center;
   }
 
+  .altar-page--city .altar-image--city-static {
+    display: none;
+  }
+
+  .altar-page--city .altar-image--city-mobile {
+    display: block;
+    opacity: 1;
+    object-fit: contain;
+    object-position: center center;
+    filter: saturate(1.12) contrast(1.06) brightness(0.98);
+  }
+
   .altar-side {
     height: 100%;
     max-height: calc(100svh - clamp(12px, 2.7vw, 36px));
@@ -3235,26 +3251,11 @@ a.sp-link:hover,
   .hotspot-ripple { left: 43%; top: 72%; width: 12%; height: 15%; }
   .hotspot-daimyojin { left: 82%; top: 60%; width: 17%; height: 14%; }
   .hotspot-ofuse { left: 36%; top: 47%; width: 31%; height: 16%; }
-  .hotspot-city { display: none; }
+  .hotspot-city { left: 39%; top: 35%; width: 22%; height: 13%; }
   .hotspot-city-return { left: 30%; top: 83%; width: 38%; height: 12%; }
 
   .home-mobile-city-link {
-    position: relative;
-    z-index: 6;
-    display: block;
-    width: min(72vw, 340px);
-    margin: 12px auto 28px;
-    padding: 12px 16px;
-    border: 1px solid rgba(255, 42, 174, 0.5);
-    background: rgba(4, 0, 8, 0.72);
-    color: rgba(246, 241, 223, 0.92);
-    text-align: center;
-    text-decoration: none;
-    font-size: 14px;
-    letter-spacing: 0;
-    box-shadow:
-      0 0 18px rgba(255, 42, 174, 0.25),
-      0 0 24px rgba(23, 241, 255, 0.14);
+    display: none;
   }
 }
 
