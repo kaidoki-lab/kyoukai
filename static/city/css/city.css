@@ -3,8 +3,9 @@
   --city-text: #f6f1df;
   --city-muted: rgba(246, 241, 223, 0.72);
   --city-line: rgba(246, 241, 223, 0.42);
-  --city-hotspot: transparent;
-  --city-hotspot-active: transparent;
+  --city-hotspot: rgba(65, 220, 190, 0.08);
+  --city-hotspot-border: rgba(65, 220, 190, 0.28);
+  --city-hotspot-active: rgba(255, 245, 170, 0.14);
 }
 
 * {
@@ -99,11 +100,13 @@ body {
 .city-hotspot {
   position: absolute;
   display: block;
-  border: 1px solid transparent;
-  background: transparent;
+  border: 1px solid var(--city-hotspot-border);
+  background: var(--city-hotspot);
+  box-shadow: 0 0 12px rgba(65, 220, 190, 0.16);
   outline: none;
   text-decoration: none;
   touch-action: manipulation;
+  transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
 .city-hotspot span {
@@ -112,8 +115,9 @@ body {
 
 .city-hotspot:hover,
 .city-hotspot:focus-visible {
-  border-color: transparent;
-  background: transparent;
+  border-color: rgba(255, 245, 170, 0.48);
+  background: rgba(255, 245, 170, 0.1);
+  box-shadow: 0 0 16px rgba(255, 245, 170, 0.22);
 }
 
 .city-body[data-city-debug="1"] .city-hotspot span {
@@ -126,7 +130,7 @@ body {
 }
 
 .city-hotspot:active {
-  background: transparent;
+  background: var(--city-hotspot-active);
 }
 
 .city-footer {
