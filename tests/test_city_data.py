@@ -61,10 +61,24 @@ class CityDataTests(unittest.TestCase):
         city_007 = self.service.get_location("city-007")
         city_008 = self.service.get_location("city-008")
 
-        self.assertIn("city-006", [hotspot["target"] for hotspot in city_005["hotspots"]])
-        self.assertEqual({"city-005", "city-007"}, {hotspot["target"] for hotspot in city_006["hotspots"]})
-        self.assertEqual({"city-006", "city-008"}, {hotspot["target"] for hotspot in city_007["hotspots"]})
-        self.assertEqual({"city-007", "/altar"}, {hotspot["target"] for hotspot in city_008["hotspots"]})
+        city_targets = lambda location: {
+            hotspot["target"] for hotspot in location["hotspots"] if hotspot["type"] == "city"
+        }
+        route_targets = lambda location: {
+            hotspot["target"] for hotspot in location["hotspots"] if hotspot["type"] == "route"
+        }
+        external_targets = lambda location: {
+            hotspot["target"] for hotspot in location["hotspots"] if hotspot["type"] == "external"
+        }
+
+        self.assertIn("city-006", city_targets(city_005))
+        self.assertEqual({"city-005", "city-007"}, city_targets(city_006))
+        self.assertEqual({"city-006", "city-008"}, city_targets(city_007))
+        self.assertEqual({"city-007"}, city_targets(city_008))
+        self.assertIn("/ripple", route_targets(city_006))
+        self.assertIn("/archive", route_targets(city_007))
+        self.assertGreaterEqual(route_targets(city_008), {"/altar", "/hyougi"})
+        self.assertIn("https://ofuse.me/be78f6ed", external_targets(city_008))
 
     def test_hotspot_coordinates_are_in_image_bounds(self):
         for location in self.service.load_locations(include_disabled=True):

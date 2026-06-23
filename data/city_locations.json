@@ -94,6 +94,25 @@
           "height": 39
         },
         "enabled": true
+      },
+      {
+        "id": "to-exit",
+        "label": "EXIT",
+        "type": "route",
+        "target": "/exit",
+        "pc": {
+          "x": 0,
+          "y": 72,
+          "width": 10,
+          "height": 15
+        },
+        "sp": {
+          "x": 0,
+          "y": 77,
+          "width": 14,
+          "height": 14
+        },
+        "enabled": true
       }
     ],
     "fallback_location": "city-001",
@@ -419,6 +438,25 @@
           "height": 48
         },
         "enabled": true
+      },
+      {
+        "id": "to-particles",
+        "label": "particles",
+        "type": "route",
+        "target": "/particles",
+        "pc": {
+          "x": 50,
+          "y": 15,
+          "width": 14,
+          "height": 18
+        },
+        "sp": {
+          "x": 45,
+          "y": 18,
+          "width": 18,
+          "height": 16
+        },
+        "enabled": true
       }
     ],
     "fallback_location": "city-003",
@@ -504,6 +542,25 @@
           "y": 20,
           "width": 25,
           "height": 30
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-gokuraku",
+        "label": "獄楽域",
+        "type": "route",
+        "target": "/gokuraku",
+        "pc": {
+          "x": 68,
+          "y": 62,
+          "width": 14,
+          "height": 17
+        },
+        "sp": {
+          "x": 62,
+          "y": 64,
+          "width": 22,
+          "height": 18
         },
         "enabled": true
       }
@@ -718,6 +775,25 @@
           "height": 30
         },
         "enabled": true
+      },
+      {
+        "id": "to-ripple",
+        "label": "ripple",
+        "type": "route",
+        "target": "/ripple",
+        "pc": {
+          "x": 44,
+          "y": 58,
+          "width": 13,
+          "height": 17
+        },
+        "sp": {
+          "x": 42,
+          "y": 62,
+          "width": 17,
+          "height": 17
+        },
+        "enabled": true
       }
     ],
     "tags": [
@@ -786,6 +862,25 @@
           "y": 24,
           "width": 24,
           "height": 38
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-archive",
+        "label": "archive",
+        "type": "route",
+        "target": "/archive",
+        "pc": {
+          "x": 70,
+          "y": 26,
+          "width": 10,
+          "height": 26
+        },
+        "sp": {
+          "x": 70,
+          "y": 28,
+          "width": 15,
+          "height": 23
         },
         "enabled": true
       }
@@ -857,6 +952,44 @@
           "y": 20,
           "width": 32,
           "height": 44
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-hyougi",
+        "label": "評議",
+        "type": "route",
+        "target": "/hyougi",
+        "pc": {
+          "x": 62,
+          "y": 36,
+          "width": 13,
+          "height": 28
+        },
+        "sp": {
+          "x": 62,
+          "y": 38,
+          "width": 19,
+          "height": 23
+        },
+        "enabled": true
+      },
+      {
+        "id": "to-ofuse",
+        "label": "OFUSE",
+        "type": "external",
+        "target": "https://ofuse.me/be78f6ed",
+        "pc": {
+          "x": 34,
+          "y": 58,
+          "width": 17,
+          "height": 17
+        },
+        "sp": {
+          "x": 30,
+          "y": 60,
+          "width": 23,
+          "height": 17
         },
         "enabled": true
       }

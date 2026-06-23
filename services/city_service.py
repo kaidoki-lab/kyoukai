@@ -21,7 +21,9 @@ ALLOWED_ROUTES = {
     "/archive",
     "/daimyojin",
     "/exit",
+    "/gokuraku",
     "/ma",
+    "/particles",
     "/ripple",
     "/altar",
 }
