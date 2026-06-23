@@ -34,12 +34,14 @@ class CityRouteTests(unittest.TestCase):
             with self.subTest(route=route):
                 self.assertIn(route, self.main_source)
 
-    def test_altar_template_records_visit_and_links_back_to_city_008(self):
+    def test_altar_template_records_visit_without_hotspot_links(self):
         html = (BASE_DIR / "templates" / "city" / "altar.html").read_text(encoding="utf-8")
         script = (BASE_DIR / "static" / "city" / "js" / "altar.js").read_text(encoding="utf-8")
 
         self.assertIn("/static/city/images/altar/altar-pc.png", html)
-        self.assertIn('href="/city/city-008"', html)
+        self.assertIn("/static/city/images/altar/altar-sp-red.png", html)
+        self.assertNotIn('class="hotspot', html)
+        self.assertNotIn('href="/city/city-008"', html)
         self.assertIn("kyoukai_city_state", script)
         self.assertIn("visited_locations", script)
         self.assertIn('const slug = "altar"', script)
