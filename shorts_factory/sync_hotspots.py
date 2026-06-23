@@ -12,10 +12,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-CENTRAL_OS = ROOT.parent / "central-os"
 TEMPLATES = ROOT.parent / "templates"
 
-LORE_PATH = CENTRAL_OS / "lore" / "kyoukai-world.md"
+LORE_PATH = ROOT.parent / "data" / "kyoukai_world.md"
 HOTSPOTS_PATH = ROOT / "kyoukai_hotspots.json"
 
 # ページルート → テンプレートファイルのマッピング
