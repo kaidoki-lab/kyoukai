@@ -118,23 +118,23 @@ class CityService:
     def all_locations_by_slug(self) -> dict[str, dict[str, Any]]:
         return {location["slug"]: location for location in self.load_locations(include_disabled=True)}
 
-    def get_location(self, slug: str) -> dict[str, Any] | None:
+    def get_location(self, slug: str, *, base_path: str = "/city") -> dict[str, Any] | None:
         location = self.all_locations_by_slug().get(slug.lower())
         if not location or not location.get("_available"):
             return None
-        return self.prepare_location(location)
+        return self.prepare_location(location, base_path=base_path)
 
-    def first_location(self) -> dict[str, Any] | None:
+    def first_location(self, *, base_path: str = "/city") -> dict[str, Any] | None:
         locations = self.load_locations()
         if not locations:
             return None
-        return self.prepare_location(locations[0])
+        return self.prepare_location(locations[0], base_path=base_path)
 
-    def prepare_location(self, location: dict[str, Any]) -> dict[str, Any]:
+    def prepare_location(self, location: dict[str, Any], *, base_path: str = "/city") -> dict[str, Any]:
         prepared = deepcopy(location)
         all_locations = self.all_locations_by_slug()
         prepared["hotspots"] = [
-            self.prepare_hotspot(hotspot, all_locations)
+            self.prepare_hotspot(hotspot, all_locations, base_path=base_path)
             for hotspot in prepared.get("hotspots", [])
             if self.hotspot_is_renderable(hotspot, all_locations)
         ]
@@ -144,12 +144,14 @@ class CityService:
         self,
         hotspot: dict[str, Any],
         all_locations: dict[str, dict[str, Any]],
+        *,
+        base_path: str = "/city",
     ) -> dict[str, Any]:
         prepared = deepcopy(hotspot)
         hotspot_type = prepared.get("type")
         target = str(prepared.get("target") or "")
         if hotspot_type == "city":
-            prepared["href"] = f"/city/{target.lower()}"
+            prepared["href"] = f"{base_path.rstrip('/')}/{target.lower()}"
         elif hotspot_type == "route":
             prepared["href"] = target
         elif hotspot_type == "external":

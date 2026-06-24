@@ -2756,8 +2756,55 @@ async def gokuraku_room(request: Request) -> HTMLResponse:
     return render_template(request, "gokuraku.html")
 
 @app.get("/exit", response_class=HTMLResponse)
-async def exit_room(request: Request) -> HTMLResponse:
-    return render_template(request, "exit.html")
+async def exit_room(request: Request) -> Any:
+    try:
+        location = city_service.first_location(base_path="/exit")
+    except CityDataError:
+        location = None
+    if location is None:
+        return render_template(
+            request,
+            "city/error.html",
+            title="NewExit is not ready",
+            message="NewExit data is not available.",
+            status_code=503,
+        )
+    return RedirectResponse(url=f"/exit/{location['slug']}")
+
+
+@app.get("/exit/{slug}", response_class=HTMLResponse)
+async def new_exit_location(request: Request, slug: str) -> HTMLResponse:
+    try:
+        location = city_service.get_location(slug, base_path="/exit")
+        districts = city_service.load_districts()
+    except CityDataError:
+        return render_template(
+            request,
+            "city/error.html",
+            title="NewExit data error",
+            message="NewExit location data could not be loaded.",
+            status_code=503,
+        )
+    if location is None:
+        return render_template(
+            request,
+            "city/error.html",
+            title="NewExit not found",
+            message="That NewExit location is not available.",
+            status_code=404,
+        )
+    district = districts.get(str(location.get("district")), {})
+    return render_template(
+        request,
+        "city/location.html",
+        location=location,
+        images=location.get("images", {}),
+        hotspots=location.get("hotspots", []),
+        district=district,
+        visit_state={},
+        debug_mode=request.query_params.get("debug") == "1",
+        base_path="/exit",
+    )
 
 @app.get("/null", response_class=HTMLResponse)
 async def null_room(request: Request) -> HTMLResponse:
@@ -2811,52 +2858,24 @@ async def ripple_page(request: Request) -> HTMLResponse:
 
 @app.get("/city", response_class=HTMLResponse)
 async def city_index(request: Request) -> Any:
-    try:
-        location = city_service.first_location()
-    except CityDataError:
-        location = None
-    if location is None:
-        return render_template(
-            request,
-            "city/error.html",
-            title="街路は準備中です",
-            message="有効な街路画像がまだ登録されていません。",
-            status_code=503,
-        )
-    return RedirectResponse(url=f"/city/{location['slug']}")
+    return RedirectResponse(url="/exit")
+
 
 @app.get("/city/{slug}", response_class=HTMLResponse)
-async def city_location(request: Request, slug: str) -> HTMLResponse:
-    try:
-        location = city_service.get_location(slug)
-        districts = city_service.load_districts()
-    except CityDataError:
-        return render_template(
-            request,
-            "city/error.html",
-            title="街路データを読めません",
-            message="city_locations.json または city_districts.json を確認してください。",
-            status_code=503,
-        )
-    if location is None:
-        return render_template(
-            request,
-            "city/error.html",
-            title="街路が見つかりません",
-            message="未登録、無効、または画像未配置の地点です。",
-            status_code=404,
-        )
-    district = districts.get(str(location.get("district")), {})
-    return render_template(
-        request,
-        "city/location.html",
-        location=location,
-        images=location.get("images", {}),
-        hotspots=location.get("hotspots", []),
-        district=district,
-        visit_state={},
-        debug_mode=request.query_params.get("debug") == "1",
-    )
+async def city_location_compat(request: Request, slug: str) -> Any:
+    return RedirectResponse(url=f"/exit/{slug}")
+
+
+@app.get("/new-exit", response_class=HTMLResponse)
+async def new_exit_alias(request: Request) -> Any:
+    return RedirectResponse(url="/exit")
+
+
+@app.get("/new-exit/{slug}", response_class=HTMLResponse)
+async def new_exit_location_alias(request: Request, slug: str) -> Any:
+    return RedirectResponse(url=f"/exit/{slug}")
+
+
 
 @app.get("/altar", response_class=HTMLResponse)
 async def altar_room(request: Request) -> HTMLResponse:

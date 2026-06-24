@@ -9,12 +9,15 @@ class CityRouteTests(unittest.TestCase):
     def setUp(self):
         self.main_source = (BASE_DIR / "main.py").read_text(encoding="utf-8")
 
-    def test_city_routes_are_registered(self):
+    def test_new_exit_routes_are_registered(self):
+        self.assertIn('@app.get("/exit"', self.main_source)
+        self.assertIn('@app.get("/exit/{slug}"', self.main_source)
         self.assertIn('@app.get("/city"', self.main_source)
         self.assertIn('@app.get("/city/{slug}"', self.main_source)
+        self.assertIn('@app.get("/new-exit"', self.main_source)
         self.assertIn('@app.get("/altar"', self.main_source)
-        self.assertIn("city_service.first_location()", self.main_source)
-        self.assertIn("city_service.get_location(slug)", self.main_source)
+        self.assertIn('city_service.first_location(base_path="/exit")', self.main_source)
+        self.assertIn('city_service.get_location(slug, base_path="/exit")', self.main_source)
 
     def test_city_template_uses_data_driven_assets_and_hotspots(self):
         html = (BASE_DIR / "templates" / "city" / "location.html").read_text(encoding="utf-8")
@@ -24,13 +27,21 @@ class CityRouteTests(unittest.TestCase):
         self.assertIn("data-pc-x", html)
         self.assertIn("data-sp-x", html)
         self.assertIn("/static/city/js/city.js", html)
+        self.assertIn("KYOUKAI NewExit", html)
+        self.assertIn('href="/exit"', html)
 
-    def test_city_404_path_is_handled(self):
-        self.assertIn('title="街路が見つかりません"', self.main_source)
+    def test_new_exit_404_path_is_handled(self):
+        self.assertIn('title="NewExit not found"', self.main_source)
         self.assertIn("status_code=404", self.main_source)
 
     def test_existing_routes_are_still_registered(self):
-        for route in ('@app.get("/", response_class=HTMLResponse)', '@app.get("/outside"', '@app.get("/signal"', '@app.get("/observation"', '@app.get("/exit"'):
+        for route in (
+            '@app.get("/", response_class=HTMLResponse)',
+            '@app.get("/outside"',
+            '@app.get("/signal"',
+            '@app.get("/observation"',
+            '@app.get("/exit"',
+        ):
             with self.subTest(route=route):
                 self.assertIn(route, self.main_source)
 
