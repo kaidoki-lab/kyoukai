@@ -298,6 +298,10 @@ dd {
   margin: 0;
 }
 
+.vertical-copy-layer p:not(:first-child) {
+  display: none;
+}
+
 .warning-box-layer {
   position: absolute;
   z-index: 7;

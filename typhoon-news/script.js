@@ -34,6 +34,114 @@ const typhoonPresets = [
     verticalCopy: "判断不能の大型台風。",
     mainCaption: "名前だけで避難開始",
     ticker: "気象庁は台風「お母さんに聞いて」への厳重な警戒を呼びかけています。各地で確認待ちが続いています。"
+  },
+  {
+    name: "前向きに善処します",
+    number: "996",
+    pressure: 905,
+    wind: 58,
+    gust: 86,
+    direction: "北東",
+    speed: 18,
+    verticalCopy: "善処だけが接近中。",
+    mainCaption: "対応は未定",
+    ticker: "台風「前向きに善処します」は、前向きな姿勢を保ったまま各地に接近しています。"
+  },
+  {
+    name: "担当者不在",
+    number: "995",
+    pressure: 900,
+    wind: 62,
+    gust: 90,
+    direction: "西北西",
+    speed: 12,
+    verticalCopy: "窓口が消えた暴風域。",
+    mainCaption: "連絡網に乱れ",
+    ticker: "台風「担当者不在」の影響で、各地の問い合わせ窓口に混乱が広がっています。"
+  },
+  {
+    name: "一旦持ち帰ります",
+    number: "994",
+    pressure: 915,
+    wind: 50,
+    gust: 78,
+    direction: "東",
+    speed: 30,
+    verticalCopy: "持ち帰ったまま北上。",
+    mainCaption: "判断を持ち帰り",
+    ticker: "台風「一旦持ち帰ります」は結論を伴わないまま東寄りに進んでいます。"
+  },
+  {
+    name: "確認中です",
+    number: "993",
+    pressure: 895,
+    wind: 64,
+    gust: 92,
+    direction: "北北東",
+    speed: 22,
+    verticalCopy: "確認だけが長引く。",
+    mainCaption: "各地で確認中",
+    ticker: "台風「確認中です」は現在も確認中です。気象庁は続報を待つよう呼びかけています。"
+  },
+  {
+    name: "折り返します",
+    number: "992",
+    pressure: 920,
+    wind: 48,
+    gust: 72,
+    direction: "南西",
+    speed: 10,
+    verticalCopy: "折り返し未確認。",
+    mainCaption: "折り返しを待つ",
+    ticker: "台風「折り返します」は折り返す見込みですが、現時点で折り返しは確認されていません。"
+  },
+  {
+    name: "なるはやで",
+    number: "991",
+    pressure: 885,
+    wind: 68,
+    gust: 98,
+    direction: "北西",
+    speed: 35,
+    verticalCopy: "速度だけが本気。",
+    mainCaption: "なるはやで接近",
+    ticker: "台風「なるはやで」は非常に速い速度で接近しています。各地で早めの判断が求められています。"
+  },
+  {
+    name: "今向かってます",
+    number: "990",
+    pressure: 930,
+    wind: 45,
+    gust: 68,
+    direction: "北",
+    speed: 40,
+    verticalCopy: "すでに遅れて接近。",
+    mainCaption: "到着時刻は未定",
+    ticker: "台風「今向かってます」は現在も向かっているとみられますが、到着時刻は不明です。"
+  },
+  {
+    name: "既読だけつけます",
+    number: "989",
+    pressure: 908,
+    wind: 57,
+    gust: 84,
+    direction: "西",
+    speed: 16,
+    verticalCopy: "返答なき暴風。",
+    mainCaption: "既読被害が拡大",
+    ticker: "台風「既読だけつけます」の接近により、各地で返信待ちの状態が続いています。"
+  },
+  {
+    name: "また後で",
+    number: "988",
+    pressure: 918,
+    wind: 52,
+    gust: 76,
+    direction: "東北東",
+    speed: 19,
+    verticalCopy: "後回しの雨雲。",
+    mainCaption: "後で対応へ",
+    ticker: "台風「また後で」は勢力を維持したまま後回しにされています。今後の情報に注意してください。"
   }
 ];
 
@@ -42,7 +150,10 @@ const captionPool = [
   "全国で様子見",
   "名前変更を検討",
   "もう遅い",
-  "気象庁、沈黙"
+  "気象庁、沈黙",
+  "対応は未定",
+  "連絡網に乱れ",
+  "折り返しを待つ"
 ];
 
 const countStarts = {
@@ -69,7 +180,7 @@ function splitNameForEye(name) {
   }
 
   const midpoint = Math.ceil(name.length / 2);
-  const breakChars = ["連", "に", "し"];
+  const breakChars = ["連", "に", "し", "持", "不", "中", "つ"];
   const breakIndex = breakChars
     .map((char) => name.indexOf(char, 2))
     .find((index) => index > 0);
