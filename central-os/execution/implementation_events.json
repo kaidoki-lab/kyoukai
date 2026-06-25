@@ -1186,5 +1186,25 @@
     ],
     "completedAt": "2026-06-25T22:50:10.323206+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260626-typhoon-news-vercel-bundle-fix",
+    "sourcePlanId": "manual-20260626-typhoon-news-vercel-bundle-fix",
+    "sourceTaskId": "",
+    "title": "台風ニュースVercelバンドルサイズ修正",
+    "targetPages": [
+      "/typhoon-news/"
+    ],
+    "status": "completed",
+    "summary": "typhoon-newsをPython関数バンドルから除外し、静的配信側に載せることでVercelの225MB制限超過を解消",
+    "artifacts": [
+      "vercel.json",
+      "main.py"
+    ],
+    "verification": [
+      "FastAPI TestClientで/typhoon-news/、/typhoon-news/index.html、背景画像が200になることを確認。Vercelエラーログの関数サイズ超過に対応"
+    ],
+    "completedAt": "2026-06-25T22:54:57.629172+00:00",
+    "recordedBy": "codex"
   }
 ]
