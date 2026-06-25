@@ -9,8 +9,6 @@
     ],
     "sourceFiles": [
       "AGENTS.md",
-      "complete_implementation.py",
-      "implementation_events.py",
       "templates/daimyojin.html",
       "static/daimyojin.js"
     ],
@@ -18,7 +16,6 @@
       "元企画IDと対象ページを保持する",
       "設定から対象ページ用データを生成する",
       "テストと表示確認を実行する",
-      "完了事象・成果物・検証結果を制作者用完了台帳へ同期する",
       "関連差分だけをコミットしてmainへプッシュする",
       "Vercel本番反映を確認する"
     ]

@@ -12,7 +12,7 @@ class AutoGeneratorTests(unittest.TestCase):
     def test_codex_context_extracts_all_configured_sources(self) -> None:
         context = build_codex_context()
         self.assertTrue(context["codex_ready"])
-        self.assertGreaterEqual(len(context["codex_sources"]), 5)
+        self.assertGreaterEqual(len(context["codex_sources"]), 3)
         self.assertTrue(all(source["sha256"] for source in context["codex_sources"]))
         self.assertLess(context["generation_ms"], 1000)
         self.assertNotIn("Central OS", " ".join(context["codex_pipeline"]))
