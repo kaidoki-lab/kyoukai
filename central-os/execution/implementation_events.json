@@ -1228,5 +1228,24 @@
     ],
     "completedAt": "2026-06-25T23:04:13.294410+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260626-news-entrance-bundle-fix",
+    "sourcePlanId": "manual-20260626-news-entrance-bundle-fix",
+    "sourceTaskId": "",
+    "title": "入口画像Vercelバンドル除外",
+    "targetPages": [
+      "/"
+    ],
+    "status": "completed",
+    "summary": "入口画像群をPython関数バンドルから除外し、news.png追加後のVercel関数サイズ超過を解消",
+    "artifacts": [
+      "vercel.json"
+    ],
+    "verification": [
+      "Vercel最新エラーログで226.77MBの関数サイズ超過を確認し、static/images/entrances/**をexcludeFilesへ追加。ローカルTestClientでnews.pngとhome-entrances.jsが200になることを確認"
+    ],
+    "completedAt": "2026-06-25T23:11:21.493587+00:00",
+    "recordedBy": "codex"
   }
 ]

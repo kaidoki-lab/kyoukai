@@ -4,7 +4,7 @@
       "src": "api/index.py",
       "use": "@vercel/python",
       "config": {
-        "excludeFiles": "{videos/**,static/archive/**,static/bgm/**,typhoon-news/**}"
+        "excludeFiles": "{videos/**,static/archive/**,static/bgm/**,static/images/entrances/**,typhoon-news/**}"
       }
     },
     {
