@@ -1167,5 +1167,24 @@
     ],
     "completedAt": "2026-06-25T22:46:46.025404+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260626-typhoon-news-fastapi-mount",
+    "sourcePlanId": "manual-20260626-typhoon-news-fastapi-mount",
+    "sourceTaskId": "",
+    "title": "台風ニュース本番ルート追加",
+    "targetPages": [
+      "/typhoon-news/"
+    ],
+    "status": "completed",
+    "summary": "FastAPIアプリにtyphoon-news静的ディレクトリをhtml=Trueでマウントし、本番のcatch-all 500を回避",
+    "artifacts": [
+      "main.py"
+    ],
+    "verification": [
+      "FastAPI TestClientで/typhoon-news/、/typhoon-news/index.html、/typhoon-news/style.cssが200になることを確認"
+    ],
+    "completedAt": "2026-06-25T22:50:10.323206+00:00",
+    "recordedBy": "codex"
   }
 ]

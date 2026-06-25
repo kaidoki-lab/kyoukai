@@ -2622,6 +2622,7 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title="KYOUKAI alpha", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+app.mount("/typhoon-news", StaticFiles(directory=BASE_DIR / "typhoon-news", html=True), name="typhoon-news")
 videos_dir = VIDEOS_DIR
 try:
     videos_dir.mkdir(exist_ok=True)
