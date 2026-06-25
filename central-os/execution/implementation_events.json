@@ -1206,5 +1206,27 @@
     ],
     "completedAt": "2026-06-25T22:54:57.629172+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260626-news-entrance-image",
+    "sourcePlanId": "manual-20260626-news-entrance-image",
+    "sourceTaskId": "",
+    "title": "台風ニュース入口画像追加",
+    "targetPages": [
+      "/",
+      "/typhoon-news/"
+    ],
+    "status": "completed",
+    "summary": "トップ入口一覧に台風ニュースへのnewsカードを追加し、指定画像をnews.pngとして配置",
+    "artifacts": [
+      "static/images/entrances/news.png",
+      "static/home-entrances.js",
+      "templates/home.html"
+    ],
+    "verification": [
+      "FastAPI TestClientでトップ、news.png、home-entrances.jsが200になることを確認。Chrome headlessでnewsカード生成、/typhoon-news/リンク、news.png読み込みを確認"
+    ],
+    "completedAt": "2026-06-25T23:04:13.294410+00:00",
+    "recordedBy": "codex"
   }
 ]

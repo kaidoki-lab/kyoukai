@@ -41,6 +41,16 @@
       status: "active",
     },
     {
+      id: "news",
+      name: "news",
+      label: "台風ニュース",
+      href: "/typhoon-news/",
+      image: "/static/images/entrances/news.png",
+      expectedImage: "/static/images/entrances/news.png",
+      material: "door",
+      status: "active",
+    },
+    {
       id: "external-signal",
       name: "外部信号",
       label: "受ける",
