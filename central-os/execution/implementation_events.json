@@ -1148,5 +1148,24 @@
     ],
     "completedAt": "2026-06-25T22:45:45.469887+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260626-typhoon-news-static-route",
+    "sourcePlanId": "manual-20260626-typhoon-news-static-route",
+    "sourceTaskId": "",
+    "title": "台風ニュース静的配信設定",
+    "targetPages": [
+      "/typhoon-news/"
+    ],
+    "status": "completed",
+    "summary": "Vercel本番でtyphoon-news配下のHTML/CSS/JS/画像を静的配信できるようビルド対象を追加",
+    "artifacts": [
+      "vercel.json"
+    ],
+    "verification": [
+      "vercel.jsonでtyphoon-news/**が@vercel/static対象になっていることを確認"
+    ],
+    "completedAt": "2026-06-25T22:46:46.025404+00:00",
+    "recordedBy": "codex"
   }
 ]

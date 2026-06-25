@@ -12,6 +12,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "typhoon-news/**",
+      "use": "@vercel/static"
+    },
+    {
       "src": "videos/**",
       "use": "@vercel/static"
     }
