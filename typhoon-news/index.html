@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>KYOUKAI Typhoon News</title>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <main class="stage-shell" aria-label="台風ニュース風ショート演出">
+      <section class="news-canvas">
+        <img class="background-layer" src="./assets/typhoon-news-bg.png" alt="">
+
+        <div class="storm-motion-layer" aria-hidden="true"></div>
+        <div class="rain-layer" aria-hidden="true"></div>
+        <div class="lightning-layer" aria-hidden="true">
+          <span class="bolt bolt-left"></span>
+          <span class="bolt bolt-right"></span>
+        </div>
+        <div class="noise-layer" aria-hidden="true"></div>
+        <div class="glitch-layer" aria-hidden="true"></div>
+
+        <header class="alert-header-layer">
+          <div class="breaking-label">速報</div>
+          <div class="breaking-text">
+            <span>大型で非常に強い台風</span>
+            <strong>「<b data-field="name">後ほど連絡します</b>」が接近中</strong>
+          </div>
+        </header>
+
+        <aside class="info-panel-layer">
+          <div class="panel-kicker">台風情報</div>
+          <h1>台風「<span data-field="name">後ほど連絡します</span>」</h1>
+          <dl>
+            <div>
+              <dt>台風番号</dt>
+              <dd>第<span data-field="number">999</span>号</dd>
+            </div>
+            <div>
+              <dt>中心気圧</dt>
+              <dd><span data-count="pressure">890</span> hPa</dd>
+            </div>
+            <div>
+              <dt>最大風速</dt>
+              <dd><span data-count="wind">65</span> m/s</dd>
+            </div>
+            <div>
+              <dt>最大瞬間風速</dt>
+              <dd><span data-count="gust">95</span> m/s</dd>
+            </div>
+            <div>
+              <dt>進行方向</dt>
+              <dd data-field="direction">北北西</dd>
+            </div>
+            <div>
+              <dt>速度</dt>
+              <dd><span data-field="speed">20</span> km/h</dd>
+            </div>
+          </dl>
+        </aside>
+
+        <div class="eye-title-layer" aria-label="台風名">
+          <span data-eye-line="first">後ほど</span>
+          <span data-eye-line="second">連絡します</span>
+        </div>
+
+        <aside class="vertical-copy-layer">
+          <p data-field="verticalCopy">史上最悪クラスのネーミング。</p>
+          <p>気象庁、困惑。</p>
+          <p>名前だけで避難開始。</p>
+          <p>命名会議、終了。</p>
+        </aside>
+
+        <section class="warning-box-layer">
+          <h2>警戒情報</h2>
+          <dl>
+            <div>
+              <dt>未読</dt>
+              <dd>通知が増え続けるおそれ</dd>
+            </div>
+            <div>
+              <dt>保留</dt>
+              <dd>返事が来ない状態に警戒</dd>
+            </div>
+            <div>
+              <dt>会議</dt>
+              <dd>結論が出ない見込み</dd>
+            </div>
+          </dl>
+        </section>
+
+        <div class="bottom-main-caption-layer">
+          <span data-main-caption>最大級の警戒を呼びかけ</span>
+        </div>
+
+        <footer class="ticker-layer">
+          <div class="ticker-track">
+            <span data-ticker>台風「後ほど連絡します」の影響で、全国的に荒天となる見込みです。</span>
+            <span data-ticker-clone>台風「後ほど連絡します」の影響で、全国的に荒天となる見込みです。</span>
+          </div>
+        </footer>
+      </section>
+    </main>
+    <script src="./script.js"></script>
+  </body>
+</html>

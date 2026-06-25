@@ -1126,5 +1126,27 @@
     ],
     "completedAt": "2026-06-22T15:12:57.834685+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260626-typhoon-news",
+    "sourcePlanId": "manual-20260626-typhoon-news",
+    "sourceTaskId": "",
+    "title": "台風ニュース風ショート演出",
+    "targetPages": [
+      "/typhoon-news/"
+    ],
+    "status": "completed",
+    "summary": "生成済み台風ニュース画像を背景に、速報帯、情報パネル、台風名、縦コピー、警戒ボックス、下部見出し、テロップ、雨、稲妻、ノイズを重ねた9:16ショート動画用HTML演出を実装",
+    "artifacts": [
+      "typhoon-news/index.html",
+      "typhoon-news/style.css",
+      "typhoon-news/script.js",
+      "typhoon-news/assets/typhoon-news-bg.png"
+    ],
+    "verification": [
+      "Chrome headless 540x960で9:16表示、背景画像読み込み、全主要レイヤー表示、数値カウントアップ後の値、中央タイトル改行崩れなしを確認"
+    ],
+    "completedAt": "2026-06-25T22:45:45.469887+00:00",
+    "recordedBy": "codex"
   }
 ]
