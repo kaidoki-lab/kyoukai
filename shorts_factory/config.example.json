@@ -1,16 +1,4 @@
 {
-  "obs": {
-    "host": "127.0.0.1",
-    "port": 4455,
-    "password": "YOUR_OBS_WEBSOCKET_PASSWORD",
-    "exe_path": "C:\\Program Files\\obs-studio\\bin\\64bit\\obs64.exe",
-    "recording_path": "input_videos",
-    "work_scene_name": "KYOUKAI_WORK_RECORD",
-    "work_source_name": "KYOUKAI_Display_Capture",
-    "recording_width": 1920,
-    "recording_height": 1080,
-    "recording_fps": 30
-  },
   "video": {
     "short_length_sec": 30,
     "candidates_per_video": 5,

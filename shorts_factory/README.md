@@ -1,153 +1,90 @@
 # KYOUKAI Shorts Factory
 
-KYOUKAI制作作業をYouTube Shorts候補へ変換するローカル量産ラインです。
-動画編集ソフトではなく、`bat起動 -> 録画 -> 停止 -> 候補生成` を簡単に固定するための補助システムです。
+KYOUKAI制作・探索の様子をYouTube Shorts候補に変換するローカル量産ラインです。
+動画編集ソフトではなく、`bat起動 -> シナリオ生成 -> 自動巡回・録画` を簡単に固定するための補助システムです。
 
-## 使い方
+## 使い方（日常運用）
 
-1. OBSの録画保存先を `shorts_factory/input_videos/` に設定する
-2. OBS WebSocketを有効化する
-3. `config.json` の `obs.password` を自分のOBS WebSocketパスワードに合わせる
-4. 必要なら `input_audio/` にBGM音源、`qr/` にQR画像を置く
-5. `start_kyoukai_record.bat` を実行する
-6. KYOUKAI制作作業を録画する
-7. `stop_kyoukai_record.bat` を実行する
+1. `auto_browse.bat` を実行する
+2. 自動でシナリオが生成され、Chromiumが起動してKYOUKAI内を自動巡回・録画する
+3. クリップごとに `sessions/<日付>/raw_clips/` へ `.webm` で保存される
 
-停止後に `main.py` が実行され、`output_shorts/` にShorts候補、`output_meta/` に投稿用テキストが出ます。
+これだけで完結します。OBSなど別アプリの起動・録画開始/停止操作は不要です。
+
+## 仕組み
+
+- `generate_scenario.py`: `data/kyoukai_world.md`（ロア）と `data/city_locations.json`（CITY街区データ）からその日の巡回ルートとブラウズ手順（スクロール・マウス移動・ホットスポットクリック）を生成する。直前のルートとは絶対に被らない
+- `sync_hotspots.py`: `templates/*.html` と `data/city_locations.json` をスキャンして `kyoukai_hotspots.json`（各ページのクリック可能要素一覧）を自動更新する。`generate_scenario.py` の実行時に内部で自動的に呼ばれる
+- `auto_browse.py`: Playwright で携帯ブラウザ（iPhone相当の縦長ビューポート）を起動し、生成されたシナリオに沿ってKYOUKAI内を巡回しながらクリップ単位で録画する
+
+## ルート
+
+`generate_scenario.py` 内の `ROUTE_SETS` に定義されている。
+
+| ルート | 内容 |
+|---|---|
+| Route-A 深層 | /observer, /ma, /null, /archive |
+| Route-B 境界 | /exit, /signal, /outside, /hyougi |
+| Route-C 記録 | /archive, /hyougi, /observation, /observer |
+| Route-D 入口巡回 | /, /signal, /null, /exit |
+| Route-E 街区 | /city/city-001, /city/city-002, /city/city-005, /city/city-004 |
+| Route-F 路地裏 | /city/city-001, /city/city-009, /city/city-003, /city/city-010 |
+
+CITY側の `/altar` および奉納街周辺（city-006〜008）はサイト側が変更中のため、ルートには含めていません。
 
 ## フォルダ
 
-- `input_videos/`: OBS録画素材の保存先
-- `input_audio/`: 固定BGMの置き場。空ならBGMなしで生成
-- `qr/`: QR画像の置き場。空ならQRなしで生成
-- `output_shorts/`: 完成したShorts候補。自動削除しない
-- `output_meta/`: 投稿用タイトル、説明、固定コメント。自動削除しない
-- `recordings_archive/`: 処理済み録画素材の退避先
-- `logs/`: 処理ログ、OBS制御ログ、削除ログ
+- `sessions/<日付>/`: その日のシナリオ・収録クリップ（`raw_clips/*.webm`）
+- `kyoukai_hotspots.json`: 各ページのクリック可能要素の自動生成データ（手で直接編集しない。ロアの更新は `data/kyoukai_world.md`、CITYの導線は `data/city_locations.json` 側で行う）
+- `logs/`: 処理ログ（`process.log`, `cleanup.log`）
 - `temp/`: 一時ファイル置き場
 
-## FFmpeg
+## 録画した素材をShorts候補に変換する（任意・手動）
 
-動画変換にはFFmpegとFFprobeが必要です。
-PATHに入っていない場合は `config.json` に直接指定してください。
+`auto_browse.py` の出力はそのままだと `sessions/<日付>/raw_clips/` に置かれたクリップ単位の動画です。
+QR合成・BGM合成・複数候補への切り出しをしたい場合は、対象の動画を `input_videos/` に移してから `main.py` を実行してください。
 
-```json
-{
-  "video": {
-    "ffmpeg_path": "C:\\ffmpeg\\bin\\ffmpeg.exe",
-    "ffprobe_path": "C:\\ffmpeg\\bin\\ffprobe.exe"
-  }
-}
+```
+python main.py
 ```
 
-## OBS
+- `output_shorts/`: 完成したShorts候補。自動削除しない
+- `output_meta/`: 投稿用タイトル・説明・固定コメント。自動削除しない
 
-`start_kyoukai_record.bat` はOBSを起動し、`tools/obs_control.js` からobs-websocket v5へ `StartRecord` を送ります。
-`stop_kyoukai_record.bat` は `StopRecord` を送り、その後 `main.py` を実行します。
+### FFmpeg
 
-OBS起動時にクラッシュ回復ダイアログが出た場合は、セーフモードではなく通常モードを選んでください。
+動画変換には `tools/ffmpeg/` 同梱のFFmpeg/FFprobeを使用する。パスは `config.json` の `video.ffmpeg_path` / `ffprobe_path` で指定。
 
-## 生成ルール
-
-- 1本の録画素材から最大5本の候補を作成
-- 初期実装では見どころAI判定はしない
-- 一定間隔で15秒切り出し
-- 1080x1920の9:16へ中央クロップ
-- BGMがあれば合成
-- QR画像があれば右下に合成
-- テロップは付けない
-
-## 録画画面
-
-OBS側の録画元は1920x1080のフル画面です。横長の作業画面を切らずに保存し、Shorts候補を作る時だけ1080x1920へ中央クロップします。
-
-録画サイズは `config.json` の以下で変更できます。
-
-```json
-{
-  "obs": {
-    "recording_width": 1920,
-    "recording_height": 1080,
-    "recording_fps": 30
-  }
-}
-```
-
-## 切り抜き位置
-
-### 録画中にマークする
-
-録画中に「ここをShorts候補にしたい」と思ったら、左手で `Ctrl + Shift` を約0.35秒押し続けます。
-
-```text
-start_kyoukai_record.bat
-  ↓ 作業する
-Ctrl + Shift
-  ↓ 別の見どころでもう一度マーク
-Ctrl + Shift
-  ↓
-stop_kyoukai_record.bat
-```
-
-マークに成功すると短い高音が2回鳴ります。キーを離すまで追加マークされないため、押し続けても1回だけ記録されます。録画していない時や失敗時は低い音が鳴ります。
-
-ホットキー監視は `start_kyoukai_record.bat` の録画開始後にバックグラウンドで起動し、`stop_kyoukai_record.bat` で自動終了します。フォルダを開いてBATを毎回探す必要はありません。
-
-マーク地点の10秒前から30秒を切り抜きます。10秒前という値は次の設定で変更できます。
+### 切り出し設定
 
 ```json
 {
   "video": {
     "short_length_sec": 30,
-    "marker_pre_roll_sec": 10
+    "candidates_per_video": 5,
+    "manual_cut_points": []
   }
 }
 ```
 
-マークが1件以上ある場合は、マーク位置が自動切り抜きや手動時刻より優先されます。
+- `manual_cut_points` に `"00:30"` のような時刻を指定すると、その時刻から `short_length_sec` 秒を切り出す
+- 空配列 `[]` の場合は等間隔で自動切り出し
 
-従来の `mark_kyoukai_clip.bat` も予備として利用できます。
+## 投稿用メタ（任意）
 
-### config.jsonで時刻を指定する
-
-`config.json` の `video.manual_cut_points` に開始時刻を指定できます。
-
-```json
-{
-  "video": {
-    "short_length_sec": 15,
-    "manual_cut_points": [
-      "00:30",
-      "12:15",
-      "37:40",
-      "01:04:20"
-    ]
-  }
-}
-```
-
-- `00:30` は30秒地点
-- `12:15` は12分15秒地点
-- `01:04:20` は1時間4分20秒地点
-- 数字の秒数指定も可能
-- 空配列 `[]` の場合は従来通り等間隔で自動切り抜き
-- 各指定時刻から `short_length_sec` 秒を切り抜く
-
-## 投稿用メタ
-
-`status.json` の `next_devlog_number` から `devlog_001` のような連番を作ります。
-各候補に対応する投稿用テキストは `output_meta/devlog_XXX.txt` に出力されます。
+`finished_shorts/` に手動編集済みの動画を置いて `generate_meta.bat` を実行すると、固定テンプレート（`generate_meta.py` 内の `TITLES` / `FIXED_COMMENTS`）からランダムにタイトル・説明・固定コメントを組み立てる。AIもCentral OSも使わない。
+`status.json` の `next_devlog_number` から `devlog_001` のような連番を振る。
 
 ## 自動削除
 
-`main.py` 起動時に、3日以上古い以下のファイルを削除します。
+`main.py` 起動時に、3日以上古い以下のファイルを削除する。
 
 - `input_videos/`
 - `recordings_archive/`
 - `temp/`
 
-削除前に `logs/cleanup.log` へ記録します。
-`output_shorts/`、`output_meta/`、`logs/`、`config.json`、`status.json`、`input_audio/`、`qr/` は削除しません。
+削除前に `logs/cleanup.log` へ記録する。
+`output_shorts/`、`output_meta/`、`logs/`、`config.json`、`status.json`、`input_audio/`、`qr/`、`sessions/` は削除しない。
 
 ## 録画しないもの
 

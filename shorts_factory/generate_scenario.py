@@ -22,6 +22,8 @@ ROUTE_SETS = [
     {"label": "Route-B 境界",   "pages": ["/exit", "/signal", "/outside", "/hyougi"]},
     {"label": "Route-C 記録",   "pages": ["/archive", "/hyougi", "/observation", "/observer"]},
     {"label": "Route-D 入口巡回", "pages": ["/", "/signal", "/null", "/exit"]},
+    {"label": "Route-E 街区", "pages": ["/city/city-001", "/city/city-002", "/city/city-005", "/city/city-004"]},
+    {"label": "Route-F 路地裏", "pages": ["/city/city-001", "/city/city-009", "/city/city-003", "/city/city-010"]},
 ]
 
 

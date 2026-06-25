@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parent
 TEMPLATES = ROOT.parent / "templates"
 
 LORE_PATH = ROOT.parent / "data" / "kyoukai_world.md"
+CITY_LOCATIONS_PATH = ROOT.parent / "data" / "city_locations.json"
 HOTSPOTS_PATH = ROOT / "kyoukai_hotspots.json"
 
 # ページルート → テンプレートファイルのマッピング
@@ -34,6 +35,7 @@ ROUTE_TO_TEMPLATE = {
     "/daimyojin":       "daimyojin.html",
     "/particles":       "particles.html",
     "/ripple":          "ripple.html",
+    "/altar":           "city/altar.html",
 }
 
 # 観測域は observation.html がない場合 observer.html を確認
@@ -168,6 +170,8 @@ def scan_interactions(template_path: Path) -> list[dict]:
         elif classes:
             cls_list = classes.group(1).split()
             selector = "." + cls_list[0]
+            if len(cls_list) > 1:
+                selector += "." + cls_list[1]
 
         if selector and name and len(name) < 50:
             interactions.append({
@@ -187,6 +191,51 @@ def scan_interactions(template_path: Path) -> list[dict]:
             unique.append(item)
 
     return unique[:10]  # 最大10件
+
+
+def build_city_pages() -> dict[str, dict]:
+    """city_locations.json から /city/{slug} の各ページを組み立てる。
+    city/location.html はJinjaループでホットスポットを描画するため、
+    テンプレートの静的スキャンではなくJSONデータから直接生成する。"""
+    locations = load_json(CITY_LOCATIONS_PATH, [])
+    pages: dict[str, dict] = {}
+
+    for location in locations:
+        if not location.get("enabled"):
+            continue
+        slug = location.get("slug", "")
+        if not slug:
+            continue
+        route = f"/city/{slug}"
+
+        interactions = []
+        for hotspot in location.get("hotspots", []):
+            if not hotspot.get("enabled", True):
+                continue
+            hotspot_type = hotspot.get("type")
+            target = str(hotspot.get("target", ""))
+            if hotspot_type == "city":
+                effect = f"/city/{target.lower()} へ遷移する"
+            elif hotspot_type == "route":
+                effect = f"{target} へ遷移する"
+            else:
+                # external/action は録画中に別タブ・別ドメインへ飛ぶ恐れがあるため対象外
+                continue
+            interactions.append({
+                "name": hotspot.get("label", hotspot.get("id", "")),
+                "action": "click",
+                "selector": f".city-hotspot[data-hotspot-id='{hotspot.get('id', '')}']",
+                "effect": effect,
+            })
+
+        pages[route] = {
+            "room_name": location.get("name", slug),
+            "lore": location.get("description", ""),
+            "narrative_purpose": "",
+            "interactions": interactions,
+        }
+
+    return pages
 
 
 def sync(verbose: bool = True) -> None:
@@ -238,9 +287,12 @@ def sync(verbose: bool = True) -> None:
             "interactions": interactions,
         }
 
+    # /city/{slug} は city_locations.json から直接生成（kyoukai-world.mdには載らない）
+    new_pages.update(build_city_pages())
+
     result = {
         "viewport": existing.get("viewport", {"width": 393, "height": 852}),
-        "note": "kyoukai-world.md から自動生成。loreの更新はkyoukai-world.mdのみ行う。",
+        "note": "kyoukai-world.md / city_locations.json から自動生成。loreの更新はkyoukai-world.mdのみ行う。",
         "pages": new_pages,
     }
 
@@ -256,4 +308,5 @@ def sync(verbose: bool = True) -> None:
 
 
 if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding="utf-8")
     sync(verbose=True)

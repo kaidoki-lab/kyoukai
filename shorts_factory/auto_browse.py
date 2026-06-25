@@ -117,7 +117,7 @@ def execute_step(page: Page, step: dict) -> None:
         selector = step.get("selector", "")
         if selector:
             try:
-                page.click(selector, timeout=3000)
+                page.click(selector, timeout=3000, force=True)
                 print(f"  → クリック: {selector}")
             except Exception:
                 print(f"  → クリック失敗（スキップ）: {selector}")
@@ -127,7 +127,7 @@ def execute_step(page: Page, step: dict) -> None:
         selector = step.get("selector", "")
         if selector:
             try:
-                page.hover(selector, timeout=3000)
+                page.hover(selector, timeout=3000, force=True)
                 print(f"  → ホバー: {selector}")
             except Exception:
                 print(f"  → ホバー失敗（スキップ）: {selector}")
@@ -185,6 +185,10 @@ def main() -> None:
             args=[
                 f"--window-size={VIEWPORT['width']},{VIEWPORT['height'] + 100}",
                 "--window-position=0,0",
+                "--disable-gpu",
+                "--disable-gpu-compositing",
+                "--disable-software-rasterizer",
+                "--disable-dev-shm-usage",
             ],
         )
 
@@ -207,6 +211,10 @@ def main() -> None:
                 ),
                 record_video_dir=str(video_dir),
                 record_video_size=VIEWPORT,
+            )
+            # ガイド説明オーバーレイ（初回訪問者向け）が録画を毎回ブロックするのを防ぐ
+            context.add_init_script(
+                "try { localStorage.setItem('kyoukai_intro_done', '1'); } catch (e) {}"
             )
             page = context.new_page()
 

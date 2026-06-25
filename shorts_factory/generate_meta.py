@@ -2,20 +2,19 @@
 KYOUKAI Shorts Factory — YouTube メタ一括生成
 finished_shorts/ の動画に対して
 タイトル・説明・固定コメント・UTM付きURL を生成する。
+AIは使わず、固定テンプレートからランダム選択する。
 """
 
 from __future__ import annotations
 
 import json
+import random
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-CENTRAL_OS = ROOT.parent / "central-os"
 
-ANALYTICS_PATH = CENTRAL_OS / "analytics" / "youtube_summary.json"
-SCENARIO_PATH = ROOT / "today_scenario.txt"
 FINISHED_DIR = ROOT / "finished_shorts"
 OUTPUT_DIR = ROOT / "output_meta"
 CONFIG_PATH = ROOT / "config.json"
@@ -26,8 +25,23 @@ UTM_MEDIUM = "shorts"
 
 STATUS_PATH = ROOT / "status.json"
 
-sys.path.insert(0, str(CENTRAL_OS / "lib"))
-from claude_client import ask
+TITLES = [
+    "この世界、生成中につきご容赦ください",
+    "AIに変なサイト作らせてる",
+    "今日も変なサイトをいじってる",
+    "この世界、まだ途中です",
+    "また変なページを調整してる",
+    "完成してないけど増えてます",
+    "KYOUKAI、生成中",
+    "変なサイト作ってる途中です",
+]
+
+FIXED_COMMENTS = [
+    "作っているのはここです。",
+    "この世界、まだ増え続けています。",
+    "気になったら覗いてみてください。",
+    "途中ですがリンクはここです。",
+]
 
 
 def load_json(path: Path, default):
@@ -55,52 +69,24 @@ def build_utm(devlog_id: str) -> str:
     return f"{base}/?utm_source={src}&utm_medium={med}&utm_campaign={devlog_id}"
 
 
-def generate_meta_for_videos(videos: list[Path], scenario: str, analytics: dict) -> list[dict]:
-    top_videos = analytics.get("topVideos", [])[:3]
-    strong_words = analytics.get("strongTitleWords", [])
+def generate_meta_for_videos(videos: list[Path]) -> list[dict]:
+    # タイトル・固定コメントは動画間で被らないよう順序をシャッフルしてから配る
+    titles = random.sample(TITLES, k=min(len(TITLES), len(videos)))
+    while len(titles) < len(videos):
+        titles += random.sample(TITLES, k=min(len(TITLES), len(videos) - len(titles)))
 
-    filenames = "\n".join(f"- {v.name}" for v in videos)
-    count = len(videos)
+    comments = random.sample(FIXED_COMMENTS, k=min(len(FIXED_COMMENTS), len(videos)))
+    while len(comments) < len(videos):
+        comments += random.sample(FIXED_COMMENTS, k=min(len(FIXED_COMMENTS), len(videos) - len(comments)))
 
-    system = """あなたはKYOUKAIというWebサイトの制作過程を記録したYouTube Shorts用のメタデータ生成AIです。
-KYOUKAIは九龍城塞スタイルの実験的Webサイトで、制作者は40代の男性です。
-視聴者は「変なサイトを作ってる人を見る」感覚で見ています。"""
-
-    user = f"""以下の動画 {count} 本分のYouTubeメタデータを生成してください。
-
-【今日の収録内容】
-{scenario if scenario else "（シナリオなし）"}
-
-【伸びた動画の傾向】
-{json.dumps(top_videos, ensure_ascii=False, indent=2)}
-
-【強いタイトルワード】
-{', '.join(strong_words)}
-
-【動画ファイル一覧】
-{filenames}
-
-各動画について以下をJSON配列で出力してください。
-コードブロック（```）は使わず、JSONのみ出力してください：
-
-[
-  {{
-    "filename": "ファイル名",
-    "title": "タイトル（20文字以内）",
-    "description": "説明文（3〜5行。最後の行はハッシュタグ #KYOUKAI #制作中 #shorts）",
-    "fixed_comment": "固定コメント（1〜2文。サイトの宣伝）"
-  }}
-]
-
-ルール：
-- タイトルは全部違う文言にする
-- 「40代」「変なサイト」「KYOUKAI」などのキーワードを活用する
-- 説明文の最後にはURLを入れない（別途UTMを付けるため）
-- 固定コメントは「作っているのはここです。」ではなく毎回違う文言にする
-"""
-
-    result = ask(system, user, max_tokens=2048)
-    return json.loads(result)
+    return [
+        {
+            "title": titles[i],
+            "description": "この世界を少しずつ増やしています。\n\nまだ途中です。\n\n#KYOUKAI\n#制作中\n#shorts",
+            "fixed_comment": comments[i],
+        }
+        for i in range(len(videos))
+    ]
 
 
 def main() -> None:
@@ -120,15 +106,7 @@ def main() -> None:
 
     print(f"{len(videos)} 本の動画を検出しました。")
 
-    scenario = SCENARIO_PATH.read_text(encoding="utf-8") if SCENARIO_PATH.exists() else ""
-    analytics = load_json(ANALYTICS_PATH, {})
-
-    print("メタデータ生成中...")
-    try:
-        meta_list = generate_meta_for_videos(videos, scenario, analytics)
-    except Exception as exc:
-        print(f"ERROR: Claude API 呼び出し失敗: {exc}")
-        sys.exit(1)
+    meta_list = generate_meta_for_videos(videos)
 
     status = load_json(STATUS_PATH, {"next_devlog_number": 1})
 
