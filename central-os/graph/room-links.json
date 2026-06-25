@@ -66,6 +66,12 @@
       "target": "観測域",
       "type": "observer",
       "notes": "観測される立場から観測する立場への反転。逆観測室から観測域への円環構造。"
+    },
+    {
+      "source": "入口域",
+      "target": "台風ニュース",
+      "type": "shorts-material",
+      "notes": "トップ入口の news カードから /typhoon-news/ へ接続する。KYOUKAI内部探索というより、外部投稿用の短尺映像素材室として扱う。"
     }
   ]
 }

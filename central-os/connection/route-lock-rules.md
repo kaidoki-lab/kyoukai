@@ -93,6 +93,11 @@ KYOUKAI における route の確定・管理ルールを定義する。
 - /null
 - /outside
 - /central
+- /typhoon-news/
+
+### 2026-06-26 route追加
+
+- `/typhoon-news/`: 台風ニュース風ショート演出。`main.py` の StaticFiles マウントと `vercel.json` の静的配信対象で確認済み。
 
 ### 設計確定・未実装route
 

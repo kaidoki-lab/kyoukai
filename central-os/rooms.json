@@ -241,6 +241,29 @@
       "codexMemo": "central-osを可視化する管理画面。一般導線ではなく内部確認用。",
       "syncStatus": "synced",
       "lastSynced": "2026-05-26"
+    },
+    {
+      "id": "room_14",
+      "name": "台風ニュース",
+      "route": "/typhoon-news/",
+      "status": "実装済み",
+      "priority": "中",
+      "role": "ニュース番組の形式を借りた短尺映像素材室。保留語の台風名を真面目な災害情報として表示し、KYOUKAI外向けショート素材へ接続する部屋。",
+      "monetization": [],
+      "sns": [
+        "youtube_shorts",
+        "tiktok",
+        "x"
+      ],
+      "issues": [],
+      "nextActions": [
+        "typhoonPresetsを増やし、別名の台風ニュース素材へ展開できるようにする",
+        "ショート投稿用の録画・タイトル・説明文と連携する"
+      ],
+      "codexMemo": "ルートは /typhoon-news/。FastAPIのStaticFilesマウントとVercel静的配信で実装済み。入口カードは static/images/entrances/news.png、表示名は news。",
+      "implemented": true,
+      "syncStatus": "synced",
+      "lastSynced": "2026-06-26"
     }
   ]
 }

@@ -29,6 +29,7 @@ class HomeEntranceTests(unittest.TestCase):
             "observation": ("/observation", "entrance-observation.png"),
             "observer": ("/observer", "entrance-observer.png"),
             "signal": ("/signal", "entrance-signal.png"),
+            "news": ("/typhoon-news/", "news.png"),
             "external-signal": ("/external-signal", "entrance-external-signal.png"),
             "null": ("/null", "entrance-null.png"),
             "archive": ("/archive", "entrance-archive.png"),

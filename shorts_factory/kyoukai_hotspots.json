@@ -3,11 +3,11 @@
     "width": 393,
     "height": 852
   },
-  "note": "kyoukai-world.md から自動生成。loreの更新はkyoukai-world.mdのみ行う。",
+  "note": "kyoukai-world.md / city_locations.json から自動生成。loreの更新はkyoukai-world.mdのみ行う。",
   "pages": {
     "/": {
-      "room_name": "祭壇域",
-      "lore": "KYOUKAIの入口。最初の接触点。 「何かが存在することへの確信」がある。何が存在するかは語らない 訪問者は祀られている側かもしれない テキストは短く、余白が多い。説明しない 導線は見えにくく、探される前提で設計する",
+      "room_name": "入口域",
+      "lore": "KYOUKAIの入口。最初の接触点。 「何かが存在することへの確信」がある。何が存在するかは語らない 訪問者は一つの部屋へ案内されるのではなく、入口群の前に置かれる スマートフォン版は縦長入口画像を横に並べ、スクロールで部屋を選ぶ 各入口の表示名はリンク名ベースの英語表記に統一する",
       "narrative_purpose": "",
       "interactions": [
         {
@@ -28,6 +28,78 @@
           "action": "click",
           "selector": ".hotspot",
           "effect": "/observation へ遷移する"
+        },
+        {
+          "name": "町へ入る",
+          "action": "click",
+          "selector": ".home-mobile-city-link",
+          "effect": "/city へ遷移する"
+        },
+        {
+          "name": "町へ入る",
+          "action": "click",
+          "selector": ".hotspot.hotspot-city",
+          "effect": "/city へ遷移する"
+        },
+        {
+          "name": "fragment-001",
+          "action": "click",
+          "selector": ".hotspot.hotspot-observation",
+          "effect": "/observation へ遷移する"
+        },
+        {
+          "name": "fragment-002",
+          "action": "click",
+          "selector": ".hotspot.hotspot-archive",
+          "effect": "/archive へ遷移する"
+        },
+        {
+          "name": "評議",
+          "action": "click",
+          "selector": ".hotspot.hotspot-hyougi",
+          "effect": "/hyougi へ遷移する"
+        },
+        {
+          "name": "fragment-004",
+          "action": "click",
+          "selector": ".hotspot.hotspot-signal-alt",
+          "effect": "/signal へ遷移する"
+        },
+        {
+          "name": "fragment-005",
+          "action": "click",
+          "selector": ".hotspot.hotspot-exit",
+          "effect": "/exit へ遷移する"
+        },
+        {
+          "name": "fragment-006",
+          "action": "click",
+          "selector": ".hotspot.hotspot-null",
+          "effect": "/null へ遷移する"
+        },
+        {
+          "name": "fragment-007",
+          "action": "click",
+          "selector": ".hotspot.hotspot-girl-film",
+          "effect": "/observer へ遷移する"
+        },
+        {
+          "name": "獄楽域",
+          "action": "click",
+          "selector": ".hotspot.hotspot-gokuraku",
+          "effect": "/gokuraku へ遷移する"
+        },
+        {
+          "name": "粒子観測",
+          "action": "click",
+          "selector": ".hotspot.hotspot-particles",
+          "effect": "/particles へ遷移する"
+        },
+        {
+          "name": "ripple observer",
+          "action": "click",
+          "selector": ".hotspot.hotspot-ripple",
+          "effect": "/ripple へ遷移する"
         }
       ]
     },
@@ -90,6 +162,12 @@
         }
       ]
     },
+    "/typhoon-news/": {
+      "room_name": "台風ニュース",
+      "lore": "ニュース番組の顔をした、YouTube Shorts / TikTok / X向けの短尺映像素材室。 生成済みの台風ニュース画像を背景に、速報帯、情報パネル、台風名、縦コピー、警戒ボックス、テロップ、雨、稲妻、ノイズを重ねる 台風名は「後ほど連絡します」「検討します」「お母さんに聞いて」など、日常的な保留語が災害名として扱われる ホラーや研究所UIではなく、真面目なニュース番組の形式でふざけた名前だけが異常化する `typhoonPresets` を変更すると別の台風名へ差し替えられる。URLパラメータ `?name=` でも指定できる",
+      "narrative_purpose": "",
+      "interactions": []
+    },
     "/null": {
       "room_name": "崩落域",
       "lore": "世界崩壊、崩壊度上昇、接続悪化、失敗方向を扱う部屋。 データがある。でも何のデータかわからない ページとして機能しているが、押すほど状態が悪化する 崩落と過剰な情報量が同時にある ここに長くいると「自分が何をしているか」がわからなくなる設計",
@@ -113,6 +191,12 @@
           "name": "まだ営業しています",
           "action": "click",
           "selector": ".ky-monetize-route",
+          "effect": "/outside へ遷移する"
+        },
+        {
+          "name": "まだ営業しています",
+          "action": "click",
+          "selector": ".ky-monetize-route.ky-monetize-route--collapse",
           "effect": "/outside へ遷移する"
         }
       ]
@@ -275,6 +359,49 @@
         }
       ]
     },
+    "/daimyojin": {
+      "room_name": "AI大明神",
+      "lore": "信仰と機械が混ざった祈願装置。 神社、奉納、機械、札、端末が同じ構造物の中にある 占い・祈願に見えるが、処理されているものが願いなのか観測結果なのかは明かさない 町の小さな祠から接続されていた経緯がある",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "もう一度占う\n          神託を再受信します",
+          "action": "click",
+          "selector": ".oracle-button",
+          "effect": "もう一度占う\n          神託を再受信します が実行される"
+        },
+        {
+          "name": "000 / return",
+          "action": "click",
+          "selector": ".daimyojin-return",
+          "effect": "/ へ遷移する"
+        }
+      ]
+    },
+    "/gokuraku": {
+      "room_name": "極楽域",
+      "lore": "引き出し、スピーカー、祠、鍵、奥へ続く通路が積み上がった部屋。 「極楽」という語を明るく扱わない 過剰な収納と音響装置が、記憶の保管庫にも通路にも見える 入口画像はトップ入口スクロールで使用する",
+      "narrative_purpose": "",
+      "interactions": []
+    },
+    "/particles": {
+      "room_name": "粒子観測",
+      "lore": "粒子群を観測する部屋。 画面内の運動と反応が先にあり、意味は後から発生する 外部信号やoutsideとは別扱い。画像入口を持つ トップ入口スクロールでは `particles` の英語名で表示する",
+      "narrative_purpose": "",
+      "interactions": []
+    },
+    "/ripple": {
+      "room_name": "波紋域",
+      "lore": "触れることで世界が応答する部屋。 ドットや波紋はゲーム要素ではなく、観測対象の反応として扱う 触れた結果が完全に制御できない一点を残す トップ入口スクロールでは `ripple` の英語名で表示する",
+      "narrative_purpose": "",
+      "interactions": []
+    },
+    "/city": {
+      "room_name": "境界街区",
+      "lore": "町として一時導入された探索領域。 `city-001` から `city-010` までの導線、街路、祠、宿泊街、奉納街、祭壇前通路などを持つ 現在のトップ主導線からは外している 今後使う場合は、トップから直接入れるのではなく、既存部屋のホットスポットやNewExitなどから再接続する 街区のホットスポットは、説明文ではなく画像内の意味がある場所へ置く方針",
+      "narrative_purpose": "",
+      "interactions": []
+    },
     "/external-signal": {
       "room_name": "external-signal",
       "lore": "",
@@ -300,42 +427,364 @@
         }
       ]
     },
-    "/gokuraku": {
-      "room_name": "gokuraku",
-      "lore": "",
-      "narrative_purpose": "",
-      "interactions": []
-    },
-    "/daimyojin": {
-      "room_name": "daimyojin",
+    "/altar": {
+      "room_name": "altar",
       "lore": "",
       "narrative_purpose": "",
       "interactions": [
         {
-          "name": "もう一度占う\n          神託を再受信します",
+          "name": "祭壇前通路へ戻る",
           "action": "click",
-          "selector": ".oracle-button",
-          "effect": "もう一度占う\n          神託を再受信します が実行される"
+          "selector": ".hotspot",
+          "effect": "/city/city-008 へ遷移する"
         },
         {
-          "name": "000 / return",
+          "name": "祭壇前通路へ戻る",
           "action": "click",
-          "selector": ".daimyojin-return",
-          "effect": "/ へ遷移する"
+          "selector": ".hotspot.hotspot-city-return",
+          "effect": "/city/city-008 へ遷移する"
+        },
+        {
+          "name": "fragment-001",
+          "action": "click",
+          "selector": ".hotspot.hotspot-observation",
+          "effect": "/observation へ遷移する"
+        },
+        {
+          "name": "fragment-002",
+          "action": "click",
+          "selector": ".hotspot.hotspot-archive",
+          "effect": "/archive へ遷移する"
+        },
+        {
+          "name": "評議",
+          "action": "click",
+          "selector": ".hotspot.hotspot-hyougi",
+          "effect": "/hyougi へ遷移する"
+        },
+        {
+          "name": "fragment-004",
+          "action": "click",
+          "selector": ".hotspot.hotspot-signal-alt",
+          "effect": "/signal へ遷移する"
+        },
+        {
+          "name": "fragment-005",
+          "action": "click",
+          "selector": ".hotspot.hotspot-exit",
+          "effect": "/exit へ遷移する"
+        },
+        {
+          "name": "fragment-006",
+          "action": "click",
+          "selector": ".hotspot.hotspot-null",
+          "effect": "/null へ遷移する"
+        },
+        {
+          "name": "fragment-007",
+          "action": "click",
+          "selector": ".hotspot.hotspot-girl-film",
+          "effect": "/observer へ遷移する"
+        },
+        {
+          "name": "極楽域",
+          "action": "click",
+          "selector": ".hotspot.hotspot-gokuraku",
+          "effect": "/gokuraku へ遷移する"
+        },
+        {
+          "name": "粒子観測",
+          "action": "click",
+          "selector": ".hotspot.hotspot-particles",
+          "effect": "/particles へ遷移する"
         }
       ]
     },
-    "/particles": {
-      "room_name": "particles",
-      "lore": "",
+    "/city/city-001": {
+      "room_name": "中心街路",
+      "lore": "町の基点となる中心街路。現在は仮背景で構成しています。",
       "narrative_purpose": "",
-      "interactions": []
+      "interactions": [
+        {
+          "name": "神社脇路地へ",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-002']",
+          "effect": "/city/city-002 へ遷移する"
+        },
+        {
+          "name": "階段上の入口へ",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-009']",
+          "effect": "/city/city-009 へ遷移する"
+        },
+        {
+          "name": "宿泊街入口へ",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-003']",
+          "effect": "/city/city-003 へ遷移する"
+        },
+        {
+          "name": "自販機横丁へ",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-004']",
+          "effect": "/city/city-004 へ遷移する"
+        },
+        {
+          "name": "EXIT",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-exit']",
+          "effect": "/exit へ遷移する"
+        }
+      ]
     },
-    "/ripple": {
-      "room_name": "ripple",
-      "lore": "",
+    "/city/city-009": {
+      "room_name": "階段上の入口",
+      "lore": "中心街路の階段を上がった先にある二階入口。",
       "narrative_purpose": "",
-      "interactions": []
+      "interactions": [
+        {
+          "name": "中心街路へ戻る",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-001']",
+          "effect": "/city/city-001 へ遷移する"
+        },
+        {
+          "name": "観測室へ接続する",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-observation']",
+          "effect": "/observation へ遷移する"
+        }
+      ]
+    },
+    "/city/city-002": {
+      "room_name": "神社脇路地",
+      "lore": "中心街路から枝分かれする神社脇の通路。現在は仮背景で構成しています。",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "中心街路へ戻る",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-001']",
+          "effect": "/city/city-001 へ遷移する"
+        },
+        {
+          "name": "AI大明神室へ接続する",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-daimyojin']",
+          "effect": "/daimyojin へ遷移する"
+        },
+        {
+          "name": "裏路地へ",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-005']",
+          "effect": "/city/city-005 へ遷移する"
+        },
+        {
+          "name": "信号室へ接続する",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-signal']",
+          "effect": "/signal へ遷移する"
+        }
+      ]
+    },
+    "/city/city-003": {
+      "room_name": "宿泊街入口",
+      "lore": "宿泊街区へ入る境目の通路。現在は仮背景で構成しています。",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "中心街路へ戻る",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-001']",
+          "effect": "/city/city-001 へ遷移する"
+        },
+        {
+          "name": "宿泊街の奥へ",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-010']",
+          "effect": "/city/city-010 へ遷移する"
+        },
+        {
+          "name": "裏路地へ",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-005']",
+          "effect": "/city/city-005 へ遷移する"
+        }
+      ]
+    },
+    "/city/city-010": {
+      "room_name": "宿泊街内通路",
+      "lore": "宿泊街の奥へ続く、地続きの通路。",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "宿泊街入口へ戻る",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-003']",
+          "effect": "/city/city-003 へ遷移する"
+        },
+        {
+          "name": "逆観測室へ接続する",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-observer']",
+          "effect": "/observer へ遷移する"
+        },
+        {
+          "name": "particles",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-particles']",
+          "effect": "/particles へ遷移する"
+        }
+      ]
+    },
+    "/city/city-004": {
+      "room_name": "自販機横丁",
+      "lore": "外部領域への接続が混じる横丁。現在は仮背景で構成しています。",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "中心街路へ戻る",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-001']",
+          "effect": "/city/city-001 へ遷移する"
+        },
+        {
+          "name": "裏路地へ",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-005']",
+          "effect": "/city/city-005 へ遷移する"
+        },
+        {
+          "name": "OUTSIDEへ接続する",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-outside']",
+          "effect": "/outside へ遷移する"
+        },
+        {
+          "name": "獄楽域",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-gokuraku']",
+          "effect": "/gokuraku へ遷移する"
+        }
+      ]
+    },
+    "/city/city-005": {
+      "room_name": "裏路地",
+      "lore": "各街区を循環させる裏側の通路。現在は仮背景で構成しています。",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "中心街路へ",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-001']",
+          "effect": "/city/city-001 へ遷移する"
+        },
+        {
+          "name": "神社脇路地へ",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-002']",
+          "effect": "/city/city-002 へ遷移する"
+        },
+        {
+          "name": "宿泊街入口へ",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-003']",
+          "effect": "/city/city-003 へ遷移する"
+        },
+        {
+          "name": "自販機横丁へ",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-004']",
+          "effect": "/city/city-004 へ遷移する"
+        },
+        {
+          "name": "NULLへ接続する",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-null']",
+          "effect": "/null へ遷移する"
+        },
+        {
+          "name": "参道裏口へ",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-006']",
+          "effect": "/city/city-006 へ遷移する"
+        }
+      ]
+    },
+    "/city/city-006": {
+      "room_name": "参道裏口",
+      "lore": "生活区から奉納街へ続く参道裏口。画像未配置のため準備中です。",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "裏路地へ戻る",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-005']",
+          "effect": "/city/city-005 へ遷移する"
+        },
+        {
+          "name": "奉納街へ進む",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-007']",
+          "effect": "/city/city-007 へ遷移する"
+        },
+        {
+          "name": "ripple",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-ripple']",
+          "effect": "/ripple へ遷移する"
+        }
+      ]
+    },
+    "/city/city-007": {
+      "room_name": "奉納街",
+      "lore": "生活と奉納が混ざる、祭壇へ向かう街区。画像未配置のため準備中です。",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "参道裏口へ戻る",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-006']",
+          "effect": "/city/city-006 へ遷移する"
+        },
+        {
+          "name": "祭壇前通路へ進む",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-008']",
+          "effect": "/city/city-008 へ遷移する"
+        },
+        {
+          "name": "archive",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-archive']",
+          "effect": "/archive へ遷移する"
+        }
+      ]
+    },
+    "/city/city-008": {
+      "room_name": "祭壇前通路",
+      "lore": "祭壇域へ入る直前の通路。画像未配置のため準備中です。",
+      "narrative_purpose": "",
+      "interactions": [
+        {
+          "name": "奉納街へ戻る",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-city-007']",
+          "effect": "/city/city-007 へ遷移する"
+        },
+        {
+          "name": "祭壇域へ入る",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-altar']",
+          "effect": "/altar へ遷移する"
+        },
+        {
+          "name": "評議",
+          "action": "click",
+          "selector": ".city-hotspot[data-hotspot-id='to-hyougi']",
+          "effect": "/hyougi へ遷移する"
+        }
+      ]
     }
   }
 }

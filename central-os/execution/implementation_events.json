@@ -1247,5 +1247,30 @@
     ],
     "completedAt": "2026-06-25T23:11:21.493587+00:00",
     "recordedBy": "codex"
+  },
+  {
+    "id": "implementation-event-manual-20260626-typhoon-news-world-db",
+    "sourcePlanId": "manual-20260626-typhoon-news-world-db",
+    "sourceTaskId": "",
+    "title": "台風ニュース部屋のワールドDB登録",
+    "targetPages": [
+      "/typhoon-news/"
+    ],
+    "status": "completed",
+    "summary": "今回実装した台風ニュース部屋をKYOUKAIワールドDB正本、Central OS rooms、導線グラフ、route管理、Shorts Factory同期JSONへ登録",
+    "artifacts": [
+      "data/kyoukai_world.md",
+      "central-os/rooms.json",
+      "central-os/graph/room-links.json",
+      "central-os/connection/route-lock-rules.md",
+      "central-os/schema/rooms-schema.md",
+      "shorts_factory/kyoukai_hotspots.json",
+      "tests/test_home_entrances.py"
+    ],
+    "verification": [
+      "python shorts_factory/sync_hotspots.pyで/typhoon-news/が同期されることを確認。JSON整合性確認。python -m unittest tests.test_home_entrances 成功"
+    ],
+    "completedAt": "2026-06-25T23:24:44.308864+00:00",
+    "recordedBy": "codex"
   }
 ]

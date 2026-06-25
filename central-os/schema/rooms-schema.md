@@ -51,6 +51,7 @@ KYOUKAI内部辞書 — rooms.json フィールド定義
 | 崩落域 | `/null` | ユーザー指定・PAGE_MAP登録（null.html） |
 | 外部接続 | `/outside` | PAGE_MAP登録（outside.html） |
 | 評議録 | `/hyougi` | PAGE_MAP登録（hyougi.html） |
+| 台風ニュース | `/typhoon-news/` | StaticFilesマウント・Vercel静的配信対象 |
 
 ### 未確定ルートの扱い
 
