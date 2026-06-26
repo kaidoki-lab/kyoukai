@@ -150,6 +150,16 @@
       material: "crack",
       status: "active",
     },
+    {
+      id: "dot-art",
+      name: "dot-art",
+      label: "弾ける",
+      href: "/dot-art",
+      image: "",
+      expectedImage: "",
+      material: "crack",
+      status: "active",
+    },
   ];
 
   function createFallback(item) {

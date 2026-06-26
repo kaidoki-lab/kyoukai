@@ -1,0 +1,9 @@
+Dot Collision Art v1.0.0
+
+Copyright (c) Yoshino Masahiro.
+All rights reserved.
+
+This package is distributed for personal use by the purchaser.
+Redistribution, resale, or public hosting of the package files is not permitted without explicit permission.
+
+No third-party libraries, image assets, or audio files are bundled.
