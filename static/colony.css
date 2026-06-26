@@ -1,0 +1,135 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #050505;
+}
+
+body {
+  min-height: 100svh;
+  color: rgba(238, 238, 232, 0.72);
+  font-family: "Times New Roman", "Yu Mincho", "Hiragino Mincho ProN", serif;
+  letter-spacing: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.colony-stage {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: min(100vw, 56.25svh);
+  height: min(100svh, 177.7778vw);
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  background: #777;
+  isolation: isolate;
+  touch-action: none;
+}
+
+.colony-background,
+#colonyCanvas,
+.colony-message-layer,
+.colony-title {
+  position: absolute;
+  inset: 0;
+}
+
+.colony-background {
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(12, 12, 12, 0.12), rgba(12, 12, 12, 0.2)),
+    url("/static/images/colony/concrete_9x16.png");
+  background-size: cover;
+  background-position: center;
+  filter: contrast(1.04) brightness(0.86) saturate(0.82);
+}
+
+#colonyCanvas {
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: default;
+}
+
+.colony-message-layer {
+  z-index: 2;
+  pointer-events: none;
+}
+
+.colony-message {
+  position: absolute;
+  left: 0;
+  top: 0;
+  max-width: 11em;
+  color: rgba(246, 242, 231, 0.68);
+  font-size: 10px;
+  line-height: 1.3;
+  white-space: nowrap;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.45);
+  transform: translate(-50%, -100%);
+  will-change: transform, opacity;
+}
+
+.colony-title {
+  z-index: 3;
+  inset: max(12px, env(safe-area-inset-top)) 0 auto 0;
+  height: auto;
+  padding-top: 2px;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0.58;
+  animation: colonyTitleSink 8s ease forwards;
+}
+
+.colony-title h1,
+.colony-title p {
+  margin: 0;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+.colony-title h1 {
+  font-size: clamp(13px, 3.2vw, 18px);
+}
+
+.colony-title p {
+  margin-top: 3px;
+  font-size: clamp(9px, 2.2vw, 12px);
+  color: rgba(238, 238, 232, 0.54);
+}
+
+@keyframes colonyTitleSink {
+  0%,
+  35% {
+    opacity: 0.58;
+  }
+
+  100% {
+    opacity: 0.2;
+  }
+}
+
+@media (min-width: 900px) {
+  .colony-stage {
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.42);
+  }
+
+  .colony-title h1 {
+    font-size: 16px;
+  }
+
+  .colony-title p {
+    font-size: 11px;
+  }
+}

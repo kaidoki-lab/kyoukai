@@ -151,6 +151,16 @@
       status: "active",
     },
     {
+      id: "colony",
+      name: "COLONY",
+      label: "群れる",
+      href: "/colony",
+      image: "/static/images/colony/concrete_9x16.png",
+      expectedImage: "/static/images/colony/concrete_9x16.png",
+      material: "crack",
+      status: "active",
+    },
+    {
       id: "dot-art",
       name: "dot-art",
       label: "弾ける",

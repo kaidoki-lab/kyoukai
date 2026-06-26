@@ -1369,6 +1369,10 @@ async def particles_page(request: Request) -> HTMLResponse:
 async def ripple_page(request: Request) -> HTMLResponse:
     return render_template(request, "ripple.html")
 
+@app.get("/colony", response_class=HTMLResponse)
+async def colony_page(request: Request) -> HTMLResponse:
+    return render_template(request, "colony.html")
+
 @app.get("/dot-art", response_class=HTMLResponse)
 async def dot_art_page(request: Request) -> HTMLResponse:
     return render_template(request, "dot-art.html")
