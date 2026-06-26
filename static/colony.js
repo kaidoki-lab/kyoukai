@@ -101,7 +101,7 @@
       y,
       angle,
       speed: random(0.15, 0.6),
-      size: random(1.9, 4.8),
+      size: random(2.35, 5.45) * (Math.random() < 0.09 ? random(1.14, 1.28) : 1),
       routeId: route.id,
       routeWeight: random(0.35, 0.9),
       wander: random(0.002, 0.012),
@@ -212,8 +212,8 @@
       dots.push({
         dx: Math.cos(angle) * spread,
         dy: Math.sin(angle) * spread,
-        r: random(0.55, 1.4),
-        color: Math.random() < 0.45 ? "rgb(18, 13, 11)" : "rgb(78, 14, 13)",
+        r: random(0.75, 1.9),
+        color: Math.random() < 0.35 ? "rgb(22, 13, 11)" : "rgb(112, 20, 17)",
       });
     }
     const life = random(3000, 6000);
@@ -262,7 +262,7 @@
 
   function drawSplats() {
     splats.forEach((splat) => {
-      const alpha = clamp(splat.life / splat.maxLife, 0, 1) * 0.56;
+      const alpha = clamp(splat.life / splat.maxLife, 0, 1) * 0.68;
       splat.dots.forEach((part) => {
         dot(splat.x + part.dx, splat.y + part.dy, part.r, part.color, alpha);
       });
