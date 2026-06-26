@@ -57,8 +57,8 @@ class DotArtPageTests(unittest.TestCase):
 
         self.assertIn('id: "dot-art"', source)
         self.assertIn('href: "/dot-art"', source)
-        self.assertIn("/static/images/entrances/entrance-dot-art.png", source)
-        self.assertTrue((BASE_DIR / "static" / "images" / "entrances" / "entrance-dot-art.png").exists())
+        self.assertIn("/static/dot-art/entrance-dot-art.png", source)
+        self.assertTrue((BASE_DIR / "static" / "dot-art" / "entrance-dot-art.png").exists())
 
 
 if __name__ == "__main__":
