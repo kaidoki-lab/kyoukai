@@ -13,9 +13,9 @@
     maxBulletsMobile: 200,
     maxBulletsDesktop: 400,
     maxExplosions: reducedMotion ? 60 : 100,
-    maxParticles: reducedMotion ? 220 : 520,
+    maxParticles: reducedMotion ? 260 : 680,
     maxMarks: 420,
-    maxSounds: 12,
+    maxSounds: 16,
   };
 
   const state = {
@@ -60,9 +60,10 @@
       this.x = x;
       this.y = y;
       this.age = 0;
-      this.duration = reducedMotion ? 0.16 : 0.18 + Math.random() * 0.12;
+      this.duration = reducedMotion ? 0.15 : 0.2 + Math.random() * 0.14;
       this.startRadius = 3;
-      this.maxRadius = type === 'bullet' ? bulletRadius() * 4.8 : bulletRadius() * 3.8;
+      this.maxRadius = type === 'bullet' ? bulletRadius() * 6.2 : bulletRadius() * 4.7;
+      this.flashRadius = type === 'bullet' ? bulletRadius() * 2.6 : bulletRadius() * 1.9;
       this.color = color;
       this.type = type;
     }
@@ -71,15 +72,15 @@
   class Particle {
     constructor(x, y, color, power) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = (28 + Math.random() * 74) * power;
+      const speed = (58 + Math.random() * 132) * power;
       this.x = x;
       this.y = y;
       this.velocityX = Math.cos(angle) * speed;
       this.velocityY = Math.sin(angle) * speed;
-      this.radius = 1.4 + Math.random() * 2.8;
+      this.radius = 1.8 + Math.random() * 3.7;
       this.color = color;
       this.age = 0;
-      this.duration = 0.2 + Math.random() * 0.3;
+      this.duration = 0.26 + Math.random() * 0.36;
       this.alpha = 1;
     }
   }
@@ -225,6 +226,7 @@
     bulletY = clamp(bulletY, radius, state.height - radius);
     state.bullets.push(new Bullet(bulletX, bulletY, velocityX, velocityY, randomColor(), edge, pointerId, performance.now() / 1000));
     state.hasFired = true;
+    playFire(edge);
     return true;
   }
 
@@ -265,14 +267,46 @@
     }, { once: true });
   }
 
+  function playFire(edge) {
+    if (!state.soundEnabled || !state.audioContext || state.activeSounds >= config.maxSounds) return;
+    const audio = state.audioContext;
+    const now = audio.currentTime;
+    const oscillator = audio.createOscillator();
+    const gain = audio.createGain();
+    const crowd = clamp(state.activeSounds / config.maxSounds, 0, 1);
+    const edgeOffset = edge === 'top' || edge === 'bottom' ? 24 : -12;
+    const base = 390 + edgeOffset;
+    const variance = 1 + (Math.random() * 0.12 - 0.06);
+    const duration = 0.055;
+
+    state.activeSounds += 1;
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(base * variance, now);
+    oscillator.frequency.exponentialRampToValueAtTime(base * 1.28 * variance, now + duration);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.026 * (1 - crowd * 0.55), now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+    oscillator.connect(gain);
+    gain.connect(audio.destination);
+    oscillator.start(now);
+    oscillator.stop(now + duration + 0.015);
+    oscillator.addEventListener('ended', () => {
+      state.activeSounds = Math.max(0, state.activeSounds - 1);
+      oscillator.disconnect();
+      gain.disconnect();
+    }, { once: true });
+  }
+
   function addExplosion(x, y, color, type) {
     state.explosions.push(new Explosion(x, y, color, type));
     if (state.explosions.length > config.maxExplosions) state.explosions.splice(0, state.explosions.length - config.maxExplosions);
 
-    const particleCount = reducedMotion ? 3 + ((Math.random() * 3) | 0) : 4 + ((Math.random() * 9) | 0);
+    const particleCount = type === 'bullet'
+      ? (reducedMotion ? 6 + ((Math.random() * 4) | 0) : 10 + ((Math.random() * 9) | 0))
+      : (reducedMotion ? 4 + ((Math.random() * 3) | 0) : 7 + ((Math.random() * 7) | 0));
     const loadFactor = state.particles.length > config.maxParticles * 0.72 ? 0.45 : 1;
     for (let i = 0; i < Math.floor(particleCount * loadFactor); i++) {
-      state.particles.push(new Particle(x, y, color, type === 'bullet' ? 1.15 : 0.85));
+      state.particles.push(new Particle(x, y, color, type === 'bullet' ? 1.85 : 1.25));
     }
     if (state.particles.length > config.maxParticles) state.particles.splice(0, state.particles.length - config.maxParticles);
 
@@ -491,6 +525,13 @@
       const t = clamp(explosion.age / explosion.duration, 0, 1);
       const ease = 1 - Math.pow(1 - t, 2);
       const radius = explosion.startRadius + (explosion.maxRadius - explosion.startRadius) * ease;
+      if (t < 0.22 && !reducedMotion) {
+        ctx.globalAlpha = (1 - t / 0.22) * 0.76;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(explosion.x, explosion.y, explosion.flashRadius * (1 + t * 1.2), 0, Math.PI * 2);
+        ctx.fill();
+      }
       ctx.globalAlpha = (1 - t) * (reducedMotion ? 0.38 : 0.56);
       ctx.fillStyle = explosion.color;
       ctx.beginPath();

@@ -30,6 +30,8 @@ class DotArtPageTests(unittest.TestCase):
         self.assertIn("class Particle", script)
         self.assertIn("class Mark", script)
         self.assertIn("buildSpatialHash", script)
+        self.assertIn("playFire", script)
+        self.assertIn("flashRadius", script)
         self.assertIn("requestAnimationFrame", script)
         self.assertIn("AudioContext", script)
         self.assertIn("pointerdown", script)
