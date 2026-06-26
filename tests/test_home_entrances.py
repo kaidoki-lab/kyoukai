@@ -36,9 +36,15 @@ class HomeEntranceTests(unittest.TestCase):
         self.assertIn("window.location.href = elevatorDoor.href;", self.journey_js)
         self.assertIn('.kyoukai-building-shell[data-building-stage="zooming"]', self.space_css)
 
-    def test_elevator_route_and_room_destinations_exist(self):
+    def test_elevator_route_and_floor_destinations_exist(self):
         self.assertIn('@app.get("/elevator"', self.main_py)
         self.assertIn("elevator.html", self.main_py)
+        self.assertIn("kyoukai_elevator_interior_20260627.png", self.elevator_html)
+        self.assertTrue((BASE_DIR / "static" / "kyoukai_elevator_interior_20260627.png").exists())
+        self.assertIn("data-floor-number", self.elevator_html)
+        self.assertIn("data-floor-up", self.elevator_html)
+        self.assertIn("data-floor-down", self.elevator_html)
+        self.assertNotIn("elevator-panel", self.elevator_html)
 
         expected_routes = [
             "/observation",
@@ -58,7 +64,7 @@ class HomeEntranceTests(unittest.TestCase):
 
         for route in expected_routes:
             with self.subTest(route=route):
-                self.assertIn(f'href="{route}"', self.elevator_html)
+                self.assertIn(f'href: "{route}"', self.elevator_js)
 
     def test_elevator_door_frames_play_in_requested_order(self):
         for frame_id in ["4", "3", "2", "1"]:
@@ -69,7 +75,8 @@ class HomeEntranceTests(unittest.TestCase):
 
         self.assertIn('const sequence = ["4", "3", "2", "1"];', self.elevator_js)
         self.assertIn("[data-door-frame]", self.elevator_js)
-        self.assertIn('[data-door-state="complete"] .elevator-panel', self.space_css)
+        self.assertIn(".kyoukai-elevator-room[data-door-state=\"complete\"] .elevator-door", self.space_css)
+        self.assertIn(".elevator-floor-display", self.space_css)
 
 
 if __name__ == "__main__":

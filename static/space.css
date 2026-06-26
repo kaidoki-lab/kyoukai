@@ -3858,6 +3858,119 @@ a.sp-link:hover,
   }
 }
 
+.kyoukai-elevator-room .elevator-cabin {
+  display: block;
+  width: min(calc(100vw - 24px), calc(100svh * 2 / 3));
+  height: min(100svh, calc(100vw * 3 / 2));
+  min-height: 0;
+  aspect-ratio: 2 / 3;
+  border: 0;
+  background: #000;
+  box-shadow:
+    0 0 32px rgba(255, 42, 168, 0.14),
+    0 0 52px rgba(0, 210, 255, 0.1);
+  overflow: hidden;
+}
+
+.kyoukai-elevator-room .elevator-door,
+.elevator-interior {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+}
+
+.kyoukai-elevator-room .elevator-door {
+  z-index: 3;
+  border: 0;
+  opacity: 1;
+  transition:
+    opacity 360ms ease,
+    visibility 360ms ease;
+}
+
+.kyoukai-elevator-room[data-door-state="complete"] .elevator-door {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.elevator-interior {
+  z-index: 1;
+  background: #000;
+}
+
+.elevator-interior-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  user-select: none;
+}
+
+.elevator-floor-display,
+.elevator-control {
+  position: absolute;
+  z-index: 4;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.elevator-floor-display {
+  left: 73.8%;
+  top: 26.6%;
+  width: 8.8%;
+  height: 10.8%;
+  display: grid;
+  place-items: center;
+  color: #ff3340;
+  font-family: var(--sp-mono);
+  font-size: clamp(18px, 4.9svh, 42px);
+  line-height: 1;
+  text-shadow:
+    0 0 6px rgba(255, 42, 54, 0.95),
+    0 0 18px rgba(255, 42, 54, 0.54);
+}
+
+.elevator-floor-display span {
+  transform: translateY(2%);
+}
+
+.elevator-control {
+  left: 75.3%;
+  width: 7.2%;
+  height: 4.8%;
+  border-radius: 50%;
+}
+
+.elevator-control--up {
+  top: 43.1%;
+}
+
+.elevator-control--down {
+  top: 50.0%;
+}
+
+.elevator-floor-display:focus-visible,
+.elevator-control:focus-visible {
+  outline: 1px solid rgba(255, 226, 170, 0.72);
+  outline-offset: 2px;
+  box-shadow: 0 0 18px rgba(111, 243, 255, 0.26);
+}
+
+@media (max-width: 720px) {
+  .kyoukai-elevator-room .elevator-cabin {
+    width: min(calc(100vw - 24px), 62svh);
+    height: min(100svh, 161.3vw);
+  }
+
+  .kyoukai-elevator-room .elevator-door {
+    margin: 0;
+  }
+}
+
 /* Smartphone stability pass: keep rooms readable without changing routes or PC layout. */
 @media (max-width: 768px) {
   html,
