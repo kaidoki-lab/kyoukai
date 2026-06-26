@@ -8,19 +8,11 @@
   const downButton = document.querySelector("[data-floor-down]");
   const sequence = ["4", "3", "2", "1"];
   const floors = [
-    { number: "01", href: "/observation", label: "OBS" },
-    { number: "02", href: "/observer", label: "OBR" },
-    { number: "03", href: "/archive", label: "ARC" },
-    { number: "04", href: "/signal", label: "SIG" },
-    { number: "05", href: "/hyougi", label: "HYO" },
-    { number: "06", href: "/gokuraku", label: "GOK" },
-    { number: "07", href: "/exit", label: "EXT" },
-    { number: "08", href: "/null", label: "NUL" },
-    { number: "09", href: "/daimyojin", label: "DMJ" },
-    { number: "10", href: "/ma", label: "MA" },
-    { number: "11", href: "/particles", label: "PRT" },
-    { number: "12", href: "/ripple", label: "RPL" },
-    { number: "13", href: "/dot-art", label: "DOT" },
+    { number: "01", href: "/floor/01", label: "FLOOR" },
+    { number: "02", href: "/floor/02", label: "FLOOR" },
+    { number: "03", href: "/floor/03", label: "FLOOR" },
+    { number: "04", href: "/floor/04", label: "FLOOR" },
+    { number: "05", href: "/floor/05", label: "FLOOR" },
   ];
 
   if (!room || frames.length === 0 || !cabin || !floorNumber || !enterButton || !upButton || !downButton) return;
@@ -37,7 +29,7 @@
     cabin.dataset.floorIndex = String(nextIndex);
     floorNumber.textContent = floor.number;
     enterButton.dataset.floorHref = floor.href;
-    enterButton.setAttribute("aria-label", `${floor.number} ${floor.label}へ`);
+    enterButton.setAttribute("aria-label", `${floor.label} ${floor.number}`);
   }
 
   function playDoorSequence() {

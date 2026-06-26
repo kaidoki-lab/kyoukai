@@ -22,7 +22,7 @@ class RipplePageTests(unittest.TestCase):
         self.assertNotIn("score", html.lower())
 
     def test_elevator_links_to_ripple_observer(self):
-        script = (BASE_DIR / "static" / "kyoukai-elevator.js").read_text(encoding="utf-8")
+        script = (BASE_DIR / "static" / "kyoukai-floor.js").read_text(encoding="utf-8")
         css = (BASE_DIR / "static" / "space.css").read_text(encoding="utf-8")
 
         self.assertIn('href: "/ripple"', script)

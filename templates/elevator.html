@@ -6,12 +6,12 @@
   <meta name="google" content="notranslate" />
   <title>Elevator / KYOUKAI</title>
   <meta property="og:title" content="Elevator / KYOUKAI" />
-  <meta property="og:description" content="KYOUKAI内部の昇降室。" />
+  <meta property="og:description" content="KYOUKAI elevator." />
   <meta property="og:image" content="https://www.void-kyoukai.net/static/kyoukai_elevator_interior_20260627.png" />
   <meta property="og:url" content="https://www.void-kyoukai.net/elevator" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="stylesheet" href="/static/space.css?v=20260627building1" />
+  <link rel="stylesheet" href="/static/space.css?v=20260627building2" />
   <link rel="stylesheet" href="/static/kyoukai-guide.css?v=3" />
   <script src="/static/kyoukai-transition.js"></script>
   <script defer src="/static/analytics.js"></script>
@@ -19,7 +19,7 @@
 </head>
 <body class="kyoukai-elevator-page">
   <main class="kyoukai-elevator-room" aria-label="KYOUKAI elevator" data-elevator-room>
-    <section class="elevator-cabin" aria-label="行き先" data-floor-index="0">
+    <section class="elevator-cabin" aria-label="Floor selector" data-floor-index="0">
       <div class="elevator-door" aria-hidden="true" data-door-sequence>
         <img class="elevator-door-frame is-active" src="/static/kyoukai_elevator_door_4_20260627.png" alt="" data-door-frame="4" />
         <img class="elevator-door-frame" src="/static/kyoukai_elevator_door_3_20260627.png" alt="" data-door-frame="3" />
@@ -34,16 +34,16 @@
           width="1024"
           height="1536"
         />
-        <button class="elevator-floor-display" type="button" data-floor-enter aria-label="選択中の階へ">
+        <button class="elevator-floor-display" type="button" data-floor-enter aria-label="Enter selected floor">
           <span data-floor-number>01</span>
         </button>
-        <button class="elevator-control elevator-control--up" type="button" data-floor-up aria-label="階を上げる"></button>
-        <button class="elevator-control elevator-control--down" type="button" data-floor-down aria-label="階を下げる"></button>
+        <button class="elevator-control elevator-control--up" type="button" data-floor-up aria-label="Floor up"></button>
+        <button class="elevator-control elevator-control--down" type="button" data-floor-down aria-label="Floor down"></button>
       </div>
     </section>
   </main>
   <script>window.KYOUKAI_ROOM = 'elevator';</script>
   <script src="/static/bgm.js"></script>
-  <script defer src="/static/kyoukai-elevator.js?v=20260627door1"></script>
+  <script defer src="/static/kyoukai-elevator.js?v=20260627floor1"></script>
 </body>
 </html>

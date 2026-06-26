@@ -9,8 +9,10 @@ class HomeEntranceTests(unittest.TestCase):
     def setUp(self):
         self.home_html = (BASE_DIR / "templates" / "home.html").read_text(encoding="utf-8")
         self.elevator_html = (BASE_DIR / "templates" / "elevator.html").read_text(encoding="utf-8")
+        self.floor_html = (BASE_DIR / "templates" / "floor.html").read_text(encoding="utf-8")
         self.journey_js = (BASE_DIR / "static" / "kyoukai-home-journey.js").read_text(encoding="utf-8")
         self.elevator_js = (BASE_DIR / "static" / "kyoukai-elevator.js").read_text(encoding="utf-8")
+        self.floor_js = (BASE_DIR / "static" / "kyoukai-floor.js").read_text(encoding="utf-8")
         self.space_css = (BASE_DIR / "static" / "space.css").read_text(encoding="utf-8")
         self.main_py = (BASE_DIR / "main.py").read_text(encoding="utf-8")
 
@@ -34,11 +36,14 @@ class HomeEntranceTests(unittest.TestCase):
         self.assertIn('shell.dataset.buildingStage = "entrance";', self.journey_js)
         self.assertIn('shell.dataset.buildingStage = "entering";', self.journey_js)
         self.assertIn("window.location.href = elevatorDoor.href;", self.journey_js)
+        self.assertIn("scheduleAutoJourney();", self.journey_js)
         self.assertIn('.kyoukai-building-shell[data-building-stage="zooming"]', self.space_css)
 
     def test_elevator_route_and_floor_destinations_exist(self):
         self.assertIn('@app.get("/elevator"', self.main_py)
+        self.assertIn('@app.get("/floor/{floor_number}"', self.main_py)
         self.assertIn("elevator.html", self.main_py)
+        self.assertIn("floor.html", self.main_py)
         self.assertIn("kyoukai_elevator_interior_20260627.png", self.elevator_html)
         self.assertTrue((BASE_DIR / "static" / "kyoukai_elevator_interior_20260627.png").exists())
         self.assertIn("data-floor-number", self.elevator_html)
@@ -46,11 +51,20 @@ class HomeEntranceTests(unittest.TestCase):
         self.assertIn("data-floor-down", self.elevator_html)
         self.assertNotIn("elevator-panel", self.elevator_html)
 
+        for floor_number in ["01", "02", "03", "04", "05"]:
+            with self.subTest(floor_number=floor_number):
+                self.assertIn(f'href: "/floor/{floor_number}"', self.elevator_js)
+
+    def test_floor_pages_use_original_entrance_images(self):
+        self.assertIn("data-floor-entrance-strip", self.floor_html)
+        self.assertIn("/static/kyoukai-floor.js", self.floor_html)
+
         expected_routes = [
             "/observation",
             "/observer",
             "/archive",
             "/signal",
+            "/typhoon-news/",
             "/hyougi",
             "/gokuraku",
             "/exit",
@@ -59,12 +73,33 @@ class HomeEntranceTests(unittest.TestCase):
             "/ma",
             "/particles",
             "/ripple",
+            "/colony",
             "/dot-art",
         ]
 
         for route in expected_routes:
             with self.subTest(route=route):
-                self.assertIn(f'href: "{route}"', self.elevator_js)
+                self.assertIn(f'href: "{route}"', self.floor_js)
+
+        for image_name in [
+            "entrance-observation.png",
+            "entrance-observer.png",
+            "entrance-archive.png",
+            "entrance-signal.png",
+            "news.png",
+            "entrance-daimyojin.png",
+            "entrance-hyougi.png",
+            "entrance-gokuraku.png",
+            "entrance-exit.png",
+            "entrance-null.png",
+            "entrance-ma.png",
+            "entrance-particles.png",
+            "entrance-ripple.png",
+            "concrete_9x16.png",
+            "entrance-dot-art.png",
+        ]:
+            with self.subTest(image_name=image_name):
+                self.assertIn(image_name, self.floor_js)
 
     def test_elevator_door_frames_play_in_requested_order(self):
         for frame_id in ["4", "3", "2", "1"]:
@@ -77,6 +112,7 @@ class HomeEntranceTests(unittest.TestCase):
         self.assertIn("[data-door-frame]", self.elevator_js)
         self.assertIn(".kyoukai-elevator-room[data-door-state=\"complete\"] .elevator-door", self.space_css)
         self.assertIn(".elevator-floor-display", self.space_css)
+        self.assertIn("left: 82.2%;", self.space_css)
 
 
 if __name__ == "__main__":

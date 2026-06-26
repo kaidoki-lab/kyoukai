@@ -1215,6 +1215,12 @@ async def entrance(request: Request) -> HTMLResponse:
 async def elevator(request: Request) -> HTMLResponse:
     return render_template(request, "elevator.html")
 
+@app.get("/floor/{floor_number}", response_class=HTMLResponse)
+async def floor_lobby(request: Request, floor_number: str) -> HTMLResponse:
+    if floor_number not in {"01", "02", "03", "04", "05"}:
+        return RedirectResponse(url="/elevator")
+    return render_template(request, "floor.html", floor_number=floor_number)
+
 @app.get("/observation", response_class=HTMLResponse)
 async def observation(request: Request) -> HTMLResponse:
     return render_template(request, "index.html")
