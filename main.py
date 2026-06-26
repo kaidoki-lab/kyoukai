@@ -1211,6 +1211,10 @@ def render_template(request: Request, name: str, status_code: int = 200, **extra
 async def entrance(request: Request) -> HTMLResponse:
     return render_template(request, "home.html")
 
+@app.get("/elevator", response_class=HTMLResponse)
+async def elevator(request: Request) -> HTMLResponse:
+    return render_template(request, "elevator.html")
+
 @app.get("/observation", response_class=HTMLResponse)
 async def observation(request: Request) -> HTMLResponse:
     return render_template(request, "index.html")

@@ -3545,6 +3545,319 @@ a.sp-link:hover,
   }
 }
 
+/* 2026-06-27 KYOUKAI building entrance flow */
+.kyoukai-building-page,
+.kyoukai-elevator-page {
+  min-height: 100svh;
+  margin: 0;
+  background: #000;
+  color: rgba(255, 239, 210, 0.92);
+  overflow: hidden;
+}
+
+.kyoukai-building-shell {
+  position: relative;
+  min-height: 100svh;
+  background: #000;
+  isolation: isolate;
+}
+
+.kyoukai-building-shell::after,
+.kyoukai-elevator-room::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(255, 0, 128, 0.08), transparent 18%, transparent 82%, rgba(0, 210, 255, 0.06)),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.048) 0 1px, rgba(0, 0, 0, 0.05) 1px 4px);
+  mix-blend-mode: screen;
+}
+
+.kyoukai-building-scene {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #000;
+  transition:
+    opacity 360ms ease,
+    filter 560ms ease,
+    transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.kyoukai-building-scene--full {
+  z-index: 1;
+}
+
+.kyoukai-building-scene--entrance {
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1.04);
+  filter: brightness(0.72);
+}
+
+.kyoukai-building-image {
+  display: block;
+  width: min(100vw, calc(100svh * 2 / 3));
+  height: min(100svh, calc(100vw * 3 / 2));
+  max-width: 100vw;
+  max-height: 100svh;
+  object-fit: contain;
+  object-position: center center;
+  filter: saturate(1.08) contrast(1.04) brightness(0.96);
+  user-select: none;
+}
+
+.kyoukai-building-hotspot,
+.kyoukai-entrance-hotspot {
+  position: absolute;
+  z-index: 4;
+  display: block;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.kyoukai-building-hotspot {
+  left: 39%;
+  top: 79%;
+  width: 22%;
+  height: 12%;
+}
+
+.kyoukai-entrance-hotspot {
+  left: 35%;
+  top: 48%;
+  width: 30%;
+  height: 36%;
+}
+
+.kyoukai-building-hotspot:focus-visible,
+.kyoukai-entrance-hotspot:focus-visible {
+  outline: 1px solid rgba(255, 230, 160, 0.56);
+  outline-offset: 3px;
+  box-shadow: 0 0 24px rgba(255, 44, 168, 0.28);
+}
+
+.kyoukai-building-shell[data-building-stage="zooming"] .kyoukai-building-scene--full {
+  transform: scale(1.34) translateY(-12%);
+  filter: brightness(0.82) saturate(1.12);
+}
+
+.kyoukai-building-shell[data-building-stage="entrance"] .kyoukai-building-scene--full,
+.kyoukai-building-shell[data-building-stage="entering"] .kyoukai-building-scene--full {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1.42) translateY(-14%);
+}
+
+.kyoukai-building-shell[data-building-stage="entrance"] .kyoukai-building-scene--entrance {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+  filter: brightness(0.95);
+}
+
+.kyoukai-building-shell[data-building-stage="entering"] .kyoukai-building-scene--entrance {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1.04);
+  filter: brightness(0.12) blur(2px);
+}
+
+.kyoukai-elevator-room {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100svh;
+  padding: clamp(12px, 3vw, 28px);
+  background:
+    linear-gradient(90deg, #020202, #080607 22%, #111 50%, #080607 78%, #020202),
+    #000;
+  overflow: hidden;
+}
+
+.elevator-cabin {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(108px, 18vw);
+  gap: clamp(12px, 2.4vw, 28px);
+  width: min(100%, 920px);
+  height: min(86svh, 760px);
+  min-height: 520px;
+  border: 1px solid rgba(255, 226, 170, 0.24);
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 18px),
+    linear-gradient(180deg, rgba(42, 26, 23, 0.96), rgba(8, 7, 8, 0.98));
+  box-shadow:
+    inset 0 0 48px rgba(0, 0, 0, 0.86),
+    0 0 42px rgba(255, 30, 132, 0.16);
+}
+
+.elevator-door {
+  position: relative;
+  margin: clamp(14px, 2vw, 26px) 0 clamp(14px, 2vw, 26px) clamp(14px, 2vw, 26px);
+  overflow: hidden;
+  border: 1px solid rgba(255, 226, 170, 0.2);
+  background: #080606;
+}
+
+.elevator-door::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.08), transparent 24%, transparent 72%, rgba(0, 0, 0, 0.22)),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 5px);
+  mix-blend-mode: screen;
+}
+
+.elevator-door-frame {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  opacity: 0;
+  transform: scale(1.012);
+  filter: saturate(1.06) contrast(1.04) brightness(0.92);
+  transition: opacity 120ms steps(1, end);
+}
+
+.elevator-door-frame.is-active {
+  opacity: 1;
+}
+
+.elevator-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  gap: clamp(7px, 1vw, 11px);
+  margin: clamp(14px, 2vw, 26px) clamp(14px, 2vw, 26px) clamp(14px, 2vw, 26px) 0;
+  padding: clamp(12px, 1.8vw, 20px);
+  border: 1px solid rgba(255, 226, 170, 0.22);
+  background:
+    linear-gradient(180deg, rgba(10, 6, 8, 0.94), rgba(0, 0, 0, 0.96));
+  opacity: 0.38;
+  transform: translateY(6px);
+  transition:
+    opacity 280ms ease,
+    transform 280ms ease;
+}
+
+.kyoukai-elevator-room[data-door-state="complete"] .elevator-panel {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.elevator-panel a {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: clamp(46px, 6svh, 64px);
+  border: 1px solid rgba(255, 226, 170, 0.22);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 226, 170, 0.22), rgba(255, 42, 168, 0.08) 54%, rgba(0, 0, 0, 0.7) 100%);
+  color: rgba(255, 245, 214, 0.92);
+  text-decoration: none;
+  box-shadow:
+    inset 0 0 18px rgba(0, 0, 0, 0.72),
+    0 0 10px rgba(255, 42, 168, 0.08);
+}
+
+.elevator-panel a span {
+  font-family: var(--sp-mono);
+  font-size: clamp(11px, 1.2vw, 14px);
+  line-height: 1;
+}
+
+.elevator-panel a b {
+  margin-top: 3px;
+  font-family: var(--sp-mono);
+  font-size: clamp(9px, 0.92vw, 12px);
+  font-weight: 400;
+  line-height: 1;
+  color: rgba(111, 243, 255, 0.76);
+}
+
+.elevator-panel a:hover,
+.elevator-panel a:focus-visible {
+  outline: none;
+  border-color: rgba(111, 243, 255, 0.66);
+  color: #fff;
+  box-shadow:
+    inset 0 0 20px rgba(111, 243, 255, 0.12),
+    0 0 18px rgba(111, 243, 255, 0.18);
+}
+
+@media (max-width: 720px) {
+  .kyoukai-building-image {
+    width: min(100vw, 62svh);
+    height: min(100svh, 161.3vw);
+  }
+
+  .kyoukai-building-hotspot {
+    left: 35%;
+    top: 79%;
+    width: 30%;
+    height: 13%;
+  }
+
+  .kyoukai-entrance-hotspot {
+    left: 31%;
+    top: 47%;
+    width: 38%;
+    height: 38%;
+  }
+
+  .elevator-cabin {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(220px, 1fr) auto;
+    width: min(100%, 430px);
+    height: min(94svh, 760px);
+    min-height: 0;
+  }
+
+  .elevator-door {
+    margin: 12px 12px 0;
+  }
+
+  .elevator-panel {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: 0 12px 12px;
+    padding: 10px;
+  }
+
+  .elevator-panel a {
+    min-height: 54px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kyoukai-building-scene {
+    transition: opacity 180ms ease;
+  }
+
+  .kyoukai-building-shell[data-building-stage="zooming"] .kyoukai-building-scene--full,
+  .kyoukai-building-shell[data-building-stage="entrance"] .kyoukai-building-scene--full,
+  .kyoukai-building-shell[data-building-stage="entering"] .kyoukai-building-scene--full,
+  .kyoukai-building-shell[data-building-stage="entering"] .kyoukai-building-scene--entrance {
+    transform: none;
+    filter: none;
+  }
+}
+
 /* Smartphone stability pass: keep rooms readable without changing routes or PC layout. */
 @media (max-width: 768px) {
   html,

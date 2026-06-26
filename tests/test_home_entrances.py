@@ -1,4 +1,3 @@
-import re
 import unittest
 from pathlib import Path
 
@@ -9,49 +8,68 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 class HomeEntranceTests(unittest.TestCase):
     def setUp(self):
         self.home_html = (BASE_DIR / "templates" / "home.html").read_text(encoding="utf-8")
-        self.entrance_js = (BASE_DIR / "static" / "home-entrances.js").read_text(encoding="utf-8")
+        self.elevator_html = (BASE_DIR / "templates" / "elevator.html").read_text(encoding="utf-8")
+        self.journey_js = (BASE_DIR / "static" / "kyoukai-home-journey.js").read_text(encoding="utf-8")
+        self.elevator_js = (BASE_DIR / "static" / "kyoukai-elevator.js").read_text(encoding="utf-8")
         self.space_css = (BASE_DIR / "static" / "space.css").read_text(encoding="utf-8")
+        self.main_py = (BASE_DIR / "main.py").read_text(encoding="utf-8")
 
-    def test_home_renders_scrollable_entrance_strip(self):
-        self.assertIn("home-entrance-page", self.home_html)
-        self.assertIn('data-entrance-strip', self.home_html)
-        self.assertIn("/static/home-entrances.js", self.home_html)
+    def test_home_uses_building_and_entrance_images(self):
+        self.assertIn("kyoukai-building-page", self.home_html)
+        self.assertIn("/static/kyoukai_building_full_20260627.png", self.home_html)
+        self.assertIn("/static/kyoukai_building_entrance_20260627.png", self.home_html)
+        self.assertTrue((BASE_DIR / "static" / "kyoukai_building_full_20260627.png").exists())
+        self.assertTrue((BASE_DIR / "static" / "kyoukai_building_entrance_20260627.png").exists())
 
-    def test_legacy_home_hotspots_are_hidden_on_entrance_page(self):
-        self.assertIn(".home-entrance-page .altar-frame > .hotspot", self.space_css)
-        self.assertRegex(
-            self.space_css,
-            r"\.home-entrance-page \.altar-frame > \.hotspot\s*\{\s*display:\s*none;",
-        )
+    def test_home_has_only_building_entrance_hotspots(self):
+        self.assertIn("data-building-entrance", self.home_html)
+        self.assertIn("data-elevator-door", self.home_html)
+        self.assertIn('href="/elevator"', self.home_html)
+        self.assertNotIn('data-entrance-strip', self.home_html)
+        self.assertNotIn('class="hotspot hotspot-', self.home_html)
+        self.assertNotIn("/static/home-entrances.js", self.home_html)
 
-    def test_entrance_links_and_expected_images_are_listed(self):
-        expected = {
-            "observation": ("/observation", "entrance-observation.png"),
-            "observer": ("/observer", "entrance-observer.png"),
-            "signal": ("/signal", "entrance-signal.png"),
-            "news": ("/typhoon-news/", "news.png"),
-            "external-signal": ("/external-signal", "entrance-external-signal.png"),
-            "null": ("/null", "entrance-null.png"),
-            "archive": ("/archive", "entrance-archive.png"),
-            "hyougi": ("/hyougi", "entrance-hyougi.png"),
-            "gokuraku": ("/gokuraku", "entrance-gokuraku.png"),
-            "exit": ("/exit", "entrance-exit.png"),
-            "outside": ("/outside", "entrance-outside.png"),
-            "daimyojin": ("/daimyojin", "entrance-daimyojin.png"),
-            "ma": ("/ma", "entrance-ma.png"),
-            "particles": ("/particles", "entrance-particles.png"),
-            "ripple": ("/ripple", "entrance-ripple.png"),
-        }
+    def test_building_flow_switches_to_entrance_then_elevator(self):
+        self.assertIn('shell.dataset.buildingStage = "zooming";', self.journey_js)
+        self.assertIn('shell.dataset.buildingStage = "entrance";', self.journey_js)
+        self.assertIn('shell.dataset.buildingStage = "entering";', self.journey_js)
+        self.assertIn("window.location.href = elevatorDoor.href;", self.journey_js)
+        self.assertIn('.kyoukai-building-shell[data-building-stage="zooming"]', self.space_css)
 
-        for entrance_id, (href, image_name) in expected.items():
-            with self.subTest(entrance_id=entrance_id):
-                self.assertIn(f'id: "{entrance_id}"', self.entrance_js)
-                self.assertIn(f'href: "{href}"', self.entrance_js)
-                self.assertIn(image_name, self.entrance_js)
+    def test_elevator_route_and_room_destinations_exist(self):
+        self.assertIn('@app.get("/elevator"', self.main_py)
+        self.assertIn("elevator.html", self.main_py)
 
-    def test_placeholder_mode_does_not_emit_broken_image_sources(self):
-        self.assertGreaterEqual(len(re.findall(r'image:\s*""', self.entrance_js)), 1)
-        self.assertIn("if (!item.image) return createFallback(item);", self.entrance_js)
+        expected_routes = [
+            "/observation",
+            "/observer",
+            "/archive",
+            "/signal",
+            "/hyougi",
+            "/gokuraku",
+            "/exit",
+            "/null",
+            "/daimyojin",
+            "/ma",
+            "/particles",
+            "/ripple",
+            "/dot-art",
+        ]
+
+        for route in expected_routes:
+            with self.subTest(route=route):
+                self.assertIn(f'href="{route}"', self.elevator_html)
+
+    def test_elevator_door_frames_play_in_requested_order(self):
+        for frame_id in ["4", "3", "2", "1"]:
+            with self.subTest(frame_id=frame_id):
+                image_name = f"kyoukai_elevator_door_{frame_id}_20260627.png"
+                self.assertIn(image_name, self.elevator_html)
+                self.assertTrue((BASE_DIR / "static" / image_name).exists())
+
+        self.assertIn('const sequence = ["4", "3", "2", "1"];', self.elevator_js)
+        self.assertIn("[data-door-frame]", self.elevator_js)
+        self.assertIn('[data-door-state="complete"] .elevator-panel', self.space_css)
 
 
 if __name__ == "__main__":

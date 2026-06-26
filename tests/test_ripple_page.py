@@ -21,8 +21,8 @@ class RipplePageTests(unittest.TestCase):
         self.assertNotIn("<button", html)
         self.assertNotIn("score", html.lower())
 
-    def test_home_links_to_ripple_observer(self):
-        html = (BASE_DIR / "templates" / "home.html").read_text(encoding="utf-8")
+    def test_elevator_links_to_ripple_observer(self):
+        html = (BASE_DIR / "templates" / "elevator.html").read_text(encoding="utf-8")
         css = (BASE_DIR / "static" / "space.css").read_text(encoding="utf-8")
 
         self.assertIn('href="/ripple"', html)
