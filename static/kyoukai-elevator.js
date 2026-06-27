@@ -15,6 +15,14 @@
     { number: "04", href: "/floor/04", label: "FLOOR" },
     { number: "05", href: "/floor/05", label: "FLOOR" },
   ];
+  const hallTracks = [
+    "/static/bgm/bgm_home.mp3",
+    "/static/bgm/bgm_exit.mp3",
+    "/static/bgm/bgm_null.mp3",
+    "/static/bgm/bgm_observer.mp3",
+  ];
+  const hallNodes = [];
+  let hallStarted = false;
 
   if (!room || frames.length === 0 || !cabin || !floorNumber || !enterButton || !upButton || !downButton) return;
 
@@ -45,6 +53,28 @@
     });
   }
 
+  function startHallSound() {
+    if (hallStarted) return;
+    hallStarted = true;
+    document.documentElement.dataset.hallSound = "playing";
+    hallTracks.forEach((src, index) => {
+      const node = new Audio(src);
+      node.loop = true;
+      node.preload = "auto";
+      node.volume = 0.045 * (index === 0 ? 1 : 0.62);
+      hallNodes.push(node);
+      node.play().catch(() => {});
+    });
+  }
+
+  function stopHallSound() {
+    document.documentElement.dataset.hallSound = "stopped";
+    hallNodes.forEach((node) => {
+      node.pause();
+      node.currentTime = 0;
+    });
+  }
+
   upButton.addEventListener("click", () => {
     updateFloor(Number(cabin.dataset.floorIndex || 0) + 1);
   });
@@ -59,6 +89,12 @@
   });
 
   updateFloor(0);
+  document.documentElement.dataset.hallSound = "ready";
+  ["pointerdown", "keydown", "touchstart"].forEach((eventName) => {
+    document.addEventListener(eventName, startHallSound, { once: true, passive: true });
+  });
+  window.addEventListener("pagehide", stopHallSound);
+  window.KYOUKAI_HALL_SOUND = { start: startHallSound, stop: stopHallSound };
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     showFrame(sequence[sequence.length - 1]);

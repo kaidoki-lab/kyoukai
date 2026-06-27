@@ -41,7 +41,8 @@ class ColonyPageTests(unittest.TestCase):
 
         self.assertIn('id: "colony"', source)
         self.assertIn('href: "/colony"', source)
-        self.assertIn("/static/images/colony/concrete_9x16.png", source)
+        self.assertIn("/static/images/colony/entrance-colony.png", source)
+        self.assertTrue((BASE_DIR / "static" / "images" / "colony" / "entrance-colony.png").exists())
 
 
 if __name__ == "__main__":

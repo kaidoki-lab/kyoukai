@@ -22,10 +22,18 @@
     ],
     "05": [
       { id: "ripple", name: "ripple", label: "RPL", href: "/ripple", image: "/static/images/entrances/entrance-ripple.png?v=20260625b", material: "crack" },
-      { id: "colony", name: "COLONY", label: "COL", href: "/colony", image: "/static/images/colony/concrete_9x16.png", material: "crack" },
+      { id: "colony", name: "COLONY", label: "COL", href: "/colony", image: "/static/images/colony/entrance-colony.png", material: "crack" },
       { id: "dot-art", name: "dot-art", label: "DOT", href: "/dot-art", image: "/static/entrance-dot-art.png", material: "crack" },
     ],
   };
+  const hallTracks = [
+    "/static/bgm/bgm_home.mp3",
+    "/static/bgm/bgm_exit.mp3",
+    "/static/bgm/bgm_null.mp3",
+    "/static/bgm/bgm_observer.mp3",
+  ];
+  const hallNodes = [];
+  let hallStarted = false;
 
   function createFallback(item) {
     const object = document.createElement("span");
@@ -87,6 +95,45 @@
     strip.replaceChildren(...items.map(createEntrance));
   }
 
+  function startHallSound() {
+    if (hallStarted) return;
+    hallStarted = true;
+    document.documentElement.dataset.hallSound = "playing";
+    hallTracks.forEach((src, index) => {
+      const node = new Audio(src);
+      node.loop = true;
+      node.preload = "auto";
+      node.volume = 0.045 * (index === 0 ? 1 : 0.62);
+      hallNodes.push(node);
+      node.play().catch(() => {});
+    });
+  }
+
+  function stopHallSound() {
+    document.documentElement.dataset.hallSound = "stopped";
+    hallNodes.forEach((node) => {
+      node.pause();
+      node.currentTime = 0;
+    });
+  }
+
+  function bindHallSound() {
+    ["pointerdown", "keydown", "touchstart"].forEach((eventName) => {
+      document.addEventListener(eventName, startHallSound, { once: true, passive: true });
+    });
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest("[data-floor-entrance-strip] .entrance-object")) {
+        stopHallSound();
+      }
+    });
+    window.addEventListener("pagehide", stopHallSound);
+    window.KYOUKAI_HALL_SOUND = { start: startHallSound, stop: stopHallSound };
+  }
+
   window.KYOUKAI_FLOOR_GROUPS = floorGroups;
   renderFloor();
+  document.documentElement.dataset.hallSound = "ready";
+  bindHallSound();
 })();

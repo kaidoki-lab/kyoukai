@@ -52,6 +52,7 @@ class HomeEntranceTests(unittest.TestCase):
         self.assertIn("data-floor-number", self.elevator_html)
         self.assertIn("data-floor-up", self.elevator_html)
         self.assertIn("data-floor-down", self.elevator_html)
+        self.assertNotIn("/static/bgm.js", self.elevator_html)
         self.assertNotIn("elevator-panel", self.elevator_html)
 
         for floor_number in ["01", "02", "03", "04", "05"]:
@@ -61,6 +62,7 @@ class HomeEntranceTests(unittest.TestCase):
     def test_floor_pages_use_original_entrance_images(self):
         self.assertIn("data-floor-entrance-strip", self.floor_html)
         self.assertIn("/static/kyoukai-floor.js", self.floor_html)
+        self.assertNotIn("/static/bgm.js", self.floor_html)
 
         expected_routes = [
             "/observation",
@@ -98,11 +100,26 @@ class HomeEntranceTests(unittest.TestCase):
             "entrance-ma.png",
             "entrance-particles.png",
             "entrance-ripple.png",
-            "concrete_9x16.png",
+            "entrance-colony.png",
             "entrance-dot-art.png",
         ]:
             with self.subTest(image_name=image_name):
                 self.assertIn(image_name, self.floor_js)
+
+    def test_hall_sound_uses_gokuraku_tracks_and_stops_on_room_entry(self):
+        combined_hall_source = self.elevator_js + "\n" + self.floor_js
+        for track in [
+            "/static/bgm/bgm_home.mp3",
+            "/static/bgm/bgm_exit.mp3",
+            "/static/bgm/bgm_null.mp3",
+            "/static/bgm/bgm_observer.mp3",
+        ]:
+            with self.subTest(track=track):
+                self.assertIn(track, combined_hall_source)
+
+        self.assertIn("startHallSound", combined_hall_source)
+        self.assertIn("stopHallSound", combined_hall_source)
+        self.assertIn("[data-floor-entrance-strip] .entrance-object", self.floor_js)
 
     def test_elevator_door_frames_play_in_requested_order(self):
         for frame_id in ["4", "3", "2", "1"]:
