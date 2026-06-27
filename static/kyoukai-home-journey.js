@@ -3,6 +3,9 @@
   const entranceButton = document.querySelector("[data-building-entrance]");
   const elevatorDoor = document.querySelector("[data-elevator-door]");
   const timers = [];
+  const fullViewMs = 1000;
+  const zoomMs = 1000;
+  const entranceHoldMs = 1000;
 
   if (!shell || !entranceButton || !elevatorDoor) return;
   window.KYOUKAI_HOME_JOURNEY_READY = true;
@@ -14,7 +17,7 @@
       shell.dataset.buildingStage = "entrance";
       document.querySelector(".kyoukai-building-scene--full")?.setAttribute("aria-hidden", "true");
       document.querySelector(".kyoukai-building-scene--entrance")?.removeAttribute("aria-hidden");
-    }, 560);
+    }, zoomMs);
   }
 
   function enterElevator(event) {
@@ -27,8 +30,8 @@
   }
 
   function scheduleAutoJourney() {
-    timers.push(window.setTimeout(showEntrance, 760));
-    timers.push(window.setTimeout(() => enterElevator(), 1840));
+    timers.push(window.setTimeout(showEntrance, fullViewMs));
+    timers.push(window.setTimeout(() => enterElevator(), fullViewMs + zoomMs + entranceHoldMs));
   }
 
   entranceButton.addEventListener("click", showEntrance);

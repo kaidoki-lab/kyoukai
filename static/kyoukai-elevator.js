@@ -7,6 +7,7 @@
   const upButton = document.querySelector("[data-floor-up]");
   const downButton = document.querySelector("[data-floor-down]");
   const sequence = ["4", "3", "2", "1"];
+  const doorFrameIntervalMs = 740;
   const floors = [
     { number: "01", href: "/floor/01", label: "FLOOR" },
     { number: "02", href: "/floor/02", label: "FLOOR" },
@@ -40,7 +41,7 @@
         if (index === sequence.length - 1) {
           room.dataset.doorState = "complete";
         }
-      }, index * 240);
+      }, index * doorFrameIntervalMs);
     });
   }
 

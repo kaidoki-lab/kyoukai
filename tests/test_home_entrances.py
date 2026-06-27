@@ -18,9 +18,9 @@ class HomeEntranceTests(unittest.TestCase):
 
     def test_home_uses_building_and_entrance_images(self):
         self.assertIn("kyoukai-building-page", self.home_html)
-        self.assertIn("/static/kyoukai_building_full_20260627.png", self.home_html)
+        self.assertIn("/static/kyoukai_building_full_20260627_sunset.png", self.home_html)
         self.assertIn("/static/kyoukai_building_entrance_20260627.png", self.home_html)
-        self.assertTrue((BASE_DIR / "static" / "kyoukai_building_full_20260627.png").exists())
+        self.assertTrue((BASE_DIR / "static" / "kyoukai_building_full_20260627_sunset.png").exists())
         self.assertTrue((BASE_DIR / "static" / "kyoukai_building_entrance_20260627.png").exists())
 
     def test_home_has_only_building_entrance_hotspots(self):
@@ -37,6 +37,9 @@ class HomeEntranceTests(unittest.TestCase):
         self.assertIn('shell.dataset.buildingStage = "entering";', self.journey_js)
         self.assertIn("window.location.href = elevatorDoor.href;", self.journey_js)
         self.assertIn("scheduleAutoJourney();", self.journey_js)
+        self.assertIn("const fullViewMs = 1000;", self.journey_js)
+        self.assertIn("const zoomMs = 1000;", self.journey_js)
+        self.assertIn("const entranceHoldMs = 1000;", self.journey_js)
         self.assertIn('.kyoukai-building-shell[data-building-stage="zooming"]', self.space_css)
 
     def test_elevator_route_and_floor_destinations_exist(self):
@@ -109,6 +112,7 @@ class HomeEntranceTests(unittest.TestCase):
                 self.assertTrue((BASE_DIR / "static" / image_name).exists())
 
         self.assertIn('const sequence = ["4", "3", "2", "1"];', self.elevator_js)
+        self.assertIn("const doorFrameIntervalMs = 740;", self.elevator_js)
         self.assertIn("[data-door-frame]", self.elevator_js)
         self.assertIn(".kyoukai-elevator-room[data-door-state=\"complete\"] .elevator-door", self.space_css)
         self.assertIn(".elevator-floor-display", self.space_css)
