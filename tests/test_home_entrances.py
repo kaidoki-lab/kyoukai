@@ -55,7 +55,7 @@ class HomeEntranceTests(unittest.TestCase):
         self.assertNotIn("/static/bgm.js", self.elevator_html)
         self.assertNotIn("elevator-panel", self.elevator_html)
 
-        for floor_number in ["01", "02", "03", "04", "05"]:
+        for floor_number in ["01", "02", "03", "04", "05", "06"]:
             with self.subTest(floor_number=floor_number):
                 self.assertIn(f'href: "/floor/{floor_number}"', self.elevator_js)
 
@@ -65,6 +65,7 @@ class HomeEntranceTests(unittest.TestCase):
         self.assertNotIn("/static/bgm.js", self.floor_html)
 
         expected_routes = [
+            "/kanrinin",
             "/observation",
             "/observer",
             "/archive",
@@ -87,6 +88,7 @@ class HomeEntranceTests(unittest.TestCase):
                 self.assertIn(f'href: "{route}"', self.floor_js)
 
         for image_name in [
+            "entrance-kanrinin.png",
             "entrance-observation.png",
             "entrance-observer.png",
             "entrance-archive.png",

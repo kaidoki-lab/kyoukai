@@ -341,3 +341,38 @@ KYOUKAIの「外」への扉。
 
 - `813b985 Fix colony entrance and hall audio`
 - `2c8dcb7 Exclude colony images from function bundle`
+
+---
+
+## 更新メモ 2026-06-28（2）
+
+### 管理人室（/kanrinin, /manager）
+
+管理人室は「管理施設」。Ofuse、BOOTH、クラウドファンディング、SNSへの導線、鍵ボックス、消滅の鍵、管理日誌を持つ。広告ページではなく、昭和〜平成初期のラブホテル受付のような空間として扱う。管理人本人は表示しない。
+
+**階層ロビーへの組み込み**
+- 階層ロビーの1階を「管理人室」専用フロアにした。`/floor/01` には管理人室の入口（古い木製ドア、`管理人室`の銘板）だけを置き、観測域・逆観測室・記録室など既存の入口群は2階〜6階へ1つずつスライドした（旧02→03、旧03→04、旧04→05、旧05→06）。エレベーターも1〜6階対応に拡張した。
+
+**背景・目玉**
+- 部屋内部の9:16背景画像は `static/images/kanrinin/kanrinin-room-9x16.png`。受付カウンター・赤いカーテン・賽銭箱・お知らせ掲示板（クラウドファンディングQR付き）・BOOTHダンボール・古いパソコン・電話・管理日誌・鍵ボックス（開けられない部屋の鍵）・消滅の鍵・目玉が画像内に描かれている。
+- 目玉はCSSアニメーションでは描かない。画像に描かれた目玉を、カーテンの隙間部分にだけ収まる黒い領域（`kanrininEyeGap`、カーテン布には重ねない寸法）で覆い隠す。通常時は完全に不透明（非表示）。`bellArea`（呼び鈴）を押すと黒い領域がopacity 0.4まで薄れ、画像の目玉がうっすら透けて見える。3秒後に自動で不透明に戻る。消滅の鍵を引いた場合はタイマーをクリアして薄い状態のまま固定する。
+
+**透明クリック領域（画像内の対象物に合わせて配置）**
+- `ofuseArea`=賽銭箱、`boothArea`=BOOTHダンボール、`crowdfundingArea`=お知らせ掲示板、`snsArea`=古いパソコン、`bellArea`=呼び鈴、`keyBoxArea`=鍵ボックスの壁、`annihilationKeyArea`=消滅の鍵、`noteArea`=管理日誌ノート。
+
+**各ギミック**
+- 呼び鈴: ランダムメッセージを表示し、目玉を薄く見せる。
+- 鍵ボックス: 「開けられない部屋の鍵」モーダルを表示（個別の鍵クリックはなし、ボックス全体クリックのみ）。
+- 消滅の鍵: クリックで確認ダイアログなしに即演出開始。「管理人が鍵を回しました。」表示→暗転→1.5秒後に存在しないパス `/kanrinin/deleted` へ遷移し、グローバル404演出（`templates/404.html`, `static/kyoukai-404.js`。訪問回数に応じて文字が崩壊し5回目以降は消滅する仕様）に接続する。ブラウザは閉じない、戻るボタンは無効化しない。
+- SNS: 単一リンクではなく一覧モーダル（`snsModal`）。X `https://x.com/maro1523095`、TikTok `https://www.tiktok.com/@kyoukai.archive`、YouTube `https://youtube.com/@hetayoko1109` の3つを表示する。
+- 管理日誌: 中央のノート（`noteArea`）クリックで管理日誌モーダル（`diaryModal`）が開く。4ページ（管理日誌／更新履歴／未解決案件／鍵管理記録）を前後ページ送りで閲覧できる。DB・投稿・AI生成は使わず、Escキーでも閉じられる。本文は `static/kanrinin-diary.json` に分離しており、`static/kanrinin.js` がノートクリック時にfetchして表示する。JSのロジックとテキストを分離しているため、今後ページ内容を更新したい場合はこのJSONファイルだけ編集すればよい。
+
+**外部リンク（本番URL確定済み）**
+- BOOTH: `https://voidscan.booth.pm/`
+- クラウドファンディング: `https://motion-gallery.net/projects/kyoukai`
+- Ofuse: `https://ofuse.me/be78f6ed`
+
+**関連ファイル**
+- `templates/kanrinin.html`, `static/kanrinin.css`, `static/kanrinin.js`, `static/kanrinin-diary.json`
+- `static/images/entrances/entrance-kanrinin.png`, `static/images/kanrinin/kanrinin-room-9x16.png`
+- `static/kyoukai-floor.js`, `static/kyoukai-elevator.js`, `main.py`, `tests/test_home_entrances.py`

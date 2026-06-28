@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>管理人室 / KYOUKAI</title>
+  <meta property="og:title" content="管理人室 / KYOUKAI" />
+  <meta property="og:description" content="管理施設。鍵と帳簿が積まれている。" />
+  <meta property="og:url" content="https://www.void-kyoukai.net/kanrinin" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="/static/kanrinin.css?v=1">
+  <script src="/static/kyoukai-transition.js"></script>
+  <script defer src="/static/analytics.js"></script>
+</head>
+<body class="kanrinin-body">
+  <script>window.KYOUKAI_ROOM = 'kanrinin';</script>
+
+  <div class="kanrinin-frame">
+    <div class="kanrinin-bg" aria-hidden="true">
+      <div class="kanrinin-eye-gap" id="kanrininEyeGap"></div>
+    </div>
+
+    <button type="button" class="kanrinin-area" id="ofuseArea" data-area="ofuse" aria-label="賽銭箱" style="top:79%;left:74%;width:25%;height:16%;"></button>
+    <button type="button" class="kanrinin-area" id="boothArea" data-area="booth" aria-label="BOOTH" style="top:72%;left:0%;width:28%;height:16%;"></button>
+    <button type="button" class="kanrinin-area" id="crowdfundingArea" data-area="crowdfunding" aria-label="お知らせ クラウドファンディング" style="top:16%;left:2%;width:17%;height:12%;"></button>
+    <button type="button" class="kanrinin-area" id="snsArea" data-area="sns" aria-label="古いパソコン（SNS一覧）" style="top:46%;left:55%;width:22%;height:11%;"></button>
+    <button type="button" class="kanrinin-area" id="bellArea" data-area="bell" aria-label="呼び鈴" style="top:58%;left:25%;width:9%;height:6%;"></button>
+    <button type="button" class="kanrinin-area" id="keyBoxArea" data-area="keybox" aria-label="開けられない部屋の鍵" style="top:9%;left:58%;width:45%;height:35%;"></button>
+    <button type="button" class="kanrinin-area kanrinin-area--key" id="annihilationKeyArea" data-area="annihilation" aria-label="消滅の鍵" style="top:46%;left:81%;width:13%;height:14%;"></button>
+    <button type="button" class="kanrinin-area hotspot-note" id="noteArea" data-area="note" aria-label="管理日誌" style="top:60%;left:37%;width:21%;height:5%;"></button>
+
+    <div class="kanrinin-message" id="kanrininMessage" aria-live="polite"></div>
+
+    <div class="kanrinin-modal" id="keyBoxModal" aria-hidden="true">
+      <div class="kanrinin-modal__panel">
+        <p class="kanrinin-modal__title">開けられない部屋の鍵</p>
+        <ul class="kanrinin-modal__list">
+          <li>逆観測室　準備中</li>
+          <li>地下資料庫　封鎖中</li>
+          <li>屋上管理室　点検中</li>
+          <li>203号室　鍵紛失</li>
+          <li>■■■■室　管理者専用</li>
+        </ul>
+        <p class="kanrinin-modal__footer">現在は開錠できません。管理人の許可が必要です。</p>
+        <button type="button" class="kanrinin-modal__close" id="keyBoxModalClose">閉じる</button>
+      </div>
+    </div>
+
+    <div class="kanrinin-modal" id="snsModal" aria-hidden="true">
+      <div class="kanrinin-modal__panel">
+        <p class="kanrinin-modal__title">外部接続</p>
+        <ul class="kanrinin-modal__list kanrinin-modal__list--links" id="snsModalList"></ul>
+        <button type="button" class="kanrinin-modal__close" id="snsModalClose">閉じる</button>
+      </div>
+    </div>
+
+    <div class="diary-modal" id="diaryModal" aria-hidden="true">
+      <div class="diary-book">
+        <button type="button" class="diary-close" id="diaryClose" aria-label="閉じる">×</button>
+        <div id="diaryCategory" class="diary-category"></div>
+        <h2 id="diaryTitle" class="diary-title"></h2>
+        <div id="diaryBody" class="diary-body"></div>
+        <div class="diary-controls">
+          <button type="button" id="diaryPrev">前のページ</button>
+          <span id="diaryPageCount"></span>
+          <button type="button" id="diaryNext">次のページ</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="kanrinin-blackout" id="kanrininBlackout" aria-hidden="true"></div>
+  </div>
+
+  <script defer src="/static/kanrinin.js?v=1"></script>
+</body>
+</html>

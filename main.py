@@ -1217,7 +1217,7 @@ async def elevator(request: Request) -> HTMLResponse:
 
 @app.get("/floor/{floor_number}", response_class=HTMLResponse)
 async def floor_lobby(request: Request, floor_number: str) -> HTMLResponse:
-    if floor_number not in {"01", "02", "03", "04", "05"}:
+    if floor_number not in {"01", "02", "03", "04", "05", "06"}:
         return RedirectResponse(url="/elevator")
     return render_template(request, "floor.html", floor_number=floor_number)
 
@@ -1337,6 +1337,11 @@ async def outside_core(request: Request) -> HTMLResponse:
 @app.get("/ma", response_class=HTMLResponse)
 async def ma_room(request: Request) -> HTMLResponse:
     return render_template(request, "ma.html")
+
+@app.get("/kanrinin", response_class=HTMLResponse)
+@app.get("/manager", response_class=HTMLResponse)
+async def kanrinin_room(request: Request) -> HTMLResponse:
+    return render_template(request, "kanrinin.html")
 
 # /central route removed (Central OS isolated 2026-06-18)
 

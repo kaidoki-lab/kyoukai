@@ -14,6 +14,7 @@
     { number: "03", href: "/floor/03", label: "FLOOR" },
     { number: "04", href: "/floor/04", label: "FLOOR" },
     { number: "05", href: "/floor/05", label: "FLOOR" },
+    { number: "06", href: "/floor/06", label: "FLOOR" },
   ];
   const hallTracks = [
     "/static/bgm/bgm_home.mp3",

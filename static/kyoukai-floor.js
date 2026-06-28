@@ -1,26 +1,29 @@
 (function () {
   const floorGroups = {
     "01": [
+      { id: "kanrinin", name: "管理人室", label: "MGR", href: "/kanrinin", image: "/static/images/entrances/entrance-kanrinin.png", material: "door" },
+    ],
+    "02": [
       { id: "observation", name: "observation", label: "OBS", href: "/observation", image: "/static/images/entrances/entrance-observation.png", material: "mirror" },
       { id: "observer", name: "observer", label: "OBR", href: "/observer", image: "/static/images/entrances/entrance-observer.png", material: "shrine" },
       { id: "archive", name: "archive", label: "ARC", href: "/archive", image: "/static/images/entrances/entrance-archive.png", material: "box" },
     ],
-    "02": [
+    "03": [
       { id: "signal", name: "signal", label: "SIG", href: "/signal", image: "/static/images/entrances/entrance-signal.png", material: "speaker" },
       { id: "news", name: "news", label: "NEWS", href: "/typhoon-news/", image: "/static/images/entrances/news.png", material: "door" },
       { id: "daimyojin", name: "daimyojin", label: "DMJ", href: "/daimyojin", image: "/static/images/entrances/entrance-daimyojin.png", material: "shrine" },
     ],
-    "03": [
+    "04": [
       { id: "hyougi", name: "hyougi", label: "HYO", href: "/hyougi", image: "/static/images/entrances/entrance-hyougi.png", material: "paper" },
       { id: "gokuraku", name: "gokuraku", label: "GOK", href: "/gokuraku", image: "/static/images/entrances/entrance-gokuraku.png", material: "shrine" },
       { id: "exit", name: "exit", label: "EXT", href: "/exit", image: "/static/images/entrances/entrance-exit.png", material: "door" },
     ],
-    "04": [
+    "05": [
       { id: "null", name: "null", label: "NUL", href: "/null", image: "/static/images/entrances/entrance-null.png", material: "crack" },
       { id: "ma", name: "ma", label: "MA", href: "/ma", image: "/static/images/entrances/entrance-ma.png", material: "mirror" },
       { id: "particles", name: "particles", label: "PRT", href: "/particles", image: "/static/images/entrances/entrance-particles.png?v=20260625c", material: "mirror" },
     ],
-    "05": [
+    "06": [
       { id: "ripple", name: "ripple", label: "RPL", href: "/ripple", image: "/static/images/entrances/entrance-ripple.png?v=20260625b", material: "crack" },
       { id: "colony", name: "COLONY", label: "COL", href: "/colony", image: "/static/images/colony/entrance-colony.png", material: "crack" },
       { id: "dot-art", name: "dot-art", label: "DOT", href: "/dot-art", image: "/static/entrance-dot-art.png", material: "crack" },
