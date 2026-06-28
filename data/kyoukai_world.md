@@ -289,3 +289,55 @@ KYOUKAIの「外」への扉。
 - AI分析官・AI企画官・AI実装監督がイベント観測データを踏まえて考察・企画・実装指示を出せるようになった（ゲーム化禁止は明文化済み）
 - KYOUKAI Shorts Factory（`shorts_factory/`）を整備。Central OSの企画案とYouTube分析からAIが収録シナリオを自動生成し、Playwrightでブラウザを操作してKYOUKAI内を自動巡回・録画する仕組みを構築した
 - これにより「観測」というKYOUKAIの核心テーマが、ユーザー体験だけでなく制作プロセス自体にも及んだ状態になっている
+
+---
+
+## 更新メモ 2026-06-28
+
+### KYOUKAI入口導線
+
+- トップページは部屋一覧ではなく、KYOUKAIという巨大建築への入口として扱う。
+- 基本導線は `トップ /` → `建物全景` → `入口クローズアップ` → `エレベーター室 /elevator` → `階層ロビー /floor/XX` → `各部屋`。
+- 建物全景と入口クローズアップは自動進行。ユーザーのクリックを要求しない。
+- 部屋数が増えてもトップページの構造は変えない。部屋追加はエレベーター側、または階層ロビー側の行き先データだけを更新する。
+
+### エレベーターと階層ロビー
+
+- エレベーター外観は建物外観とは切り離す。建物外からエレベーターは見えない。
+- `/elevator` では右側の上下ボタンで階層番号を増減し、黒い表示窓にCSSで階層番号を表示する。
+- エレベーター扉は `4 → 3 → 2 → 1` の画像順で再生し、扉が徐々に開く表現にする。
+- `/floor/01` から `/floor/05` まで、各階に入口画像を並べる。部屋を選ぶ場所はトップページではなく階層ロビー。
+
+### 音の扱い
+
+- エレベーター室と階層ロビーでは、獄楽域にある4つの音源を薄く重ねて流す。
+- 使用音源は `/static/bgm/bgm_home.mp3`, `/static/bgm/bgm_exit.mp3`, `/static/bgm/bgm_null.mp3`, `/static/bgm/bgm_observer.mp3`。
+- ブラウザ制約に合わせ、初回のユーザー操作後に再生を開始する。
+- 部屋入口を押した時点でロビー音は停止する。各部屋に入った後までロビー音を持ち越さない。
+
+### COLONY入口と部屋背景
+
+- COLONYの階層ロビー入口画像は `/static/images/colony/entrance-colony.png` を使う。
+- `/colony` 本体の背景は `/static/images/colony/concrete_9x16.png` を使う。
+- 入口画像と部屋背景は混同しない。入口を押しても再び入口画像だけになる状態は不可。
+
+### 関連実装ファイル
+
+- `templates/home.html`
+- `templates/elevator.html`
+- `templates/floor.html`
+- `static/kyoukai-home-journey.js`
+- `static/kyoukai-elevator.js`
+- `static/kyoukai-floor.js`
+- `static/home-entrances.js`
+- `static/space.css`
+- `static/colony.css`
+- `static/images/colony/entrance-colony.png`
+- `static/images/colony/concrete_9x16.png`
+- `tests/test_home_entrances.py`
+- `tests/test_colony_page.py`
+
+### 最新コミット
+
+- `813b985 Fix colony entrance and hall audio`
+- `2c8dcb7 Exclude colony images from function bundle`
