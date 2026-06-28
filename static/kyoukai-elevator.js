@@ -9,12 +9,12 @@
   const sequence = ["4", "3", "2", "1"];
   const doorFrameIntervalMs = 740;
   const floors = [
-    { number: "01", href: "/floor/01", label: "FLOOR" },
-    { number: "02", href: "/floor/02", label: "FLOOR" },
-    { number: "03", href: "/floor/03", label: "FLOOR" },
-    { number: "04", href: "/floor/04", label: "FLOOR" },
-    { number: "05", href: "/floor/05", label: "FLOOR" },
-    { number: "06", href: "/floor/06", label: "FLOOR" },
+    { number: "01", display: "M", href: "/floor/01", label: "管理人室" },
+    { number: "02", display: "02", href: "/floor/02", label: "FLOOR" },
+    { number: "03", display: "03", href: "/floor/03", label: "FLOOR" },
+    { number: "04", display: "04", href: "/floor/04", label: "FLOOR" },
+    { number: "05", display: "05", href: "/floor/05", label: "FLOOR" },
+    { number: "06", display: "06", href: "/floor/06", label: "FLOOR" },
   ];
   const hallTracks = [
     "/static/bgm/bgm_home.mp3",
@@ -39,7 +39,7 @@
     const nextIndex = Math.max(0, Math.min(floors.length - 1, index));
     const floor = floors[nextIndex];
     cabin.dataset.floorIndex = String(nextIndex);
-    floorNumber.textContent = floor.number;
+    floorNumber.textContent = floor.display || floor.number;
     enterButton.dataset.floorHref = floor.href;
     enterButton.setAttribute("aria-label", `${floor.label} ${floor.number}`);
   }
