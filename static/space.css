@@ -3015,13 +3015,18 @@ a.sp-link:hover,
 }
 
 .entrance-strip {
+  --entrance-card-width: 78%;
+  --entrance-edge-space: calc((100% - var(--entrance-card-width)) / 2);
+  box-sizing: border-box;
   display: flex;
   gap: 18px;
+  width: 100%;
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--entrance-edge-space);
   scrollbar-width: none;
-  padding: 22px 18px 30px;
+  padding: 22px var(--entrance-edge-space) 30px;
 }
 
 .entrance-strip::-webkit-scrollbar {
@@ -3030,7 +3035,7 @@ a.sp-link:hover,
 
 .entrance-object {
   position: relative;
-  flex: 0 0 78%;
+  flex: 0 0 var(--entrance-card-width);
   min-height: 260px;
   display: grid;
   grid-template-rows: 1fr auto;
@@ -4021,11 +4026,8 @@ a.sp-link:hover,
 }
 
 .kyoukai-floor-page .entrance-strip {
+  --entrance-card-width: 74%;
   padding-top: 8px;
-}
-
-.kyoukai-floor-page .entrance-object {
-  flex-basis: 74%;
 }
 
 /* Smartphone stability pass: keep rooms readable without changing routes or PC layout. */

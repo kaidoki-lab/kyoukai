@@ -127,6 +127,16 @@ class HomeEntranceTests(unittest.TestCase):
         self.assertNotIn("hallTracks.forEach", combined_hall_source)
         self.assertIn("[data-floor-entrance-strip] .entrance-object", self.floor_js)
 
+    def test_floor_entrance_scroll_snaps_to_centered_neighbors(self):
+        self.assertIn("--entrance-edge-space", self.space_css)
+        self.assertIn("scroll-padding-inline: var(--entrance-edge-space);", self.space_css)
+        self.assertIn("box-sizing: border-box;", self.space_css)
+        self.assertIn("calibrateEntranceStrip(strip);", self.floor_js)
+        self.assertIn("snapEntranceIntoCenter(strip, targetIndex);", self.floor_js)
+        self.assertIn("interactionStartIndex + direction", self.floor_js)
+        self.assertIn("window.addEventListener(\"resize\"", self.floor_js)
+        self.assertIn("20260628snap1", self.floor_html)
+
     def test_elevator_door_frames_play_in_requested_order(self):
         for frame_id in ["4", "3", "2", "1"]:
             with self.subTest(frame_id=frame_id):

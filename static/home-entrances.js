@@ -227,15 +227,39 @@
     return link;
   }
 
-  function nearestEntrance(strip) {
+  function getEntrances(strip) {
     const items = Array.from(strip.querySelectorAll(".entrance-object"));
+    return items;
+  }
+
+  function nearestEntranceIndex(strip) {
+    const items = getEntrances(strip);
     const center = strip.scrollLeft + strip.clientWidth / 2;
-    return items.reduce((nearest, item) => {
+    return items.reduce((nearest, item, index) => {
       const itemCenter = item.offsetLeft + item.offsetWidth / 2;
       const distance = Math.abs(itemCenter - center);
-      if (!nearest || distance < nearest.distance) return { item, distance };
+      if (!nearest || distance < nearest.distance) return { index, distance };
       return nearest;
-    }, null)?.item;
+    }, null)?.index ?? 0;
+  }
+
+  function snapEntranceIntoCenter(strip, index, behavior = "smooth") {
+    const items = getEntrances(strip);
+    const item = items[index];
+    if (!item) return;
+
+    const targetLeft = item.offsetLeft + item.offsetWidth / 2 - strip.clientWidth / 2;
+    strip.scrollTo({ left: Math.max(0, targetLeft), behavior });
+    item.classList.remove("is-snap-bump");
+    void item.offsetWidth;
+    item.classList.add("is-snap-bump");
+  }
+
+  function calibrateEntranceStrip(strip) {
+    const cardWidth = Math.round(strip.clientWidth * 0.78);
+    const edgeSpace = Math.max(0, Math.round((strip.clientWidth - cardWidth) / 2));
+    strip.style.setProperty("--entrance-card-width", `${cardWidth}px`);
+    strip.style.setProperty("--entrance-edge-space", `${edgeSpace}px`);
   }
 
   function enableSnapBump() {
@@ -243,18 +267,57 @@
     if (!strip) return;
 
     let timer = 0;
-    const bump = () => {
-      const item = nearestEntrance(strip);
-      if (!item) return;
-      item.classList.remove("is-snap-bump");
-      void item.offsetWidth;
-      item.classList.add("is-snap-bump");
+    let interactionStartIndex = 0;
+    let interactionStartLeft = strip.scrollLeft;
+    let isSnapping = false;
+
+    calibrateEntranceStrip(strip);
+
+    const rememberStart = () => {
+      if (isSnapping) return;
+      interactionStartIndex = nearestEntranceIndex(strip);
+      interactionStartLeft = strip.scrollLeft;
     };
+
+    const settle = () => {
+      if (isSnapping) return;
+      const items = getEntrances(strip);
+      if (!items.length) return;
+
+      const direction = Math.sign(strip.scrollLeft - interactionStartLeft);
+      const nearestIndex = nearestEntranceIndex(strip);
+      let targetIndex = nearestIndex;
+      if (direction !== 0) {
+        const nextIndex = Math.max(0, Math.min(items.length - 1, interactionStartIndex + direction));
+        targetIndex = direction > 0
+          ? Math.min(nearestIndex, nextIndex)
+          : Math.max(nearestIndex, nextIndex);
+      }
+
+      isSnapping = true;
+      snapEntranceIntoCenter(strip, targetIndex);
+      window.setTimeout(() => {
+        interactionStartIndex = targetIndex;
+        interactionStartLeft = strip.scrollLeft;
+        isSnapping = false;
+      }, 360);
+    };
+
+    ["pointerdown", "touchstart", "wheel", "keydown"].forEach((eventName) => {
+      strip.addEventListener(eventName, rememberStart, { passive: true });
+    });
 
     strip.addEventListener("scroll", () => {
       window.clearTimeout(timer);
-      timer = window.setTimeout(bump, 120);
+      timer = window.setTimeout(settle, 120);
     }, { passive: true });
+
+    window.addEventListener("resize", () => {
+      calibrateEntranceStrip(strip);
+      snapEntranceIntoCenter(strip, nearestEntranceIndex(strip), "auto");
+    }, { passive: true });
+
+    requestAnimationFrame(() => snapEntranceIntoCenter(strip, nearestEntranceIndex(strip), "auto"));
   }
 
   function renderEntrances() {
