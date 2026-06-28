@@ -21,7 +21,9 @@
     "/static/bgm/bgm_null.mp3",
     "/static/bgm/bgm_observer.mp3",
   ];
-  const hallNodes = [];
+  const hallSoundVolume = 0.018;
+  let hallNode = null;
+  let hallTrackIndex = 0;
   let hallStarted = false;
 
   if (!room || frames.length === 0 || !cabin || !floorNumber || !enterButton || !upButton || !downButton) return;
@@ -57,22 +59,22 @@
     if (hallStarted) return;
     hallStarted = true;
     document.documentElement.dataset.hallSound = "playing";
-    hallTracks.forEach((src, index) => {
-      const node = new Audio(src);
-      node.loop = true;
-      node.preload = "auto";
-      node.volume = 0.045 * (index === 0 ? 1 : 0.62);
-      hallNodes.push(node);
-      node.play().catch(() => {});
+    hallNode = new Audio(hallTracks[hallTrackIndex]);
+    hallNode.preload = "auto";
+    hallNode.volume = hallSoundVolume;
+    hallNode.addEventListener("ended", () => {
+      hallTrackIndex = (hallTrackIndex + 1) % hallTracks.length;
+      hallNode.src = hallTracks[hallTrackIndex];
+      hallNode.play().catch(() => {});
     });
+    hallNode.play().catch(() => {});
   }
 
   function stopHallSound() {
     document.documentElement.dataset.hallSound = "stopped";
-    hallNodes.forEach((node) => {
-      node.pause();
-      node.currentTime = 0;
-    });
+    if (!hallNode) return;
+    hallNode.pause();
+    hallNode.currentTime = 0;
   }
 
   upButton.addEventListener("click", () => {

@@ -119,6 +119,10 @@ class HomeEntranceTests(unittest.TestCase):
 
         self.assertIn("startHallSound", combined_hall_source)
         self.assertIn("stopHallSound", combined_hall_source)
+        self.assertIn("const hallSoundVolume = 0.018;", combined_hall_source)
+        self.assertIn("new Audio(hallTracks[hallTrackIndex])", combined_hall_source)
+        self.assertIn('addEventListener("ended"', combined_hall_source)
+        self.assertNotIn("hallTracks.forEach", combined_hall_source)
         self.assertIn("[data-floor-entrance-strip] .entrance-object", self.floor_js)
 
     def test_elevator_door_frames_play_in_requested_order(self):
