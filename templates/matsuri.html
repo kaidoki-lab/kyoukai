@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>棒入れ祭 / KYOUKAI</title>
+  <meta property="og:title" content="棒入れ祭 / KYOUKAI" />
+  <meta property="og:description" content="豊穣を願う、奉納の儀。" />
+  <meta property="og:url" content="https://www.void-kyoukai.net/matsuri" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="/static/matsuri.css?v=9">
+  <script src="/static/kyoukai-transition.js"></script>
+  <script defer src="/static/analytics.js"></script>
+</head>
+<body class="matsuri-body">
+  <script>window.KYOUKAI_ROOM = 'matsuri';</script>
+
+  <div class="matsuri-frame" id="matsuriFrame">
+    <div class="matsuri-bg" aria-hidden="true"></div>
+
+    <div class="matsuri-decoration matsuri-decoration--gohei matsuri-decoration--gohei-left" aria-hidden="true"></div>
+    <div class="matsuri-decoration matsuri-decoration--gohei matsuri-decoration--gohei-right" aria-hidden="true"></div>
+
+    <div class="matsuri-hole" id="matsuriHole" aria-hidden="true"></div>
+
+    <div class="matsuri-pole-stage" id="matsuriPoleStage">
+      <div class="matsuri-pole-visual" aria-hidden="true">
+        <span class="matsuri-pole__shadow" aria-hidden="true"></span>
+      </div>
+      <button type="button" class="matsuri-pole-hit" id="matsuriPole" aria-label="棒を奉納する"></button>
+    </div>
+
+    <div class="matsuri-hole__shadow" aria-hidden="true"></div>
+
+    <div class="matsuri-confetti-layer" id="matsuriConfettiLayer" aria-hidden="true"></div>
+
+    <div class="matsuri-hud">
+      <div class="matsuri-message" id="matsuriMessage" aria-live="polite"></div>
+    </div>
+
+    <button type="button" class="matsuri-reset" id="matsuriReset" hidden>もう一度</button>
+
+    <div class="matsuri-flash" id="matsuriFlash" aria-hidden="true"></div>
+    <div class="matsuri-impact-lines" id="matsuriImpactLines" aria-hidden="true"></div>
+    <div class="matsuri-vignette" aria-hidden="true"></div>
+  </div>
+
+  <script defer src="/static/matsuri.js?v=8"></script>
+</body>
+</html>

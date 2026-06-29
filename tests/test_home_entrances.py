@@ -81,6 +81,7 @@ class HomeEntranceTests(unittest.TestCase):
             "/ripple",
             "/colony",
             "/dot-art",
+            "/matsuri",
         ]
 
         for route in expected_routes:
@@ -104,6 +105,7 @@ class HomeEntranceTests(unittest.TestCase):
             "entrance-ripple.png",
             "entrance-colony.png",
             "entrance-dot-art.png",
+            "entrance-matsuri.png",
         ]:
             with self.subTest(image_name=image_name):
                 self.assertIn(image_name, self.floor_js)

@@ -377,3 +377,63 @@ KYOUKAIの「外」への扉。
 - `templates/kanrinin.html`, `static/kanrinin.css`, `static/kanrinin.js`, `static/kanrinin-diary.json`
 - `static/images/entrances/entrance-kanrinin.png`, `static/images/kanrinin/kanrinin-room-9x16.png`
 - `static/kyoukai-floor.js`, `static/kyoukai-elevator.js`, `main.py`, `tests/test_home_entrances.py`
+
+---
+
+## 更新メモ 2026-06-28（3）
+
+### 棒入れ祭（/matsuri）
+
+豊穣信仰の奉納儀式として処理する部屋。「KYOUKAI 棒入れ祭 素材入手担当表 v1.0」に基づく。人物・手・群衆は描かない。棒と穴、注連縄・紙垂・御幣などの祭具のみで構成する。
+
+**実装範囲（今回完了したのはCSS/JS実装担当分のみ）**
+- 棒（`matsuriPole`）を繰り返しタップすると、穴（`matsuriHole`）へ少しずつ沈む。タップごとに画面の小揺れ、棒の振動、土煙、ランダムで紙吹雪が発生する。
+- 10回タップでクライマックス：フラッシュ・衝撃波・紙吹雪大量発生・モーションブラー・「ヨイショーー！！」→「奉納完了。」。完了後は「もう一度」ボタンで`resetMatsuri()`によりリセットできる。
+- 掛け声・効果音はファイルが存在しない場合は黒い処理（再生をスキップ）でエラーにならない設計。画像も同様に、無ければCSSの色面・グラデーションで表示する（実装確認に画像生成を待つ必要はない）。
+
+**アセット配置場所**
+- 画像: `static/images/matsuri/{background,pole,hole,decoration,confetti,effects,props}/`（期待ファイル名は`static/images/matsuri/README.md`に記載、担当表のファイル名と一致）
+- 音声: `static/audio/matsuri/{voices,sfx}/`（期待ファイル名は`static/audio/matsuri/README.md`に記載）
+- 画像生成（ChatGPTへのプロンプト作成）、フリー素材サイトからの効果音・写真入手、掛け声の自作録音は未着手。担当表の通り別作業者が行う想定。
+
+**画像の実装（2026-06-28追記）**
+- ChatGPTが生成した「素材入手担当表」のリファレンスシート1枚（36個のアセットを1枚にまとめた画像）から、`scripts/extract_matsuri_assets.py` で個別に切り出して`static/images/matsuri/`へ配置済み。
+- 紙吹雪・土煙・衝撃線・フラッシュ・モーションブラー・ビネット・棒の影・穴の影・注連縄・紙垂・御幣は黒背景を透過処理（輝度ベースのアルファ変換）した。背景・棒・穴・小物は写真としてそのまま矩形クロップしている（棒の画像だけ背後にうっすら紺色の矩形が残るが実用上は許容範囲）。
+- 切り出し座礁はリファレンスシート1枚に依存した手動調整のため、別の生成画像に差し替える場合はこのスクリプトの座標は使えない。新しいシートから切り出す場合は座標を再調整するか、各アセットを個別に生成し直す方が確実。
+
+**入口導線**
+- 階層ロビー6階（`/floor/06`）の入口一覧に `matsuri` を追加した（ripple, colony, dot-art に続く4枚目）。入口画像は鳥居越しに棒と穴を見た正面構図 `static/images/entrances/entrance-matsuri.png`。
+
+**棒の表示サイズ調整（2026-06-28追記）**
+- `.matsuri-pole` のサイズは、見切れと小さすぎのバランスを見ながら調整した。最終値: `top:10%; left:38%; width:24%; height:42%;`（`static/matsuri.css`）。
+
+**穴画像の差し替え（2026-06-29）**
+- `10_hole_main.png` を、石組みの穴の写真から「石ブロックを連結した楕円リング」のイラスト画像に差し替えた。元画像は黒背景の上に描かれていたため、輝度ベースで黒を透過処理してから保存している。リング中央の黒い穴部分はそのまま透明（＝下の地面背景がそのまま見える）になる。
+
+**ゲームロジックの見直し（2026-06-29）**
+- 「奉納10回で確定クリア」という固定カウント方式を廃止した。表示カウンターも削除。
+- 代わりに、タップごとに深さ(`depth`)が少し進み、30%の確率でランダムに少し後退する積み上げ方式にした（`static/matsuri.js`の`FORWARD_RANGE`/`BACKWARD_RANGE`/`FALLBACK_CHANCE`）。
+- ゴール条件: 棒の当たり判定（`.matsuri-pole-hit`）の中心が、穴（`.matsuri-hole`）の中心に到達した深さ。当たり判定や穴の位置を変えたら`DEPTH_MAX`の再計算が必要（計算式はJS内コメントに記載）。
+- 当たり判定（`.matsuri-pole-hit`）は画像本体（`.matsuri-pole-visual`）とは別要素に分離した。`.matsuri-pole-stage`が回転・深さの変形を担当し、視覚的な棒の大きさを変えずに当たり判定だけ調整できる。
+
+**棒と穴の重なり順（2026-06-29）**
+- 石のリング画像（`.matsuri-hole`）は棒より背面（z-index:2）。
+- 黒い穴の中心部分（`.matsuri-hole__shadow`、独立した要素に分離済み）だけを棒より前面（z-index:6）に出している。これにより、石の画像が棒に不自然に重ならず、棒の先端が黒い穴に差し掛かると沈んで消えるように見える。
+- ゴール間近で穴全体を前面に切り替える方式（is-buryingクラス）は一度試したが、切り替えの瞬間が不自然だったため撤廃した。
+
+**音の調整（2026-06-29）**
+- 観客の歓声・拍手（`crowd_cheer_01〜04.mp3`：女声・男声「オーッ！」を含む4種）を環境音としてランダムに流し続ける。3本の独立ループを少しずらして開始し、前の音の終了を待たずに次を鳴らすため、瞬間的に重なって途切れない。
+- 手持ち花火・打ち上げ花火（`firework_handheld_01.mp3`, `firework_launch_01.mp3`）はゴール（クライマックス）の瞬間だけ鳴らす。ランダムな後退タップでは鳴らさない。
+
+**削除した要素（2026-06-29）**
+- 画面上部の注連縄（`matsuri-decoration--shimenawa`）。
+- タップ時に穴付近から出ていた土煙エフェクト（`spawnDustPuff`、`30_dust_medium.png`使用）。素材シートからの切り出しが上手くいっておらず何の画像か判別できなかったため削除した。
+
+**関連ファイル**
+- `templates/matsuri.html`, `static/matsuri.css`, `static/matsuri.js`
+- `static/images/matsuri/README.md`, `static/audio/matsuri/README.md`
+- `static/images/entrances/entrance-matsuri.png`
+- `static/audio/matsuri/sfx/crowd_cheer_01.mp3`〜`04.mp3`, `firework_handheld_01.mp3`, `firework_launch_01.mp3`
+- `scripts/extract_matsuri_assets.py`
+- `main.py`（`/matsuri`ルート追加）
+- `static/kyoukai-floor.js`, `tests/test_home_entrances.py`（floor06への追加）

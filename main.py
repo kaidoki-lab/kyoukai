@@ -1343,6 +1343,10 @@ async def ma_room(request: Request) -> HTMLResponse:
 async def kanrinin_room(request: Request) -> HTMLResponse:
     return render_template(request, "kanrinin.html")
 
+@app.get("/matsuri", response_class=HTMLResponse)
+async def matsuri_room(request: Request) -> HTMLResponse:
+    return render_template(request, "matsuri.html")
+
 # /central route removed (Central OS isolated 2026-06-18)
 
 @app.get("/about", response_class=HTMLResponse)

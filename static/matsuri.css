@@ -1,0 +1,305 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+.matsuri-body {
+  font-family: "Yu Gothic", "Meiryo", "Hiragino Kaku Gothic ProN", sans-serif;
+}
+
+/* ---------- Frame (9:16 centered, black bars on wide screens) ---------- */
+
+.matsuri-frame {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(100vw, calc(100vh * 9 / 16));
+  height: min(100vh, calc(100vw * 16 / 9));
+  background: #1c160f;
+  overflow: hidden;
+}
+
+.matsuri-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url("/static/images/matsuri/background/01_ground_dirt.png");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-color: #3a2f1f;
+}
+
+.matsuri-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 85% 65% at 50% 40%, transparent 55%, rgba(0, 0, 0, 0.4) 100%);
+  pointer-events: none;
+}
+
+/* ---------- Decoration ---------- */
+
+.matsuri-decoration {
+  position: absolute;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  pointer-events: none;
+}
+
+.matsuri-decoration--gohei {
+  top: 28%;
+  width: 10%;
+  height: 16%;
+  background-image: url("/static/images/matsuri/decoration/16_gohei.png");
+}
+
+.matsuri-decoration--gohei-left {
+  left: 14%;
+}
+
+.matsuri-decoration--gohei-right {
+  right: 14%;
+}
+
+/* ---------- Hole ---------- */
+
+.matsuri-hole {
+  position: absolute;
+  top: -3%;
+  left: -27%;
+  width: 147%;
+  height: 128%;
+  background-image: url("/static/images/matsuri/hole/10_hole_main.png?v=3");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* 黒い穴の部分だけ棒より前面に出す（石のリング画像は前面に出さない）。
+   棒の先端がここに差し掛かると黒に沈んで消えるように見える。 */
+.matsuri-hole__shadow {
+  position: absolute;
+  top: 15%;
+  left: 17%;
+  width: 59%;
+  height: 92%;
+  background: radial-gradient(ellipse 60% 55% at 50% 50%, #000 0%, #000 55%, transparent 88%);
+  border-radius: 50%;
+  z-index: 6;
+  pointer-events: none;
+}
+
+/* ---------- Pole ---------- */
+/* .matsuri-pole-stage carries the rotation/depth transform for the whole
+   assembly. .matsuri-pole-visual is the full-size image (never resized).
+   .matsuri-pole-hit is the actual click target and can be made short
+   without affecting the image size. */
+
+.matsuri-pole-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  --matsuri-pole-tilt: 16deg;
+  transform-origin: 51% 69%;
+  transform: rotate(var(--matsuri-pole-tilt)) translateY(0);
+  transition: transform 0.18s ease;
+}
+
+.matsuri-pole-visual {
+  position: absolute;
+  top: -87%;
+  left: -10%;
+  width: 122%;
+  height: 177%;
+  background-image: url("/static/images/matsuri/pole/06_pole_main.png?v=2");
+  background-size: contain;
+  background-position: top center;
+  background-repeat: no-repeat;
+}
+
+.matsuri-pole-hit {
+  position: absolute;
+  top: 5%;
+  left: 37%;
+  width: 27%;
+  height: 8%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.matsuri-pole-hit::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(120, 90, 40, 0.18);
+  opacity: 0;
+  border-radius: 6px;
+}
+
+.matsuri-pole-hit:active::after {
+  opacity: 1;
+}
+
+.matsuri-pole-stage.is-shaking {
+  animation: matsuri-pole-shake 0.18s ease;
+}
+
+@keyframes matsuri-pole-shake {
+  0% { transform: rotate(var(--matsuri-pole-tilt, 0deg)) translateY(var(--matsuri-pole-depth, 0)); }
+  30% { transform: rotate(calc(var(--matsuri-pole-tilt, 0deg) - 1.5deg)) translateY(var(--matsuri-pole-depth, 0)); }
+  60% { transform: rotate(calc(var(--matsuri-pole-tilt, 0deg) + 1.5deg)) translateY(var(--matsuri-pole-depth, 0)); }
+  100% { transform: rotate(var(--matsuri-pole-tilt, 0deg)) translateY(var(--matsuri-pole-depth, 0)); }
+}
+
+.matsuri-frame.is-screen-shaking {
+  animation: matsuri-screen-shake 0.22s ease;
+}
+
+@keyframes matsuri-screen-shake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-1.2%, 0.6%); }
+  50% { transform: translate(1%, -0.6%); }
+  75% { transform: translate(-0.6%, 0.4%); }
+}
+
+/* ---------- Confetti ---------- */
+
+.matsuri-confetti-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.matsuri-confetti-piece {
+  position: absolute;
+  top: -5%;
+  width: 2.2%;
+  height: 3.2%;
+  background: #e0c66a;
+  opacity: 0.95;
+  animation: matsuri-confetti-fall linear forwards;
+}
+
+@keyframes matsuri-confetti-fall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0.95; }
+  100% { transform: translateY(115vh) rotate(540deg); opacity: 0.4; }
+}
+
+/* ---------- HUD ---------- */
+
+.matsuri-hud {
+  position: absolute;
+  top: 4%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.matsuri-progress {
+  font-size: clamp(13px, 3.2vw, 16px);
+  letter-spacing: 0.08em;
+  color: #f1e3bb;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+}
+
+.matsuri-message {
+  font-size: clamp(14px, 3.6vw, 18px);
+  letter-spacing: 0.06em;
+  color: #ffe6a8;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.85);
+  min-height: 1.4em;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.matsuri-message.is-visible {
+  opacity: 1;
+}
+
+.matsuri-reset {
+  position: absolute;
+  bottom: 6%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(224, 198, 106, 0.6);
+  color: #f1e3bb;
+  padding: 8px 20px;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+/* ---------- Climax overlays ---------- */
+
+.matsuri-flash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.matsuri-flash.is-active {
+  animation: matsuri-flash 0.5s ease-out;
+}
+
+@keyframes matsuri-flash {
+  0% { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+
+.matsuri-impact-lines {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 70%, rgba(255, 240, 200, 0.5), transparent 60%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 19;
+}
+
+.matsuri-impact-lines.is-active {
+  animation: matsuri-impact 0.6s ease-out;
+}
+
+@keyframes matsuri-impact {
+  0% { opacity: 0.9; transform: scale(0.8); }
+  100% { opacity: 0; transform: scale(1.3); }
+}
+
+.matsuri-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 90% 80% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+  pointer-events: none;
+  z-index: 6;
+}
+
+.matsuri-frame.is-motion-blur {
+  filter: blur(1.5px);
+  transition: filter 0.1s ease;
+}
