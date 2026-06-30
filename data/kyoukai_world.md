@@ -479,3 +479,57 @@ KYOUKAIの「外」への扉。
 - `vercel.json`（excludeFiles: matsuri/namahage追加）
 - `main.py`（`/namahage`ルート追加）
 - `static/kyoukai-floor.js`, `tests/test_home_entrances.py`（floor06への追加）
+
+---
+
+## 更新メモ 2026-06-30
+
+### シナリオモードシステム v1.0
+
+KYOUKAIに、今後シナリオ・部屋・住人・階層を継続追加できるためのデータ駆動型シナリオ基盤を追加した。
+一本道の物語をコードに書くのではなく、ルート、電話イベント、部屋状態、フロア状態、住人状態を外部データと保存状態で管理する方針。
+
+**基本構造**
+- 1フロアは5部屋固定。
+- 階数のみ増設可能。
+- 部屋追加時は `roomIndex` から `floor` と `slot` を自動算出する。
+- 算出式は `floor = Math.floor(roomIndex / 5) + 1`、`slot = roomIndex % 5 + 1`。
+- 同一フロアに6部屋目は存在しない。6部屋目は自動的に次フロアの1部屋目になる。
+- このルールは `docs/境界ワールド.md` の「フロア自動増設ルール」にも記録済み。
+
+**初回モード分岐**
+- 初回に管理人室へ入るとシナリオモード開始。
+- 初回に管理人室以外へ入ると自由探索モード開始。
+- 判定結果は `localStorage` の `kyoukai_scenario_state_v1` に保存する。
+
+**シナリオモードの初期開放**
+- シナリオモード開始時は1F、2F、3Fのみ探索可能。
+- 4F以上は `story_only` / locked 扱い。
+- 4F以上は自由探索では解除されず、赤い電話または管理人イベントでのみ開放される想定。
+
+**赤い電話**
+- 管理人室に `redPhoneArea` を追加。
+- 電話はプレイヤーから掛けるものではなく、条件成立時のみ着信する。
+- 管理人室入室後30秒で着信判定を行う。
+- 電話イベントは `static/kyoukai-scenario-events.js` で管理し、会話文をコードへ直書きしない方針。
+
+**状態管理**
+- 保存対象はモード、現在ルート、現在章、現在イベント、管理人状態、電話状態、部屋状態、フロア状態、住人状態、取得アイテム、開放済み部屋、会話履歴、進行率。
+- 管理人状態は `hidden` / `visible` / `busy` / `away` などに拡張可能。
+- 部屋状態は `normal` / `waiting` / `active` / `completed` / `locked` / `disabled` などに拡張可能。
+- フロア状態は `locked` / `unlocked` / `story_only` / `completed` などに拡張可能。
+
+**実装構成**
+- `static/kyoukai-building-data.js`: 建物、部屋、住人、ルートのデータ定義。
+- `static/kyoukai-scenario-events.js`: 電話イベント、管理人イベント、部屋イベントのデータ定義。
+- `static/kyoukai-scenario.js`: セーブデータ、モード判定、部屋配置、ロック判定、イベント適用の共通ロジック。
+- `static/kyoukai-elevator.js`: 階リストをデータから生成し、シナリオロック状態を反映。
+- `static/kyoukai-floor.js`: フロア内5スロット固定表示。部屋は `roomIndex` から自動配置。
+- `templates/kanrinin.html`, `static/kanrinin.js`, `static/kanrinin.css`: 赤い電話ホットスポットと着信表示。
+- `main.py`: 全HTMLへシナリオ共通スクリプトを注入。`/floor/{floor_number}` は7階以降も受け入れる。
+
+**運用方針**
+- シナリオ追加時は、原則として `static/kyoukai-building-data.js` と `static/kyoukai-scenario-events.js` へのデータ追加で対応する。
+- シナリオ進行を `if` 文で個別実装しない。
+- 部屋番号、階番号、電話番号、住人番号を進行コードへ直書きしない。
+- 将来的に100部屋以上、数百イベント規模になっても、基本ロジックを書き換えずに増築できる構造を維持する。
