@@ -28,6 +28,7 @@
       { id: "colony", name: "COLONY", label: "COL", href: "/colony", image: "/static/images/colony/entrance-colony.png", material: "crack" },
       { id: "dot-art", name: "dot-art", label: "DOT", href: "/dot-art", image: "/static/entrance-dot-art.png", material: "crack" },
       { id: "matsuri", name: "matsuri", label: "MAT", href: "/matsuri", image: "/static/images/entrances/entrance-matsuri.png", material: "shrine" },
+      { id: "namahage", name: "namahage", label: "NMH", href: "/namahage", image: "/static/images/entrances/entrance-namahage.png", material: "crack" },
     ],
   };
   const hallTracks = [
