@@ -238,6 +238,19 @@
     openDiary();
   });
 
+  bindArea("amazonArea", () => {
+    trackArea("amazon");
+    const links = Array.isArray(window.KYOUKAI_OUTSIDE_AMAZON_LINKS)
+      ? window.KYOUKAI_OUTSIDE_AMAZON_LINKS.filter(Boolean)
+      : [];
+    const url = links.length ? links[Math.floor(Math.random() * links.length)] : "https://www.amazon.co.jp/";
+    window.open(url, "_blank", "noopener,noreferrer");
+  });
+
+  bindArea("rakutenArea", () => {
+    trackArea("rakuten");
+  });
+
   function setPhoneRinging(eventData) {
     activePhoneEvent = eventData;
     phoneRinging = Boolean(eventData);
