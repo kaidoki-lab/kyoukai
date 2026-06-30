@@ -8,14 +8,8 @@
   const downButton = document.querySelector("[data-floor-down]");
   const sequence = ["4", "3", "2", "1"];
   const doorFrameIntervalMs = 740;
-  const floors = [
-    { number: "01", display: "M", href: "/floor/01", label: "管理人室" },
-    { number: "02", display: "02", href: "/floor/02", label: "FLOOR" },
-    { number: "03", display: "03", href: "/floor/03", label: "FLOOR" },
-    { number: "04", display: "04", href: "/floor/04", label: "FLOOR" },
-    { number: "05", display: "05", href: "/floor/05", label: "FLOOR" },
-    { number: "06", display: "06", href: "/floor/06", label: "FLOOR" },
-  ];
+  const scenario = window.KYOUKAI_SCENARIO;
+  const building = window.KYOUKAI_BUILDING || { rooms: [], initialScenarioFloors: 3 };
   const hallTracks = [
     "/static/bgm/bgm_home.mp3",
     "/static/bgm/bgm_exit.mp3",
@@ -29,6 +23,31 @@
 
   if (!room || frames.length === 0 || !cabin || !floorNumber || !enterButton || !upButton || !downButton) return;
 
+  function floorKey(floor) {
+    return String(floor).padStart(2, "0");
+  }
+
+  function getRooms() {
+    return scenario ? scenario.getRooms() : [];
+  }
+
+  function getFloors() {
+    const maxRoomFloor = getRooms().reduce((max, item) => Math.max(max, item.floor), 1);
+    const maxFloor = Math.max(maxRoomFloor, Number(building.initialScenarioFloors || 3));
+    return Array.from({ length: maxFloor }, (_, index) => {
+      const floor = index + 1;
+      const number = floorKey(floor);
+      const locked = scenario ? !scenario.canEnterFloor(number) : false;
+      return {
+        number,
+        display: floor === 1 ? "M" : number,
+        href: `/floor/${number}`,
+        label: locked ? "LOCKED" : "FLOOR",
+        locked,
+      };
+    });
+  }
+
   function showFrame(frameId) {
     frames.forEach((frame) => {
       frame.classList.toggle("is-active", frame.dataset.doorFrame === frameId);
@@ -36,11 +55,14 @@
   }
 
   function updateFloor(index) {
+    const floors = getFloors();
     const nextIndex = Math.max(0, Math.min(floors.length - 1, index));
     const floor = floors[nextIndex];
     cabin.dataset.floorIndex = String(nextIndex);
     floorNumber.textContent = floor.display || floor.number;
     enterButton.dataset.floorHref = floor.href;
+    enterButton.disabled = Boolean(floor.locked);
+    enterButton.classList.toggle("is-locked", Boolean(floor.locked));
     enterButton.setAttribute("aria-label", `${floor.label} ${floor.number}`);
   }
 
@@ -87,8 +109,15 @@
   });
 
   enterButton.addEventListener("click", () => {
+    const floors = getFloors();
+    const floor = floors[Number(cabin.dataset.floorIndex || 0)];
+    if (floor && floor.locked) return;
     const href = enterButton.dataset.floorHref;
     if (href) window.location.href = href;
+  });
+
+  document.addEventListener("kyoukai:scenario-state", () => {
+    updateFloor(Number(cabin.dataset.floorIndex || 0));
   });
 
   updateFloor(0);

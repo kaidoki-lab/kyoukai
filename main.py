@@ -1138,6 +1138,12 @@ MOMENT_LAYER_WINDOW_ASSETS = (
     '  <script src="/static/js/moment-layer-window.js?v=4" defer></script>\n'
 )
 
+SCENARIO_MODE_ASSETS = (
+    '  <script src="/static/kyoukai-building-data.js?v=scenario1" defer></script>\n'
+    '  <script src="/static/kyoukai-scenario-events.js?v=scenario1" defer></script>\n'
+    '  <script src="/static/kyoukai-scenario.js?v=scenario1" defer></script>\n'
+)
+
 
 def inject_moment_layer_window_assets(html: str) -> str:
     if "/static/js/moment-layer-window.js" in html:
@@ -1146,6 +1152,15 @@ def inject_moment_layer_window_assets(html: str) -> str:
     if closing_head is None:
         return html
     return html[: closing_head.start()] + MOMENT_LAYER_WINDOW_ASSETS + html[closing_head.start() :]
+
+
+def inject_scenario_mode_assets(html: str) -> str:
+    if "/static/kyoukai-scenario.js" in html:
+        return html
+    closing_head = re.search(r"</head\s*>", html, flags=re.IGNORECASE)
+    if closing_head is None:
+        return html
+    return html[: closing_head.start()] + SCENARIO_MODE_ASSETS + html[closing_head.start() :]
 
 
 @app.middleware("http")
@@ -1165,7 +1180,7 @@ async def moment_layer_window_middleware(request: Request, call_next: Any) -> Re
         charset = charset_match.group(1).strip()
 
     html = body.decode(charset, errors="replace")
-    updated_html = inject_moment_layer_window_assets(html)
+    updated_html = inject_scenario_mode_assets(inject_moment_layer_window_assets(html))
     headers = dict(response.headers)
     headers.pop("content-length", None)
     return Response(
@@ -1217,9 +1232,9 @@ async def elevator(request: Request) -> HTMLResponse:
 
 @app.get("/floor/{floor_number}", response_class=HTMLResponse)
 async def floor_lobby(request: Request, floor_number: str) -> HTMLResponse:
-    if floor_number not in {"01", "02", "03", "04", "05", "06"}:
+    if re.fullmatch(r"\d{1,3}", floor_number) is None or int(floor_number) < 1:
         return RedirectResponse(url="/elevator")
-    return render_template(request, "floor.html", floor_number=floor_number)
+    return render_template(request, "floor.html", floor_number=floor_number.zfill(2))
 
 @app.get("/observation", response_class=HTMLResponse)
 async def observation(request: Request) -> HTMLResponse:

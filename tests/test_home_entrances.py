@@ -13,6 +13,8 @@ class HomeEntranceTests(unittest.TestCase):
         self.journey_js = (BASE_DIR / "static" / "kyoukai-home-journey.js").read_text(encoding="utf-8")
         self.elevator_js = (BASE_DIR / "static" / "kyoukai-elevator.js").read_text(encoding="utf-8")
         self.floor_js = (BASE_DIR / "static" / "kyoukai-floor.js").read_text(encoding="utf-8")
+        self.building_js = (BASE_DIR / "static" / "kyoukai-building-data.js").read_text(encoding="utf-8")
+        self.scenario_js = (BASE_DIR / "static" / "kyoukai-scenario.js").read_text(encoding="utf-8")
         self.space_css = (BASE_DIR / "static" / "space.css").read_text(encoding="utf-8")
         self.main_py = (BASE_DIR / "main.py").read_text(encoding="utf-8")
 
@@ -54,10 +56,9 @@ class HomeEntranceTests(unittest.TestCase):
         self.assertIn("data-floor-down", self.elevator_html)
         self.assertNotIn("/static/bgm.js", self.elevator_html)
         self.assertNotIn("elevator-panel", self.elevator_html)
-
-        for floor_number in ["01", "02", "03", "04", "05", "06"]:
-            with self.subTest(floor_number=floor_number):
-                self.assertIn(f'href: "/floor/{floor_number}"', self.elevator_js)
+        self.assertIn("getFloors()", self.elevator_js)
+        self.assertIn("scenario.canEnterFloor(number)", self.elevator_js)
+        self.assertIn('href: `/floor/${number}`', self.elevator_js)
 
     def test_floor_pages_use_original_entrance_images(self):
         self.assertIn("data-floor-entrance-strip", self.floor_html)
@@ -87,7 +88,7 @@ class HomeEntranceTests(unittest.TestCase):
 
         for route in expected_routes:
             with self.subTest(route=route):
-                self.assertIn(f'href: "{route}"', self.floor_js)
+                self.assertIn(f'href: "{route}"', self.building_js)
 
         for image_name in [
             "entrance-kanrinin.png",
@@ -110,7 +111,7 @@ class HomeEntranceTests(unittest.TestCase):
             "entrance-namahage.png",
         ]:
             with self.subTest(image_name=image_name):
-                self.assertIn(image_name, self.floor_js)
+                self.assertIn(image_name, self.building_js)
 
     def test_hall_sound_uses_gokuraku_tracks_and_stops_on_room_entry(self):
         combined_hall_source = self.elevator_js + "\n" + self.floor_js
@@ -139,7 +140,7 @@ class HomeEntranceTests(unittest.TestCase):
         self.assertIn("snapEntranceIntoCenter(strip, targetIndex);", self.floor_js)
         self.assertIn("interactionStartIndex + direction", self.floor_js)
         self.assertIn("window.addEventListener(\"resize\"", self.floor_js)
-        self.assertIn("20260628snap1", self.floor_html)
+        self.assertIn("scenario1", self.floor_html)
 
     def test_elevator_door_frames_play_in_requested_order(self):
         for frame_id in ["4", "3", "2", "1"]:
@@ -154,6 +155,28 @@ class HomeEntranceTests(unittest.TestCase):
         self.assertIn(".kyoukai-elevator-room[data-door-state=\"complete\"] .elevator-door", self.space_css)
         self.assertIn(".elevator-floor-display", self.space_css)
         self.assertIn("left: 82.2%;", self.space_css)
+
+    def test_scenario_mode_uses_data_driven_room_placement(self):
+        self.assertIn("window.KYOUKAI_BUILDING", self.building_js)
+        self.assertIn("roomsPerFloor: 5", self.building_js)
+        self.assertIn("roomIndex: 29", self.building_js)
+        self.assertIn("Math.floor(index / roomsPerFloor) + 1", self.scenario_js)
+        self.assertIn("index % roomsPerFloor + 1", self.scenario_js)
+        self.assertIn("nextRoomIndex", self.scenario_js)
+        self.assertIn("groupRoomsByFloor", self.scenario_js)
+        self.assertIn('upperDefault: "story_only"', self.building_js)
+        self.assertIn('state.mode = mode;', self.scenario_js)
+        self.assertIn('roomId === "kanrinin" ? "scenario" : "free"', self.scenario_js)
+
+    def test_scenario_assets_are_injected_and_upper_floors_are_dynamic(self):
+        self.assertIn("SCENARIO_MODE_ASSETS", self.main_py)
+        self.assertIn("/static/kyoukai-scenario.js", self.main_py)
+        self.assertIn('re.fullmatch(r"\\d{1,3}", floor_number)', self.main_py)
+        self.assertNotIn('{"01", "02", "03", "04", "05", "06"}', self.main_py)
+        self.assertIn("is-locked", self.elevator_js)
+        self.assertIn("is-locked", self.floor_js)
+        self.assertIn("entrance-object--empty", self.floor_js)
+        self.assertIn('Array.from({ length: roomsPerFloor }', self.floor_js)
 
 
 if __name__ == "__main__":

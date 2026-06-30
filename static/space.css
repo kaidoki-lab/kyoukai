@@ -3045,6 +3045,30 @@ a.sp-link:hover,
   isolation: isolate;
 }
 
+.entrance-object.is-locked,
+.entrance-object--empty {
+  cursor: default;
+  opacity: 0.58;
+  filter: grayscale(0.72);
+}
+
+.entrance-object.is-locked::after,
+.entrance-object--empty::after {
+  content: "";
+  position: absolute;
+  inset: 12px 22px 46px;
+  border: 1px solid rgba(255, 42, 54, 0.28);
+  background:
+    linear-gradient(135deg, transparent 0 47%, rgba(255, 42, 54, 0.32) 48% 52%, transparent 53% 100%),
+    rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+}
+
+.kyoukai-floor-shell[data-floor-state="locked"] .kyoukai-floor-head span::after {
+  content: " / LOCKED";
+  color: rgba(255, 42, 54, 0.72);
+}
+
 .entrance-object__visual {
   position: relative;
   display: grid;
@@ -3938,6 +3962,12 @@ a.sp-link:hover,
   text-shadow:
     0 0 6px rgba(255, 42, 54, 0.95),
     0 0 18px rgba(255, 42, 54, 0.54);
+}
+
+.elevator-floor-display.is-locked {
+  color: rgba(255, 42, 54, 0.48);
+  text-decoration: line-through;
+  cursor: default;
 }
 
 .elevator-floor-display span {

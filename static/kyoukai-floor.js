@@ -1,36 +1,7 @@
 (function () {
-  const floorGroups = {
-    "01": [
-      { id: "kanrinin", name: "管理人室", label: "MGR", href: "/kanrinin", image: "/static/images/entrances/entrance-kanrinin.png", material: "door" },
-    ],
-    "02": [
-      { id: "observation", name: "observation", label: "OBS", href: "/observation", image: "/static/images/entrances/entrance-observation.png", material: "mirror" },
-      { id: "observer", name: "observer", label: "OBR", href: "/observer", image: "/static/images/entrances/entrance-observer.png", material: "shrine" },
-      { id: "archive", name: "archive", label: "ARC", href: "/archive", image: "/static/images/entrances/entrance-archive.png", material: "box" },
-    ],
-    "03": [
-      { id: "signal", name: "signal", label: "SIG", href: "/signal", image: "/static/images/entrances/entrance-signal.png", material: "speaker" },
-      { id: "news", name: "news", label: "NEWS", href: "/typhoon-news/", image: "/static/images/entrances/news.png", material: "door" },
-      { id: "daimyojin", name: "daimyojin", label: "DMJ", href: "/daimyojin", image: "/static/images/entrances/entrance-daimyojin.png", material: "shrine" },
-    ],
-    "04": [
-      { id: "hyougi", name: "hyougi", label: "HYO", href: "/hyougi", image: "/static/images/entrances/entrance-hyougi.png", material: "paper" },
-      { id: "gokuraku", name: "gokuraku", label: "GOK", href: "/gokuraku", image: "/static/images/entrances/entrance-gokuraku.png", material: "shrine" },
-      { id: "exit", name: "exit", label: "EXT", href: "/exit", image: "/static/images/entrances/entrance-exit.png", material: "door" },
-    ],
-    "05": [
-      { id: "null", name: "null", label: "NUL", href: "/null", image: "/static/images/entrances/entrance-null.png", material: "crack" },
-      { id: "ma", name: "ma", label: "MA", href: "/ma", image: "/static/images/entrances/entrance-ma.png", material: "mirror" },
-      { id: "particles", name: "particles", label: "PRT", href: "/particles", image: "/static/images/entrances/entrance-particles.png?v=20260625c", material: "mirror" },
-    ],
-    "06": [
-      { id: "ripple", name: "ripple", label: "RPL", href: "/ripple", image: "/static/images/entrances/entrance-ripple.png?v=20260625b", material: "crack" },
-      { id: "colony", name: "COLONY", label: "COL", href: "/colony", image: "/static/images/colony/entrance-colony.png", material: "crack" },
-      { id: "dot-art", name: "dot-art", label: "DOT", href: "/dot-art", image: "/static/entrance-dot-art.png", material: "crack" },
-      { id: "matsuri", name: "matsuri", label: "MAT", href: "/matsuri", image: "/static/images/entrances/entrance-matsuri.png", material: "shrine" },
-      { id: "namahage", name: "namahage", label: "NMH", href: "/namahage", image: "/static/images/entrances/entrance-namahage.png", material: "crack" },
-    ],
-  };
+  const scenario = window.KYOUKAI_SCENARIO;
+  const building = window.KYOUKAI_BUILDING || { roomsPerFloor: 5, rooms: [] };
+  const roomsPerFloor = Number(building.roomsPerFloor || 5);
   const hallTracks = [
     "/static/bgm/bgm_home.mp3",
     "/static/bgm/bgm_exit.mp3",
@@ -45,11 +16,11 @@
   function createFallback(item) {
     const object = document.createElement("span");
     object.className = "entrance-object__fallback";
-    object.dataset.material = item.material;
+    object.dataset.material = item.material || "door";
 
     const mark = document.createElement("span");
     mark.className = "entrance-object__mark";
-    mark.textContent = item.name.slice(0, 2);
+    mark.textContent = (item.name || "??").slice(0, 2);
     object.append(mark);
     return object;
   }
@@ -65,11 +36,42 @@
     return image;
   }
 
+  function createEmptySlot(slot) {
+    const object = document.createElement("span");
+    object.className = "entrance-object entrance-object--empty";
+    object.dataset.slot = String(slot);
+
+    const visual = document.createElement("span");
+    visual.className = "entrance-object__visual";
+    visual.append(createFallback({ name: "--", material: "door" }));
+
+    const text = document.createElement("span");
+    text.className = "entrance-object__text";
+    const name = document.createElement("span");
+    name.className = "entrance-object__name";
+    name.textContent = "VACANT";
+    const label = document.createElement("span");
+    label.className = "entrance-object__label";
+    label.textContent = `SLOT ${slot}`;
+    text.append(name, label);
+    object.append(visual, text);
+    return object;
+  }
+
   function createEntrance(item) {
-    const link = document.createElement("a");
+    const locked = scenario ? !scenario.canEnterRoom(item.id) : false;
+    const link = document.createElement(locked ? "span" : "a");
     link.className = "entrance-object";
-    link.href = item.href;
     link.dataset.entranceId = item.id;
+    link.dataset.floor = String(item.floor);
+    link.dataset.slot = String(item.slot);
+    link.classList.toggle("is-locked", locked);
+    if (locked) {
+      link.setAttribute("role", "link");
+      link.setAttribute("aria-disabled", "true");
+    } else {
+      link.href = item.href;
+    }
     link.setAttribute("aria-label", `${item.name} ${item.label}`);
 
     const visual = document.createElement("span");
@@ -85,11 +87,18 @@
 
     const label = document.createElement("span");
     label.className = "entrance-object__label";
-    label.textContent = item.label;
+    label.textContent = locked ? "LOCKED" : item.label;
 
     text.append(name, label);
     link.append(visual, text);
     return link;
+  }
+
+  function roomsForFloor(floorNumber) {
+    const floor = Number(floorNumber);
+    const floors = scenario ? scenario.groupRoomsByFloor() : {};
+    const fromScenario = floors[String(floor).padStart(2, "0")] || [];
+    return Array.from({ length: roomsPerFloor }, (_, index) => fromScenario[index] || null);
   }
 
   function renderFloor() {
@@ -98,8 +107,12 @@
     if (!shell || !strip) return;
 
     const floorNumber = shell.dataset.floorNumber || "01";
-    const items = floorGroups[floorNumber] || floorGroups["01"];
-    strip.replaceChildren(...items.map(createEntrance));
+    const isFloorLocked = scenario ? !scenario.canEnterFloor(floorNumber) : false;
+    shell.dataset.floorState = isFloorLocked ? "locked" : "open";
+    const items = roomsForFloor(floorNumber).map((item, index) => (
+      item && !isFloorLocked ? createEntrance(item) : createEmptySlot(index + 1)
+    ));
+    strip.replaceChildren(...items);
   }
 
   function calibrateEntranceStrip(strip) {
@@ -231,7 +244,8 @@
     window.KYOUKAI_HALL_SOUND = { start: startHallSound, stop: stopHallSound };
   }
 
-  window.KYOUKAI_FLOOR_GROUPS = floorGroups;
+  document.addEventListener("kyoukai:scenario-state", renderFloor);
+  window.KYOUKAI_FLOOR_GROUPS = scenario ? scenario.groupRoomsByFloor() : {};
   renderFloor();
   enableEntranceSnap();
   document.documentElement.dataset.hallSound = "ready";

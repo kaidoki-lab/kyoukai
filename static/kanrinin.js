@@ -42,10 +42,15 @@
   const diaryPrevBtn = document.getElementById("diaryPrev");
   const diaryNextBtn = document.getElementById("diaryNext");
   const blackout = document.getElementById("kanrininBlackout");
+  const redPhoneArea = document.getElementById("redPhoneArea");
 
   let messageTimer = null;
   let revealTimer = null;
+  let phoneTimer = null;
+  let activePhoneEvent = null;
+  let phoneRinging = false;
   const EYE_REVEAL_MS = 3000;
+  const PHONE_CHECK_DELAY_MS = 30000;
 
   function trackArea(area) {
     if (typeof window.trackKyoukaiEvent === "function") {
@@ -232,6 +237,47 @@
     trackArea("note");
     openDiary();
   });
+
+  function setPhoneRinging(eventData) {
+    activePhoneEvent = eventData;
+    phoneRinging = Boolean(eventData);
+    if (redPhoneArea) redPhoneArea.classList.toggle("is-ringing", phoneRinging);
+    if (phoneRinging) showMessage("赤い電話が鳴っている。", 5000);
+  }
+
+  function schedulePhoneCheck() {
+    if (!redPhoneArea || !window.KYOUKAI_SCENARIO) return;
+    const state = window.KYOUKAI_SCENARIO.getState();
+    if (state.mode !== "scenario") return;
+    window.clearTimeout(phoneTimer);
+    phoneTimer = window.setTimeout(() => {
+      const nextEvent = window.KYOUKAI_SCENARIO.getNextPhoneEvent();
+      if (nextEvent) {
+        setPhoneRinging(nextEvent);
+      }
+    }, PHONE_CHECK_DELAY_MS);
+  }
+
+  bindArea("redPhoneArea", () => {
+    trackArea("red-phone");
+    if (!window.KYOUKAI_SCENARIO) return;
+    if (!phoneRinging || !activePhoneEvent) {
+      showMessage("電話は沈黙している。", 2400);
+      return;
+    }
+    window.KYOUKAI_SCENARIO.acceptPhoneEvent(activePhoneEvent.event_id);
+    const lines = Array.isArray(activePhoneEvent.conversation) ? activePhoneEvent.conversation : [];
+    showMessage(lines.join("\n"), 7000);
+    setPhoneRinging(null);
+  });
+
+  document.addEventListener("kyoukai:scenario-notice", (event) => {
+    if (!event.detail || !event.detail.message) return;
+    event.preventDefault();
+    showMessage(event.detail.message, 4200);
+  });
+
+  schedulePhoneCheck();
 
   if (keyBoxModalClose) {
     keyBoxModalClose.addEventListener("click", closeKeyBoxModal);
