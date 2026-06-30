@@ -1,0 +1,69 @@
+.is-scenario-target {
+  outline: 1px solid rgba(248, 63, 63, 0.78);
+  outline-offset: 4px;
+  cursor: pointer;
+  filter: saturate(1.08) contrast(1.05);
+}
+
+.scenario-line-overlay {
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left));
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 120;
+  min-height: 2.7rem;
+  padding: 14px 16px;
+  border: 1px solid rgba(228, 69, 69, 0.56);
+  background: rgba(8, 8, 12, 0.88);
+  color: #f3eee4;
+  font-size: clamp(0.92rem, 2.7vw, 1.05rem);
+  line-height: 1.7;
+  letter-spacing: 0;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+  box-shadow: 0 0 24px rgba(190, 28, 28, 0.22);
+}
+
+.scenario-line-overlay.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.observation-room[data-route-a-ready] .room-crt-noise,
+.observation-room[data-route-a-event="route_a_room_observation_001"] .room-crt-noise {
+  opacity: 0.72;
+  mix-blend-mode: screen;
+}
+
+.observation-room[data-route-a-event="route_a_room_observation_001"] .crt-stage {
+  animation: route-a-observation-noise 520ms steps(2, end) infinite;
+}
+
+.signal-room[data-route-a-event="route_a_room_signal_001"] .signal-tv-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.16) 0 1px, rgba(0,0,0,0.22) 1px 3px),
+    radial-gradient(circle at 45% 42%, rgba(130, 245, 222, 0.28), transparent 38%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: route-a-signal-noise 420ms steps(2, end) infinite;
+}
+
+@keyframes route-a-observation-noise {
+  0% { transform: translate(0, 0); filter: hue-rotate(0deg) contrast(1.1); }
+  35% { transform: translate(1px, -1px); filter: hue-rotate(22deg) contrast(1.32); }
+  70% { transform: translate(-1px, 1px); filter: hue-rotate(-18deg) contrast(1.2); }
+  100% { transform: translate(0, 0); filter: hue-rotate(0deg) contrast(1.1); }
+}
+
+@keyframes route-a-signal-noise {
+  0% { opacity: 0.48; transform: translateX(0); }
+  50% { opacity: 0.88; transform: translateX(2px); }
+  100% { opacity: 0.52; transform: translateX(-1px); }
+}

@@ -49,6 +49,7 @@
   let phoneTimer = null;
   let activePhoneEvent = null;
   let phoneRinging = false;
+  let scenarioLineActive = false;
   const EYE_REVEAL_MS = 3000;
   const PHONE_CHECK_DELAY_MS = 30000;
 
@@ -66,6 +67,61 @@
     messageTimer = window.setTimeout(() => {
       messageEl.classList.remove("is-visible");
     }, duration || 2600);
+  }
+
+  function lineText(line) {
+    if (!line) return "";
+    return typeof line === "string" ? line : line.text || "";
+  }
+
+  function playScenarioLines(lines, options) {
+    const list = (Array.isArray(lines) ? lines : []).map(lineText).filter(Boolean);
+    const config = options || {};
+    let index = 0;
+    let advanceTimer = null;
+    scenarioLineActive = true;
+
+    function cleanup() {
+      window.clearTimeout(advanceTimer);
+      document.removeEventListener("click", advance);
+      document.removeEventListener("keydown", advanceByKey);
+      scenarioLineActive = false;
+    }
+
+    function finish() {
+      cleanup();
+      if (typeof config.onComplete === "function") config.onComplete();
+    }
+
+    function showCurrent() {
+      if (index >= list.length) {
+        finish();
+        return;
+      }
+      showMessage(list[index], config.lineDuration || 2800);
+      index += 1;
+      window.clearTimeout(advanceTimer);
+      advanceTimer = window.setTimeout(showCurrent, config.lineDuration || 2800);
+    }
+
+    function advance(event) {
+      if (event && redPhoneArea && event.target === redPhoneArea) return;
+      window.clearTimeout(advanceTimer);
+      showCurrent();
+    }
+
+    function advanceByKey(event) {
+      if (event.key === "Escape") return;
+      advance(event);
+    }
+
+    if (!list.length) {
+      finish();
+      return;
+    }
+    document.addEventListener("click", advance);
+    document.addEventListener("keydown", advanceByKey);
+    showCurrent();
   }
 
   function revealEye() {
@@ -147,7 +203,17 @@
     fetch(DIARY_DATA_URL)
       .then((response) => response.json())
       .then((data) => {
-        diaryPages = Array.isArray(data) ? data : [];
+        const basePages = Array.isArray(data) ? data : [];
+        const scenarioPages = window.KYOUKAI_SCENARIO
+          ? window.KYOUKAI_SCENARIO.getDiaryEntries()
+          : [];
+        const seen = new Set();
+        diaryPages = [...basePages, ...scenarioPages].filter((page) => {
+          const key = page.entry_id || `${page.category}:${page.title}:${page.body}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
         showDiaryModal();
       })
       .catch(() => {
@@ -255,16 +321,20 @@
     activePhoneEvent = eventData;
     phoneRinging = Boolean(eventData);
     if (redPhoneArea) redPhoneArea.classList.toggle("is-ringing", phoneRinging);
-    if (phoneRinging) showMessage("赤い電話が鳴っている。", 5000);
+    if (phoneRinging) {
+      window.KYOUKAI_SCENARIO?.startPhoneRinging(eventData.event_id);
+      showMessage("赤い電話が鳴っている。", 5000);
+    }
   }
 
   function schedulePhoneCheck() {
     if (!redPhoneArea || !window.KYOUKAI_SCENARIO) return;
     const state = window.KYOUKAI_SCENARIO.getState();
     if (state.mode !== "scenario") return;
+    if (window.KYOUKAI_SCENARIO.getManagerEvent("kanrinin")) return;
     window.clearTimeout(phoneTimer);
     phoneTimer = window.setTimeout(() => {
-      const nextEvent = window.KYOUKAI_SCENARIO.getNextPhoneEvent();
+      const nextEvent = window.KYOUKAI_SCENARIO.getNextPhoneEvent({ roomStaySeconds: PHONE_CHECK_DELAY_MS / 1000 });
       if (nextEvent) {
         setPhoneRinging(nextEvent);
       }
@@ -274,14 +344,21 @@
   bindArea("redPhoneArea", () => {
     trackArea("red-phone");
     if (!window.KYOUKAI_SCENARIO) return;
+    if (scenarioLineActive) return;
     if (!phoneRinging || !activePhoneEvent) {
       showMessage("電話は沈黙している。", 2400);
       return;
     }
-    window.KYOUKAI_SCENARIO.acceptPhoneEvent(activePhoneEvent.event_id);
-    const lines = Array.isArray(activePhoneEvent.conversation) ? activePhoneEvent.conversation : [];
-    showMessage(lines.join("\n"), 7000);
+    const eventData = window.KYOUKAI_SCENARIO.acceptPhoneEvent(activePhoneEvent.event_id);
+    if (!eventData) return;
     setPhoneRinging(null);
+    playScenarioLines(eventData.conversation, {
+      lineDuration: 3000,
+      onComplete: () => {
+        window.KYOUKAI_SCENARIO.finishPhoneEvent(eventData.event_id);
+        showMessage("受話器が、静かに戻った。", 2600);
+      },
+    });
   });
 
   document.addEventListener("kyoukai:scenario-notice", (event) => {
@@ -290,7 +367,39 @@
     showMessage(event.detail.message, 4200);
   });
 
-  schedulePhoneCheck();
+  function runManagerReturnIfReady() {
+    if (!window.KYOUKAI_SCENARIO) return false;
+    const managerEvent = window.KYOUKAI_SCENARIO.getManagerEvent("kanrinin");
+    if (!managerEvent) return false;
+    const sequence = Array.isArray(managerEvent.manager_state_sequence)
+      ? managerEvent.manager_state_sequence
+      : ["visible"];
+    const state = window.KYOUKAI_SCENARIO.getState();
+    state.manager_state = sequence[1] || "visible";
+    window.KYOUKAI_SCENARIO.saveState(state);
+    playScenarioLines(managerEvent.conversation, {
+      lineDuration: 3200,
+      onComplete: () => {
+        const next = window.KYOUKAI_SCENARIO.getState();
+        next.manager_state = sequence[sequence.length - 1] || "visible";
+        window.KYOUKAI_SCENARIO.saveState(next);
+        window.KYOUKAI_SCENARIO.completeScenarioEvent(managerEvent.event_id, {
+          sequenceEventId: managerEvent.event_id,
+        });
+        showMessage("上階の閉鎖が、一つだけ解かれた。", 3600);
+      },
+    });
+    return true;
+  }
+
+  if (!runManagerReturnIfReady()) {
+    schedulePhoneCheck();
+  }
+
+  window.addEventListener("pagehide", () => {
+    window.clearTimeout(phoneTimer);
+    if (phoneRinging) window.KYOUKAI_SCENARIO?.cancelPhoneRinging();
+  });
 
   if (keyBoxModalClose) {
     keyBoxModalClose.addEventListener("click", closeKeyBoxModal);
