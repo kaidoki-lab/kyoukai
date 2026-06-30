@@ -437,3 +437,45 @@ KYOUKAIの「外」への扉。
 - `scripts/extract_matsuri_assets.py`
 - `main.py`（`/matsuri`ルート追加）
 - `static/kyoukai-floor.js`, `tests/test_home_entrances.py`（floor06への追加）
+
+---
+
+## 更新メモ 2026-06-30
+
+### なまはげ（/namahage）
+
+民俗の「なまはげ」をモチーフにした観測型インタラクション部屋。
+
+**基本構造**
+- 9:16背景画像 `static/images/namahage/namahage-room-9x16.png` を全画面表示。
+- なまはげの顔の両目の位置に、16×12の低解像度Canvas（`namahage-eye--left`, `namahage-eye--right`）を重ねる。`image-rendering: pixelated` で粗粒子のドット目として表示する。
+- 操作はタップ・長押し・ダブルタップのみ。UI要素・ボタン・説明文は持たない。
+
+**目の反応（CONFIG定数で管理）**
+- 通常: 赤く光る瞳が緩やかに明滅（idle状態）。
+- タップ（短押し）: 目が瞬きし、短い刺激音（怒鳴り声系）が再生される。
+- ダブルタップ: 目が見開き、強い光りを放った後に半目状態に移行。
+- 長押し: 0.8秒以上押し続けると「起動シーケンス」が走り、目が段階的に変化。長押しを途中で離すとシーケンスを即時中断する。
+
+**長押しシーケンスの修正（2026-06-30）**
+- 長押し途中でユーザーが指を離した場合、内部のチェーン`setTimeout`がキャンセルされずにシーケンスが続行するバグがあった。`longPressSeqTimers`配列で内側のタイマーIDをすべて記録し、`endLongPress()`から`clearLongPressSeq()`を呼ぶことで確実に全タイマーを中断するよう修正した（`static/namahage.js`）。
+
+**目の座標（DevToolsで調整済み）**
+- `.namahage-eye--left`: `top:31.5%; left:30%; width:14%; height:7%`
+- `.namahage-eye--right`: `top:31.5%; left:60%; width:14%; height:7%`
+- 座標は背景画像のなまはげの顔の実位置に合わせた値。背景画像を差し替えた場合は再調整が必要。
+
+**入口導線**
+- 6階（`/floor/06`）の入口一覧に `namahage` を追加した（ripple, colony, dot-art, matsuri に続く5枚目）。入口画像は `static/images/entrances/entrance-namahage.png`。
+- `material: "crack"` を指定。
+
+**本番デプロイ対応（2026-06-30）**
+- `vercel.json` の `excludeFiles` に `static/images/matsuri/**` と `static/images/namahage/**` を追加した。これらが含まれていなかったため、本番環境でPython関数バンドルが肥大化し、matsuriとnamahageへのルートが機能しない状態になっていた。追加後にプッシュして解消。
+
+**関連ファイル**
+- `templates/namahage.html`, `static/namahage.css`, `static/namahage.js`
+- `static/images/entrances/entrance-namahage.png`
+- `static/images/namahage/namahage-room-9x16.png`
+- `vercel.json`（excludeFiles: matsuri/namahage追加）
+- `main.py`（`/namahage`ルート追加）
+- `static/kyoukai-floor.js`, `tests/test_home_entrances.py`（floor06への追加）
