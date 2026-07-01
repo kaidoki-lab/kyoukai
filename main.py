@@ -1141,7 +1141,7 @@ MOMENT_LAYER_WINDOW_ASSETS = (
 SCENARIO_MODE_ASSETS = (
     '  <script src="/static/kyoukai-building-data.js?v=topfloor1" defer></script>\n'
     '  <script src="/static/kyoukai-scenario-events.js?v=routea2" defer></script>\n'
-    '  <script src="/static/kyoukai-scenario.js?v=topfloor1" defer></script>\n'
+    '  <script src="/static/kyoukai-scenario.js?v=phonewait1" defer></script>\n'
 )
 
 

@@ -370,13 +370,20 @@
     const state = window.KYOUKAI_SCENARIO.getState();
     if (state.mode !== "scenario") return;
     if (window.KYOUKAI_SCENARIO.getManagerEvent("kanrinin")) return;
+    window.KYOUKAI_SCENARIO.startPhoneWait();
+    const elapsedSeconds = window.KYOUKAI_SCENARIO.getPhoneWaitSeconds();
+    const remainingMs = Math.max(0, PHONE_CHECK_DELAY_MS - elapsedSeconds * 1000);
     window.clearTimeout(phoneTimer);
     phoneTimer = window.setTimeout(() => {
-      const nextEvent = window.KYOUKAI_SCENARIO.getNextPhoneEvent({ roomStaySeconds: PHONE_CHECK_DELAY_MS / 1000 });
+      const nextEvent = window.KYOUKAI_SCENARIO.getNextPhoneEvent({
+        roomStaySeconds: Math.max(PHONE_CHECK_DELAY_MS / 1000, window.KYOUKAI_SCENARIO.getPhoneWaitSeconds()),
+      });
       if (nextEvent) {
         setPhoneRinging(nextEvent);
+      } else {
+        phoneTimer = window.setTimeout(schedulePhoneCheck, 10000);
       }
-    }, PHONE_CHECK_DELAY_MS);
+    }, remainingMs);
   }
 
   bindArea("redPhoneArea", () => {

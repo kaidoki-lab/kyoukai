@@ -165,6 +165,7 @@
       manager_state: "hidden",
       last_completed_event_id: null,
       last_phone_ring_at: null,
+      phone_wait_started_at: null,
       diary_entry_ids: [],
       phone_ignore_count: 0,
       phone_pool_enabled: [],
@@ -398,6 +399,23 @@
     })[0] || null;
   }
 
+  function startPhoneWait() {
+    var state = getState();
+    if (state.mode !== "scenario") return state;
+    if (!state.phone_wait_started_at) {
+      state.phone_wait_started_at = new Date().toISOString();
+      return saveState(state);
+    }
+    return state;
+  }
+
+  function getPhoneWaitSeconds() {
+    var state = getState();
+    if (!state.phone_wait_started_at) return 0;
+    var elapsedMs = Date.now() - Date.parse(state.phone_wait_started_at);
+    return Number.isFinite(elapsedMs) ? Math.max(0, elapsedMs / 1000) : 0;
+  }
+
   function setEventStatus(state, eventId, status) {
     if (!eventId) return;
     state.event_status[eventId] = status;
@@ -513,6 +531,7 @@
     state = applyEffects(event, { sequenceEventId: eventId });
     state.phone_state = "idle";
     state.active_phone_event_id = null;
+    state.phone_wait_started_at = null;
     return saveState(state);
   }
 
@@ -617,6 +636,8 @@
     getEventById: getEventById,
     requirementsMet: requirementsMet,
     getNextPhoneEvent: getNextPhoneEvent,
+    startPhoneWait: startPhoneWait,
+    getPhoneWaitSeconds: getPhoneWaitSeconds,
     startPhoneRinging: startPhoneRinging,
     cancelPhoneRinging: cancelPhoneRinging,
     acceptPhoneEvent: acceptPhoneEvent,

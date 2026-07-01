@@ -71,6 +71,9 @@ class RouteAScenarioTests(unittest.TestCase):
         self.assertIn("/static/audio/kanrinin/red-phone-ring.wav", self.events_js)
         self.assertIn("playPhoneAudio", self.kanrinin_js)
         self.assertIn("last_phone_ring_at", self.scenario_js)
+        self.assertIn("phone_wait_started_at", self.scenario_js)
+        self.assertIn("startPhoneWait", self.kanrinin_js)
+        self.assertIn("getPhoneWaitSeconds", self.kanrinin_js)
         self.assertIn("current_target_room_id", self.floor_js)
         self.assertIn("current_target_room_id", self.elevator_js)
         self.assertIn("is-scenario-target", self.space_css)
@@ -93,7 +96,7 @@ class RouteAScenarioTests(unittest.TestCase):
     def test_cache_busts_scenario_assets(self):
         self.assertIn("kyoukai-building-data.js?v=topfloor1", self.main_py)
         self.assertIn("kyoukai-scenario-events.js?v=routea2", self.main_py)
-        self.assertIn("kyoukai-scenario.js?v=topfloor1", self.main_py)
+        self.assertIn("kyoukai-scenario.js?v=phonewait1", self.main_py)
 
 
 if __name__ == "__main__":
