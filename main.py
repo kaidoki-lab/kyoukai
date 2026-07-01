@@ -1139,9 +1139,9 @@ MOMENT_LAYER_WINDOW_ASSETS = (
 )
 
 SCENARIO_MODE_ASSETS = (
-    '  <script src="/static/kyoukai-building-data.js?v=routea2" defer></script>\n'
+    '  <script src="/static/kyoukai-building-data.js?v=topfloor1" defer></script>\n'
     '  <script src="/static/kyoukai-scenario-events.js?v=routea2" defer></script>\n'
-    '  <script src="/static/kyoukai-scenario.js?v=routea2" defer></script>\n'
+    '  <script src="/static/kyoukai-scenario.js?v=topfloor1" defer></script>\n'
 )
 
 
@@ -1261,6 +1261,10 @@ async def archive_log_detail(request: Request, log_id: str) -> HTMLResponse:
 @app.get("/signal", response_class=HTMLResponse)
 async def signal_room(request: Request) -> HTMLResponse:
     return render_template(request, "signal.html")
+
+@app.get("/top-floor", response_class=HTMLResponse)
+async def top_floor_room(request: Request) -> HTMLResponse:
+    return render_template(request, "top-floor.html")
 
 @app.get("/external-signal", response_class=HTMLResponse)
 async def external_signal_room(request: Request) -> HTMLResponse:

@@ -74,8 +74,8 @@ class RouteAScenarioTests(unittest.TestCase):
         self.assertIn("current_target_room_id", self.floor_js)
         self.assertIn("current_target_room_id", self.elevator_js)
         self.assertIn("is-scenario-target", self.space_css)
-        self.assertIn("routea2", self.floor_html)
-        self.assertIn("routea2", self.elevator_html)
+        self.assertIn("topfloor1", self.floor_html)
+        self.assertIn("topfloor1", self.elevator_html)
 
     def test_conversation_text_is_kept_in_data(self):
         for line in [
@@ -91,9 +91,9 @@ class RouteAScenarioTests(unittest.TestCase):
                 self.assertNotIn(line, self.room_js)
 
     def test_cache_busts_scenario_assets(self):
-        self.assertIn("kyoukai-building-data.js?v=routea2", self.main_py)
+        self.assertIn("kyoukai-building-data.js?v=topfloor1", self.main_py)
         self.assertIn("kyoukai-scenario-events.js?v=routea2", self.main_py)
-        self.assertIn("kyoukai-scenario.js?v=routea2", self.main_py)
+        self.assertIn("kyoukai-scenario.js?v=topfloor1", self.main_py)
 
 
 if __name__ == "__main__":

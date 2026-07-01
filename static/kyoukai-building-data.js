@@ -9,6 +9,18 @@
       unlockedUntil: 3,
       upperDefault: "story_only"
     },
+    topFloorRoom: {
+      id: "top-floor",
+      name: "top-floor",
+      label: "KEY",
+      href: "/top-floor",
+      image: "/static/images/entrances/entrance-top-floor.png",
+      roomImage: "/static/images/top-floor/top-floor-room.png",
+      material: "shrine",
+      residentId: "top_floor",
+      defaultState: "locked",
+      topFloorOnly: true
+    },
     routes: [
       {
         id: "route_a",
@@ -48,7 +60,8 @@
       { id: "kanrinin", state: "hidden", roomId: "kanrinin" },
       { id: "observer", state: "hidden", roomId: "observation" },
       { id: "archivist", state: "hidden", roomId: "archive" },
-      { id: "signal", state: "hidden", roomId: "signal" }
+      { id: "signal", state: "hidden", roomId: "signal" },
+      { id: "top_floor", state: "hidden", roomId: "top-floor" }
     ]
   };
 })();

@@ -34,7 +34,7 @@
     return match ? Number(match[1]) : null;
   }
 
-  function getRooms() {
+  function getBaseRooms() {
     return (building.rooms || []).map(function (room) {
       var next = Object.assign({}, room);
       var placement = calculatePlacement(next.roomIndex);
@@ -46,8 +46,30 @@
     });
   }
 
+  function getTopFloorRoom(baseRooms) {
+    if (!building.topFloorRoom) return null;
+    var rooms = Array.isArray(baseRooms) ? baseRooms : getBaseRooms();
+    var maxBaseFloor = rooms.reduce(function (max, room) {
+      return Math.max(max, room.floor);
+    }, Number(building.initialScenarioFloors || 3));
+    return Object.assign({}, building.topFloorRoom, {
+      floor: maxBaseFloor + 1,
+      slot: 1,
+      roomIndex: null,
+      topFloorOnly: true
+    });
+  }
+
+  function getRooms() {
+    var rooms = getBaseRooms();
+    var topFloorRoom = getTopFloorRoom(rooms);
+    return topFloorRoom ? rooms.concat([topFloorRoom]) : rooms;
+  }
+
   function nextRoomIndex(rooms) {
-    var list = Array.isArray(rooms) ? rooms : getRooms();
+    var list = (Array.isArray(rooms) ? rooms : getBaseRooms()).filter(function (room) {
+      return !room.topFloorOnly;
+    });
     if (!list.length) return 0;
     return list.reduce(function (max, room) {
       return Math.max(max, normalizeNumber(room.roomIndex, -1));
@@ -75,7 +97,11 @@
     getRooms().forEach(function (room) {
       var floorKey = String(room.floor).padStart(2, "0");
       if (!floors[floorKey]) floors[floorKey] = [];
-      floors[floorKey][room.slot - 1] = room;
+      if (room.topFloorOnly) {
+        floors[floorKey] = [room];
+      } else {
+        floors[floorKey][room.slot - 1] = room;
+      }
     });
     return floors;
   }

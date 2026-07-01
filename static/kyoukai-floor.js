@@ -102,6 +102,9 @@
     const floor = Number(floorNumber);
     const floors = scenario ? scenario.groupRoomsByFloor() : {};
     const fromScenario = floors[String(floor).padStart(2, "0")] || [];
+    if (fromScenario.some((item) => item && item.topFloorOnly)) {
+      return fromScenario.filter(Boolean);
+    }
     return Array.from({ length: roomsPerFloor }, (_, index) => fromScenario[index] || null);
   }
 

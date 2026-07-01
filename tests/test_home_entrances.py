@@ -84,6 +84,7 @@ class HomeEntranceTests(unittest.TestCase):
             "/dot-art",
             "/matsuri",
             "/namahage",
+            "/top-floor",
         ]
 
         for route in expected_routes:
@@ -109,6 +110,7 @@ class HomeEntranceTests(unittest.TestCase):
             "entrance-dot-art.png",
             "entrance-matsuri.png",
             "entrance-namahage.png",
+            "entrance-top-floor.png",
         ]:
             with self.subTest(image_name=image_name):
                 self.assertIn(image_name, self.building_js)
@@ -140,7 +142,7 @@ class HomeEntranceTests(unittest.TestCase):
         self.assertIn("snapEntranceIntoCenter(strip, targetIndex);", self.floor_js)
         self.assertIn("interactionStartIndex + direction", self.floor_js)
         self.assertIn("window.addEventListener(\"resize\"", self.floor_js)
-        self.assertIn("routea2", self.floor_html)
+        self.assertIn("topfloor1", self.floor_html)
 
     def test_elevator_door_frames_play_in_requested_order(self):
         for frame_id in ["4", "3", "2", "1"]:
@@ -163,10 +165,24 @@ class HomeEntranceTests(unittest.TestCase):
         self.assertIn("Math.floor(index / roomsPerFloor) + 1", self.scenario_js)
         self.assertIn("index % roomsPerFloor + 1", self.scenario_js)
         self.assertIn("nextRoomIndex", self.scenario_js)
+        self.assertIn("getTopFloorRoom", self.scenario_js)
+        self.assertIn("topFloorOnly", self.scenario_js)
         self.assertIn("groupRoomsByFloor", self.scenario_js)
+        self.assertIn("topFloorRoom", self.building_js)
         self.assertIn('upperDefault: "story_only"', self.building_js)
         self.assertIn('state.mode = mode;', self.scenario_js)
         self.assertIn('roomId === "kanrinin" ? "scenario" : "free"', self.scenario_js)
+
+    def test_top_floor_is_single_fixed_room(self):
+        self.assertIn('@app.get("/top-floor"', self.main_py)
+        self.assertTrue((BASE_DIR / "templates" / "top-floor.html").exists())
+        self.assertTrue((BASE_DIR / "static" / "images" / "entrances" / "entrance-top-floor.png").exists())
+        self.assertTrue((BASE_DIR / "static" / "images" / "top-floor" / "top-floor-room.png").exists())
+        self.assertIn('id: "top-floor"', self.building_js)
+        self.assertIn('topFloorOnly: true', self.building_js)
+        self.assertIn('roomImage: "/static/images/top-floor/top-floor-room.png"', self.building_js)
+        self.assertIn("fromScenario.some((item) => item && item.topFloorOnly)", self.floor_js)
+        self.assertIn("return fromScenario.filter(Boolean);", self.floor_js)
 
     def test_scenario_assets_are_injected_and_upper_floors_are_dynamic(self):
         self.assertIn("SCENARIO_MODE_ASSETS", self.main_py)

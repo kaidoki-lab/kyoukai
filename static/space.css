@@ -3029,6 +3029,45 @@ a.sp-link:hover,
   padding: 22px var(--entrance-edge-space) 30px;
 }
 
+.top-floor-body {
+  min-height: 100svh;
+  margin: 0;
+  background: #050306;
+  color: #f4eadb;
+}
+
+.top-floor-room {
+  position: relative;
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 46%, rgba(188, 21, 92, 0.2), transparent 42%),
+    #050306;
+}
+
+.top-floor-room__image {
+  display: block;
+  width: min(100vw, calc(100svh * 1024 / 1792));
+  height: min(100svh, calc(100vw * 1792 / 1024));
+  object-fit: cover;
+  box-shadow: 0 0 56px rgba(0, 0, 0, 0.8);
+}
+
+.top-floor-room__return {
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left));
+  top: max(16px, env(safe-area-inset-top));
+  z-index: 4;
+  color: rgba(255, 230, 210, 0.78);
+  font-family: var(--sp-mono);
+  font-size: 12px;
+  letter-spacing: 0;
+  text-decoration: none;
+  text-shadow: 0 0 12px rgba(228, 35, 116, 0.56);
+}
+
 .entrance-strip::-webkit-scrollbar {
   display: none;
 }
