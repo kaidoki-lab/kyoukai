@@ -47,7 +47,7 @@
           { type: "event_not_completed", event_id: "route_a_phone_001" }
         ],
         phone_config: {
-          ring_audio: "/static/audio/kanrinin/red-phone-ring.wav",
+          ring_audio: "/static/audio/kanrinin/red-phone-ring.mp3",
           retry_enabled: true,
           retry_trigger: "kanrinin_reentry",
           retry_interval_seconds: 60

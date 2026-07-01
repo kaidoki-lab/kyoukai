@@ -1140,7 +1140,7 @@ MOMENT_LAYER_WINDOW_ASSETS = (
 
 SCENARIO_MODE_ASSETS = (
     '  <script src="/static/kyoukai-building-data.js?v=topfloor1" defer></script>\n'
-    '  <script src="/static/kyoukai-scenario-events.js?v=routea2" defer></script>\n'
+    '  <script src="/static/kyoukai-scenario-events.js?v=routea3" defer></script>\n'
     '  <script src="/static/kyoukai-scenario.js?v=phonewait1" defer></script>\n'
 )
 
@@ -1356,6 +1356,10 @@ async def outside_core(request: Request) -> HTMLResponse:
 @app.get("/ma", response_class=HTMLResponse)
 async def ma_room(request: Request) -> HTMLResponse:
     return render_template(request, "ma.html")
+
+@app.get("/fukashitsu", response_class=HTMLResponse)
+async def fukashitsu_room(request: Request) -> HTMLResponse:
+    return render_template(request, "fukashitsu.html")
 
 @app.get("/kanrinin", response_class=HTMLResponse)
 @app.get("/manager", response_class=HTMLResponse)

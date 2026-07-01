@@ -1,0 +1,152 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+.fuka-body {
+  font-family: "Yu Gothic", "Meiryo", "Hiragino Kaku Gothic ProN", sans-serif;
+}
+
+/* ---------- Frame (9:16 centered) ---------- */
+
+.fuka-frame {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(100vw, calc(100vh * 9 / 16));
+  height: min(100vh, calc(100vw * 16 / 9));
+  background: #f5dada;
+  overflow: hidden;
+}
+
+/* ---------- 背景（卵トレー画像） ---------- */
+
+.fuka-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url("/static/images/fukashitsu/fukashitsu-room-9x16.png?v=2");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-color: #f5dada;
+}
+
+/* ---------- dot canvas ---------- */
+
+.fuka-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ---------- ボタン3つ（下部パネル） ---------- */
+
+.fuka-action-btn {
+  position: absolute;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 50%;
+}
+
+/* ---------- メッセージ ---------- */
+
+.fuka-message {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(120, 60, 80, 0.9);
+  font-size: clamp(11px, 3.2vw, 15px);
+  letter-spacing: 0.1em;
+  text-align: center;
+  white-space: pre-line;
+  line-height: 1.9;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  width: 80%;
+  text-shadow: 0 1px 4px rgba(255, 200, 210, 0.8);
+}
+
+.fuka-message.is-visible {
+  opacity: 1;
+}
+
+/* ---------- 稚魚所持バッジ ---------- */
+
+.fuka-badge {
+  position: absolute;
+  top: 5%;
+  right: 4%;
+  padding: 5px 12px;
+  background: rgba(255, 200, 210, 0.75);
+  color: rgba(120, 50, 70, 0.95);
+  border: 1px solid rgba(200, 130, 150, 0.5);
+  border-radius: 20px;
+  font-size: clamp(10px, 2.8vw, 13px);
+  letter-spacing: 0.08em;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.fuka-badge.is-visible {
+  opacity: 1;
+}
+
+/* ---------- 稚魚取得ボタン ---------- */
+
+.fuka-collect-btn {
+  position: absolute;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 28px;
+  background: rgba(255, 180, 200, 0.85);
+  color: rgba(100, 30, 50, 0.95);
+  border: 1px solid rgba(200, 130, 150, 0.6);
+  border-radius: 20px;
+  font-family: inherit;
+  font-size: clamp(12px, 3.5vw, 15px);
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s ease;
+  display: none;
+}
+
+.fuka-collect-btn.is-visible {
+  display: block;
+}
+
+.fuka-collect-btn:hover {
+  background: rgba(255, 160, 185, 0.95);
+}
+
+/* ---------- ブラックアウト ---------- */
+
+.fuka-blackout {
+  position: absolute;
+  inset: 0;
+  background: #fff8f8;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+
+.fuka-blackout.is-active {
+  opacity: 1;
+  pointer-events: all;
+}

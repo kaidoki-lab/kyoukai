@@ -33,7 +33,7 @@
         { "type": "active_phone_event_equals", "value": null }
       ],
       "phone_config": {
-        "ring_audio": "/static/audio/kanrinin/red-phone-ring.wav",
+        "ring_audio": "/static/audio/kanrinin/red-phone-ring.mp3",
         "retry_enabled": true,
         "retry_trigger": "kanrinin_reentry",
         "retry_interval_seconds": 60
