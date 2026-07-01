@@ -77,6 +77,7 @@ html, body {
   border: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  z-index: 1;
 }
 
 .kanrinin-area:focus-visible {
@@ -85,6 +86,7 @@ html, body {
 
 .red-phone-area {
   border-radius: 50%;
+  z-index: 4;
 }
 
 .red-phone-area::before {

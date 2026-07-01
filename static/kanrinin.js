@@ -53,7 +53,7 @@
   let phoneRinging = false;
   let scenarioLineActive = false;
   const EYE_REVEAL_MS = 3000;
-  const PHONE_CHECK_DELAY_MS = 30000;
+  const PHONE_CHECK_DELAY_MS = 20000;
 
   function trackArea(area) {
     if (typeof window.trackKyoukaiEvent === "function") {
