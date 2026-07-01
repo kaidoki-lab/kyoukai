@@ -1,10 +1,36 @@
-# HANDOFF_KYOUKAI.md — 2026-06-30（最新）
+# HANDOFF_KYOUKAI.md — 2026-07-01（最新）
 
 このファイルを新規チャット・Claude Code・Codex の冒頭に貼るだけで再開できます。
 
 ---
 
-## 直近でやったこと
+## 直近でやったこと（2026-07-01）
+
+- 孵化室（/fukashitsu）ページを実装・本番デプロイ（**ただし未完成**）
+  - 背景画像：ピンク卵トレイ（`static/images/fukashitsu/fukashitsu-room-9x16.png`）
+  - キャンバスドットアート：DOT=3、丸と四角ミックス、呼吸アニメーション
+  - 3ボタン（栄養/赤・酸素/青・温度/黄）×10回で稚魚収集 → `kyoukai_has_fish=1`
+  - 上部10%を3秒以内に7回タップで隠しリセット
+- 管理人室の赤電話音を `黒電話のベルが鳴る.mp3` に変更（`static/audio/kanrinin/red-phone-ring.mp3`）
+- 管理人室のAmazonホットスポットが電話に被る問題をz-index:15で修正
+- 全変更コミット・プッシュ済み（commit: 01d2e81）
+
+## 次にやること（孵化室の未完成部分）
+
+孵化室の何が未完成かは次セッションでまろに確認する。
+候補：
+- 他の部屋からの導線（ドア画像A）
+- 稚魚取得後に管理人室の鍵棚に培養室の鍵が出る処理
+- 培養室（/baiyoshitsu）ページの実装
+- ビジュアル・演出面の追加
+
+## localStorage キー（生命生成ルート）
+- `kyoukai_has_fish` — 稚魚所持フラグ（1=あり）
+- `kyoukai_fuka_red` / `kyoukai_fuka_blue` / `kyoukai_fuka_yellow` — 各ボタン押下数
+
+---
+
+## 以前やったこと
 
 - 管理人室（/kanrinin）の室内画像を新しいものに差し替えた（`static/images/kanrinin/kanrinin-room-9x16.png`）
 - Amazon棚（亜魔逐管理用品棚）クリック領域を追加 → `outside-items.js` のアソシエイトリンクからランダム遷移
