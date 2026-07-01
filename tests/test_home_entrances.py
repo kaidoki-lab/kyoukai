@@ -140,7 +140,7 @@ class HomeEntranceTests(unittest.TestCase):
         self.assertIn("snapEntranceIntoCenter(strip, targetIndex);", self.floor_js)
         self.assertIn("interactionStartIndex + direction", self.floor_js)
         self.assertIn("window.addEventListener(\"resize\"", self.floor_js)
-        self.assertIn("scenario1", self.floor_html)
+        self.assertIn("routea2", self.floor_html)
 
     def test_elevator_door_frames_play_in_requested_order(self):
         for frame_id in ["4", "3", "2", "1"]:

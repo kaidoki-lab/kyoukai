@@ -32,6 +32,40 @@
   pointer-events: auto;
 }
 
+.kanrinin-manager-presence {
+  position: absolute;
+  left: 55%;
+  top: 24%;
+  width: 18%;
+  height: 38%;
+  z-index: 8;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px) scale(0.98);
+  transition: opacity 600ms ease, transform 600ms ease, filter 220ms ease;
+}
+
+.kanrinin-manager-presence::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 45% 45% 38% 38%;
+  background:
+    radial-gradient(circle at 50% 17%, rgba(18, 15, 14, 0.92) 0 18%, transparent 19%),
+    linear-gradient(180deg, rgba(18, 13, 12, 0.84), rgba(3, 3, 4, 0.18));
+  box-shadow: 0 0 34px rgba(160, 22, 22, 0.16);
+  filter: blur(0.3px);
+}
+
+.kanrinin-manager-presence.is-visible {
+  opacity: 0.72;
+  transform: translateY(0) scale(1);
+}
+
+.kanrinin-manager-presence.is-busy {
+  filter: saturate(1.4) contrast(1.1);
+}
+
 .observation-room[data-route-a-ready] .room-crt-noise,
 .observation-room[data-route-a-event="route_a_room_observation_001"] .room-crt-noise {
   opacity: 0.72;

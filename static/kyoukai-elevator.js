@@ -58,11 +58,18 @@
     const floors = getFloors();
     const nextIndex = Math.max(0, Math.min(floors.length - 1, index));
     const floor = floors[nextIndex];
+    const state = scenario ? scenario.getState() : {};
+    const targetRoom = scenario && state.current_target_room_id
+      ? scenario.roomById(state.current_target_room_id)
+      : null;
+    const isTargetFloor = targetRoom && floor.number === floorKey(targetRoom.floor);
     cabin.dataset.floorIndex = String(nextIndex);
     floorNumber.textContent = floor.display || floor.number;
     enterButton.dataset.floorHref = floor.href;
     enterButton.disabled = Boolean(floor.locked);
     enterButton.classList.toggle("is-locked", Boolean(floor.locked));
+    enterButton.classList.toggle("is-scenario-target", Boolean(isTargetFloor));
+    enterButton.dataset.scenarioTarget = isTargetFloor ? "current" : "";
     enterButton.setAttribute("aria-label", `${floor.label} ${floor.number}`);
   }
 

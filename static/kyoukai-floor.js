@@ -60,12 +60,16 @@
 
   function createEntrance(item) {
     const locked = scenario ? !scenario.canEnterRoom(item.id) : false;
+    const state = scenario ? scenario.getState() : {};
+    const isTarget = state.current_target_room_id === item.id;
     const link = document.createElement(locked ? "span" : "a");
     link.className = "entrance-object";
     link.dataset.entranceId = item.id;
     link.dataset.floor = String(item.floor);
     link.dataset.slot = String(item.slot);
     link.classList.toggle("is-locked", locked);
+    link.classList.toggle("is-scenario-target", isTarget);
+    if (isTarget) link.dataset.scenarioTarget = "current";
     if (locked) {
       link.setAttribute("role", "link");
       link.setAttribute("aria-disabled", "true");

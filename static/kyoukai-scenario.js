@@ -138,6 +138,7 @@
       phone_state: "idle",
       manager_state: "hidden",
       last_completed_event_id: null,
+      last_phone_ring_at: null,
       diary_entry_ids: [],
       phone_ignore_count: 0,
       phone_pool_enabled: [],
@@ -360,7 +361,12 @@
     var state = getState();
     if (state.mode !== "scenario") return null;
     return (events.phoneEvents || []).filter(function (event) {
-      return state.enabled_event_ids.indexOf(event.event_id) !== -1 && requirementsMet(event.requirements, state, context || {});
+      if (state.enabled_event_ids.indexOf(event.event_id) === -1) return false;
+      if (!requirementsMet(event.requirements, state, context || {})) return false;
+      var retrySeconds = Number(event.phone_config && event.phone_config.retry_interval_seconds || 0);
+      if (!retrySeconds || !state.last_phone_ring_at) return true;
+      var elapsedMs = Date.now() - Date.parse(state.last_phone_ring_at);
+      return !Number.isFinite(elapsedMs) || elapsedMs >= retrySeconds * 1000;
     }).sort(function (a, b) {
       return Number(b.priority || 0) - Number(a.priority || 0);
     })[0] || null;
@@ -438,6 +444,7 @@
     if (state.phone_state !== "idle" || state.active_phone_event_id) return state;
     state.phone_state = "ringing";
     state.active_phone_event_id = eventId;
+    state.last_phone_ring_at = new Date().toISOString();
     return saveState(state);
   }
 

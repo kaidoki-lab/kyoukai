@@ -16,6 +16,11 @@ class RouteAScenarioTests(unittest.TestCase):
         self.kanrinin_html = (BASE_DIR / "templates" / "kanrinin.html").read_text(encoding="utf-8")
         self.observation_html = (BASE_DIR / "templates" / "index.html").read_text(encoding="utf-8")
         self.signal_html = (BASE_DIR / "templates" / "signal.html").read_text(encoding="utf-8")
+        self.floor_html = (BASE_DIR / "templates" / "floor.html").read_text(encoding="utf-8")
+        self.elevator_html = (BASE_DIR / "templates" / "elevator.html").read_text(encoding="utf-8")
+        self.floor_js = (BASE_DIR / "static" / "kyoukai-floor.js").read_text(encoding="utf-8")
+        self.elevator_js = (BASE_DIR / "static" / "kyoukai-elevator.js").read_text(encoding="utf-8")
+        self.space_css = (BASE_DIR / "static" / "space.css").read_text(encoding="utf-8")
         self.main_py = (BASE_DIR / "main.py").read_text(encoding="utf-8")
 
     def test_route_a_json_is_valid_and_complete(self):
@@ -52,13 +57,25 @@ class RouteAScenarioTests(unittest.TestCase):
 
     def test_templates_expose_route_a_targets(self):
         self.assertIn('data-scenario-target="red-phone"', self.kanrinin_html)
+        self.assertIn("kanrininManagerPresence", self.kanrinin_html)
         self.assertIn('data-scenario-target="observation-primary"', self.observation_html)
         self.assertIn('data-scenario-target="signal-primary"', self.signal_html)
-        self.assertIn("/static/kyoukai-route-a-room.js?v=routea1", self.observation_html)
-        self.assertIn("/static/kyoukai-route-a-room.js?v=routea1", self.signal_html)
-        self.assertIn("/static/kyoukai-scenario-ui.css?v=routea1", self.kanrinin_html)
-        self.assertIn("/static/kyoukai-scenario-ui.css?v=routea1", self.observation_html)
-        self.assertIn("/static/kyoukai-scenario-ui.css?v=routea1", self.signal_html)
+        self.assertIn("/static/kyoukai-route-a-room.js?v=routea2", self.observation_html)
+        self.assertIn("/static/kyoukai-route-a-room.js?v=routea2", self.signal_html)
+        self.assertIn("/static/kyoukai-scenario-ui.css?v=routea2", self.kanrinin_html)
+        self.assertIn("/static/kyoukai-scenario-ui.css?v=routea2", self.observation_html)
+        self.assertIn("/static/kyoukai-scenario-ui.css?v=routea2", self.signal_html)
+
+    def test_route_a_audio_and_target_guidance_exist(self):
+        self.assertTrue((BASE_DIR / "static" / "audio" / "kanrinin" / "red-phone-ring.wav").exists())
+        self.assertIn("/static/audio/kanrinin/red-phone-ring.wav", self.events_js)
+        self.assertIn("playPhoneAudio", self.kanrinin_js)
+        self.assertIn("last_phone_ring_at", self.scenario_js)
+        self.assertIn("current_target_room_id", self.floor_js)
+        self.assertIn("current_target_room_id", self.elevator_js)
+        self.assertIn("is-scenario-target", self.space_css)
+        self.assertIn("routea2", self.floor_html)
+        self.assertIn("routea2", self.elevator_html)
 
     def test_conversation_text_is_kept_in_data(self):
         for line in [
@@ -74,9 +91,9 @@ class RouteAScenarioTests(unittest.TestCase):
                 self.assertNotIn(line, self.room_js)
 
     def test_cache_busts_scenario_assets(self):
-        self.assertIn("kyoukai-building-data.js?v=routea1", self.main_py)
-        self.assertIn("kyoukai-scenario-events.js?v=routea1", self.main_py)
-        self.assertIn("kyoukai-scenario.js?v=routea1", self.main_py)
+        self.assertIn("kyoukai-building-data.js?v=routea2", self.main_py)
+        self.assertIn("kyoukai-scenario-events.js?v=routea2", self.main_py)
+        self.assertIn("kyoukai-scenario.js?v=routea2", self.main_py)
 
 
 if __name__ == "__main__":

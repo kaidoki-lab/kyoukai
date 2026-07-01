@@ -27,10 +27,15 @@
     var index = 0;
     var timer = 0;
 
+    function cleanup() {
+      overlay.removeEventListener("click", next);
+      window.clearTimeout(timer);
+    }
+
     function next() {
       if (index >= lines.length) {
         overlay.classList.remove("is-visible");
-        window.clearTimeout(timer);
+        cleanup();
         if (typeof done === "function") done();
         return;
       }
@@ -43,6 +48,31 @@
 
     overlay.addEventListener("click", next);
     next();
+  }
+
+  function playSignalCue() {
+    var AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    try {
+      var context = new AudioContext();
+      var oscillator = context.createOscillator();
+      var gain = context.createGain();
+      oscillator.type = "triangle";
+      oscillator.frequency.setValueAtTime(roomId === "signal" ? 180 : 260, context.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(roomId === "signal" ? 86 : 140, context.currentTime + 0.9);
+      gain.gain.setValueAtTime(0.0001, context.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.12, context.currentTime + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 1.1);
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.start();
+      oscillator.stop(context.currentTime + 1.15);
+      window.setTimeout(function () {
+        context.close().catch(function () {});
+      }, 1300);
+    } catch (error) {
+      console.warn("[KYOUKAI] scenario cue unavailable:", error);
+    }
   }
 
   function pauseSignalVideo() {
@@ -76,6 +106,7 @@
       root.dataset.routeAEvent = eventData.event_id;
       scenario.setRoomEventActive(eventData.event_id);
       var restore = roomId === "signal" ? pauseSignalVideo() : function () {};
+      playSignalCue();
       playLines(root, eventData, function () {
         restore();
         root.dataset.routeAEvent = "";

@@ -3189,6 +3189,14 @@ a.sp-link:hover,
   outline-offset: 4px;
 }
 
+.entrance-object.is-scenario-target .entrance-object__visual {
+  filter: drop-shadow(0 0 18px rgba(230, 51, 51, 0.52)) saturate(1.16);
+}
+
+.entrance-object.is-scenario-target .entrance-object__label {
+  color: rgba(255, 162, 150, 0.92);
+}
+
 .entrance-object:active .entrance-object__visual {
   transform: translateY(2px);
 }
@@ -3968,6 +3976,13 @@ a.sp-link:hover,
   color: rgba(255, 42, 54, 0.48);
   text-decoration: line-through;
   cursor: default;
+}
+
+.elevator-floor-display.is-scenario-target {
+  color: rgba(255, 178, 166, 0.96);
+  text-shadow:
+    0 0 9px rgba(238, 43, 43, 0.78),
+    0 0 19px rgba(238, 43, 43, 0.42);
 }
 
 .elevator-floor-display span {
