@@ -15,7 +15,7 @@
       label: "KEY",
       href: "/top-floor",
       image: "/static/images/entrances/entrance-top-floor.png",
-      roomImage: "/static/images/top-floor/top-floor-room.png",
+      roomImage: "/static/images/top-floor/room-9x16.png",
       material: "shrine",
       residentId: "top_floor",
       defaultState: "locked",

@@ -177,10 +177,10 @@ class HomeEntranceTests(unittest.TestCase):
         self.assertIn('@app.get("/top-floor"', self.main_py)
         self.assertTrue((BASE_DIR / "templates" / "top-floor.html").exists())
         self.assertTrue((BASE_DIR / "static" / "images" / "entrances" / "entrance-top-floor.png").exists())
-        self.assertTrue((BASE_DIR / "static" / "images" / "top-floor" / "top-floor-room.png").exists())
+        self.assertTrue((BASE_DIR / "static" / "images" / "top-floor" / "room-9x16.png").exists())
         self.assertIn('id: "top-floor"', self.building_js)
         self.assertIn('topFloorOnly: true', self.building_js)
-        self.assertIn('roomImage: "/static/images/top-floor/top-floor-room.png"', self.building_js)
+        self.assertIn('roomImage: "/static/images/top-floor/room-9x16.png"', self.building_js)
         self.assertIn("fromScenario.some((item) => item && item.topFloorOnly)", self.floor_js)
         self.assertIn("return fromScenario.filter(Boolean);", self.floor_js)
 
