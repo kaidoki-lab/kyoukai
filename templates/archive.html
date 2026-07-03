@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="/static/space.css" />
   <link rel="stylesheet" href="/static/outside-hotspots.css?v=3" />
   <link rel="stylesheet" href="/static/drift-flags.css" />
+  <link rel="stylesheet" href="/static/kyoukai-scenario-ui.css?v=routeb1" />
   <script src="/static/kyoukai-transition.js"></script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1522978966321203" crossorigin="anonymous"></script>
   <script defer src="/static/analytics.js"></script>
@@ -28,7 +29,7 @@
     <figure class="archive-frame" aria-label="KYOUKAI 残留域">
       <img class="archive-room-image" src="/static/kyoukai_archive_room.png" alt="白い隔離室とカルテラック" />
 
-      <button class="archive-rack-hit" type="button" data-rack aria-label="カルテラック"></button>
+      <button class="archive-rack-hit" type="button" data-rack data-scenario-target="archive-record" aria-label="カルテラック"></button>
 
       <section class="archive-card" data-card aria-hidden="true">
         <div class="archive-card-meta">
@@ -308,6 +309,7 @@
       renderArchiveItem(chooseArchiveItem());
     });
   </script>
+  <script defer src="/static/kyoukai-route-b-room.js?v=routeb1"></script>
   <script src="/static/bgm.js"></script>
   <script src="/static/outside-items.js"></script>
   <script src="/static/outside-hotspots.js?v=3"></script>

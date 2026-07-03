@@ -6,6 +6,7 @@
   <title>獄楽域 / KYOUKAI</title>
   <link rel="stylesheet" href="/static/space.css" />
   <link rel="stylesheet" href="/static/gokuraku.css?v=20260608b" />
+  <link rel="stylesheet" href="/static/kyoukai-scenario-ui.css?v=routeb1" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1522978966321203" crossorigin="anonymous"></script>
   <script defer src="/static/analytics.js"></script>
   <script defer src="/static/null-infection.js"></script>
@@ -22,7 +23,7 @@
       <div class="gokuraku-scan" aria-hidden="true"></div>
     </section>
 
-    <aside class="gokuraku-vault" aria-labelledby="gokuraku-title">
+    <aside class="gokuraku-vault" aria-labelledby="gokuraku-title" data-scenario-target="gokuraku-container">
       <span class="gokuraku-kicker">AUDIO VAULT</span>
       <h1 id="gokuraku-title">獄楽域</h1>
       <p>音声室に残った曲を保管しています。</p>
@@ -49,6 +50,7 @@
     <a class="gokuraku-return" href="/" aria-label="入口へ戻る">000 / return</a>
   </main>
 
-
+  <script>window.KYOUKAI_ROOM = 'gokuraku';</script>
+  <script defer src="/static/kyoukai-route-b-room.js?v=routeb1"></script>
 </body>
 </html>

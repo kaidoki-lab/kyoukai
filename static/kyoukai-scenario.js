@@ -183,6 +183,10 @@
       conversation_history: [],
       completed_events: [],
       progress_rate: 0,
+      final_route_available: false,
+      top_floor_unlocked: false,
+      annihilation_key_obtained: false,
+      top_floor_keyhole_active: false,
       updated_at: new Date().toISOString()
     };
   }
@@ -325,7 +329,19 @@
     if (!canEnterFloor(room.floor)) return false;
     var roomState = state.room_states[roomId] || room.defaultState || "normal";
     if (roomState === "disabled") return false;
-    return ["normal", "waiting", "active", "completed", "post_route_a", "signal_contaminated", "observation_signal_received"].indexOf(roomState) !== -1 || state.unlocked_rooms.indexOf(roomId) !== -1;
+    return [
+      "normal",
+      "waiting",
+      "active",
+      "completed",
+      "post_route_a",
+      "post_route_b",
+      "signal_contaminated",
+      "observation_signal_received",
+      "unregistered_record_visible",
+      "unregistered_record_deliberation",
+      "unregistered_container_active"
+    ].indexOf(roomState) !== -1 || state.unlocked_rooms.indexOf(roomId) !== -1;
   }
 
   function showNotice(message) {
@@ -373,6 +389,7 @@
       if (requirement.type === "event_enabled") return state.enabled_event_ids.indexOf(requirement.event_id) !== -1 || state.event_status[requirement.event_id] === "enabled";
       if (requirement.type === "room_state") return state.room_states[requirement.room || requirement.room_id] === requirement.state;
       if (requirement.type === "floor_state") return state.floor_state[String(requirement.floor).padStart(2, "0")] === requirement.state;
+      if (requirement.type === "floor_unlocked") return state.unlocked_floor_ids.indexOf(requirement.floor_id) !== -1;
       if (requirement.type === "room_stay_seconds") return compareSeconds(Number(ctx.roomStaySeconds || 0), requirement.operator || ">=", Number(requirement.value || 0));
       if (requirement.type === "room_entered") return state.room_entry_history.some(function (entry) { return entry.room_id === requirement.room_id; });
       if (requirement.type === "interaction_completed") return state.interaction_history.indexOf(requirement.target) !== -1 || ctx.interactionTarget === requirement.target;
@@ -592,7 +609,7 @@
     }).filter(Boolean).map(function (entry) {
       return {
         entry_id: entry.entry_id,
-        category: "Route_A",
+        category: entry.route_id === "route_b" ? "Route_B" : "Route_A",
         title: entry.title || "混線している観測",
         body: entry.text
       };

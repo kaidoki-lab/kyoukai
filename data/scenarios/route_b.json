@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "route_id": "route_b",
+  "name": "\u8a18\u9332\u3055\u308c\u3066\u3044\u306a\u3044\u4eba",
+  "type": "normal",
+  "shared_room_ids": ["kanrinin"],
+  "reserved_room_ids": ["archive", "hyougi", "gokuraku"],
+  "start_requirements": [
+    { "type": "mode_equals", "value": "scenario" },
+    { "type": "route_status_equals", "route_id": "route_a", "value": "completed" },
+    { "type": "route_status_equals", "route_id": "route_b", "value": "not_started" },
+    { "type": "active_route_equals", "value": null },
+    { "type": "floor_unlocked", "floor_id": "floor_04" }
+  ],
+  "completion_requirements": [
+    { "type": "event_completed", "event_id": "route_b_phone_001" },
+    { "type": "event_completed", "event_id": "route_b_room_archive_001" },
+    { "type": "event_completed", "event_id": "route_b_room_hyougi_001" },
+    { "type": "event_completed", "event_id": "route_b_room_gokuraku_001" },
+    { "type": "event_completed", "event_id": "route_b_manager_return_001" }
+  ],
+  "failure_requirements": [],
+  "phone_events": [
+    {
+      "event_id": "route_b_phone_001",
+      "caller_id": "resident_unregistered_record_001",
+      "caller_display_name": "\u8a18\u9332\u306a\u3057",
+      "priority": 10,
+      "requirements": [
+        { "type": "mode_equals", "value": "scenario" },
+        { "type": "route_status_equals", "route_id": "route_a", "value": "completed" },
+        { "type": "route_status_equals", "route_id": "route_b", "value": "not_started" },
+        { "type": "active_route_equals", "value": null },
+        { "type": "floor_unlocked", "floor_id": "floor_04" },
+        { "type": "room_stay_seconds", "room_id": "kanrinin", "operator": ">=", "value": 20 },
+        { "type": "active_phone_event_equals", "value": null },
+        { "type": "event_enabled", "event_id": "route_b_phone_001" },
+        { "type": "event_not_completed", "event_id": "route_b_phone_001" },
+        { "type": "room_entered_after_event", "room_id": "kanrinin", "after_event_id": "route_a_manager_return_001" }
+      ],
+      "phone_config": {
+        "ring_audio": "/static/audio/kanrinin/red-phone-ring.mp3",
+        "retry_enabled": true,
+        "retry_trigger": "kanrinin_reentry",
+        "retry_interval_seconds": 60
+      },
+      "caller_profile": {
+        "resident_type": "unregistered_record",
+        "home_room_id": null,
+        "identity_confirmed": false,
+        "resident_number": null,
+        "registered": false
+      },
+      "conversation": [
+        { "speaker": "caller", "text": "\u7ba1\u7406\u4eba\u5ba4\u3067\u3059\u304b\u3002" },
+        { "speaker": "caller", "text": "\u79c1\u306e\u8a18\u9332\u304c\u3001\u305d\u3061\u3089\u306b\u5c4a\u3044\u3066\u3044\u307e\u305b\u3093\u3002" }
+      ],
+      "effects": [
+        { "type": "set_route_status", "route_id": "route_b", "value": "active" },
+        { "type": "set_active_route", "route_id": "route_b" },
+        { "type": "complete_event", "event_id": "route_b_phone_001" },
+        { "type": "enable_event", "event_id": "route_b_room_archive_001" },
+        { "type": "set_target_room", "room_id": "archive" },
+        { "type": "append_diary_entry", "entry_id": "route_b_diary_001" }
+      ],
+      "next_events": ["route_b_room_archive_001"]
+    }
+  ],
+  "room_events": [
+    {
+      "event_id": "route_b_room_archive_001",
+      "room_id": "archive",
+      "requirements": [
+        { "type": "route_status_equals", "route_id": "route_b", "value": "active" },
+        { "type": "event_completed", "event_id": "route_b_phone_001" },
+        { "type": "event_enabled", "event_id": "route_b_room_archive_001" },
+        { "type": "event_not_completed", "event_id": "route_b_room_archive_001" }
+      ],
+      "room_state_before": "normal",
+      "room_state_during": "unregistered_record_visible",
+      "room_state_after": "post_route_b",
+      "messages": ["record_number:none", "owner:unregistered", "state:adding"],
+      "interaction": { "target": "archive-record", "action": "open", "repeatable": false },
+      "completion_requirements": [
+        { "type": "room_entered", "room_id": "archive" },
+        { "type": "interaction_completed", "target": "archive-record" },
+        { "type": "sequence_finished", "event_id": "route_b_room_archive_001" }
+      ],
+      "effects": [
+        { "type": "complete_event", "event_id": "route_b_room_archive_001" },
+        { "type": "set_room_state", "room_id": "archive", "value": "post_route_b" },
+        { "type": "enable_event", "event_id": "route_b_room_hyougi_001" },
+        { "type": "set_target_room", "room_id": "hyougi" },
+        { "type": "append_diary_entry", "entry_id": "route_b_diary_002" }
+      ],
+      "next_events": ["route_b_room_hyougi_001"]
+    },
+    {
+      "event_id": "route_b_room_hyougi_001",
+      "room_id": "hyougi",
+      "requirements": [
+        { "type": "route_status_equals", "route_id": "route_b", "value": "active" },
+        { "type": "event_completed", "event_id": "route_b_room_archive_001" },
+        { "type": "event_enabled", "event_id": "route_b_room_hyougi_001" },
+        { "type": "event_not_completed", "event_id": "route_b_room_hyougi_001" }
+      ],
+      "room_state_before": "normal",
+      "room_state_during": "unregistered_record_deliberation",
+      "room_state_after": "post_route_b",
+      "messages": ["decision:deferred", "storage_only:approved"],
+      "interaction": { "target": "hyougi-record", "action": "open", "repeatable": false },
+      "completion_requirements": [
+        { "type": "room_entered", "room_id": "hyougi" },
+        { "type": "interaction_completed", "target": "hyougi-record" },
+        { "type": "sequence_finished", "event_id": "route_b_room_hyougi_001" }
+      ],
+      "effects": [
+        { "type": "complete_event", "event_id": "route_b_room_hyougi_001" },
+        { "type": "set_room_state", "room_id": "hyougi", "value": "post_route_b" },
+        { "type": "enable_event", "event_id": "route_b_room_gokuraku_001" },
+        { "type": "set_target_room", "room_id": "gokuraku" },
+        { "type": "append_diary_entry", "entry_id": "route_b_diary_003" }
+      ],
+      "next_events": ["route_b_room_gokuraku_001"]
+    },
+    {
+      "event_id": "route_b_room_gokuraku_001",
+      "room_id": "gokuraku",
+      "requirements": [
+        { "type": "route_status_equals", "route_id": "route_b", "value": "active" },
+        { "type": "event_completed", "event_id": "route_b_room_hyougi_001" },
+        { "type": "event_enabled", "event_id": "route_b_room_gokuraku_001" },
+        { "type": "event_not_completed", "event_id": "route_b_room_gokuraku_001" }
+      ],
+      "room_state_before": "normal",
+      "room_state_during": "unregistered_container_active",
+      "room_state_after": "post_route_b",
+      "messages": ["materials:insufficient", "owner:unconfirmed", "state:not_stopped"],
+      "interaction": { "target": "gokuraku-container", "action": "open", "repeatable": false },
+      "completion_requirements": [
+        { "type": "room_entered", "room_id": "gokuraku" },
+        { "type": "interaction_completed", "target": "gokuraku-container" },
+        { "type": "sequence_finished", "event_id": "route_b_room_gokuraku_001" }
+      ],
+      "effects": [
+        { "type": "complete_event", "event_id": "route_b_room_gokuraku_001" },
+        { "type": "set_room_state", "room_id": "gokuraku", "value": "post_route_b" },
+        { "type": "enable_event", "event_id": "route_b_manager_return_001" },
+        { "type": "set_target_room", "room_id": "kanrinin" },
+        { "type": "append_diary_entry", "entry_id": "route_b_diary_004" }
+      ],
+      "next_events": ["route_b_manager_return_001"]
+    }
+  ],
+  "manager_events": [
+    {
+      "event_id": "route_b_manager_return_001",
+      "room_id": "kanrinin",
+      "requirements": [
+        { "type": "route_status_equals", "route_id": "route_b", "value": "active" },
+        { "type": "event_completed", "event_id": "route_b_room_archive_001" },
+        { "type": "event_completed", "event_id": "route_b_room_hyougi_001" },
+        { "type": "event_completed", "event_id": "route_b_room_gokuraku_001" },
+        { "type": "event_enabled", "event_id": "route_b_manager_return_001" },
+        { "type": "event_not_completed", "event_id": "route_b_manager_return_001" },
+        { "type": "room_entered_after_event", "room_id": "kanrinin", "after_event_id": "route_b_room_gokuraku_001" }
+      ],
+      "manager_state_sequence": ["away", "visible", "busy", "visible"],
+      "conversation": [{ "speaker": "manager", "text": "\u898b\u3064\u304b\u308a\u307e\u3057\u305f\u3002" }],
+      "effects": [
+        { "type": "complete_event", "event_id": "route_b_manager_return_001" },
+        { "type": "set_route_status", "route_id": "route_b", "value": "completed" },
+        { "type": "set_active_route", "route_id": null },
+        { "type": "unlock_floor", "floor_id": "floor_05" },
+        { "type": "increment_counter", "counter_id": "completed_scenario_count", "value": 1 },
+        { "type": "clear_target_room" },
+        { "type": "append_diary_entry", "entry_id": "route_b_diary_complete" },
+        { "type": "enable_phone_pool", "pool_id": "normal_route_phone_pool" },
+        { "type": "set_manager_state", "state": "visible" }
+      ],
+      "next_events": []
+    }
+  ],
+  "diary_entries": [
+    { "entry_id": "route_b_diary_001", "text": "Route_B phone received." },
+    { "entry_id": "route_b_diary_002", "text": "Archive record checked." },
+    { "entry_id": "route_b_diary_003", "text": "Deliberation record checked." },
+    { "entry_id": "route_b_diary_004", "text": "Container checked." },
+    { "entry_id": "route_b_diary_complete", "text": "Route_B completed." }
+  ],
+  "branch_slots": []
+}

@@ -29,6 +29,17 @@
         completionRequirements: [],
         failureRequirements: [],
         branches: []
+      },
+      {
+        id: "route_b",
+        name: "Route_B",
+        startRequirements: [
+          { type: "mode", value: "scenario" },
+          { type: "route_status_equals", route_id: "route_a", value: "completed" }
+        ],
+        completionRequirements: [],
+        failureRequirements: [],
+        branches: []
       }
     ],
     rooms: [

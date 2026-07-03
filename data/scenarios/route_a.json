@@ -29,7 +29,7 @@
       "requirements": [
         { "type": "mode_equals", "value": "scenario" },
         { "type": "route_status_equals", "route_id": "route_a", "value": "not_started" },
-        { "type": "room_stay_seconds", "room_id": "kanrinin", "operator": ">=", "value": 30 },
+        { "type": "room_stay_seconds", "room_id": "kanrinin", "operator": ">=", "value": 20 },
         { "type": "active_phone_event_equals", "value": null }
       ],
       "phone_config": {
@@ -146,6 +146,7 @@
         { "type": "clear_target_room" },
         { "type": "append_diary_entry", "entry_id": "route_a_diary_complete" },
         { "type": "enable_phone_pool", "pool_id": "normal_route_phone_pool" },
+        { "type": "enable_event", "event_id": "route_b_phone_001" },
         { "type": "set_manager_state", "state": "visible" }
       ],
       "next_events": []
