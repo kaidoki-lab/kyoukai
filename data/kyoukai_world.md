@@ -733,3 +733,46 @@ Route_C 完了では、最上階、最終シナリオ、消滅の鍵、巨大鍵
 - `static/ma.js`
 
 Route_C の会話文、部屋イベント、管理人イベント、日誌はコードへ直接書かず、イベントデータとして管理する。
+
+---
+
+## 更新メモ 2026-07-03
+
+### 部屋マスターフォーマット v1
+
+ShortFACTORYや今後の動画生成AIが既存部屋を扱えるように、部屋ごとのMarkdownを `data/rooms/` に作成した。
+
+今回作成した対象は、全室ではなく以下の5部屋のみ。
+
+- 管理人室 `/kanrinin`
+- 観測域 `/observation`
+- 受信域 `/signal`
+- 崩落域 `/null`
+- 卵部屋 `/fukashitsu`
+
+各部屋Markdownには以下の項目を持たせる。
+
+- 基本情報
+- コンセプト
+- 現在の実装
+- 操作仕様
+- 動画化仕様
+- AI巡回仕様
+- ShortFACTORYメモ
+- 未解決
+
+`kyoukai_world.md` に書かれていない情報は断定せず、未確定の箇所は `未記載` または `未設定` として残す運用にした。
+
+この部屋マスターは、世界観設定の正本ではなく、ShortFACTORY・Playwright巡回・動画生成AI向けの実務用参照ファイルとして扱う。
+
+**作成ファイル**
+- `data/rooms/kanrinin.md`
+- `data/rooms/observation.md`
+- `data/rooms/signal.md`
+- `data/rooms/null.md`
+- `data/rooms/fukashitsu.md`
+
+**運用メモ**
+- 今後ほかの部屋を追加する場合も、まず `kyoukai_world.md` の記載範囲を基準にする。
+- 操作箇所、動画尺、テロップ案、AI巡回手順が不足している部屋は、各部屋Markdownの `未解決` に残す。
+- 実装コードの変更と部屋マスター更新は別作業として扱う。
