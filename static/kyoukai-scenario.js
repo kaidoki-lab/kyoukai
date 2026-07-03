@@ -155,6 +155,7 @@
       active_route_id: null,
       route_status: defaultRouteStatus(),
       event_status: {},
+      event_completed_at: {},
       enabled_event_ids: [],
       room_states: roomStates,
       unlocked_floor_ids: defaultUnlockedFloorIds(),
@@ -201,6 +202,7 @@
     next.schema_version = 1;
     next.route_status = Object.assign(defaultRouteStatus(), next.route_status || {});
     next.event_status = Object.assign({}, next.event_status || {});
+    next.event_completed_at = Object.assign({}, next.event_completed_at || {});
     next.enabled_event_ids = unique(next.enabled_event_ids);
     next.unlocked_floor_ids = unique(next.unlocked_floor_ids);
     next.diary_entry_ids = unique(next.diary_entry_ids);
@@ -336,11 +338,15 @@
       "completed",
       "post_route_a",
       "post_route_b",
+      "post_route_c",
       "signal_contaminated",
       "observation_signal_received",
       "unregistered_record_visible",
       "unregistered_record_deliberation",
-      "unregistered_container_active"
+      "unregistered_container_active",
+      "persistent_fragment_visible",
+      "route_c_conversation",
+      "persistent_fragment_generation"
     ].indexOf(roomState) !== -1 || state.unlocked_rooms.indexOf(roomId) !== -1;
   }
 
@@ -397,6 +403,13 @@
       if (requirement.type === "room_entered_after_event") {
         return currentRoomId === requirement.room_id && state.last_completed_event_id === requirement.after_event_id;
       }
+      if (requirement.type === "room_reentered_after_event") {
+        var completedAt = Date.parse(state.event_completed_at[requirement.after_event_id] || "");
+        if (!Number.isFinite(completedAt)) return false;
+        return currentRoomId === requirement.room_id && state.room_entry_history.some(function (entry) {
+          return entry.room_id === requirement.room_id && Date.parse(entry.at || "") > completedAt;
+        });
+      }
       return requirementWarn(requirement);
     });
   }
@@ -437,7 +450,10 @@
     if (!eventId) return;
     state.event_status[eventId] = status;
     if (status === "enabled" && state.enabled_event_ids.indexOf(eventId) === -1) state.enabled_event_ids.push(eventId);
-    if (status === "completed" && state.completed_events.indexOf(eventId) === -1) state.completed_events.push(eventId);
+    if (status === "completed") {
+      if (state.completed_events.indexOf(eventId) === -1) state.completed_events.push(eventId);
+      state.event_completed_at[eventId] = new Date().toISOString();
+    }
   }
 
   function unlockFloor(state, floorId) {
@@ -609,7 +625,7 @@
     }).filter(Boolean).map(function (entry) {
       return {
         entry_id: entry.entry_id,
-        category: entry.route_id === "route_b" ? "Route_B" : "Route_A",
+        category: entry.route_id === "route_c" ? "Route_C" : entry.route_id === "route_b" ? "Route_B" : "Route_A",
         title: entry.title || "混線している観測",
         body: entry.text
       };

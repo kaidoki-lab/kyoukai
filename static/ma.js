@@ -157,14 +157,18 @@
 
   // ---------- Main ----------
 
-  var visits = incrementVisitCount();
-  var conv = getConv(visits);
-
   var speakerEl = document.getElementById('maSpeaker');
   var textEl = document.getElementById('maText');
   var nextBtn = document.getElementById('maNext');
 
   if (!speakerEl || !textEl || !nextBtn) return;
+
+  if (window.KYOUKAI_SCENARIO && window.KYOUKAI_SCENARIO.getActiveRoomEvent('ma')) {
+    return;
+  }
+
+  var visits = incrementVisitCount();
+  var conv = getConv(visits);
 
   speakerEl.textContent = conv.speaker;
   textEl.textContent = '';

@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>粒子生成構造体観測システム / KYOUKAI</title>
     <link rel="stylesheet" href="/static/particles.css" />
+    <link rel="stylesheet" href="/static/kyoukai-scenario-ui.css?v=routec1" />
     <script defer src="/static/analytics.js"></script>
   </head>
   <body>
+    <script>window.KYOUKAI_ROOM = 'particles';</script>
     <div id="stage">
       <canvas id="c"></canvas>
     </div>
@@ -60,5 +62,6 @@
         engine.start();
       })();
     </script>
+    <script defer src="/static/kyoukai-route-c-room.js?v=routec1"></script>
   </body>
 </html>

@@ -51,9 +51,36 @@
     failure_requirements: []
   };
 
+  var routeC = {
+    schema_version: 1,
+    route_id: "route_c",
+    name: "壊れる前の形",
+    type: "normal",
+    theme: "崩壊と生成の境界",
+    status_default: "not_started",
+    shared_room_ids: ["kanrinin"],
+    reserved_room_ids: ["null", "ma", "particles"],
+    start_requirements: [
+      { type: "mode_equals", value: "scenario" },
+      { type: "route_status_equals", route_id: "route_a", value: "completed" },
+      { type: "route_status_equals", route_id: "route_b", value: "completed" },
+      { type: "route_status_equals", route_id: "route_c", value: "not_started" },
+      { type: "active_route_equals", value: null },
+      { type: "floor_unlocked", floor_id: "floor_05" }
+    ],
+    completion_requirements: [
+      { type: "event_completed", event_id: "route_c_phone_001" },
+      { type: "event_completed", event_id: "route_c_room_null_001" },
+      { type: "event_completed", event_id: "route_c_room_ma_001" },
+      { type: "event_completed", event_id: "route_c_room_particles_001" },
+      { type: "event_completed", event_id: "route_c_manager_return_001" }
+    ],
+    failure_requirements: []
+  };
+
   window.KYOUKAI_SCENARIO_EVENTS = {
-    version: "route-b-v1",
-    routes: [routeA, routeB],
+    version: "route-c-v1",
+    routes: [routeA, routeB, routeC],
     phoneEvents: [
       {
         event_id: "route_a_phone_001",
@@ -146,6 +173,58 @@
           { type: "append_diary_entry", entry_id: "route_b_diary_001" }
         ],
         next_events: ["route_b_room_archive_001"]
+      },
+      {
+        event_id: "route_c_phone_001",
+        route_id: "route_c",
+        caller_id: "resident_null_fragment_001",
+        caller_display_name: "発信元不明",
+        caller: "発信元不明",
+        room: "null",
+        floor: null,
+        priority: 10,
+        requirements: [
+          { type: "mode_equals", value: "scenario" },
+          { type: "route_status_equals", route_id: "route_a", value: "completed" },
+          { type: "route_status_equals", route_id: "route_b", value: "completed" },
+          { type: "route_status_equals", route_id: "route_c", value: "not_started" },
+          { type: "active_route_equals", value: null },
+          { type: "floor_unlocked", floor_id: "floor_05" },
+          { type: "room_stay_seconds", room_id: "kanrinin", operator: ">=", value: 20 },
+          { type: "room_reentered_after_event", room_id: "kanrinin", after_event_id: "route_b_manager_return_001" },
+          { type: "active_phone_event_equals", value: null },
+          { type: "event_enabled", event_id: "route_c_phone_001" },
+          { type: "event_not_completed", event_id: "route_c_phone_001" }
+        ],
+        phone_config: {
+          ring_audio: "/static/audio/kanrinin/red-phone-ring.mp3",
+          retry_enabled: true,
+          retry_trigger: "kanrinin_reentry",
+          retry_interval_seconds: 60
+        },
+        caller_profile: {
+          resident_type: "unknown_source",
+          home_room_id: null,
+          identity_confirmed: false,
+          resident_number: null,
+          registered: false
+        },
+        conversation: [
+          { speaker: "caller", text: "崩れる音。" },
+          { speaker: "caller", text: "一定の間隔で、硬いものが接触する音。" },
+          { speaker: "caller", text: "まだ" },
+          { speaker: "caller", text: "形が" },
+          { speaker: "caller", text: "残っています" }
+        ],
+        effects: [
+          { type: "set_route_status", route_id: "route_c", value: "active" },
+          { type: "set_active_route", route_id: "route_c" },
+          { type: "complete_event", event_id: "route_c_phone_001" },
+          { type: "enable_event", event_id: "route_c_room_null_001" },
+          { type: "set_target_room", room_id: "null" },
+          { type: "append_diary_entry", entry_id: "route_c_diary_001" }
+        ],
+        next_events: ["route_c_room_null_001"]
       }
     ],
     roomEvents: [
@@ -318,6 +397,111 @@
           { type: "append_diary_entry", entry_id: "route_b_diary_004" }
         ],
         next_events: ["route_b_manager_return_001"]
+      },
+      {
+        event_id: "route_c_room_null_001",
+        route_id: "route_c",
+        room_id: "null",
+        requirements: [
+          { type: "route_status_equals", route_id: "route_c", value: "active" },
+          { type: "event_completed", event_id: "route_c_phone_001" },
+          { type: "event_enabled", event_id: "route_c_room_null_001" },
+          { type: "event_not_completed", event_id: "route_c_room_null_001" }
+        ],
+        room_state_before: "normal",
+        room_state_during: "persistent_fragment_visible",
+        room_state_after: "post_route_c",
+        messages: [
+          "崩れていない",
+          "崩れた場所に戻っている",
+          "同じ形ではない"
+        ],
+        interaction: { target: "route-c-null-fragment", action: "touch", repeatable: false },
+        completion_requirements: [
+          { type: "room_entered", room_id: "null" },
+          { type: "interaction_completed", target: "route-c-null-fragment" },
+          { type: "sequence_finished", event_id: "route_c_room_null_001" }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_c_room_null_001" },
+          { type: "set_room_state", room_id: "null", value: "post_route_c" },
+          { type: "enable_event", event_id: "route_c_room_ma_001" },
+          { type: "set_target_room", room_id: "ma" },
+          { type: "append_diary_entry", entry_id: "route_c_diary_002" }
+        ],
+        next_events: ["route_c_room_ma_001"]
+      },
+      {
+        event_id: "route_c_room_ma_001",
+        route_id: "route_c",
+        room_id: "ma",
+        requirements: [
+          { type: "route_status_equals", route_id: "route_c", value: "active" },
+          { type: "event_completed", event_id: "route_c_room_null_001" },
+          { type: "event_enabled", event_id: "route_c_room_ma_001" },
+          { type: "event_not_completed", event_id: "route_c_room_ma_001" }
+        ],
+        room_state_before: "normal",
+        room_state_during: "route_c_conversation",
+        room_state_after: "post_route_c",
+        messages: [
+          "また来たか",
+          "下で拾ったものの話だろう",
+          "拾ってはいない？",
+          "触ったなら同じだ",
+          "壊れて戻るものは、戻っているんじゃない",
+          "作り直されている",
+          "作っている場所へ行け",
+          "同じものだと思うなよ"
+        ],
+        interaction: { target: "route-c-ma-conversation", action: "listen", repeatable: false },
+        completion_requirements: [
+          { type: "room_entered", room_id: "ma" },
+          { type: "interaction_completed", target: "route-c-ma-conversation" },
+          { type: "sequence_finished", event_id: "route_c_room_ma_001" }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_c_room_ma_001" },
+          { type: "set_room_state", room_id: "ma", value: "post_route_c" },
+          { type: "enable_event", event_id: "route_c_room_particles_001" },
+          { type: "set_target_room", room_id: "particles" },
+          { type: "append_diary_entry", entry_id: "route_c_diary_003" }
+        ],
+        next_events: ["route_c_room_particles_001"]
+      },
+      {
+        event_id: "route_c_room_particles_001",
+        route_id: "route_c",
+        room_id: "particles",
+        requirements: [
+          { type: "route_status_equals", route_id: "route_c", value: "active" },
+          { type: "event_completed", event_id: "route_c_room_ma_001" },
+          { type: "event_enabled", event_id: "route_c_room_particles_001" },
+          { type: "event_not_completed", event_id: "route_c_room_particles_001" }
+        ],
+        room_state_before: "normal",
+        room_state_during: "persistent_fragment_generation",
+        room_state_after: "post_route_c",
+        messages: [
+          "構成中",
+          "参照元：破損",
+          "一致しません",
+          "次を生成します"
+        ],
+        interaction: { target: "route-c-particles-generator", action: "activate", repeatable: false },
+        completion_requirements: [
+          { type: "room_entered", room_id: "particles" },
+          { type: "interaction_completed", target: "route-c-particles-generator" },
+          { type: "sequence_finished", event_id: "route_c_room_particles_001" }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_c_room_particles_001" },
+          { type: "set_room_state", room_id: "particles", value: "post_route_c" },
+          { type: "enable_event", event_id: "route_c_manager_return_001" },
+          { type: "set_target_room", room_id: "kanrinin" },
+          { type: "append_diary_entry", entry_id: "route_c_diary_004" }
+        ],
+        next_events: ["route_c_manager_return_001"]
       }
     ],
     managerEvents: [
@@ -389,6 +573,44 @@
           { type: "clear_target_room" },
           { type: "append_diary_entry", entry_id: "route_b_diary_complete" },
           { type: "enable_phone_pool", pool_id: "normal_route_phone_pool" },
+          { type: "enable_event", event_id: "route_c_phone_001" },
+          { type: "set_manager_state", state: "visible" }
+        ],
+        next_events: []
+      },
+      {
+        event_id: "route_c_manager_return_001",
+        route_id: "route_c",
+        room_id: "kanrinin",
+        requirements: [
+          { type: "route_status_equals", route_id: "route_c", value: "active" },
+          { type: "event_completed", event_id: "route_c_room_null_001" },
+          { type: "event_completed", event_id: "route_c_room_ma_001" },
+          { type: "event_completed", event_id: "route_c_room_particles_001" },
+          { type: "event_enabled", event_id: "route_c_manager_return_001" },
+          { type: "event_not_completed", event_id: "route_c_manager_return_001" },
+          { type: "room_entered_after_event", room_id: "kanrinin", after_event_id: "route_c_room_particles_001" }
+        ],
+        manager_state_sequence: ["visible", "visible", "busy", "visible"],
+        conversation: [
+          { speaker: "manager", text: "同じものはありましたか" },
+          { speaker: "manager", text: "なかったんですね" },
+          { speaker: "manager", text: "なら、あれは直っているんじゃありません" },
+          { speaker: "manager", text: "壊れるたびに、似たものが置き直されています" },
+          { speaker: "manager", text: "前のものがどこへ行くのかは分かりません" },
+          { speaker: "manager", text: "次の階を開けます" },
+          { speaker: "manager", text: "上に行けば、もっと完成したものがあるとは限りません" },
+          { speaker: "manager", text: "むしろ逆かもしれません" }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_c_manager_return_001" },
+          { type: "set_route_status", route_id: "route_c", value: "completed" },
+          { type: "set_active_route", route_id: null },
+          { type: "unlock_floor", floor_id: "floor_06" },
+          { type: "increment_counter", counter_id: "completed_scenario_count", value: 1 },
+          { type: "clear_target_room" },
+          { type: "append_diary_entry", entry_id: "route_c_diary_complete" },
+          { type: "enable_phone_pool", pool_id: "normal_route_phone_pool" },
           { type: "set_manager_state", state: "visible" }
         ],
         next_events: []
@@ -448,6 +670,36 @@
         route_id: "route_b",
         title: "記録されていない人 完了",
         text: "所有者不在の記録の保管状態を確認。記録は停止していない。判断は保留。次階の開錠を解除。"
+      },
+      {
+        entry_id: "route_c_diary_001",
+        route_id: "route_c",
+        title: "Route_C 1",
+        text: "Unidentified call received. Most of the sound was damaged. Periodic contact noise was detected inside the collapse sound. Check the collapse area."
+      },
+      {
+        entry_id: "route_c_diary_002",
+        route_id: "route_c",
+        title: "Route_C 2",
+        text: "A persistent object was found inside the collapse area. Each reconstruction changes its details. Ask the resident in Ma."
+      },
+      {
+        entry_id: "route_c_diary_003",
+        route_id: "route_c",
+        title: "Route_C 3",
+        text: "The object may not be restored. It may be generated again each time. Check the likely generation room."
+      },
+      {
+        entry_id: "route_c_diary_004",
+        route_id: "route_c",
+        title: "Route_C 4",
+        text: "A similar form appeared in the particle structure. It does not match the collapse object. The order of collapse and generation is unknown."
+      },
+      {
+        entry_id: "route_c_diary_complete",
+        route_id: "route_c",
+        title: "Route_C complete",
+        text: "Collapse area and particle structure checked. The object is likely repeated generation, not restoration. Source and disposal remain unknown. Next floor unlocked."
       }
     ],
     branchSlots: [
@@ -455,7 +707,8 @@
       { branch_id: "route_a_observation_repeat", enabled: false, attach_after_event: "route_a_room_observation_001" },
       { branch_id: "route_a_signal_alternate", enabled: false, attach_after_event: "route_a_room_signal_001" },
       { branch_id: "route_a_manager_absent", enabled: false, attach_after_event: "route_a_manager_return_001" },
-      { branch_id: "route_b_unregistered_repeat", enabled: false, attach_after_event: "route_b_room_archive_001" }
+      { branch_id: "route_b_unregistered_repeat", enabled: false, attach_after_event: "route_b_room_archive_001" },
+      { branch_id: "route_c_fragment_repeat", enabled: false, attach_after_event: "route_c_room_null_001" }
     ]
   };
 })();

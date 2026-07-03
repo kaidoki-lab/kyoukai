@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "route_id": "route_c",
+  "name": "壊れる前の形",
+  "type": "normal",
+  "theme": "崩壊と生成の境界",
+  "shared_room_ids": ["kanrinin"],
+  "reserved_room_ids": ["null", "ma", "particles"],
+  "start_requirements": [
+    { "type": "mode_equals", "value": "scenario" },
+    { "type": "route_status_equals", "route_id": "route_a", "value": "completed" },
+    { "type": "route_status_equals", "route_id": "route_b", "value": "completed" },
+    { "type": "route_status_equals", "route_id": "route_c", "value": "not_started" },
+    { "type": "active_route_equals", "value": null },
+    { "type": "floor_unlocked", "floor_id": "floor_05" },
+    { "type": "room_reentered_after_event", "room_id": "kanrinin", "after_event_id": "route_b_manager_return_001" }
+  ],
+  "completion_requirements": [
+    { "type": "event_completed", "event_id": "route_c_phone_001" },
+    { "type": "event_completed", "event_id": "route_c_room_null_001" },
+    { "type": "event_completed", "event_id": "route_c_room_ma_001" },
+    { "type": "event_completed", "event_id": "route_c_room_particles_001" },
+    { "type": "event_completed", "event_id": "route_c_manager_return_001" }
+  ],
+  "failure_requirements": [],
+  "phone_events": ["route_c_phone_001"],
+  "room_events": [
+    "route_c_room_null_001",
+    "route_c_room_ma_001",
+    "route_c_room_particles_001"
+  ],
+  "manager_events": ["route_c_manager_return_001"],
+  "diary_entries": [
+    "route_c_diary_001",
+    "route_c_diary_002",
+    "route_c_diary_003",
+    "route_c_diary_004",
+    "route_c_diary_complete"
+  ],
+  "completion_state": {
+    "active_route_id": null,
+    "route_status": {
+      "route_a": "completed",
+      "route_b": "completed",
+      "route_c": "completed"
+    },
+    "room_states": {
+      "null": "post_route_c",
+      "ma": "post_route_c",
+      "particles": "post_route_c"
+    },
+    "unlocked_floor_ids": [
+      "floor_01",
+      "floor_02",
+      "floor_03",
+      "floor_04",
+      "floor_05",
+      "floor_06"
+    ],
+    "completed_scenario_count": 3,
+    "current_target_room_id": null,
+    "final_route_available": false,
+    "top_floor_unlocked": false,
+    "annihilation_key_obtained": false,
+    "top_floor_keyhole_active": false
+  },
+  "branch_slots": [
+    { "branch_id": "route_c_fragment_repeat", "enabled": false, "attach_after_event": "route_c_room_null_001" }
+  ]
+}
