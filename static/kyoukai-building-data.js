@@ -49,6 +49,8 @@
       { roomIndex: 6, id: "observer", name: "observer", label: "OBR", href: "/observer", image: "/static/images/entrances/entrance-observer.png", material: "shrine", residentId: "observer", defaultState: "normal" },
       { roomIndex: 7, id: "archive", name: "archive", label: "ARC", href: "/archive", image: "/static/images/entrances/entrance-archive.png", material: "box", residentId: "archivist", defaultState: "normal" },
 
+      { roomIndex: 8, id: "fukashitsu", name: "fukashitsu", label: "EGG", href: "/fukashitsu", image: "/static/images/entrances/entrance-fukashitsu.png", material: "door", residentId: "fukashitsu", defaultState: "normal" },
+
       { roomIndex: 10, id: "signal", name: "signal", label: "SIG", href: "/signal", image: "/static/images/entrances/entrance-signal.png", material: "speaker", residentId: "signal", defaultState: "normal" },
       { roomIndex: 11, id: "news", name: "news", label: "NEWS", href: "/typhoon-news/", image: "/static/images/entrances/news.png", material: "door", residentId: "news", defaultState: "normal" },
       { roomIndex: 12, id: "daimyojin", name: "daimyojin", label: "DMJ", href: "/daimyojin", image: "/static/images/entrances/entrance-daimyojin.png", material: "shrine", residentId: "daimyojin", defaultState: "normal" },

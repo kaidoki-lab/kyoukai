@@ -164,7 +164,7 @@
         this._clicks.push({ x: e.clientX - r.left, y: e.clientY - r.top, t: performance.now() });
       };
 
-      window.addEventListener('resize', this._rz);
+      if (!opts.noAutoResize) window.addEventListener('resize', this._rz);
       canvas.addEventListener('pointerdown', this._pd);
       if (opts.observerEffect !== false) {
         canvas.addEventListener('mousemove', this._mm);
@@ -178,6 +178,7 @@
     // ── 初期化 ─────────────────────────────────────────────
 
     _resize() {
+      if (this.opts.noAutoResize) return;
       this.cv.width  = window.innerWidth;
       this.cv.height = window.innerHeight;
     }
@@ -472,8 +473,12 @@
       const n     = pts.length;
       const w     = this.cv.width, h = this.cv.height;
 
-      ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, w, h);
+      if (this.opts.background === 'transparent') {
+        ctx.clearRect(0, 0, w, h);
+      } else {
+        ctx.fillStyle = this.opts.background || '#000';
+        ctx.fillRect(0, 0, w, h);
+      }
 
       // 接続線アルファ
       let ca = 0;
@@ -502,11 +507,15 @@
           ctx.stroke();
         };
 
-        batch(cl.rrN, 255,  55,  55, 0.9, ca * 0.85);
-        batch(cl.rrF, 255,  55,  55, 0.5, ca * 0.38);
-        batch(cl.bbN,  55, 148, 255, 0.6, ca * 0.70);
-        batch(cl.bbF,  55, 148, 255, 0.4, ca * 0.30);
-        batch(cl.yyA, 255, 215,  20, 0.4, ca * 0.48);
+        const _c = this.opts.getColors ? this.opts.getColors() : null;
+        const rC = _c ? _c.r : [255,  55,  55];
+        const bC = _c ? _c.b : [ 55, 148, 255];
+        const yC = _c ? _c.y : [255, 215,  20];
+        batch(cl.rrN, rC[0], rC[1], rC[2], 0.9, ca * 0.85);
+        batch(cl.rrF, rC[0], rC[1], rC[2], 0.5, ca * 0.38);
+        batch(cl.bbN, bC[0], bC[1], bC[2], 0.6, ca * 0.70);
+        batch(cl.bbF, bC[0], bC[1], bC[2], 0.4, ca * 0.30);
+        batch(cl.yyA, yC[0], yC[1], yC[2], 0.4, ca * 0.48);
         batch(cl.xxA, 155, 155, 155, 0.3, ca * 0.15);
       }
 
@@ -523,9 +532,10 @@
         ctx.fill();
       };
 
-      drawGroup('r', 'rgb(255,55,55)');
-      drawGroup('b', 'rgb(55,148,255)');
-      drawGroup('y', 'rgb(255,220,30)');
+      const _dc = this.opts.getColors ? this.opts.getColors() : null;
+      drawGroup('r', _dc ? `rgb(${_dc.r[0]},${_dc.r[1]},${_dc.r[2]})` : 'rgb(255,55,55)');
+      drawGroup('b', _dc ? `rgb(${_dc.b[0]},${_dc.b[1]},${_dc.b[2]})` : 'rgb(55,148,255)');
+      drawGroup('y', _dc ? `rgb(${_dc.y[0]},${_dc.y[1]},${_dc.y[2]})` : 'rgb(255,220,30)');
     }
 
     // ── フレームループ ──────────────────────────────────────

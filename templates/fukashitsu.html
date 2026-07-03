@@ -4,13 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow">
-  <title>孵化室 / KYOUKAI</title>
-  <meta property="og:title" content="孵化室 / KYOUKAI" />
+  <title>卵部屋 / KYOUKAI</title>
+  <meta property="og:title" content="卵部屋 / KYOUKAI" />
   <meta property="og:description" content="卵が並んでいる。動きはない。" />
   <meta property="og:url" content="https://www.void-kyoukai.net/fukashitsu" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="stylesheet" href="/static/fukashitsu.css?v=2">
+  <link rel="stylesheet" href="/static/fukashitsu.css?v=4">
+  <script src="/static/particle-engine.js"></script>
   <script src="/static/kyoukai-transition.js"></script>
   <script defer src="/static/analytics.js"></script>
 </head>
@@ -24,17 +25,13 @@
 
     <!-- 卵ボタンはJSで動的生成 -->
 
-    <div class="fuka-message" id="fukaMessage" aria-live="polite"></div>
-
-    <button type="button" class="fuka-collect-btn" id="fukaCollectBtn" aria-label="稚魚を持ち帰る">
-      持ち帰る
+    <button type="button" class="fuka-collect-btn" id="fukaCollectBtn" aria-label="卵を取り出す">
+      取り出す
     </button>
-
-    <div class="fuka-badge" id="fukaBadge" aria-hidden="true">稚魚を所持</div>
 
     <div class="fuka-blackout" id="fukaBlackout" aria-hidden="true"></div>
   </div>
 
-  <script src="/static/fukashitsu.js?v=9"></script>
+  <script src="/static/fukashitsu.js?v=10"></script>
 </body>
 </html>
