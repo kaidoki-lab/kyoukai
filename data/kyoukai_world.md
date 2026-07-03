@@ -59,6 +59,7 @@ KYOUKAIは「境界」を名乗る実験的Webサイト。
 | 極楽域 | /gokuraku | 引き出しと音響装置が積み上がった奥の部屋 |
 | 粒子観測 | /particles | 粒子群を観測する部屋。意味より運動が先にある |
 | 波紋域 | /ripple | 触れると世界が応答するが、一点だけ命令を聞かない |
+| ドット花火崩壊 | /dot-hanabi | ドット絵の夜の街に花火を打ち込む。3発目以降はランダムで爆弾となり、街を段階的に破壊する |
 | 境界街区 | /city | 一時導入された町の探索領域。現在はトップ主導線からは外し、必要に応じて再接続する |
 
 ---
@@ -666,3 +667,69 @@ KYOUKAIの通常シナリオとして、Route_A「混線している観測」の
 - `templates/kanrinin.html`
 - `static/kanrinin.js`
 - `main.py`
+## 更新メモ 2026-07-03
+
+### シナリオ Route_C「壊れる前の形」
+
+KYOUKAIの通常シナリオとして、Route_B「記録されていない人」の次に発生する Route_C「壊れる前の形」を追加した。
+
+開始条件は以下。
+
+- シナリオモードであること。
+- Route_A と Route_B が completed であること。
+- Route_C が not_started であること。
+- active_route_id が null であること。
+- `floor_05` が開放済みであること。
+- Route_B 管理人帰還イベント完了後、一度管理人室を退出し、再入室していること。
+- 管理人室へ再入室後、20秒経過していること。
+- 他の電話イベントが発生していないこと。
+
+進行順は以下。
+
+1. `route_c_phone_001`
+2. `route_c_room_null_001`
+3. `route_c_room_ma_001`
+4. `route_c_room_particles_001`
+5. `route_c_manager_return_001`
+
+使用部屋は以下。
+
+- 共通ハブ: `kanrinin`
+- Route_C 専用主要部屋: `null`, `ma`, `particles`
+
+Route_C 完了時の状態変化は以下。
+
+- Route_C を completed にする。
+- active_route_id を null に戻す。
+- completed_scenario_count を +1 する。
+- `floor_06` を開放する。
+- `null`, `ma`, `particles` は `post_route_c` 状態を保持する。
+- current_target_room_id を null に戻す。
+
+Route_C 完了では、最上階、最終シナリオ、消滅の鍵、巨大鍵穴、最上階鍵穴は開放しない。
+
+以下の値は Route_C 完了後も false のまま維持する。
+
+```json
+{
+  "final_route_available": false,
+  "top_floor_unlocked": false,
+  "annihilation_key_obtained": false,
+  "top_floor_keyhole_active": false
+}
+```
+
+関連ファイル。
+
+- `data/scenarios/route_c.json`
+- `static/kyoukai-scenario-events.js`
+- `static/kyoukai-scenario.js`
+- `static/kyoukai-building-data.js`
+- `static/kyoukai-route-c-room.js`
+- `static/kyoukai-scenario-ui.css`
+- `templates/null.html`
+- `templates/ma.html`
+- `templates/particles.html`
+- `static/ma.js`
+
+Route_C の会話文、部屋イベント、管理人イベント、日誌はコードへ直接書かず、イベントデータとして管理する。

@@ -40,6 +40,18 @@
         completionRequirements: [],
         failureRequirements: [],
         branches: []
+      },
+      {
+        id: "route_c",
+        name: "Route_C",
+        startRequirements: [
+          { type: "mode", value: "scenario" },
+          { type: "route_status_equals", route_id: "route_a", value: "completed" },
+          { type: "route_status_equals", route_id: "route_b", value: "completed" }
+        ],
+        completionRequirements: [],
+        failureRequirements: [],
+        branches: []
       }
     ],
     rooms: [
@@ -67,7 +79,8 @@
       { roomIndex: 26, id: "colony", name: "COLONY", label: "COL", href: "/colony", image: "/static/images/colony/entrance-colony.png", material: "crack", residentId: "colony", defaultState: "locked" },
       { roomIndex: 27, id: "dot-art", name: "dot-art", label: "DOT", href: "/dot-art", image: "/static/entrance-dot-art.png", material: "crack", residentId: "dot_art", defaultState: "locked" },
       { roomIndex: 28, id: "matsuri", name: "matsuri", label: "MAT", href: "/matsuri", image: "/static/images/entrances/entrance-matsuri.png", material: "shrine", residentId: "matsuri", defaultState: "locked" },
-      { roomIndex: 29, id: "namahage", name: "namahage", label: "NMH", href: "/namahage", image: "/static/images/entrances/entrance-namahage.png", material: "crack", residentId: "namahage", defaultState: "locked" }
+      { roomIndex: 29, id: "namahage", name: "namahage", label: "NMH", href: "/namahage", image: "/static/images/entrances/entrance-namahage.png", material: "crack", residentId: "namahage", defaultState: "locked" },
+      { roomIndex: 30, id: "dot-hanabi", name: "dot-hanabi", label: "HNB", href: "/dot-hanabi", image: "/static/images/entrances/entrance-dot-hanabi.png", material: "crack", residentId: "dot_hanabi", defaultState: "locked" }
     ],
     residents: [
       { id: "kanrinin", state: "hidden", roomId: "kanrinin" },

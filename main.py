@@ -1139,9 +1139,9 @@ MOMENT_LAYER_WINDOW_ASSETS = (
 )
 
 SCENARIO_MODE_ASSETS = (
-    '  <script src="/static/kyoukai-building-data.js?v=routeb2" defer></script>\n'
-    '  <script src="/static/kyoukai-scenario-events.js?v=routeb2" defer></script>\n'
-    '  <script src="/static/kyoukai-scenario.js?v=routeb2" defer></script>\n'
+    '  <script src="/static/kyoukai-building-data.js?v=routec1" defer></script>\n'
+    '  <script src="/static/kyoukai-scenario-events.js?v=routec1" defer></script>\n'
+    '  <script src="/static/kyoukai-scenario.js?v=routec1" defer></script>\n'
 )
 
 
@@ -1373,6 +1373,10 @@ async def matsuri_room(request: Request) -> HTMLResponse:
 @app.get("/namahage", response_class=HTMLResponse)
 async def namahage_room(request: Request) -> HTMLResponse:
     return render_template(request, "namahage.html")
+
+@app.get("/dot-hanabi", response_class=HTMLResponse)
+async def dot_hanabi_room(request: Request) -> HTMLResponse:
+    return render_template(request, "dot-hanabi.html")
 
 # /central route removed (Central OS isolated 2026-06-18)
 
