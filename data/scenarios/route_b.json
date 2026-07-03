@@ -35,8 +35,7 @@
         { "type": "room_stay_seconds", "room_id": "kanrinin", "operator": ">=", "value": 20 },
         { "type": "active_phone_event_equals", "value": null },
         { "type": "event_enabled", "event_id": "route_b_phone_001" },
-        { "type": "event_not_completed", "event_id": "route_b_phone_001" },
-        { "type": "room_entered_after_event", "room_id": "kanrinin", "after_event_id": "route_a_manager_return_001" }
+        { "type": "event_not_completed", "event_id": "route_b_phone_001" }
       ],
       "phone_config": {
         "ring_audio": "/static/audio/kanrinin/red-phone-ring.mp3",
