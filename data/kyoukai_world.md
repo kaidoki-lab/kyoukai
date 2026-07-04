@@ -776,3 +776,36 @@ ShortFACTORYや今後の動画生成AIが既存部屋を扱えるように、部
 - 今後ほかの部屋を追加する場合も、まず `kyoukai_world.md` の記載範囲を基準にする。
 - 操作箇所、動画尺、テロップ案、AI巡回手順が不足している部屋は、各部屋Markdownの `未解決` に残す。
 - 実装コードの変更と部屋マスター更新は別作業として扱う。
+
+---
+
+## 新規部屋追加時の必須条件
+
+新しい部屋を追加する場合、HTML/CSS/JSの実装だけで完了扱いにしない。
+
+必ず `data/rooms/{room_id}.md` を作成し、以下を記録する。
+
+- 基本情報
+- 世界観
+- 現在の実装
+- 操作仕様
+- Room States
+- Interaction Flow
+- Video Spec
+- AI Navigation
+- Capture Rules
+- ShortFACTORYメモ
+- 未解決
+- 更新履歴
+
+部屋に操作が存在しない場合でも、`observe` の Interaction Flow を必ず作成する。
+
+セレクタ、座標、撮影条件、状態変化が不明な場合は、推測で補完せず `未設定` または `未記載` と記録する。
+
+部屋追加時は、実装ファイルと同じ作業単位で `data/rooms/{room_id}.md` も更新する。
+
+ShortFACTORYが使用するため、動画化・巡回・撮影条件がまったく残っていない部屋を作らない。
+
+`Interaction Script` は一本道の手順、`Interaction Flow` は条件分岐と撮影判断を含む上位仕様として扱う。今後の新規部屋では `Interaction Flow` を必須とする。既存の `Interaction Script` は残してもよいが、最終的には `Interaction Flow` に統合する。
+
+新規部屋作成時の正本テンプレートは `data/rooms/_template.md` を使用する。

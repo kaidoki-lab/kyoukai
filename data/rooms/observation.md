@@ -23,6 +23,29 @@
 
 操作結果は未記載。
 
+## Room States
+
+```yaml
+room_states:
+  - id: "initial"
+    label: "初期状態"
+    description: "観測域に入った直後の状態"
+    trigger: "goto"
+    capture_priority: "medium"
+
+  - id: "observation_active"
+    label: "観測中"
+    description: "生命体の観測ログ、または観測対象の気配がある状態"
+    trigger: "未設定"
+    capture_priority: "high"
+
+  - id: "target_unknown"
+    label: "対象未確定"
+    description: "観測対象が訪問者である可能性を示唆するが確定しない状態"
+    trigger: "未設定"
+    capture_priority: "medium"
+```
+
 ## Interaction Script
 
 ```yaml
@@ -68,7 +91,57 @@ interaction_script:
     expected: "撮影を終了できる状態"
 ```
 
-## 動画仕様
+## Interaction Flow
+
+```yaml
+interaction_flow:
+  - step: 1
+    id: "enter_room"
+    label: "部屋に入る"
+    action: "goto"
+    target: "room"
+    selector: "未設定"
+    wait_ms: 1500
+    expected_state: "initial"
+    capture:
+      name: "initial"
+      timing: "after_action"
+      required: true
+
+  - step: 2
+    id: "observe_logs"
+    label: "観測ログまたは観測対象を映す"
+    action: "observe"
+    target: "観測ログまたは観測対象"
+    selector: "未設定"
+    wait_ms: 1500
+    expected_state: "observation_active"
+    condition:
+      if: "観測ログまたは観測対象が確認できる"
+      then:
+        capture: "highlight"
+      else:
+        action: "continue"
+    capture:
+      name: "highlight"
+      timing: "after_action"
+      required: false
+
+  - step: 3
+    id: "end"
+    label: "終了"
+    action: "observe"
+    target: "room"
+    selector: "未設定"
+    wait_ms: 1000
+    expected_state: "end"
+    capture:
+      name: "end"
+      timing: "after_action"
+      required: false
+```
+
+## Video Spec
 
 ShortFACTORYや動画撮影で使う情報。
 
@@ -103,7 +176,7 @@ video_spec:
     outro: "未設定"
 ```
 
-## AI巡回仕様
+## AI Navigation
 
 Playwrightなどで自動巡回する場合の手順。
 
@@ -140,6 +213,31 @@ ai_navigation:
     - name: "highlight"
       timing: "after_main_observe"
   end_condition: "未設定"
+```
+
+## Capture Rules
+
+```yaml
+capture_rules:
+  required_captures:
+    - name: "initial"
+      state: "initial"
+      reason: "観測域の初期状態を記録するため"
+
+  optional_captures:
+    - name: "highlight"
+      state: "observation_active"
+      reason: "観測ログまたは観測対象の気配が確認できる場合のみ記録する"
+    - name: "target_unknown"
+      state: "target_unknown"
+      reason: "訪問者観測の気配を見せる場合のみ記録する"
+
+  success_conditions:
+    - "initial が撮影できること"
+
+  failure_conditions:
+    - "ページが表示されない"
+    - "主要対象が未設定で撮影対象を判断できない"
 ```
 
 ## ShortFACTORYメモ

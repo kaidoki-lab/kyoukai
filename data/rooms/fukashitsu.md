@@ -31,6 +31,41 @@
 * 取り出すボタン: 3つのボタンを各10回押すと出現する。押下でパーティクル停止、フェードアウト、取り出し後背景へ切り替わる。セレクタは `#fukaCollectBtn`。
 * 上部パネル: 7回タップで隠しリセット。セレクタは未設定。
 
+## Room States
+
+```yaml
+room_states:
+  - id: "initial"
+    label: "初期状態"
+    description: "卵部屋の9:16背景全体が表示される"
+    trigger: "goto"
+    capture_priority: "medium"
+
+  - id: "egg_particles"
+    label: "卵内粒子"
+    description: "卵形Canvas内で粒子が動作している状態"
+    trigger: "goto"
+    capture_priority: "high"
+
+  - id: "color_changed"
+    label: "粒子色変化"
+    description: "栄養・酸素・温度ボタンで粒子色が鮮やかになる状態"
+    trigger: "未設定"
+    capture_priority: "high"
+
+  - id: "collect_button_visible"
+    label: "取り出すボタン表示"
+    description: "各ボタンを10回押した後に取り出すボタンが出現した状態"
+    trigger: "#fukaCollectBtn"
+    capture_priority: "high"
+
+  - id: "collected"
+    label: "取り出し後"
+    description: "取り出し後背景に切り替わった状態"
+    trigger: "#fukaCollectBtn"
+    capture_priority: "high"
+```
+
 ## Interaction Script
 
 ```yaml
@@ -112,7 +147,84 @@ interaction_script:
     expected: "撮影を終了できる状態"
 ```
 
-## 動画仕様
+## Interaction Flow
+
+```yaml
+interaction_flow:
+  - step: 1
+    id: "enter_room"
+    label: "部屋に入る"
+    action: "goto"
+    target: "room"
+    selector: "未設定"
+    wait_ms: 1500
+    expected_state: "initial"
+    capture:
+      name: "initial"
+      timing: "after_action"
+      required: true
+
+  - step: 2
+    id: "observe_egg"
+    label: "卵を見る"
+    action: "observe"
+    target: "卵エリア"
+    selector: "#fukaCanvas"
+    wait_ms: 1500
+    expected_state: "egg_particles"
+    capture:
+      name: "egg_particles"
+      timing: "after_action"
+      required: true
+
+  - step: 3
+    id: "change_colors"
+    label: "必要回数押して粒子色を変化させる"
+    action: "repeat_click"
+    target: "栄養・酸素・温度ボタン"
+    selector: "未設定"
+    note: "座標確認が必要"
+    wait_ms: 1000
+    expected_state: "color_changed"
+    capture:
+      name: "color_changed"
+      timing: "after_action"
+      required: false
+
+  - step: 4
+    id: "collect"
+    label: "取り出すボタンを押す"
+    action: "click"
+    target: "取り出すボタン"
+    selector: "#fukaCollectBtn"
+    wait_ms: 1500
+    expected_state: "collected"
+    condition:
+      if: "取り出すボタンが表示されている"
+      then:
+        capture: "collected"
+      else:
+        action: "continue"
+    capture:
+      name: "collected"
+      timing: "after_action"
+      required: false
+
+  - step: 5
+    id: "end"
+    label: "終了"
+    action: "observe"
+    target: "room"
+    selector: "未設定"
+    wait_ms: 1000
+    expected_state: "end"
+    capture:
+      name: "end"
+      timing: "after_action"
+      required: false
+```
+
+## Video Spec
 
 ShortFACTORYや動画撮影で使う情報。
 
@@ -147,7 +259,7 @@ video_spec:
     outro: "未設定"
 ```
 
-## AI巡回仕様
+## AI Navigation
 
 Playwrightなどで自動巡回する場合の手順。
 
@@ -212,6 +324,39 @@ ai_navigation:
     - name: "collected"
       timing: "after_collect"
   end_condition: "取り出し後背景が表示されること"
+```
+
+## Capture Rules
+
+```yaml
+capture_rules:
+  required_captures:
+    - name: "initial"
+      state: "initial"
+      reason: "卵部屋の初期状態を記録するため"
+    - name: "egg_particles"
+      state: "egg_particles"
+      reason: "卵内の粒子運動を記録するため"
+
+  optional_captures:
+    - name: "color_changed"
+      state: "color_changed"
+      reason: "粒子色の変化を見せる場合に記録する"
+    - name: "collect_button_visible"
+      state: "collect_button_visible"
+      reason: "取り出すボタンが出現した状態を見せる場合に記録する"
+    - name: "collected"
+      state: "collected"
+      reason: "取り出し後背景を見せる場合に記録する"
+
+  success_conditions:
+    - "initial が撮影できること"
+    - "egg_particles が撮影できること"
+
+  failure_conditions:
+    - "ページが表示されない"
+    - "卵エリアまたは粒子が確認できない"
+    - "栄養・酸素・温度ボタンの座標が未設定で自動操作できない"
 ```
 
 ## ShortFACTORYメモ

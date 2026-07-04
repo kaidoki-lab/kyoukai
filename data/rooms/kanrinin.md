@@ -35,6 +35,47 @@
 * `noteArea`: 管理日誌ノート。管理日誌モーダルを開く。セレクタは `#noteArea`。
 * `redPhoneArea`: 赤い電話。条件成立時のみ着信する。操作結果の詳細はイベントデータ管理。セレクタは `#redPhoneArea`。
 
+## Room States
+
+```yaml
+room_states:
+  - id: "initial"
+    label: "初期状態"
+    description: "管理人室の9:16背景全体が表示される"
+    trigger: "goto"
+    capture_priority: "medium"
+
+  - id: "eye_visible"
+    label: "目玉表示"
+    description: "呼び鈴で目玉がうっすら見える状態"
+    trigger: "#bellArea"
+    capture_priority: "high"
+
+  - id: "diary_open"
+    label: "管理日誌表示"
+    description: "管理日誌モーダルが開いている状態"
+    trigger: "#noteArea"
+    capture_priority: "high"
+
+  - id: "sns_open"
+    label: "SNS一覧表示"
+    description: "SNS一覧モーダルが開いている状態"
+    trigger: "#snsArea"
+    capture_priority: "medium"
+
+  - id: "keybox_open"
+    label: "鍵ボックス表示"
+    description: "鍵ボックスモーダルが開いている状態"
+    trigger: "#keyBoxArea"
+    capture_priority: "medium"
+
+  - id: "phone_ring"
+    label: "赤電話着信"
+    description: "条件成立時に赤電話が着信する状態"
+    trigger: "#redPhoneArea"
+    capture_priority: "high"
+```
+
 ## Interaction Script
 
 ```yaml
@@ -96,7 +137,83 @@ interaction_script:
     expected: "撮影を終了できる状態"
 ```
 
-## 動画仕様
+## Interaction Flow
+
+```yaml
+interaction_flow:
+  - step: 1
+    id: "enter_room"
+    label: "部屋に入る"
+    action: "goto"
+    target: "room"
+    selector: "未設定"
+    wait_ms: 1500
+    expected_state: "initial"
+    capture:
+      name: "initial"
+      timing: "after_action"
+      required: true
+
+  - step: 2
+    id: "press_bell"
+    label: "呼び鈴を押す"
+    action: "click"
+    target: "bellArea"
+    selector: "#bellArea"
+    wait_ms: 1000
+    expected_state: "eye_visible"
+    capture:
+      name: "eye_visible"
+      timing: "after_action"
+      required: true
+
+  - step: 3
+    id: "open_diary"
+    label: "管理日誌を開く"
+    action: "click"
+    target: "noteArea"
+    selector: "#noteArea"
+    wait_ms: 1000
+    expected_state: "diary_open"
+    capture:
+      name: "diary_open"
+      timing: "after_action"
+      required: false
+
+  - step: 4
+    id: "optional_modals"
+    label: "必要ならSNS一覧または鍵ボックスを開く"
+    action: "click"
+    target: "snsArea または keyBoxArea"
+    selector: "未設定"
+    wait_ms: 1000
+    expected_state: "sns_open または keybox_open"
+    condition:
+      if: "SNS一覧または鍵ボックスを撮影する場合"
+      then:
+        capture: "sns_open または keybox_open"
+      else:
+        action: "continue"
+    capture:
+      name: "optional_modal"
+      timing: "after_action"
+      required: false
+
+  - step: 5
+    id: "end"
+    label: "終了"
+    action: "observe"
+    target: "room"
+    selector: "未設定"
+    wait_ms: 1000
+    expected_state: "end"
+    capture:
+      name: "end"
+      timing: "after_action"
+      required: false
+```
+
+## Video Spec
 
 ShortFACTORYや動画撮影で使う情報。
 
@@ -131,7 +248,7 @@ video_spec:
     outro: "未設定"
 ```
 
-## AI巡回仕様
+## AI Navigation
 
 Playwrightなどで自動巡回する場合の手順。
 
@@ -182,6 +299,41 @@ ai_navigation:
     - name: "highlight"
       timing: "after_main_action"
   end_condition: "未設定"
+```
+
+## Capture Rules
+
+```yaml
+capture_rules:
+  required_captures:
+    - name: "initial"
+      state: "initial"
+      reason: "管理人室の初期状態を記録するため"
+    - name: "eye_visible"
+      state: "eye_visible"
+      reason: "呼び鈴で目玉が見える主要変化を記録するため"
+
+  optional_captures:
+    - name: "diary_open"
+      state: "diary_open"
+      reason: "管理日誌を動画素材として使う場合に記録する"
+    - name: "sns_open"
+      state: "sns_open"
+      reason: "SNS一覧を見せる場合のみ記録する"
+    - name: "keybox_open"
+      state: "keybox_open"
+      reason: "鍵ボックスを見せる場合のみ記録する"
+    - name: "phone_ring"
+      state: "phone_ring"
+      reason: "条件成立時のみ記録する"
+
+  success_conditions:
+    - "initial が撮影できること"
+    - "eye_visible が撮影できること"
+
+  failure_conditions:
+    - "ページが表示されない"
+    - "呼び鈴操作後に目玉の変化を確認できない"
 ```
 
 ## ShortFACTORYメモ

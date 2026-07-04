@@ -27,6 +27,29 @@
 
 操作結果は「押すほど状態が悪化する」と記載されている。具体的な対象箇所と悪化内容は未記載。
 
+## Room States
+
+```yaml
+room_states:
+  - id: "initial"
+    label: "初期状態"
+    description: "崩落域に入った直後の状態"
+    trigger: "goto"
+    capture_priority: "medium"
+
+  - id: "collapse_possible"
+    label: "崩壊可能"
+    description: "押すほど状態が悪化するとされる状態"
+    trigger: "未設定"
+    capture_priority: "high"
+
+  - id: "collapse_unknown"
+    label: "崩壊詳細未確定"
+    description: "具体的な操作箇所、演出内容、状態悪化の段階が未記載の状態"
+    trigger: "未設定"
+    capture_priority: "medium"
+```
+
 ## Interaction Script
 
 ```yaml
@@ -72,7 +95,57 @@ interaction_script:
     expected: "撮影を終了できる状態"
 ```
 
-## 動画仕様
+## Interaction Flow
+
+```yaml
+interaction_flow:
+  - step: 1
+    id: "enter_room"
+    label: "部屋に入る"
+    action: "goto"
+    target: "room"
+    selector: "未設定"
+    wait_ms: 1500
+    expected_state: "initial"
+    capture:
+      name: "initial"
+      timing: "after_action"
+      required: true
+
+  - step: 2
+    id: "observe_collapse"
+    label: "初期状態と崩壊変化を観測する"
+    action: "observe"
+    target: "崩壊変化"
+    selector: "未設定"
+    wait_ms: 1500
+    expected_state: "collapse_possible"
+    condition:
+      if: "崩壊変化が確認できる"
+      then:
+        capture: "highlight"
+      else:
+        action: "continue"
+    capture:
+      name: "highlight"
+      timing: "after_action"
+      required: false
+
+  - step: 3
+    id: "end"
+    label: "終了"
+    action: "observe"
+    target: "room"
+    selector: "未設定"
+    wait_ms: 1000
+    expected_state: "end"
+    capture:
+      name: "end"
+      timing: "after_action"
+      required: false
+```
+
+## Video Spec
 
 ShortFACTORYや動画撮影で使う情報。
 
@@ -107,7 +180,7 @@ video_spec:
     outro: "未設定"
 ```
 
-## AI巡回仕様
+## AI Navigation
 
 Playwrightなどで自動巡回する場合の手順。
 
@@ -144,6 +217,32 @@ ai_navigation:
     - name: "highlight"
       timing: "after_main_observe"
   end_condition: "未設定"
+```
+
+## Capture Rules
+
+```yaml
+capture_rules:
+  required_captures:
+    - name: "initial"
+      state: "initial"
+      reason: "崩落域の初期状態を記録するため"
+
+  optional_captures:
+    - name: "highlight"
+      state: "collapse_possible"
+      reason: "崩壊変化が確認できる場合のみ記録する"
+    - name: "collapse_unknown"
+      state: "collapse_unknown"
+      reason: "崩壊詳細が未確定であることを記録する場合のみ使う"
+
+  success_conditions:
+    - "initial が撮影できること"
+
+  failure_conditions:
+    - "ページが表示されない"
+    - "押せる場所が未設定で自動操作できない"
+    - "主要対象が未設定で撮影対象を判断できない"
 ```
 
 ## ShortFACTORYメモ
