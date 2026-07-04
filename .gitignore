@@ -26,6 +26,9 @@ booth-wallpaper-pack-v2/
 shorts_factory/tools/
 shorts_factory/output_shorts/
 shorts_factory/output_meta/
+shorts_factory/output_plans/
+shorts_factory/output_recordings/
+shorts_factory/output_captures/
 shorts_factory/recordings_archive/
 shorts_factory/sessions/
 shorts_factory/input_videos/
