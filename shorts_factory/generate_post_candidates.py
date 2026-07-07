@@ -80,6 +80,16 @@ def extract_shortfactory_memo(markdown: str) -> dict[str, str]:
     return memo
 
 
+def extract_post_candidate_info(markdown: str) -> dict[str, str]:
+    section = extract_section(markdown, "投稿候補情報")
+    info: dict[str, str] = {}
+    for line in section.splitlines():
+        match = re.match(r"\*\s*([^:：]+)[:：]\s*(.*)", line.strip())
+        if match:
+            info[match.group(1).strip()] = match.group(2).strip() or "未設定"
+    return info
+
+
 def extract_video_highlight(markdown: str) -> str:
     blocks = extract_yaml_blocks(markdown)
     block = blocks.get("video_spec", "")
@@ -110,11 +120,14 @@ def load_room_info(room_id: str) -> dict[str, Any]:
     markdown = path.read_text(encoding="utf-8")
     blocks = extract_yaml_blocks(markdown)
     memo = extract_shortfactory_memo(markdown)
-    recommended_text = memo.get("使える一言", "未設定")
-    highlight = extract_video_highlight(markdown)
+    post_info = extract_post_candidate_info(markdown)
+    recommended_text = post_info.get("投稿文候補") or memo.get("使える一言", "未設定")
+    highlight = post_info.get("見どころ") or extract_video_highlight(markdown)
     if highlight == "未設定":
         highlight = memo.get("投稿向きの見どころ", "未設定")
     notes = []
+    if post_info.get("メモ") and post_info["メモ"] not in {"なし", "未設定"}:
+        notes.append(post_info["メモ"])
     for block_name in ("video_spec", "capture_rules"):
         if block_name not in blocks:
             notes.append(f"{block_name} が未記載")
