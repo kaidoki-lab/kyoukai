@@ -51,7 +51,7 @@ video_spec:
   aspect_ratio: "9:16"
   opening_shot: { target: "room", zoom: "100%", duration_ms: 1500 }
   main_action: { target: "記録", action: "observe", duration_ms: "未設定" }
-  highlight: { target: "記録", state: "records_visible", description: "感情を排した記録の羅列と、削除されたはずの記録の気配" }
+  highlight: { target: "記録", state: "records_visible", description: "よく分からない画集を閲覧できる部屋。" }
   ending: { target: "未設定", duration_ms: "未設定" }
   text: { intro: "未設定", outro: "未設定" }
 ```
@@ -87,9 +87,15 @@ capture_rules:
 
 * 使用できる素材: 未記載
 * ズーム推奨箇所: 日付・ID・内容の羅列
-* 使える一言: 「削除されたはずの記録が残っている」
-* 投稿向きの見どころ: 感情を排した記録
+* 使える一言: 「よく分からない画集だけを集めた部屋。」
+* 投稿向きの見どころ: よく分からない画集を閲覧できる部屋。
 * 不足している情報: 画像、セレクタ、推奨尺
+
+## 投稿候補情報
+
+* 見どころ: よく分からない画集を閲覧できる部屋。
+* 投稿文候補: 「よく分からない画集だけを集めた部屋。」
+* メモ: 2026-07-07確定版を反映。
 
 ## 未解決
 
@@ -98,3 +104,4 @@ capture_rules:
 ## 更新履歴
 
 * 2026-07-04: 部屋マスター Phase 2 として作成。
+* 2026-07-07: 投稿候補情報の確定版を反映。

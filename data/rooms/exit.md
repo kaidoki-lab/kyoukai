@@ -51,7 +51,7 @@ video_spec:
   aspect_ratio: "9:16"
   opening_shot: { target: "room", zoom: "100%", duration_ms: 1500 }
   main_action: { target: "接続混線", action: "observe", duration_ms: "未設定" }
-  highlight: { target: "接続混線", state: "connection_mixed", description: "出口に見えるが終わりではないロード画面のような状態" }
+  highlight: { target: "街エリア", state: "connection_mixed", description: "街を歩きながら建物を探索し、それぞれの部屋へ入れる。" }
   ending: { target: "未設定", duration_ms: "未設定" }
   text: { intro: "未設定", outro: "未設定" }
 ```
@@ -87,9 +87,15 @@ capture_rules:
 
 * 使用できる素材: 未記載
 * ズーム推奨箇所: 接続中の表示、少女の断片
-* 使える一言: 「終わりのような場所だが、終わりではない」
-* 投稿向きの見どころ: 出口に見えて出口ではない構造
+* 使える一言: 「この街、全部入れます。」
+* 投稿向きの見どころ: 街を歩きながら建物を探索し、それぞれの部屋へ入れる。
 * 不足している情報: 画像、関連ファイル、セレクタ、推奨尺
+
+## 投稿候補情報
+
+* 見どころ: 街を歩きながら建物を探索し、それぞれの部屋へ入れる。
+* 投稿文候補: 「この街、全部入れます。」
+* メモ: 現在の街エリア。2026-07-07確定版を反映。
 
 ## 未解決
 
@@ -98,3 +104,4 @@ capture_rules:
 ## 更新履歴
 
 * 2026-07-04: 部屋マスター Phase 2 として作成。
+* 2026-07-07: 投稿候補情報の確定版を反映。

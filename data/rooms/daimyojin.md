@@ -51,7 +51,7 @@ video_spec:
   aspect_ratio: "9:16"
   opening_shot: { target: "room", zoom: "100%", duration_ms: 1500 }
   main_action: { target: "祈願装置", action: "observe", duration_ms: "未設定" }
-  highlight: { target: "祈願装置", state: "shrine_machine", description: "信仰と機械が混ざった構造物" }
+  highlight: { target: "祈願装置", state: "shrine_machine", description: "AIから神託が届くが、内容はまったく意味がない。" }
   ending: { target: "未設定", duration_ms: "未設定" }
   text: { intro: "未設定", outro: "未設定" }
 ```
@@ -87,9 +87,15 @@ capture_rules:
 
 * 使用できる素材: 未記載
 * ズーム推奨箇所: 祈願装置、札、端末
-* 使える一言: 「処理されているものが願いなのか観測結果なのかは明かさない」
-* 投稿向きの見どころ: 信仰と機械の混在
+* 使える一言: 「AIが神託をくれる。でも全部意味がない。」
+* 投稿向きの見どころ: AIから神託が届くが、内容はまったく意味がない。
 * 不足している情報: 画像、関連ファイル、セレクタ、推奨尺
+
+## 投稿候補情報
+
+* 見どころ: AIから神託が届くが、内容はまったく意味がない。
+* 投稿文候補: 「AIが神託をくれる。でも全部意味がない。」
+* メモ: 2026-07-07確定版を反映。
 
 ## 未解決
 
@@ -98,3 +104,4 @@ capture_rules:
 ## 更新履歴
 
 * 2026-07-04: 部屋マスター Phase 2 として作成。
+* 2026-07-07: 投稿候補情報の確定版を反映。
