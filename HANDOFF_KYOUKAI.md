@@ -42,6 +42,13 @@
   - `booth/listings/_出品手順.md` を新規作成。単品16商品+バンドル1商品=17回分のBOOTH出品チェックリスト
   - 実行結果: `python generate_packs.py` 実行成功、バンドルzip検証で16パックフォルダ+README.txt=17項目を確認
   - ROADMAP.mdの工程5を「完了」に更新済み
+- BOOTH販売展開の工程6「最終検証と出品準備完了確認」を実装
+  - `booth/final_check.py` を新規作成。zip17本(16単品+バンドル)存在、thumbnails16部屋×4枚(00_main+3スクショ)が1920x1080であること、listings必須19ファイル(16部屋分+`_series.md`+`_bundle.md`+`_出品手順.md`)の存在、`verify_report.json`全pass、の4項目を検証
+  - listings検証はファイル総数の完全一致ではなく「必須19ファイルが名前で全て存在するか」の判定に変更（コーディネーター判断）。付随ファイルがあってもFAILしない設計
+  - cp932コンソール対策としてstdout/stderrをUTF-8 TextIOWrapperでラップ
+  - `booth/listings/_OBS実機確認手順.md` を新規作成。OBS Studioのブラウザソースにwaiting/brb/lower_thirdの3素材を設定して目視確認する手順（任意の1部屋分でよい）
+  - 実行結果: `python final_check.py` → **ALL PASS**、exit code 0（zip17本・サムネイル64枚全1920x1080・listings必須19ファイル全確認・verify_report.json 48エントリ全pass）
+  - ROADMAP.mdの工程6を「実装完了・実機確認待ち」に更新済み。完了条件は「final_check.py全pass」のみ[x]、「OBS実機確認」はユーザー操作待ちのため未チェック
 
 ## 直近でやったこと（2026-07-01）
 
@@ -85,7 +92,7 @@
 - **ローカル**: `C:/Users/pc/Documents/Claude/Projects/kyoukai` が最新
 - **ブランチ**: main、本サイト側は全変更プッシュ済み
 - **最新コミット**: `9320147 Add Amazon/Rakuten areas to kanrinin; update room image`
-- **BOOTH販売展開（`ROADMAP.md` 参照）**: 工程1〜5（品質検証・スクショ・サムネ・商品文16本・シリーズ資材+バンドル作成）完了・未コミット。工程6のみ未着手
+- **BOOTH販売展開（`ROADMAP.md` 参照）**: 工程1〜6すべて実装完了・未コミット。工程6は機械的チェック（`final_check.py`）は全pass。残るはユーザーによるOBS実機確認のみ（`booth/listings/_OBS実機確認手順.md` 参照）
 
 ---
 
@@ -109,7 +116,10 @@
 3. **観測域（/observation）の更新** — 更新頻度を上げたい部屋、未着手
 
 ### BOOTH販売展開（`ROADMAP.md`）
-- 工程6: 最終検証と出品準備完了確認（`booth/final_check.py`）— 未着手
+- 工程6: 機械的チェック（`booth/final_check.py`）は完了・ALL PASS。残タスクはユーザーによるOBS実機確認のみ
+  - 手順書: `booth/listings/_OBS実機確認手順.md`（任意の1部屋分のwaiting/brb/lower_thirdをOBS Studioのブラウザソースで確認）
+  - 確認完了後、ROADMAP.mdの工程6の完了条件2つ目にチェックを入れ、状態を「完了」に更新すること
+- 全工程完了後、`ROADMAP.md`・`booth/`配下の新規/変更ファイルをコミットするかどうかまろに確認する（現状未コミット）
 
 ---
 
