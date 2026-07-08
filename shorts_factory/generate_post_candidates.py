@@ -84,10 +84,14 @@ def extract_post_candidate_info(markdown: str) -> dict[str, str]:
     section = extract_section(markdown, "投稿候補情報")
     info: dict[str, str] = {}
     for line in section.splitlines():
-        match = re.match(r"\*\s*([^:：]+)[:：]\s*(.*)", line.strip())
+        match = re.match(r"[-*]\s*([^:：]+)[:：]\s*(.*)", line.strip())
         if match:
             info[match.group(1).strip()] = match.group(2).strip() or "未設定"
     return info
+
+
+def is_post_target(value: str) -> bool:
+    return value.strip().lower() in {"true", "yes", "1", "対象", "投稿対象"}
 
 
 def extract_video_highlight(markdown: str) -> str:
@@ -115,6 +119,8 @@ def load_room_info(room_id: str) -> dict[str, Any]:
             "route": "/" if room_id == "home" else f"/{room_id}",
             "recommended_text": "未設定",
             "highlight": "未設定",
+            "post_target": False,
+            "exclusion_reason": "部屋マスターが見つかりません",
             "notes": [f"部屋マスターが見つかりません: {path}"],
         }
     markdown = path.read_text(encoding="utf-8")
@@ -136,6 +142,8 @@ def load_room_info(room_id: str) -> dict[str, Any]:
         "route": parse_route(markdown, room_id),
         "recommended_text": recommended_text or "未設定",
         "highlight": highlight or "未設定",
+        "post_target": is_post_target(post_info.get("投稿対象", "true")),
+        "exclusion_reason": post_info.get("投稿対象外理由", "未設定"),
         "notes": notes,
     }
 
@@ -149,6 +157,11 @@ def build_candidates(report: dict[str, Any]) -> dict[str, Any]:
         recording = room.get("recording", "")
         captures = room.get("captures", [])
         reasons: list[str] = []
+        info = load_room_info(room_id)
+        if not info["post_target"]:
+            reason = info.get("exclusion_reason") or "未設定"
+            excluded.append({"room_id": room_id, "reasons": [f"投稿対象外: {reason}"]})
+            continue
         if room.get("status") not in SUCCESS_STATUSES:
             reasons.append(f"status={room.get('status')}")
         if not recording or not resolve_path(recording).exists():
@@ -160,7 +173,6 @@ def build_candidates(report: dict[str, Any]) -> dict[str, Any]:
             excluded.append({"room_id": room_id, "reasons": reasons})
             continue
 
-        info = load_room_info(room_id)
         notes = list(info.get("notes", []))
         notes.extend(room.get("warnings", []))
         candidates.append(
