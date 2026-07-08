@@ -1,8 +1,47 @@
-# HANDOFF_KYOUKAI.md — 2026-07-01（最新）
+# HANDOFF_KYOUKAI.md — 2026-07-08（最新）
 
 このファイルを新規チャット・Claude Code・Codex の冒頭に貼るだけで再開できます。
 
 ---
+
+## 直近でやったこと（2026-07-08）
+
+- BOOTH販売展開プロジェクト（`booth/ROADMAP.md` 相当、実体は `ROADMAP.md`）の工程1「全パックHTML品質検証と修正」を実装
+  - `booth/verify_packs.py` を新規作成。Playwright(chromium, headless)で16部屋×3種=48HTMLを検証
+  - 検証項目: consoleエラー、pageerror、canvas存在確認（waiting/brb）、`#name-el` の初期テキストが「名前」であること（lower_third）
+  - `booth/verify_report.json` に部屋×ファイル別で結果出力
+  - 実行結果: 48/48 全件pass。`generate_packs.py` の修正は不要だった
+  - ROADMAP.mdの工程1を「完了」に更新済み
+- BOOTH販売展開の工程2「スクリーンショット自動撮影」を実装
+  - `booth/screenshot_packs.py` を新規作成。Playwright(chromium, headless)、viewport 1920x1080、device_scale_factor=1
+  - waiting/brb: `file://` で開き5秒待機後にスクショ。輝度チェック（平均輝度が閾値以下ならリトライ、最大5回）
+  - lower_third: `?name=サンプル&title=配信者` を付与し、`page.add_style_tag` で暗いグラデーション背景を注入して撮影
+  - `generate_packs.py` に `if __name__ == '__main__':` ガードを追加（import時に生成処理が走らないよう修正）
+  - 出力: `booth/thumbnails/<部屋ID>/{01_waiting,02_brb,03_lower_third}.png` 48枚
+  - 実行結果: 48/48全件生成、全て1920x1080、waiting/brb系の輝度チェック全件pass（リトライなしで一発通過）
+  - ROADMAP.mdの工程2を「完了」に更新済み
+- BOOTH販売展開の工程3「サムネイル1枚目（メイン画像）生成」を実装
+  - `booth/make_thumbnails.py` を新規作成。Pillowで `01_waiting.png` を下敷きに文字入れ
+  - シリーズ名「KYOUKAI OBS PACK」（letter-spacing風）、部屋名（日本語・文字数で150pt/100ptの2段階分岐）+部屋ID、「待機画面 / 離席画面 / 名前テロップ 3点セット」、テーマカラー細枠を描画
+  - フォント: `meiryob.ttc` 第一候補、`msgothic.ttc` フォールバック
+  - `generate_packs.py` のROOMSをimportで参照（`__main__`ガードは工程2で追加済みのため流用のみ）
+  - 出力: `booth/thumbnails/<部屋ID>/00_main.png` 16枚、すべて1920x1080
+  - 実行結果: 16/16全件生成成功
+  - ROADMAP.mdの工程3を「完了」に更新済み
+- BOOTH販売展開の工程4「商品ページ文章16本生成」を実装
+  - `booth/make_listings.py` を新規作成。`generate_packs.py` のROOMSをimportし、部屋別の世界観記述（`data/kyoukai_world.md` 各部屋詳細の要約）をスクリプト内辞書で保持
+  - 出力: `booth/listings/<部屋ID>.md` 16ファイル。タイトル（40字以内）、商品説明文（世界観一文→同梱3点→OBS設定→動作環境→利用規約→KYOUKAI URL）、タグ10個（共通5+部屋別5）、価格300円を含む
+  - 台風ニュースのみニュース速報風の文体にし、他部屋の不穏トーンと差別化
+  - 禁止ワード（解説/わかりやすく/入門/方法/やり方/コツ/裏技/チャンネル登録/チャレンジ/ランキング/おすすめ/元気/前向き/感動/おめでとう）をタイトル・世界観パートに含まないことをスクリプト内で検査
+  - 実行結果: 16/16全件生成、禁止ワード検査全件pass、タイトル全件40字以内
+  - ROADMAP.mdの工程4を「完了」に更新済み
+- BOOTH販売展開の工程5「シリーズ共通資材とバンドル作成」を実装
+  - `booth/listings/_series.md` を新規作成。シリーズ名「KYOUKAI OBS PACK シリーズ」、全16部屋一覧（各300円）を全商品ページ末尾に貼る共通説明文として用意
+  - `booth/generate_packs.py` に `generate_bundle()` と `bundle_readme_txt()` を追加。`booth/all-packs/KYOUKAI_全部屋_OBS素材パック.zip` を16パックフォルダ+総合README.txt同梱で生成。`main()` 内で個別パック生成後に自動実行されるよう組み込み済み
+  - `booth/listings/_bundle.md` を新規作成。価格2,980円（単品合計4,800円との差額1,820円を明記）
+  - `booth/listings/_出品手順.md` を新規作成。単品16商品+バンドル1商品=17回分のBOOTH出品チェックリスト
+  - 実行結果: `python generate_packs.py` 実行成功、バンドルzip検証で16パックフォルダ+README.txt=17項目を確認
+  - ROADMAP.mdの工程5を「完了」に更新済み
 
 ## 直近でやったこと（2026-07-01）
 
@@ -44,13 +83,15 @@
 
 - **本番**: 正常稼働中（`https://www.void-kyoukai.net`）
 - **ローカル**: `C:/Users/pc/Documents/Claude/Projects/kyoukai` が最新
-- **ブランチ**: main、全変更プッシュ済み
+- **ブランチ**: main、本サイト側は全変更プッシュ済み
 - **最新コミット**: `9320147 Add Amazon/Rakuten areas to kanrinin; update room image`
+- **BOOTH販売展開（`ROADMAP.md` 参照）**: 工程1〜5（品質検証・スクショ・サムネ・商品文16本・シリーズ資材+バンドル作成）完了・未コミット。工程6のみ未着手
 
 ---
 
 ## 次にやること（未着手）
 
+### 本サイト側
 1. **楽天モーションウィジェットの位置調整**
    - `rakutenArea`（`top:60%;left:76%;width:21%;height:16%`）が楽天モニターの位置
    - DevToolsでウィジェットのDOMクラス名を確認 → CSSで上書きしてモニター内に収める
@@ -66,6 +107,9 @@
    - ズレていればDevToolsで確認して教えてもらう
 
 3. **観測域（/observation）の更新** — 更新頻度を上げたい部屋、未着手
+
+### BOOTH販売展開（`ROADMAP.md`）
+- 工程6: 最終検証と出品準備完了確認（`booth/final_check.py`）— 未着手
 
 ---
 

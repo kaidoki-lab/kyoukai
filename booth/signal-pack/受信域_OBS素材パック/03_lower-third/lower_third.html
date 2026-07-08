@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>受信域 - ローワーサード</title>
+<!--
+  使い方 / OBS設定:
+    ブラウザソース → このファイルのパスを指定 → 幅1920 高さ1080
+    URLパラメータで名前・肩書きを変更できます（ローカルファイルでは使用不可の場合あり）
+    その場合はファイル内の NAME / TITLE を直接書き換えてください
+-->
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 1920px; height: 1080px;
+  background: transparent;
+  overflow: hidden;
+  font-family: 'Courier New', Courier, monospace;
+}
+.lower-third {
+  position: absolute;
+  bottom: 72px;
+  left: 72px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  animation: slideIn 0.8s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes slideIn {
+  from { transform: translateY(30px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.accent-bar {
+  width: 3px;
+  height: 72px;
+  background: linear-gradient(to bottom, transparent, #00ddaa, transparent);
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+.text-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.name {
+  font-size: 38px;
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.92);
+  line-height: 1;
+}
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.title-label {
+  font-size: 11px;
+  letter-spacing: 5px;
+  color: #00ddaa;
+  text-transform: uppercase;
+}
+.title-sep {
+  width: 24px;
+  height: 1px;
+  background: rgba(0,221,170,0.4);
+}
+.title-text {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: rgba(0,221,170,0.6);
+  text-transform: uppercase;
+}
+.signal-block {
+  position: absolute;
+  bottom: 72px;
+  right: 72px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  animation: slideIn 0.8s 0.1s cubic-bezier(0.16,1,0.3,1) both;
+}
+.live-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #00ddaa;
+  box-shadow: 0 0 8px #00ddaa;
+  animation: blink 1.4s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.1} }
+.live-label {
+  font-size: 10px;
+  letter-spacing: 5px;
+  color: rgba(0,221,170,0.5);
+  font-family: 'Courier New', monospace;
+}
+.mini-bars {
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+}
+.mini-bar {
+  width: 3px;
+  background: rgba(0,221,170,0.5);
+}
+
+/* Data scroll strip */
+.data-strip {
+  position: absolute;
+  bottom: 55px;
+  left: 72px;
+  right: 72px;
+  height: 1px;
+  background: rgba(0,221,170,0.15);
+  overflow: hidden;
+}
+.data-strip::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(0,221,170,0.6), transparent);
+  animation: scanLine 4s linear infinite;
+}
+@keyframes scanLine {
+  from { left: -40%; }
+  to   { left: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="lower-third">
+  <div class="accent-bar"></div>
+  <div class="text-block">
+    <div class="name" id="name-el">名前</div>
+    <div class="title-row">
+      <div class="title-label">受信域</div>
+      <div class="title-sep"></div>
+      <div class="title-text" id="title-el">KYOUKAI</div>
+    </div>
+  </div>
+</div>
+
+<div class="signal-block">
+  <div class="mini-bars" id="mini-bars"></div>
+  <div class="live-dot"></div>
+  <div class="live-label">受信中</div>
+</div>
+
+<div class="data-strip"></div>
+
+<script>
+// URL params
+const params = new URLSearchParams(window.location.search);
+const name  = params.get('name')  || '名前';
+const title = params.get('title') || 'KYOUKAI';
+
+document.getElementById('name-el').textContent  = name;
+document.getElementById('title-el').textContent = title;
+
+// Mini signal bars
+const barsEl = document.getElementById('mini-bars');
+[6, 9, 13, 9, 6, 9, 13].forEach((h, i) => {
+  const bar = document.createElement('div');
+  bar.className = 'mini-bar';
+  bar.style.height = h + 'px';
+  const dur = (0.3 + Math.random() * 0.5).toFixed(2);
+  const delay = (i * 0.05).toFixed(2);
+  bar.style.animation = `mb ${dur}s ease-in-out ${delay}s infinite alternate`;
+  barsEl.appendChild(bar);
+});
+
+const st = document.createElement('style');
+st.textContent = `@keyframes mb{from{opacity:0.2}to{opacity:0.8}}`;
+document.head.appendChild(st);
+</script>
+</body>
+</html>
