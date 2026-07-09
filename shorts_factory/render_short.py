@@ -22,6 +22,13 @@ OUTPUT_RECORDINGS = SHORTS_ROOT / "output_recordings"
 OUTPUT_SHORTS = SHORTS_ROOT / "output_shorts"
 ROOMS_DIR = ROOT / "data" / "rooms"
 FFMPEG = SHORTS_ROOT / "tools" / "ffmpeg" / "ffmpeg-8.1.1-essentials_build" / "bin" / "ffmpeg.exe"
+DEFAULT_BGM_CANDIDATES = [
+    ROOT / "assets" / "bgm" / "kyoukai_main.mp3",
+    ROOT / "static" / "bgm" / "bgm_home.mp3",
+    ROOT / "static" / "bgm" / "bgm_exit.mp3",
+    ROOT / "static" / "bgm" / "bgm_null.mp3",
+    ROOT / "static" / "bgm" / "bgm_observer.mp3",
+]
 FONTS = [
     Path("C:/Windows/Fonts/YuGothM.ttc"),
     Path("C:/Windows/Fonts/YuGothB.ttc"),
@@ -70,7 +77,7 @@ def ffmpeg_text(value: str) -> str:
     return value.replace("\\", "\\\\").replace(":", "\\:").replace("'", "\\'").replace("\n", " ")
 
 
-def shorten(value: str, limit: int = 34) -> str:
+def shorten(value: str, limit: int = 24) -> str:
     value = value.strip()
     if len(value) <= limit:
         return value
@@ -80,7 +87,7 @@ def shorten(value: str, limit: int = 34) -> str:
 def caption_for(room_id: str, info: dict[str, Any]) -> str:
     recommended = str(info.get("recommended_text", "")).strip()
     if recommended not in UNSET:
-        return recommended
+        return shorten(recommended)
     highlight = str(info.get("highlight", "")).strip()
     if highlight not in UNSET:
         return shorten(highlight)
@@ -97,6 +104,22 @@ def candidate_room_ids() -> list[str]:
         if info.get("post_target"):
             room_ids.append(path.stem)
     return room_ids
+
+
+def all_room_ids() -> list[str]:
+    return sorted(path.stem for path in ROOMS_DIR.glob("*.md") if path.name != "_template.md")
+
+
+def resolve_bgm_path(path_text: str | None) -> Path | None:
+    candidates: list[Path] = []
+    if path_text:
+        path = Path(path_text)
+        candidates.append(path if path.is_absolute() else ROOT / path)
+    candidates.extend(DEFAULT_BGM_CANDIDATES)
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return None
 
 
 def ensure_recording(room_id: str, run_id: str, auto_record: bool = True) -> tuple[Path | None, list[str]]:
@@ -123,7 +146,16 @@ def ensure_recording(room_id: str, run_id: str, auto_record: bool = True) -> tup
     return None, ["自動録画後の録画ファイルが見つかりません。"]
 
 
-def render_video(source: Path, output: Path, caption: str, duration: int, start: float) -> None:
+def render_video(
+    source: Path,
+    output: Path,
+    caption: str,
+    duration: int,
+    start: float,
+    with_bgm: bool = False,
+    bgm_path: Path | None = None,
+    bgm_volume: float = 0.4,
+) -> None:
     if not FFMPEG.exists():
         raise FileNotFoundError(f"ffmpeg が見つかりません: {FFMPEG}")
     font = choose_font()
@@ -150,9 +182,32 @@ def render_video(source: Path, output: Path, caption: str, duration: int, start:
         str(duration),
         "-i",
         str(source),
-        "-an",
+    ]
+    if with_bgm:
+        if bgm_path is None or not bgm_path.exists():
+            raise FileNotFoundError("BGMファイルが見つかりません。")
+        command.extend(["-stream_loop", "-1", "-i", str(bgm_path)])
+    if with_bgm:
+        command.extend(
+            [
+                "-map",
+                "0:v:0",
+                "-map",
+                "1:a:0",
+            ]
+        )
+    else:
+        command.append("-an")
+    command.extend(
+        [
         "-vf",
         video_filter,
+        ]
+    )
+    if with_bgm:
+        command.extend(["-af", f"volume={bgm_volume}"])
+    command.extend(
+        [
         "-c:v",
         "libx264",
         "-preset",
@@ -161,8 +216,13 @@ def render_video(source: Path, output: Path, caption: str, duration: int, start:
         "23",
         "-pix_fmt",
         "yuv420p",
+        ]
+    )
+    if with_bgm:
+        command.extend(["-c:a", "aac", "-b:a", "128k", "-shortest"])
+    command.append(
         str(output),
-    ]
+    )
     completed = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace")
     log_path = output.with_suffix(".log")
     log_path.write_text(
@@ -187,9 +247,13 @@ def render_one(
     start: float = 1,
     auto_record: bool = True,
     final_output: Path | None = None,
+    allow_non_post_target: bool = False,
+    with_bgm: bool = False,
+    bgm_path: Path | None = None,
+    bgm_volume: float = 0.4,
 ) -> dict[str, Any]:
     info = load_room_info(room_id)
-    if not info.get("post_target"):
+    if not info.get("post_target") and not allow_non_post_target:
         return {
             "room_id": room_id,
             "display_name": info.get("display_name", room_id),
@@ -198,6 +262,8 @@ def render_one(
             "output_video": "",
             "caption": "",
             "duration_sec": 0,
+            "bgm_enabled": with_bgm,
+            "bgm_file": display_path(bgm_path) if bgm_path else "",
             "errors": [f"投稿対象外: {info.get('exclusion_reason', '未設定')}"],
             "warnings": [],
         }
@@ -213,13 +279,24 @@ def render_one(
             "output_video": "",
             "caption": caption,
             "duration_sec": 0,
+            "bgm_enabled": with_bgm,
+            "bgm_file": display_path(bgm_path) if bgm_path else "",
             "errors": warnings,
             "warnings": [],
         }
 
     output = final_output or OUTPUT_SHORTS / run_id / f"{room_id}.mp4"
     try:
-        render_video(recording, output, caption, duration, start)
+        render_video(
+            recording,
+            output,
+            caption,
+            duration,
+            start,
+            with_bgm=with_bgm,
+            bgm_path=bgm_path,
+            bgm_volume=bgm_volume,
+        )
     except Exception as exc:
         return {
             "room_id": room_id,
@@ -229,6 +306,8 @@ def render_one(
             "output_video": "",
             "caption": caption,
             "duration_sec": 0,
+            "bgm_enabled": with_bgm,
+            "bgm_file": display_path(bgm_path) if bgm_path else "",
             "errors": [str(exc)],
             "warnings": warnings,
         }
@@ -241,8 +320,135 @@ def render_one(
         "output_video": display_path(output),
         "caption": caption,
         "duration_sec": duration,
+        "bgm_enabled": with_bgm,
+        "bgm_file": display_path(bgm_path) if bgm_path else "",
         "errors": [],
         "warnings": warnings,
+    }
+
+
+def create_remix(
+    results: list[dict[str, Any]],
+    with_bgm: bool = False,
+    bgm_path: Path | None = None,
+    bgm_volume: float = 0.4,
+) -> dict[str, Any]:
+    priority = ["archive", "signal", "observation", "null", "daimyojin"]
+    by_room = {item["room_id"]: item for item in results if item.get("status") == "success"}
+    ordered = [by_room[room_id] for room_id in priority if room_id in by_room]
+    for item in results:
+        if item.get("status") == "success" and item["room_id"] not in priority:
+            ordered.append(item)
+    selected = ordered[:6]
+    if len(selected) < 2:
+        return {
+            "status": "skipped",
+            "output_video": "",
+            "errors": ["リミックスに使える成功動画が不足しています。"],
+        }
+    if not FFMPEG.exists():
+        return {"status": "failed", "output_video": "", "errors": [f"ffmpeg が見つかりません: {FFMPEG}"]}
+
+    tmp_dir = OUTPUT_SHORTS / "_remix_tmp"
+    tmp_dir.mkdir(parents=True, exist_ok=True)
+    segment_paths: list[Path] = []
+    segment_duration = 2.5
+    for index, item in enumerate(selected, start=1):
+        source = ROOT / item["output_video"]
+        if not source.exists():
+            continue
+        segment = tmp_dir / f"segment_{index:02d}_{item['room_id']}.mp4"
+        command = [
+            str(FFMPEG),
+            "-y",
+            "-ss",
+            "1",
+            "-t",
+            str(segment_duration),
+            "-i",
+            str(source),
+            "-an",
+            "-vf",
+            "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,format=yuv420p",
+            "-c:v",
+            "libx264",
+            "-preset",
+            "veryfast",
+            "-crf",
+            "23",
+            "-pix_fmt",
+            "yuv420p",
+            str(segment),
+        ]
+        completed = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        if completed.returncode == 0 and segment.exists():
+            segment_paths.append(segment)
+
+    if len(segment_paths) < 2:
+        return {"status": "failed", "output_video": "", "errors": ["リミックス用セグメント生成に失敗しました。"]}
+
+    concat_list = tmp_dir / "concat.txt"
+    concat_list.write_text(
+        "\n".join(f"file '{path.as_posix()}'" for path in segment_paths),
+        encoding="utf-8",
+    )
+    joined = tmp_dir / "joined.mp4"
+    concat_command = [
+        str(FFMPEG),
+        "-y",
+        "-f",
+        "concat",
+        "-safe",
+        "0",
+        "-i",
+        str(concat_list),
+        "-c",
+        "copy",
+        str(joined),
+    ]
+    completed = subprocess.run(concat_command, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    if completed.returncode != 0 or not joined.exists():
+        return {"status": "failed", "output_video": "", "errors": ["リミックス結合に失敗しました。"]}
+
+    output = OUTPUT_SHORTS / "kyoukai_remix_001.mp4"
+    font = choose_font()
+    fontfile = str(font).replace("\\", "/").replace(":", "\\:")
+    text = ffmpeg_text("まだ開いてる部屋がある")
+    video_filter = (
+        "scale=1080:1920:force_original_aspect_ratio=increase,"
+        "crop=1080:1920,"
+        "format=yuv420p,"
+        f"drawtext=fontfile='{fontfile}':text='{text}':"
+        "fontsize=58:fontcolor=white:borderw=4:bordercolor=black:"
+        "box=1:boxcolor=black@0.45:boxborderw=28:"
+        "x=(w-text_w)/2:y=150"
+    )
+    command = [str(FFMPEG), "-y", "-i", str(joined)]
+    if with_bgm:
+        if bgm_path is None or not bgm_path.exists():
+            return {"status": "failed", "output_video": "", "errors": ["BGMファイルが見つかりません。"]}
+        command.extend(["-stream_loop", "-1", "-i", str(bgm_path), "-map", "0:v:0", "-map", "1:a:0"])
+    else:
+        command.append("-an")
+    command.extend(["-vf", video_filter])
+    if with_bgm:
+        command.extend(["-af", f"volume={bgm_volume}"])
+    command.extend(["-t", "15", "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-pix_fmt", "yuv420p"])
+    if with_bgm:
+        command.extend(["-c:a", "aac", "-b:a", "128k", "-shortest"])
+    command.append(str(output))
+    completed = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace")
+    log_path = output.with_suffix(".log")
+    log_path.write_text(completed.stdout + "\n\n" + completed.stderr, encoding="utf-8")
+    if completed.returncode != 0 or not output.exists():
+        return {"status": "failed", "output_video": "", "errors": [f"リミックス出力に失敗しました: {log_path}"]}
+    return {
+        "status": "success",
+        "output_video": display_path(output),
+        "source_rooms": [item["room_id"] for item in selected],
+        "bgm_enabled": with_bgm,
+        "bgm_file": display_path(bgm_path) if bgm_path else "",
+        "errors": [],
     }
 
 
@@ -262,7 +468,10 @@ def write_shorts_report(run_id: str, results: list[dict[str, Any]]) -> tuple[Pat
     }
     json_path = output_dir / "shorts_report.json"
     md_path = output_dir / "shorts_report.md"
+    flat_json_path = OUTPUT_SHORTS / "short_generation_report.json"
+    flat_md_path = OUTPUT_SHORTS / "short_generation_report.md"
     json_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    flat_json_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 
     lines = [
         "# Shorts生成レポート",
@@ -287,6 +496,8 @@ def write_shorts_report(run_id: str, results: list[dict[str, Any]]) -> tuple[Pat
                 f"- 出力: {item['output_video']}",
                 f"- テロップ: {item['caption']}",
                 f"- 尺: {item['duration_sec']}秒",
+                f"- BGM: {'あり' if item.get('bgm_enabled') else 'なし'}",
+                f"- BGMファイル: {item.get('bgm_file') or 'なし'}",
                 "",
             ]
         )
@@ -315,6 +526,7 @@ def write_shorts_report(run_id: str, results: list[dict[str, Any]]) -> tuple[Pat
             ]
         )
     md_path.write_text("\n".join(lines), encoding="utf-8")
+    flat_md_path.write_text("\n".join(lines), encoding="utf-8")
     return json_path, md_path
 
 
@@ -334,6 +546,8 @@ def write_room_report(run_id: str, result: dict[str, Any]) -> tuple[Path, Path]:
         f"- 出力: {result['output_video'] or 'なし'}",
         f"- テロップ: {result['caption'] or 'なし'}",
         f"- 尺: {result['duration_sec']}秒",
+        f"- BGM: {'あり' if result.get('bgm_enabled') else 'なし'}",
+        f"- BGMファイル: {result.get('bgm_file') or 'なし'}",
         f"- エラー: {', '.join(result['errors']) if result['errors'] else 'なし'}",
         f"- 警告: {', '.join(result['warnings']) if result['warnings'] else 'なし'}",
         "",
@@ -349,6 +563,10 @@ def run_rooms(
     start: float,
     auto_record: bool,
     flat_output: bool = False,
+    allow_non_post_target: bool = False,
+    with_bgm: bool = False,
+    bgm_path: Path | None = None,
+    bgm_volume: float = 0.4,
 ) -> tuple[list[dict[str, Any]], tuple[Path, Path]]:
     results = []
     for room_id in room_ids:
@@ -361,6 +579,10 @@ def run_rooms(
             start=start,
             auto_record=auto_record,
             final_output=final_output,
+            allow_non_post_target=allow_non_post_target,
+            with_bgm=with_bgm,
+            bgm_path=bgm_path,
+            bgm_volume=bgm_volume,
         )
         print(f"  status={result['status']} output={result.get('output_video') or '-'}")
         results.append(result)
@@ -379,15 +601,23 @@ def main() -> int:
     parser.add_argument("--duration", type=int, default=15, help="max duration seconds")
     parser.add_argument("--start", type=float, default=1, help="start offset seconds")
     parser.add_argument("--no-auto-record", action="store_true", help="do not record missing rooms")
+    parser.add_argument("--with-bgm", action="store_true", help="add existing KYOUKAI BGM")
+    parser.add_argument("--bgm", default="", help="optional BGM path")
+    parser.add_argument("--bgm-volume", type=float, default=0.4, help="BGM volume")
+    parser.add_argument("--post-target-only", action="store_true", help="render only rooms marked 投稿対象 true")
     args = parser.parse_args()
 
     run_id = normalize_run_id(args.run_id)
     if args.all:
-        room_ids = candidate_room_ids()
+        room_ids = candidate_room_ids() if args.post_target_only else all_room_ids()
     elif args.room:
         room_ids = [args.room]
     else:
         print("ERROR: --room または --all を指定してください。")
+        return 1
+    bgm_path = resolve_bgm_path(args.bgm) if args.with_bgm else None
+    if args.with_bgm and bgm_path is None:
+        print("ERROR: BGMファイルが見つかりません。")
         return 1
 
     results, (json_path, md_path) = run_rooms(
@@ -397,6 +627,10 @@ def main() -> int:
         start=args.start,
         auto_record=not args.no_auto_record,
         flat_output=True,
+        allow_non_post_target=not args.post_target_only,
+        with_bgm=args.with_bgm,
+        bgm_path=bgm_path,
+        bgm_volume=args.bgm_volume,
     )
     success = sum(1 for item in results if item["status"] == "success")
     failed = sum(1 for item in results if item["status"] == "failed")

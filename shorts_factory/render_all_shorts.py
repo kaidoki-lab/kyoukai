@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from render_short import candidate_room_ids, normalize_run_id, run_rooms
+from render_short import all_room_ids, create_remix, normalize_run_id, resolve_bgm_path, run_rooms
 
 
 def main() -> int:
@@ -15,17 +15,34 @@ def main() -> int:
     parser.add_argument("--duration", type=int, default=15, help="max duration seconds")
     parser.add_argument("--start", type=float, default=1, help="start offset seconds")
     parser.add_argument("--no-auto-record", action="store_true", help="do not record missing rooms")
+    parser.add_argument("--with-bgm", action="store_true", help="add existing KYOUKAI BGM")
+    parser.add_argument("--bgm", default="", help="optional BGM path")
+    parser.add_argument("--bgm-volume", type=float, default=0.4, help="BGM volume")
+    parser.add_argument("--post-target-only", action="store_true", help="render only rooms marked 投稿対象 true")
     args = parser.parse_args()
 
     run_id = normalize_run_id(args.run_id)
+    bgm_path = resolve_bgm_path(args.bgm) if args.with_bgm else None
+    if args.with_bgm and bgm_path is None:
+        print("ERROR: BGMファイルが見つかりません。")
+        return 1
+    room_ids = all_room_ids() if not args.post_target_only else [
+        room_id for room_id in all_room_ids()
+        if room_id not in {"city", "outside", "observer", "top-floor", "fukashitsu"}
+    ]
     results, (json_path, md_path) = run_rooms(
-        candidate_room_ids(),
+        room_ids,
         run_id,
         duration=min(args.duration, 15),
         start=args.start,
         auto_record=not args.no_auto_record,
         flat_output=True,
+        allow_non_post_target=not args.post_target_only,
+        with_bgm=args.with_bgm,
+        bgm_path=bgm_path,
+        bgm_volume=args.bgm_volume,
     )
+    remix = create_remix(results, with_bgm=args.with_bgm, bgm_path=bgm_path, bgm_volume=args.bgm_volume)
     success = sum(1 for item in results if item["status"] == "success")
     failed = sum(1 for item in results if item["status"] == "failed")
     skipped = sum(1 for item in results if item["status"] == "skipped")
@@ -35,6 +52,7 @@ def main() -> int:
     print(f"skipped: {skipped}")
     print(f"shorts_report.json: {json_path}")
     print(f"shorts_report.md: {md_path}")
+    print(f"remix: {remix.get('status')} {remix.get('output_video', '')}")
     return 0 if failed == 0 else 2
 
 
