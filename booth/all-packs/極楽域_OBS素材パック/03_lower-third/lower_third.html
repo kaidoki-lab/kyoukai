@@ -5,60 +5,39 @@
 <title>極楽域 - ローワーサード</title>
 <!--
   OBS設定: ブラウザソース → このHTMLを指定 → 幅1920 高さ1080
-  名前変更: ファイル内の '名前' と 'KYOUKAI' を書き換えてください
+  名前変更: ?name=&title= のURLパラメータで指定してください
 -->
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:1920px;height:1080px;background:transparent;overflow:hidden;font-family:'Courier New',monospace;}
-.lt{position:absolute;bottom:72px;left:72px;display:flex;align-items:center;gap:0;animation:slideIn .8s cubic-bezier(.16,1,.3,1) both;}
-@keyframes slideIn{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
-.accent{width:3px;height:72px;background:linear-gradient(to bottom,transparent,#ffaa44,transparent);margin-right:20px;flex-shrink:0;}
-.texts{display:flex;flex-direction:column;gap:6px;}
-.name{font-size:38px;letter-spacing:4px;color:rgba(255,255,255,.92);line-height:1;}
-.title-row{display:flex;align-items:center;gap:12px;}
-.title-label{font-size:11px;letter-spacing:5px;color:#ffaa44;text-transform:uppercase;}
-.title-sep{width:24px;height:1px;background:rgba(255,170,68,.4);}
-.title-text{font-size:11px;letter-spacing:3px;color:rgba(255,170,68,.6);text-transform:uppercase;}
-.right-block{position:absolute;bottom:72px;right:72px;display:flex;align-items:center;gap:14px;animation:slideIn .8s .1s cubic-bezier(.16,1,.3,1) both;}
-.live-dot{width:7px;height:7px;border-radius:50%;background:#ffaa44;box-shadow:0 0 8px #ffaa44;animation:blink 1.4s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
-.live-label{font-size:10px;letter-spacing:5px;color:rgba(255,170,68,.5);}
-.mini-bars{display:flex;gap:2px;align-items:flex-end;}
-.mini-bar{width:3px;background:rgba(255,170,68,.5);}
-@keyframes mb{from{opacity:.2}to{opacity:.8}}
-.line{position:absolute;bottom:55px;left:72px;right:72px;height:1px;background:rgba(255,170,68,.12);overflow:hidden;}
-.line::after{content:'';position:absolute;top:0;left:-40%;width:40%;height:100%;background:linear-gradient(to right,transparent,rgba(255,170,68,.6),transparent);animation:scan 4s linear infinite;}
-@keyframes scan{from{left:-40%}to{left:100%}}
+
+/* .gok- プレフィックス付き固有クラス群(引き出しラベル+音量バー内蔵テロップ) */
+.gok-lt-frame{position:absolute;bottom:80px;left:80px;display:flex;align-items:center;gap:0;background:linear-gradient(180deg,rgba(255,170,68,0.14),rgba(255,170,68,0.04));border:1px solid rgba(255,170,68,0.5);}
+.gok-lt-label{padding:14px 18px;font-size:11px;letter-spacing:3px;color:rgba(255,170,68,0.6);border-right:1px solid rgba(255,170,68,0.4);}
+.gok-lt-name{padding:14px 26px;font-size:32px;letter-spacing:3px;color:rgba(255,255,255,0.94);}
+.gok-lt-bars{display:flex;align-items:flex-end;gap:3px;padding-right:18px;height:24px;}
+.gok-lt-bar{width:4px;background:rgba(255,170,68,0.8);animation:gokLtBar 1.2s ease-in-out infinite;}
+.gok-lt-bar:nth-child(1){height:40%;animation-delay:0s;}
+.gok-lt-bar:nth-child(2){height:70%;animation-delay:.15s;}
+.gok-lt-bar:nth-child(3){height:100%;animation-delay:.3s;}
+.gok-lt-bar:nth-child(4){height:55%;animation-delay:.45s;}
+@keyframes gokLtBar{0%,100%{transform:scaleY(0.4);}50%{transform:scaleY(1);}}
+.gok-lt-title{position:absolute;left:80px;bottom:52px;font-size:11px;letter-spacing:4px;color:rgba(255,170,68,0.55);}
 </style>
 </head>
 <body>
-<div class="lt">
-  <div class="accent"></div>
-  <div class="texts">
-    <div class="name" id="name-el">名前</div>
-    <div class="title-row">
-      <div class="title-label">極楽域</div>
-      <div class="title-sep"></div>
-      <div class="title-text" id="title-el">KYOUKAI</div>
-    </div>
+<div class="gok-lt-frame">
+  <div class="gok-lt-label">引出 03</div>
+  <span class="gok-lt-name" id="name-el">名前</span>
+  <div class="gok-lt-bars">
+    <div class="gok-lt-bar"></div><div class="gok-lt-bar"></div><div class="gok-lt-bar"></div><div class="gok-lt-bar"></div>
   </div>
 </div>
-<div class="right-block">
-  <div class="mini-bars" id="mbars"></div>
-  <div class="live-dot"></div>
-  <div class="live-label">受信中</div>
-</div>
-<div class="line"></div>
+<div class="gok-lt-title" id="title-el">KYOUKAI</div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
 document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
-const mb=document.getElementById('mbars');
-[6,9,13,9,6,9,13].forEach((h,i)=>{
-  const b=document.createElement('div');b.className='mini-bar';b.style.height=h+'px';
-  b.style.animation=`mb ${(.3+Math.random()*.5).toFixed(2)}s ease-in-out ${(i*.05).toFixed(2)}s infinite alternate`;
-  mb.appendChild(b);
-});
 </script>
 </body>
 </html>

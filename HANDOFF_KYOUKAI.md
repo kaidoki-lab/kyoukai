@@ -32,6 +32,18 @@
   - 各部屋、部屋IDプレフィックス付きCSSクラス(`.null-` `.obsr-` `.ma-` `.nmh-`)を10個以上ずつ付与
   - 検証: `python generate_packs.py`で48ファイル+zip17本再生成 → `verify_packs.py` 48/48 pass（逆観測室lower_thirdで`#name-el`のtextContentが子要素混入によりズレるバグを1回発見・修正して再検証pass）→ `diff_check.py null observer ma namahage --commit b7ca038` で対象12ファイル全てDIFF確認 → `screenshot_packs.py`を全16部屋(48ファイル)に対して再実行し輝度チェック全pass（悪魔の間・なまはげも含め閾値の部屋別上書きなしで通過。brightness値は各waiting 2.99〜8.04、brb 3.27〜4.57）
   - ROADMAP.mdの工程3を「完了」に更新済み、完了条件チェックボックス全て[x]
+- OBSパック「部屋別個性化リニューアル」の工程4「部屋実装グループC（AI大明神・極楽域・棒入れ祭・管理人室）」を実装
+  - `room_specs/gokuraku.py`: 極楽域を専用実装化(方式A・部屋専用画像なしのためCSS/Canvasのみ)。waitingは引き出し棚をCSS grid(4行5列)で描画し各引き出しにCanvasスペクトルバーを埋め込み、brbは引き出しが1つずつ`transform:translateY`で開閉+音源番号がランダム切替、lower_thirdは引き出しラベル+CSSアニメーションの音量バー内蔵テロップ
+  - `room_specs/matsuri.py`: 棒入れ祭を専用実装化(方式B・画像同梱)。waitingは`static/images/matsuri/`の棒・穴・御幣素材を配置した祭り画面全体(画面構成ごと祭り化。背景演出としてではなく主役に)+奉納カウンタ+紙吹雪Canvas、brbはfirework spark(Canvas)が上がり続け「奉納の準備」、lower_thirdは祭り半纏風の縁取り+紙吹雪が散るテロップ。`static/matsuri.js`の紙吹雪カラーパレット・掛け声メッセージを踏襲
+  - `room_specs/daimyojin.py`(初版): AI大明神を専用実装化(方式B・画像同梱)。本体画像を中央配置+絵馬型祈願札発光+祈願ログ
+  - `room_specs/kanrinin.py`(初版): 管理人室を専用実装化(方式B・画像同梱)。本体画像+呼び鈴・鍵ボックス発光ポイント+席外し札揺れ
+  - reviewerが「daimyojinとkanriniのwaiting/brbがDOM構造・座標・演出ロジックともに同一テンプレートの色違いになっている」と要修正判定。ユーザー承認を得て再修正:
+    - `room_specs/daimyojin.py`(再設計): waitingを「祈願処理装置のコンソール」構図に変更。左62%に回路グリッド+巨大祈願番号(明滅カウントアップ)+縦スクロールする祈願ログウィンドウ、右38%に本体画像を帯状配置(中央配置から変更)。brbはおみくじ筒回転+札揺れをやめ、二重の円環プログレスリング(`.dmj-ring`/`.dmj-ring--inner`)が回転する「PROCESSING」構図に変更(揺れアニメは管理人室側にのみ残す)
+    - `room_specs/kanrinin.py`(再設計): waitingを「受付フロントカウンター」構図に変更。上部38%(412px)に本体画像を帯状配置、下部62%を宿帳ページ(1行がめくれるように差し替わる`.kan-diary-page`)+鍵ボックス格子グリッド(12マスが1マスずつ点灯)+呼び鈴応答なしカウンターの3ペイン構成に変更。brbは揺れる立て札演出を維持しつつ、目玉の透けをCSS要素からCanvasベースのvignette明滅(`.kan-brb-eye`の周期リビール)に変更して差別化
+  - 部屋IDプレフィックス付きCSSクラスは再設計後もdaimyojin 20個・kanrinin 25個(要件の3個以上を大幅に満たす)
+  - 各部屋waitingに`<canvas>`要素が0件でverify_packs.pyのcanvas存在チェックに落ちた3部屋(daimyojin/matsuri/kanrinin、初版時点)へ演出言語に沿った補助Canvasを追加して契約を満たした経緯あり(gokurakuは引き出しスペクトルバー20枚のCanvasで最初からpass)
+  - 検証(再修正後): `python generate_packs.py`で48ファイル+zip17本再生成 → `verify_packs.py` 48/48 pass → `diff_check.py daimyojin gokuraku matsuri kanrinin --commit b7ca038`で12/12 DIFF、再修正後`diff_check.py daimyojin kanrinin --commit b7ca038`でも6/6 DIFF再確認 → `screenshot_packs.py`を全16部屋(48ファイル)に対して再実行し輝度チェック全pass(daimyojin waiting=9.70, kanrinin waiting=43.41含む) → zipサイズ確認(daimyojin 0.15MB, gokuraku 0.006MB, matsuri 3.03MB, kanrinin 1.87MBで全て5MB以内)
+  - ROADMAP.mdの工程4を「完了」に更新済み、完了条件チェックボックス全て[x]
 
 ## 以前やったこと（2026-07-08）
 
@@ -121,7 +133,7 @@
 - **ローカル**: `C:/Users/pc/Documents/Claude/Projects/kyoukai` が最新
 - **ブランチ**: main、本サイト側は全変更プッシュ済み
 - **最新コミット**: `9320147 Add Amazon/Rakuten areas to kanrinin; update room image`
-- **OBSパック 部屋別個性化リニューアル（`ROADMAP.md` 現行版）**: 工程1（基盤リファクタ）・工程2（部屋実装グループA: 観測域・記録室・評議録・境界域）・工程3（部屋実装グループB: 崩落域・逆観測室・悪魔の間・なまはげ）完了。工程4〜6は未着手。`booth/all-packs/`・`booth/verify_report.json`・`booth/room_specs/`・`booth/pack_base.py`・`booth/asset_extract.py`・`booth/legacy_templates.py`・`booth/diff_check.py`は現状未コミット
+- **OBSパック 部屋別個性化リニューアル（`ROADMAP.md` 現行版）**: 工程1（基盤リファクタ）・工程2（部屋実装グループA: 観測域・記録室・評議録・境界域）・工程3（部屋実装グループB: 崩落域・逆観測室・悪魔の間・なまはげ）・工程4（部屋実装グループC: AI大明神・極楽域・棒入れ祭・管理人室）完了。工程5〜6は未着手。`booth/all-packs/`・`booth/verify_report.json`・`booth/room_specs/`・`booth/pack_base.py`・`booth/asset_extract.py`・`booth/legacy_templates.py`・`booth/diff_check.py`は現状未コミット
 - 旧世代のBOOTH販売展開（前ラウンド）成果物（`booth/all-packs`旧版, `booth/thumbnails`, `booth/listings`, `booth/signal-pack`, `booth/verify_report.json`旧版）はユーザー指示で削除済み（git履歴には残っている。コミット`3101d72`）
 
 ---
@@ -146,7 +158,6 @@
 3. **観測域（/observation）の更新** — 更新頻度を上げたい部屋、未着手
 
 ### OBSパック 部屋別個性化リニューアル（`ROADMAP.md`）
-- 工程4: 部屋実装グループC（AI大明神・極楽域・棒入れ祭・管理人室）— 極楽域は方式Aへ変更済み
 - 工程5: 部屋実装グループD（粒子観測・波紋域・卵部屋・台風ニュース）
 - 工程6: 全再生成・検証拡張（verify_packs差別化チェック・final_checkのzipサイズ上限）・thumbnails/listings再生成・コミット
 - 工程1〜6完了後、`ROADMAP.md`・`booth/`配下の新規/変更ファイルをコミットするかどうかまろに確認する（現状未コミット）

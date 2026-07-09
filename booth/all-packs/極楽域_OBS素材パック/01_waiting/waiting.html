@@ -6,146 +6,53 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:1920px;height:1080px;background:#040200;overflow:hidden;font-family:'Courier New',monospace;color:#ffaa44;}
-canvas{position:absolute;top:0;left:0;width:1920px;height:1080px;}
-.scanlines{position:absolute;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,0.12) 3px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:20;}
-.ui{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:10;}
-.corner{position:absolute;width:36px;height:36px;}
-.corner--tl{top:48px;left:48px;border-top:1px solid #ffaa44;border-left:1px solid #ffaa44;opacity:.5;}
-.corner--tr{top:48px;right:48px;border-top:1px solid #ffaa44;border-right:1px solid #ffaa44;opacity:.5;}
-.corner--bl{bottom:48px;left:48px;border-bottom:1px solid #ffaa44;border-left:1px solid #ffaa44;opacity:.5;}
-.corner--br{bottom:48px;right:48px;border-bottom:1px solid #ffaa44;border-right:1px solid #ffaa44;opacity:.5;}
-.top-bar{position:absolute;top:54px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:8px;color:rgba(255,170,68,0.35);text-transform:uppercase;}
-.rec{position:absolute;top:50px;right:100px;display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:4px;color:rgba(255,170,68,0.5);}
-.rec-dot{width:7px;height:7px;border-radius:50%;background:#ffaa44;box-shadow:0 0 6px #ffaa44;animation:blink 1.4s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
-.freq-block{position:absolute;left:100px;top:50%;transform:translateY(-50%);}
-.label{font-size:10px;letter-spacing:4px;color:rgba(255,170,68,0.3);margin-bottom:6px;}
-.freq-value{font-size:38px;letter-spacing:3px;color:rgba(255,170,68,0.75);text-shadow:0 0 20px rgba(255,170,68,0.3);}
-.unit{font-size:10px;letter-spacing:4px;color:rgba(255,170,68,0.2);margin-top:4px;}
-.source-block{position:absolute;right:100px;top:50%;transform:translateY(-50%);text-align:right;}
-.source-value{font-size:16px;letter-spacing:4px;color:rgba(255,170,68,0.45);margin-top:6px;}
-.frags{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;}
-.frag{position:absolute;font-size:10px;letter-spacing:2px;color:rgba(255,170,68,0.18);white-space:nowrap;}
-@keyframes fragFade{0%,100%{opacity:0}15%,85%{opacity:1}}
-.bottom-bar{position:absolute;bottom:56px;left:100px;right:100px;display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:4px;color:rgba(255,170,68,0.3);}
-.sig-bars{display:flex;gap:3px;align-items:flex-end;}
-.sig-bar{width:4px;background:rgba(255,170,68,0.6);}
-@keyframes barP{from{opacity:0.2}to{opacity:0.9}}
+
+/* .gok- プレフィックス付き固有クラス群(引き出し棚のCSS grid構成) */
+.gok-label{position:absolute;top:64px;left:0;width:100%;text-align:center;font-size:13px;letter-spacing:9px;color:rgba(255,170,68,0.6);z-index:6;text-transform:uppercase;}
+.gok-cabinet{position:absolute;left:50%;top:50%;width:1200px;height:640px;margin:-320px 0 0 -600px;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(4,1fr);gap:14px;padding:20px;background:linear-gradient(180deg,#1a0f04,#0a0602);border:2px solid rgba(255,170,68,0.4);box-shadow:0 0 60px rgba(255,170,68,0.2) inset;}
+.gok-drawer{position:relative;background:linear-gradient(180deg,rgba(255,170,68,0.14),rgba(255,170,68,0.04));border:1px solid rgba(255,170,68,0.45);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:transform 0.4s ease;}
+.gok-drawer-spectrum{width:60px;height:18px;}
+.gok-drawer-num{font-size:11px;letter-spacing:2px;color:rgba(255,170,68,0.55);}
+.gok-fragment-log{position:absolute;bottom:96px;left:0;width:100%;text-align:center;font-size:15px;letter-spacing:4px;color:rgba(255,170,68,0.65);z-index:6;min-height:24px;}
+canvas.gok-drawer-spectrum{display:block;}
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
-<div class="scanlines"></div>
-<div class="ui">
-  <div class="corner corner--tl"></div><div class="corner corner--tr"></div>
-  <div class="corner corner--bl"></div><div class="corner corner--br"></div>
-  <div class="top-bar">KYOUKAI &nbsp;/&nbsp; 極楽域 &nbsp;──&nbsp; 音源 再生中</div>
-  <div class="rec"><div class="rec-dot"></div>REC</div>
-  <div class="freq-block">
-    <div class="label">音源番号</div>
-    <div class="freq-value" id="freq">----.---</div>
-    <div class="unit">────</div>
-  </div>
-  <div class="source-block">
-    <div class="label" style="text-align:right">音源</div>
-    <div class="source-value">不明</div>
-  </div>
-  <div class="frags" id="fragsEl"></div>
-  <div class="bottom-bar">
-    <div>音源 再生中</div>
-    <div class="sig-bars" id="barsEl"></div>
-    <div id="ts"></div>
-  </div>
-</div>
+<div class="gok-label">KYOUKAI // 極楽域</div>
+<div class="gok-cabinet"><div class="gok-drawer" style="grid-row:1;grid-column:1;" data-idx="1"><canvas class="gok-drawer-spectrum" data-slot="1" width="60" height="18"></canvas><span class="gok-drawer-num">01</span></div><div class="gok-drawer" style="grid-row:1;grid-column:2;" data-idx="2"><canvas class="gok-drawer-spectrum" data-slot="2" width="60" height="18"></canvas><span class="gok-drawer-num">02</span></div><div class="gok-drawer" style="grid-row:1;grid-column:3;" data-idx="3"><canvas class="gok-drawer-spectrum" data-slot="3" width="60" height="18"></canvas><span class="gok-drawer-num">03</span></div><div class="gok-drawer" style="grid-row:1;grid-column:4;" data-idx="4"><canvas class="gok-drawer-spectrum" data-slot="4" width="60" height="18"></canvas><span class="gok-drawer-num">04</span></div><div class="gok-drawer" style="grid-row:1;grid-column:5;" data-idx="5"><canvas class="gok-drawer-spectrum" data-slot="5" width="60" height="18"></canvas><span class="gok-drawer-num">05</span></div><div class="gok-drawer" style="grid-row:2;grid-column:1;" data-idx="6"><canvas class="gok-drawer-spectrum" data-slot="6" width="60" height="18"></canvas><span class="gok-drawer-num">06</span></div><div class="gok-drawer" style="grid-row:2;grid-column:2;" data-idx="7"><canvas class="gok-drawer-spectrum" data-slot="7" width="60" height="18"></canvas><span class="gok-drawer-num">07</span></div><div class="gok-drawer" style="grid-row:2;grid-column:3;" data-idx="8"><canvas class="gok-drawer-spectrum" data-slot="8" width="60" height="18"></canvas><span class="gok-drawer-num">08</span></div><div class="gok-drawer" style="grid-row:2;grid-column:4;" data-idx="9"><canvas class="gok-drawer-spectrum" data-slot="9" width="60" height="18"></canvas><span class="gok-drawer-num">09</span></div><div class="gok-drawer" style="grid-row:2;grid-column:5;" data-idx="10"><canvas class="gok-drawer-spectrum" data-slot="10" width="60" height="18"></canvas><span class="gok-drawer-num">10</span></div><div class="gok-drawer" style="grid-row:3;grid-column:1;" data-idx="11"><canvas class="gok-drawer-spectrum" data-slot="11" width="60" height="18"></canvas><span class="gok-drawer-num">11</span></div><div class="gok-drawer" style="grid-row:3;grid-column:2;" data-idx="12"><canvas class="gok-drawer-spectrum" data-slot="12" width="60" height="18"></canvas><span class="gok-drawer-num">12</span></div><div class="gok-drawer" style="grid-row:3;grid-column:3;" data-idx="13"><canvas class="gok-drawer-spectrum" data-slot="13" width="60" height="18"></canvas><span class="gok-drawer-num">13</span></div><div class="gok-drawer" style="grid-row:3;grid-column:4;" data-idx="14"><canvas class="gok-drawer-spectrum" data-slot="14" width="60" height="18"></canvas><span class="gok-drawer-num">14</span></div><div class="gok-drawer" style="grid-row:3;grid-column:5;" data-idx="15"><canvas class="gok-drawer-spectrum" data-slot="15" width="60" height="18"></canvas><span class="gok-drawer-num">15</span></div><div class="gok-drawer" style="grid-row:4;grid-column:1;" data-idx="16"><canvas class="gok-drawer-spectrum" data-slot="16" width="60" height="18"></canvas><span class="gok-drawer-num">16</span></div><div class="gok-drawer" style="grid-row:4;grid-column:2;" data-idx="17"><canvas class="gok-drawer-spectrum" data-slot="17" width="60" height="18"></canvas><span class="gok-drawer-num">17</span></div><div class="gok-drawer" style="grid-row:4;grid-column:3;" data-idx="18"><canvas class="gok-drawer-spectrum" data-slot="18" width="60" height="18"></canvas><span class="gok-drawer-num">18</span></div><div class="gok-drawer" style="grid-row:4;grid-column:4;" data-idx="19"><canvas class="gok-drawer-spectrum" data-slot="19" width="60" height="18"></canvas><span class="gok-drawer-num">19</span></div><div class="gok-drawer" style="grid-row:4;grid-column:5;" data-idx="20"><canvas class="gok-drawer-spectrum" data-slot="20" width="60" height="18"></canvas><span class="gok-drawer-num">20</span></div></div>
+<div class="gok-fragment-log" id="gok-log">引き出し 1</div>
 <script>
-const canvas=document.getElementById('c');
-const ctx=canvas.getContext('2d');
-canvas.width=1920; canvas.height=1080;
-
-let bvals=new Array(48).fill(0).map(()=>Math.random());
-let bt2=0;
-function drawCanvas(){
-  ctx.clearRect(0,0,1920,1080);
-  ctx.fillStyle='rgba(0,0,0,0.12)'; ctx.fillRect(0,0,1920,1080);
-  const bw=1920/bvals.length; const maxH=400; const baseY=740;
-  bvals.forEach((v,i)=>{
-    bvals[i]+=(Math.random()-0.5)*0.15;
-    bvals[i]=Math.max(0.05,Math.min(1,bvals[i]));
-    const h=bvals[i]*maxH;
-    const alpha=0.1+bvals[i]*0.5;
-    ctx.fillStyle=`rgba(255,170,68,${alpha})`;
-    ctx.fillRect(i*bw+2, baseY-h, bw-4, h);
-    ctx.fillStyle=`rgba(255,170,68,${alpha*1.5})`;
-    ctx.fillRect(i*bw+2, baseY-h, bw-4, 2);
-  });
-  bt2++;
-  requestAnimationFrame(drawCanvas);
+const FRAGMENTS=["引き出し 1", "── 開かない", "音響装置 起動", "記憶の収納", "奥へ続く", "扉 発見", "鍵 必要", "音が聞こえる", "── 何の音か", "極楽 ではない"];
+const logEl=document.getElementById('gok-log');
+function nextFragment(){
+  logEl.style.opacity='0';
+  setTimeout(()=>{
+    logEl.textContent=FRAGMENTS[Math.floor(Math.random()*FRAGMENTS.length)];
+    logEl.style.opacity='1';
+  },300);
 }
-drawCanvas();
+logEl.style.transition='opacity 0.3s ease';
+setInterval(nextFragment,2800);
 
-let fv=80+Math.random()*900;
-const freqEl=document.getElementById('freq');
-setInterval(()=>{fv+=(Math.random()-.5)*.5;freqEl.textContent=fv.toFixed(3);},250);
-const fragsEl=document.getElementById('fragsEl');
-  const _f0=document.createElement('div');
-  _f0.className='frag';
-  _f0.textContent="引き出し 1";
-  _f0.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f0);
-  const _f1=document.createElement('div');
-  _f1.className='frag';
-  _f1.textContent="── 開かない";
-  _f1.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f1);
-  const _f2=document.createElement('div');
-  _f2.className='frag';
-  _f2.textContent="音響装置 起動";
-  _f2.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f2);
-  const _f3=document.createElement('div');
-  _f3.className='frag';
-  _f3.textContent="記憶の収納";
-  _f3.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f3);
-  const _f4=document.createElement('div');
-  _f4.className='frag';
-  _f4.textContent="奥へ続く";
-  _f4.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f4);
-  const _f5=document.createElement('div');
-  _f5.className='frag';
-  _f5.textContent="扉 発見";
-  _f5.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f5);
-  const _f6=document.createElement('div');
-  _f6.className='frag';
-  _f6.textContent="鍵 必要";
-  _f6.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f6);
-  const _f7=document.createElement('div');
-  _f7.className='frag';
-  _f7.textContent="音が聞こえる";
-  _f7.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f7);
-  const _f8=document.createElement('div');
-  _f8.className='frag';
-  _f8.textContent="── 何の音か";
-  _f8.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f8);
-  const _f9=document.createElement('div');
-  _f9.className='frag';
-  _f9.textContent="極楽 ではない";
-  _f9.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f9);
-const barsEl=document.getElementById('barsEl');
-[8,12,18,22,18,14,10,14,20,22,18,12].forEach((h,i)=>{
-  const b=document.createElement('div');b.className='sig-bar';b.style.height=h+'px';
-  b.style.animation=`barP ${(0.3+Math.random()*.8).toFixed(2)}s ease-in-out ${(Math.random()*.4).toFixed(2)}s infinite alternate`;
-  barsEl.appendChild(b);
-});
-const tsEl=document.getElementById('ts');
-setInterval(()=>{tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);},1000);
-tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);
+// 各引き出しのスペクトルバー(棚に埋め込み)
+const bars=document.querySelectorAll('.gok-drawer-spectrum');
+const ctxs=Array.from(bars).map(c=>c.getContext('2d'));
+const heights=Array.from(bars).map(()=>Array.from({length:10},()=>Math.random()));
+function drawSpectrum(){
+  ctxs.forEach((ctx,i)=>{
+    ctx.clearRect(0,0,60,18);
+    const h=heights[i];
+    for(let b=0;b<h.length;b++){
+      h[b]+=(Math.random()-0.5)*0.35;
+      h[b]=Math.max(0.05,Math.min(1,h[b]));
+      const barH=h[b]*16;
+      ctx.fillStyle='rgba(255,170,68,'+(0.35+h[b]*0.5)+')';
+      ctx.fillRect(b*6,18-barH,4,barH);
+    }
+  });
+  requestAnimationFrame(drawSpectrum);
+}
+drawSpectrum();
 </script>
 </body>
 </html>

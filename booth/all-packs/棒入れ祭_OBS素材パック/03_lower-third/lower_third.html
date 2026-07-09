@@ -5,60 +5,46 @@
 <title>棒入れ祭 - ローワーサード</title>
 <!--
   OBS設定: ブラウザソース → このHTMLを指定 → 幅1920 高さ1080
-  名前変更: ファイル内の '名前' と 'KYOUKAI' を書き換えてください
+  名前変更: ?name=&title= のURLパラメータで指定してください
 -->
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:1920px;height:1080px;background:transparent;overflow:hidden;font-family:'Courier New',monospace;}
-.lt{position:absolute;bottom:72px;left:72px;display:flex;align-items:center;gap:0;animation:slideIn .8s cubic-bezier(.16,1,.3,1) both;}
-@keyframes slideIn{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
-.accent{width:3px;height:72px;background:linear-gradient(to bottom,transparent,#ffdd00,transparent);margin-right:20px;flex-shrink:0;}
-.texts{display:flex;flex-direction:column;gap:6px;}
-.name{font-size:38px;letter-spacing:4px;color:rgba(255,255,255,.92);line-height:1;}
-.title-row{display:flex;align-items:center;gap:12px;}
-.title-label{font-size:11px;letter-spacing:5px;color:#ffdd00;text-transform:uppercase;}
-.title-sep{width:24px;height:1px;background:rgba(255,221,0,.4);}
-.title-text{font-size:11px;letter-spacing:3px;color:rgba(255,221,0,.6);text-transform:uppercase;}
-.right-block{position:absolute;bottom:72px;right:72px;display:flex;align-items:center;gap:14px;animation:slideIn .8s .1s cubic-bezier(.16,1,.3,1) both;}
-.live-dot{width:7px;height:7px;border-radius:50%;background:#ffdd00;box-shadow:0 0 8px #ffdd00;animation:blink 1.4s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
-.live-label{font-size:10px;letter-spacing:5px;color:rgba(255,221,0,.5);}
-.mini-bars{display:flex;gap:2px;align-items:flex-end;}
-.mini-bar{width:3px;background:rgba(255,221,0,.5);}
-@keyframes mb{from{opacity:.2}to{opacity:.8}}
-.line{position:absolute;bottom:55px;left:72px;right:72px;height:1px;background:rgba(255,221,0,.12);overflow:hidden;}
-.line::after{content:'';position:absolute;top:0;left:-40%;width:40%;height:100%;background:linear-gradient(to right,transparent,rgba(255,221,0,.6),transparent);animation:scan 4s linear infinite;}
-@keyframes scan{from{left:-40%}to{left:100%}}
+
+/* .mat- プレフィックス付き固有クラス群(祭り半纏風の縁取り+紙吹雪が散るテロップ) */
+.mat-lt-frame{position:absolute;bottom:80px;left:80px;padding:16px 30px;background:linear-gradient(90deg,rgba(60,10,10,0.85),rgba(20,4,4,0.85));border:3px solid rgba(255,221,0,0.7);border-radius:2px;position:relative;overflow:visible;}
+.mat-lt-frame::before{content:'';position:absolute;top:-6px;left:-6px;right:-6px;bottom:-6px;border:1px solid rgba(255,221,0,0.35);pointer-events:none;}
+.mat-lt-name{font-size:32px;letter-spacing:3px;color:rgba(255,255,255,0.94);}
+.mat-lt-title{position:absolute;left:80px;bottom:52px;font-size:11px;letter-spacing:4px;color:rgba(255,221,0,0.55);}
+.mat-lt-confetti-layer{position:absolute;top:60px;left:80px;width:420px;height:120px;pointer-events:none;overflow:visible;}
+.mat-lt-confetti-piece{position:absolute;top:-10px;width:8px;height:8px;animation:matLtFall linear forwards;}
+@keyframes matLtFall{0%{transform:translateY(0) rotate(0deg);opacity:1;}100%{transform:translateY(140px) rotate(280deg);opacity:0;}}
 </style>
 </head>
 <body>
-<div class="lt">
-  <div class="accent"></div>
-  <div class="texts">
-    <div class="name" id="name-el">名前</div>
-    <div class="title-row">
-      <div class="title-label">棒入れ祭</div>
-      <div class="title-sep"></div>
-      <div class="title-text" id="title-el">KYOUKAI</div>
-    </div>
-  </div>
+<div class="mat-lt-confetti-layer" id="mat-lt-confetti"></div>
+<div class="mat-lt-frame">
+  <span class="mat-lt-name" id="name-el">名前</span>
 </div>
-<div class="right-block">
-  <div class="mini-bars" id="mbars"></div>
-  <div class="live-dot"></div>
-  <div class="live-label">受信中</div>
-</div>
-<div class="line"></div>
+<div class="mat-lt-title" id="title-el">KYOUKAI</div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
 document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
-const mb=document.getElementById('mbars');
-[6,9,13,9,6,9,13].forEach((h,i)=>{
-  const b=document.createElement('div');b.className='mini-bar';b.style.height=h+'px';
-  b.style.animation=`mb ${(.3+Math.random()*.5).toFixed(2)}s ease-in-out ${(i*.05).toFixed(2)}s infinite alternate`;
-  mb.appendChild(b);
-});
+
+const COLORS=["#e0c66a", "#d8483f", "#f4efe0", "#9bb15b"];
+const layer=document.getElementById('mat-lt-confetti');
+function spawn(){
+  const piece=document.createElement('div');
+  piece.className='mat-lt-confetti-piece';
+  piece.style.left=(Math.random()*100)+'%';
+  piece.style.background=COLORS[Math.floor(Math.random()*COLORS.length)];
+  const dur=1.4+Math.random()*1.0;
+  piece.style.animationDuration=dur+'s';
+  layer.appendChild(piece);
+  setTimeout(()=>piece.remove(),(dur+0.2)*1000);
+}
+setInterval(spawn,600);
 </script>
 </body>
 </html>

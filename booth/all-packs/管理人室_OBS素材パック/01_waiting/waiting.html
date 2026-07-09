@@ -6,140 +6,105 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:1920px;height:1080px;background:#050300;overflow:hidden;font-family:'Courier New',monospace;color:#aa8855;}
-canvas{position:absolute;top:0;left:0;width:1920px;height:1080px;}
-.scanlines{position:absolute;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,0.12) 3px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:20;}
-.ui{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:10;}
-.corner{position:absolute;width:36px;height:36px;}
-.corner--tl{top:48px;left:48px;border-top:1px solid #aa8855;border-left:1px solid #aa8855;opacity:.5;}
-.corner--tr{top:48px;right:48px;border-top:1px solid #aa8855;border-right:1px solid #aa8855;opacity:.5;}
-.corner--bl{bottom:48px;left:48px;border-bottom:1px solid #aa8855;border-left:1px solid #aa8855;opacity:.5;}
-.corner--br{bottom:48px;right:48px;border-bottom:1px solid #aa8855;border-right:1px solid #aa8855;opacity:.5;}
-.top-bar{position:absolute;top:54px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:8px;color:rgba(170,136,85,0.35);text-transform:uppercase;}
-.rec{position:absolute;top:50px;right:100px;display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:4px;color:rgba(170,136,85,0.5);}
-.rec-dot{width:7px;height:7px;border-radius:50%;background:#aa8855;box-shadow:0 0 6px #aa8855;animation:blink 1.4s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
-.freq-block{position:absolute;left:100px;top:50%;transform:translateY(-50%);}
-.label{font-size:10px;letter-spacing:4px;color:rgba(170,136,85,0.3);margin-bottom:6px;}
-.freq-value{font-size:38px;letter-spacing:3px;color:rgba(170,136,85,0.75);text-shadow:0 0 20px rgba(170,136,85,0.3);}
-.unit{font-size:10px;letter-spacing:4px;color:rgba(170,136,85,0.2);margin-top:4px;}
-.source-block{position:absolute;right:100px;top:50%;transform:translateY(-50%);text-align:right;}
-.source-value{font-size:16px;letter-spacing:4px;color:rgba(170,136,85,0.45);margin-top:6px;}
-.frags{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;}
-.frag{position:absolute;font-size:10px;letter-spacing:2px;color:rgba(170,136,85,0.18);white-space:nowrap;}
-@keyframes fragFade{0%,100%{opacity:0}15%,85%{opacity:1}}
-.bottom-bar{position:absolute;bottom:56px;left:100px;right:100px;display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:4px;color:rgba(170,136,85,0.3);}
-.sig-bars{display:flex;gap:3px;align-items:flex-end;}
-.sig-bar{width:4px;background:rgba(170,136,85,0.6);}
-@keyframes barP{from{opacity:0.2}to{opacity:0.9}}
+
+/* .kan- プレフィックス付き固有クラス群(受付フロント構成: 上部=室内帯画像/下部=カウンターデスク) */
+.kan-photo-band{position:absolute;top:0;left:0;width:1920px;height:412px;background-image:url('assets/kanrinin-room-9x16.png');background-size:cover;background-position:center 20%;background-repeat:no-repeat;z-index:1;}
+.kan-photo-fade{position:absolute;top:320px;left:0;width:1920px;height:92px;background:linear-gradient(180deg,rgba(0,0,0,0) 0%,#050300 100%);z-index:2;}
+.kan-header{position:absolute;top:36px;left:60px;font-size:13px;letter-spacing:9px;color:rgba(170,136,85,0.75);z-index:6;text-transform:uppercase;text-shadow:0 2px 6px rgba(0,0,0,0.8);}
+.kan-desk{position:absolute;top:412px;left:0;width:1920px;height:668px;background:linear-gradient(180deg,#0e0906,#050300);border-top:2px solid rgba(170,136,85,0.4);z-index:3;display:flex;}
+.kan-diary-pane{width:900px;height:100%;padding:56px 60px;position:relative;border-right:1px solid rgba(170,136,85,0.25);}
+.kan-diary-page{background:linear-gradient(180deg,#e4d2aa,#d9c491);color:#241705;padding:36px 40px;min-height:420px;box-shadow:0 10px 30px rgba(0,0,0,0.5);font-family:'Yu Mincho','Hiragino Mincho ProN',serif;}
+.kan-diary-title{font-size:14px;letter-spacing:4px;opacity:0.7;margin-bottom:18px;}
+.kan-diary-line{font-size:20px;line-height:2.1;min-height:44px;}
+.kan-keybox-pane{width:520px;height:100%;padding:56px 40px;}
+.kan-keybox-title{font-size:12px;letter-spacing:4px;color:rgba(170,136,85,0.6);margin-bottom:18px;}
+.kan-keybox-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:440px;}
+.kan-keyslot{width:96px;height:60px;background:linear-gradient(180deg,rgba(170,136,85,0.14),rgba(170,136,85,0.04));border:1px solid rgba(170,136,85,0.4);position:relative;}
+.kan-keyslot::after{content:'';position:absolute;top:50%;left:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:rgba(170,136,85,0.5);}
+.kan-keyslot.is-lit::after{background:#ffcc55;box-shadow:0 0 10px rgba(255,204,85,0.9);}
+.kan-bell-pane{width:500px;height:100%;padding:56px 40px;border-left:1px solid rgba(170,136,85,0.25);}
+.kan-bell-title{font-size:12px;letter-spacing:4px;color:rgba(170,136,85,0.6);margin-bottom:18px;}
+.kan-bell-icon{width:88px;height:88px;margin:0 auto 20px;border-radius:50%;background:radial-gradient(circle,rgba(255,60,40,0.85),rgba(120,10,0,0.15));box-shadow:0 0 24px rgba(255,60,40,0.5);animation:kanBellIdle 2.6s ease-in-out infinite;}
+@keyframes kanBellIdle{0%,100%{opacity:0.5;}50%{opacity:0.9;}}
+.kan-bell-counter{text-align:center;font-size:38px;letter-spacing:3px;color:#aa8855;}
+.kan-bell-counter-label{text-align:center;font-size:11px;letter-spacing:3px;color:rgba(170,136,85,0.5);margin-top:8px;}
+canvas.kan-dust-canvas{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:5;pointer-events:none;}
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
-<div class="scanlines"></div>
-<div class="ui">
-  <div class="corner corner--tl"></div><div class="corner corner--tr"></div>
-  <div class="corner corner--bl"></div><div class="corner corner--br"></div>
-  <div class="top-bar">KYOUKAI &nbsp;/&nbsp; 管理人室 &nbsp;──&nbsp; 管理 継続中</div>
-  <div class="rec"><div class="rec-dot"></div>REC</div>
-  <div class="freq-block">
-    <div class="label">入室番号</div>
-    <div class="freq-value" id="freq">----.---</div>
-    <div class="unit">────</div>
+<div class="kan-photo-band"></div>
+<div class="kan-photo-fade"></div>
+<canvas class="kan-dust-canvas" id="kan-dust"></canvas>
+<div class="kan-header">KYOUKAI // 管理人室 // 受付</div>
+<div class="kan-desk">
+  <div class="kan-diary-pane">
+    <div class="kan-diary-page">
+      <div class="kan-diary-title">管理日誌</div>
+      <div class="kan-diary-line" id="kan-diary-line">── 本日、来訪者なし</div>
+    </div>
   </div>
-  <div class="source-block">
-    <div class="label" style="text-align:right">室内状況</div>
-    <div class="source-value">管理人</div>
+  <div class="kan-keybox-pane">
+    <div class="kan-keybox-title">鍵ボックス</div>
+    <div class="kan-keybox-grid" id="kan-keybox"><div class="kan-keyslot" data-slot="0"></div><div class="kan-keyslot" data-slot="1"></div><div class="kan-keyslot" data-slot="2"></div><div class="kan-keyslot" data-slot="3"></div><div class="kan-keyslot" data-slot="4"></div><div class="kan-keyslot" data-slot="5"></div><div class="kan-keyslot" data-slot="6"></div><div class="kan-keyslot" data-slot="7"></div><div class="kan-keyslot" data-slot="8"></div><div class="kan-keyslot" data-slot="9"></div><div class="kan-keyslot" data-slot="10"></div><div class="kan-keyslot" data-slot="11"></div></div>
   </div>
-  <div class="frags" id="fragsEl"></div>
-  <div class="bottom-bar">
-    <div>管理 継続中</div>
-    <div class="sig-bars" id="barsEl"></div>
-    <div id="ts"></div>
+  <div class="kan-bell-pane">
+    <div class="kan-bell-title">呼び鈴</div>
+    <div class="kan-bell-icon"></div>
+    <div class="kan-bell-counter" id="kan-bell-count">000</div>
+    <div class="kan-bell-counter-label">応答なし回数</div>
   </div>
 </div>
 <script>
-const canvas=document.getElementById('c');
-const ctx=canvas.getContext('2d');
-canvas.width=1920; canvas.height=1080;
-
-let retrot=0;
-function drawCanvas(){
-  const id=ctx.createImageData(1920,1080); const d=id.data;
-  for(let i=0;i<d.length;i+=4){
-    const on=Math.random()>0.85; const v=on?Math.floor(20+Math.random()*60):0;
-    d[i]=Math.floor(v*0.9); d[i+1]=Math.floor(v*0.7); d[i+2]=Math.floor(v*0.3); d[i+3]=on?180:0;
-  }
-  ctx.putImageData(id,0,0);
-  const scan=Math.floor(retrot*2)%1080;
-  ctx.fillStyle='rgba(255,200,100,0.04)'; ctx.fillRect(0,scan,1920,3);
-  retrot++;
-  requestAnimationFrame(drawCanvas);
+// 天井から差し込む微細な埃(受付の静けさを表現するCanvas演出)
+const dustCanvas=document.getElementById('kan-dust');
+const dustCtx=dustCanvas.getContext('2d');
+dustCanvas.width=1920;dustCanvas.height=1080;
+let dust=Array.from({length:36},()=>({x:Math.random()*1920,y:Math.random()*412,vy:0.15+Math.random()*0.3,r:1+Math.random()*1.5}));
+function drawDust(){
+  dustCtx.clearRect(0,0,1920,1080);
+  dustCtx.fillStyle='rgba(255,240,210,0.5)';
+  dust.forEach(d=>{
+    d.y+=d.vy;
+    if(d.y>412){d.y=0;d.x=Math.random()*1920;}
+    dustCtx.beginPath();
+    dustCtx.arc(d.x,d.y,d.r,0,Math.PI*2);
+    dustCtx.fill();
+  });
+  requestAnimationFrame(drawDust);
 }
-drawCanvas();
+drawDust();
 
-let fv=80+Math.random()*900;
-const freqEl=document.getElementById('freq');
-setInterval(()=>{fv+=(Math.random()-.5)*.5;freqEl.textContent=fv.toFixed(3);},250);
-const fragsEl=document.getElementById('fragsEl');
-  const _f0=document.createElement('div');
-  _f0.className='frag';
-  _f0.textContent="管理人 不在";
-  _f0.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f0);
-  const _f1=document.createElement('div');
-  _f1.className='frag';
-  _f1.textContent="呼び鈴 未応答";
-  _f1.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f1);
-  const _f2=document.createElement('div');
-  _f2.className='frag';
-  _f2.textContent="鍵 管理中";
-  _f2.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f2);
-  const _f3=document.createElement('div');
-  _f3.className='frag';
-  _f3.textContent="消滅の鍵 保管";
-  _f3.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f3);
-  const _f4=document.createElement('div');
-  _f4.className='frag';
-  _f4.textContent="BOOTH 荷物あり";
-  _f4.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f4);
-  const _f5=document.createElement('div');
-  _f5.className='frag';
-  _f5.textContent="日誌 更新済み";
-  _f5.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f5);
-  const _f6=document.createElement('div');
-  _f6.className='frag';
-  _f6.textContent="── いらっしゃい";
-  _f6.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f6);
-  const _f7=document.createElement('div');
-  _f7.className='frag';
-  _f7.textContent="賽銭箱 確認";
-  _f7.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f7);
-  const _f8=document.createElement('div');
-  _f8.className='frag';
-  _f8.textContent="目玉 観測";
-  _f8.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f8);
-  const _f9=document.createElement('div');
-  _f9.className='frag';
-  _f9.textContent="管理日誌 閲覧可";
-  _f9.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f9);
-const barsEl=document.getElementById('barsEl');
-[8,12,18,22,18,14,10,14,20,22,18,12].forEach((h,i)=>{
-  const b=document.createElement('div');b.className='sig-bar';b.style.height=h+'px';
-  b.style.animation=`barP ${(0.3+Math.random()*.8).toFixed(2)}s ease-in-out ${(Math.random()*.4).toFixed(2)}s infinite alternate`;
-  barsEl.appendChild(b);
-});
-const tsEl=document.getElementById('ts');
-setInterval(()=>{tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);},1000);
-tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);
+// 宿帳ページの1行がめくれるように差し替わる
+const DIARY=["── 本日、来訪者なし", "呼び鈴 3回 応答なし", "鍵ボックス 施錠確認済み", "BOOTH荷物 受領済み", "消滅の鍵 保管中", "目玉 異常なし", "賽銭箱 確認済み", "── いらっしゃい、と書きかけてやめた"];
+const diaryEl=document.getElementById('kan-diary-line');
+function nextDiaryLine(){
+  diaryEl.style.transform='rotateX(90deg)';
+  setTimeout(()=>{
+    diaryEl.textContent=DIARY[Math.floor(Math.random()*DIARY.length)];
+    diaryEl.style.transform='rotateX(0deg)';
+  },260);
+}
+diaryEl.style.transition='transform 0.26s ease';
+diaryEl.style.transformOrigin='top center';
+setInterval(nextDiaryLine,3200);
+
+// 鍵ボックスの格子が1マスずつランダムに点灯する
+const slots=document.querySelectorAll('.kan-keyslot');
+function litRandomSlot(){
+  slots.forEach(s=>s.classList.remove('is-lit'));
+  const idx=Math.floor(Math.random()*slots.length);
+  slots[idx].classList.add('is-lit');
+}
+setInterval(litRandomSlot,1400);
+litRandomSlot();
+
+// 呼び鈴の応答なしカウンターが増え続ける
+const bellCountEl=document.getElementById('kan-bell-count');
+let bellCount=0;
+setInterval(()=>{
+  bellCount+=1;
+  bellCountEl.textContent=String(bellCount).padStart(3,'0');
+},2600);
 </script>
 </body>
 </html>

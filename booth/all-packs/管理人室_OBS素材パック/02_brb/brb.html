@@ -6,75 +6,69 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:1920px;height:1080px;background:#050300;overflow:hidden;font-family:'Courier New',monospace;color:#aa8855;}
+
+/* .kan- プレフィックス付き固有クラス群(waitingとは骨格が異なる: 揺れる立て札+vignette明滅の目玉) */
+.kan-brb-stage{position:absolute;inset:0;width:1920px;height:1080px;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.kan-brb-sign{padding:20px 44px;background:linear-gradient(180deg,#2a1c0e,#140c04);border:2px solid rgba(170,136,85,0.6);color:#aa8855;font-size:28px;letter-spacing:6px;box-shadow:0 0 30px rgba(170,136,85,0.3);animation:kanSignSway 3.2s ease-in-out infinite;transform-origin:top center;}
+@keyframes kanSignSway{0%,100%{transform:rotate(-2.5deg);}50%{transform:rotate(2.5deg);}}
+.kan-brb-msg{margin-top:36px;font-size:20px;letter-spacing:4px;color:#aa8855;text-shadow:0 0 14px rgba(170,136,85,0.5);min-height:32px;opacity:0.85;}
 canvas{position:absolute;top:0;left:0;width:1920px;height:1080px;}
-.vignette{position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse 55% 55% at 50% 50%,rgba(0,0,0,.85) 0%,rgba(0,0,0,.5) 50%,transparent 100%);z-index:5;}
-.scanlines{position:absolute;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,.15) 3px,rgba(0,0,0,.15) 4px);z-index:20;}
-.ui{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.corner{position:absolute;width:36px;height:36px;}
-.corner--tl{top:48px;left:48px;border-top:1px solid rgba(170,136,85,.4);border-left:1px solid rgba(170,136,85,.4);}
-.corner--tr{top:48px;right:48px;border-top:1px solid rgba(170,136,85,.4);border-right:1px solid rgba(170,136,85,.4);}
-.corner--bl{bottom:48px;left:48px;border-bottom:1px solid rgba(170,136,85,.4);border-left:1px solid rgba(170,136,85,.4);}
-.corner--br{bottom:48px;right:48px;border-bottom:1px solid rgba(170,136,85,.4);border-right:1px solid rgba(170,136,85,.4);}
-.sig-lost{font-size:11px;letter-spacing:8px;color:rgba(170,136,85,.3);margin-bottom:48px;text-transform:uppercase;}
-.main-msg{font-size:48px;letter-spacing:8px;color:rgba(170,136,85,.85);text-shadow:0 0 30px rgba(170,136,85,.4);text-align:center;animation:glitch 8s ease-in-out infinite;}
-@keyframes glitch{0%,90%,100%{transform:translate(0,0)}91%{transform:translate(-3px,1px)}92%{transform:translate(3px,-1px)}93%{transform:translate(0,0)}}
-.cursor{display:inline-block;width:28px;height:4px;background:rgba(170,136,85,.7);vertical-align:middle;margin-left:10px;animation:cb 1s step-end infinite;}
-@keyframes cb{0%,100%{opacity:1}50%{opacity:0}}
-.status{margin-top:36px;font-size:13px;letter-spacing:5px;color:rgba(170,136,85,.4);text-align:center;min-height:20px;transition:opacity .5s;}
-.meter{margin-top:56px;display:flex;align-items:center;gap:16px;font-size:10px;letter-spacing:4px;color:rgba(170,136,85,.25);}
-.meter-bars{display:flex;gap:3px;align-items:flex-end;}
-.meter-bar{width:5px;background:rgba(170,136,85,.4);}
-@keyframes mb{from{opacity:.15;background:rgba(170,136,85,.3)}to{opacity:.7;background:rgba(170,136,85,.7)}}
-.bottom-label{position:absolute;bottom:56px;left:0;right:0;text-align:center;font-size:10px;letter-spacing:6px;color:rgba(170,136,85,.2);}
+canvas#kan-brb-bg{z-index:1;}
+canvas#kan-brb-eye{z-index:9;pointer-events:none;}
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
-<div class="vignette"></div><div class="scanlines"></div>
-<div class="ui">
-  <div class="corner corner--tl"></div><div class="corner corner--tr"></div>
-  <div class="corner corner--bl"></div><div class="corner corner--br"></div>
-  <div class="sig-lost">── SIGNAL INTERRUPTED ──</div>
-  <div class="main-msg">管理人は席を外しています<span class="cursor"></span></div>
-  <div class="status" id="status"></div>
-  <div class="meter">
-    <span>SIGNAL</span>
-    <div class="meter-bars" id="mbars"></div>
-    <span id="spct">──%</span>
-  </div>
-  <div class="bottom-label">しばらくお待ちください</div>
+<canvas id="kan-brb-bg"></canvas>
+<canvas id="kan-brb-eye"></canvas>
+<div class="kan-brb-stage">
+  <div class="kan-brb-sign">席を外しています</div>
+  <div class="kan-brb-msg" id="kan-msg"></div>
 </div>
 <script>
-const canvas=document.getElementById('c');
-const ctx=canvas.getContext('2d');
-canvas.width=1920;canvas.height=1080;
-let gf=0;
+const bgCanvas=document.getElementById('kan-brb-bg');
+const bgCtx=bgCanvas.getContext('2d');
+bgCanvas.width=1920;bgCanvas.height=1080;
 function draw(){
-  const id=ctx.createImageData(1920,1080);const d=id.data;
-  for(let i=0;i<d.length;i+=4){
-    const on=Math.random()>.82;const v=on?Math.floor(20+Math.random()*50):0;
-    d[i]=Math.floor(v*.3);d[i+1]=Math.floor(v*.6);d[i+2]=v;d[i+3]=on?200:0;
-  }
-  ctx.putImageData(id,0,0);
-  if(gf>0){gf--;const y=Math.floor(Math.random()*1080);const h=Math.floor(Math.random()*12)+2;
-    try{const seg=ctx.getImageData(0,y,1920,h);ctx.putImageData(seg,Math.floor((Math.random()-.5)*60),y);}catch(e){}}
+  bgCtx.clearRect(0,0,1920,1080);
+  bgCtx.fillStyle='rgba(170,136,85,0.02)';
+  bgCtx.fillRect(0,0,1920,1080);
   requestAnimationFrame(draw);
 }
 draw();
-setInterval(()=>{if(Math.random()<.3)gf=Math.floor(Math.random()*8)+3;},2000);
-const msgs=["管理人を呼んでいます", "呼び鈴を鳴らしています", "管理人は席を外しています", "日誌を確認中です", "しばらくお待ちください"];
-let si=0;const stEl=document.getElementById('status');
-function cycle(){stEl.style.opacity=0;setTimeout(()=>{stEl.textContent=msgs[si%msgs.length];stEl.style.opacity=1;si++;},400);}
-cycle();setInterval(cycle,3500);
-const mb=document.getElementById('mbars');
-[4,6,10,14,18,14,10,6,4].forEach((h,i)=>{
-  const b=document.createElement('div');b.className='meter-bar';b.style.height=h+'px';
-  b.style.animation=`mb ${(.4+Math.random()*.6).toFixed(2)}s ease-in-out ${(i*.06).toFixed(2)}s infinite alternate`;
-  mb.appendChild(b);
-});
-const sp=document.getElementById('spct');
-let sv=8+Math.random()*15;
-setInterval(()=>{sv+=(Math.random()-.5)*8;sv=Math.max(0,Math.min(35,sv));sp.textContent=Math.floor(sv)+'%';},500);
+
+// 目玉がvignette状にうっすら透ける明滅(本体kanrinin.cssの.kanrinin-eye-gapギミックを踏襲)
+const eyeCanvas=document.getElementById('kan-brb-eye');
+const eyeCtx=eyeCanvas.getContext('2d');
+eyeCanvas.width=1920;eyeCanvas.height=1080;
+let eyeT=0;
+function drawEye(){
+  eyeCtx.clearRect(0,0,1920,1080);
+  const cycle=(eyeT%320)/320;
+  const reveal=cycle>0.82?(cycle-0.82)/0.18:0;
+  if(reveal>0){
+    const grad=eyeCtx.createRadialGradient(960,420,10,960,420,140);
+    grad.addColorStop(0,'rgba(170,136,85,'+(0.5*reveal)+')');
+    grad.addColorStop(0.7,'rgba(170,136,85,'+(0.15*reveal)+')');
+    grad.addColorStop(1,'rgba(170,136,85,0)');
+    eyeCtx.fillStyle=grad;
+    eyeCtx.beginPath();
+    eyeCtx.ellipse(960,420,140,84,0,0,Math.PI*2);
+    eyeCtx.fill();
+  }
+  eyeT+=1;
+  requestAnimationFrame(drawEye);
+}
+drawEye();
+
+const LINES=["管理人を呼んでいます", "呼び鈴を鳴らしています", "管理人は席を外しています", "日誌を確認中です", "しばらくお待ちください"];
+const msgEl=document.getElementById('kan-msg');
+function showLine(){
+  msgEl.textContent=LINES[Math.floor(Math.random()*LINES.length)];
+  msgEl.style.opacity='1';
+  setTimeout(()=>{msgEl.style.opacity='0';},2200);
+}
+msgEl.style.transition='opacity 0.5s ease';
+setInterval(showLine,4000);
 </script>
 </body>
 </html>

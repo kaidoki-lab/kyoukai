@@ -6,149 +6,82 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:1920px;height:1080px;background:#040200;overflow:hidden;font-family:'Courier New',monospace;color:#ffdd00;}
-canvas{position:absolute;top:0;left:0;width:1920px;height:1080px;}
-.scanlines{position:absolute;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,0.12) 3px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:20;}
-.ui{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:10;}
-.corner{position:absolute;width:36px;height:36px;}
-.corner--tl{top:48px;left:48px;border-top:1px solid #ffdd00;border-left:1px solid #ffdd00;opacity:.5;}
-.corner--tr{top:48px;right:48px;border-top:1px solid #ffdd00;border-right:1px solid #ffdd00;opacity:.5;}
-.corner--bl{bottom:48px;left:48px;border-bottom:1px solid #ffdd00;border-left:1px solid #ffdd00;opacity:.5;}
-.corner--br{bottom:48px;right:48px;border-bottom:1px solid #ffdd00;border-right:1px solid #ffdd00;opacity:.5;}
-.top-bar{position:absolute;top:54px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:8px;color:rgba(255,221,0,0.35);text-transform:uppercase;}
-.rec{position:absolute;top:50px;right:100px;display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:4px;color:rgba(255,221,0,0.5);}
-.rec-dot{width:7px;height:7px;border-radius:50%;background:#ffdd00;box-shadow:0 0 6px #ffdd00;animation:blink 1.4s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
-.freq-block{position:absolute;left:100px;top:50%;transform:translateY(-50%);}
-.label{font-size:10px;letter-spacing:4px;color:rgba(255,221,0,0.3);margin-bottom:6px;}
-.freq-value{font-size:38px;letter-spacing:3px;color:rgba(255,221,0,0.75);text-shadow:0 0 20px rgba(255,221,0,0.3);}
-.unit{font-size:10px;letter-spacing:4px;color:rgba(255,221,0,0.2);margin-top:4px;}
-.source-block{position:absolute;right:100px;top:50%;transform:translateY(-50%);text-align:right;}
-.source-value{font-size:16px;letter-spacing:4px;color:rgba(255,221,0,0.45);margin-top:6px;}
-.frags{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;}
-.frag{position:absolute;font-size:10px;letter-spacing:2px;color:rgba(255,221,0,0.18);white-space:nowrap;}
-@keyframes fragFade{0%,100%{opacity:0}15%,85%{opacity:1}}
-.bottom-bar{position:absolute;bottom:56px;left:100px;right:100px;display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:4px;color:rgba(255,221,0,0.3);}
-.sig-bars{display:flex;gap:3px;align-items:flex-end;}
-.sig-bar{width:4px;background:rgba(255,221,0,0.6);}
-@keyframes barP{from{opacity:0.2}to{opacity:0.9}}
+
+/* .mat- プレフィックス付き固有クラス群(祭り画面: 棒・穴・御幣・紙吹雪を配置) */
+.mat-stage{position:absolute;inset:0;width:1920px;height:1080px;background:radial-gradient(ellipse at 50% 30%,#1a1004 0%,#040200 70%);}
+.mat-label{position:absolute;top:64px;left:0;width:100%;text-align:center;font-size:13px;letter-spacing:9px;color:rgba(255,221,0,0.6);z-index:6;text-transform:uppercase;}
+.mat-hole{position:absolute;left:50%;bottom:120px;width:260px;height:160px;margin-left:-130px;background:url('assets/10_hole_main.png') center/contain no-repeat;z-index:3;filter:drop-shadow(0 0 30px rgba(255,221,0,0.3));}
+.mat-pole{position:absolute;left:50%;bottom:220px;width:120px;height:560px;margin-left:-60px;background:url('assets/06_pole_main.png') center/contain no-repeat;z-index:4;transform-origin:bottom center;animation:matPoleSway 2.6s ease-in-out infinite;}
+@keyframes matPoleSway{0%,100%{transform:rotate(-2deg);}50%{transform:rotate(2deg);}}
+.mat-gohei{position:absolute;top:120px;left:120px;width:100px;height:180px;background:url('assets/16_gohei.png') center/contain no-repeat;z-index:5;opacity:0.85;}
+.mat-gohei--right{left:auto;right:120px;}
+.mat-counter{position:absolute;top:64px;right:96px;font-size:12px;letter-spacing:3px;color:rgba(255,221,0,0.5);z-index:6;}
+.mat-voice-log{position:absolute;bottom:80px;left:0;width:100%;text-align:center;font-size:26px;letter-spacing:6px;color:#ffdd00;z-index:6;min-height:36px;text-shadow:0 0 16px rgba(255,221,0,0.6);}
+.mat-confetti-layer{position:absolute;inset:0;z-index:7;pointer-events:none;overflow:hidden;}
+.mat-confetti-piece{position:absolute;top:-40px;width:26px;height:26px;background:url('assets/20_confetti_mix1.png') center/contain no-repeat;animation:matConfettiFall linear forwards;}
+@keyframes matConfettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1;}100%{transform:translateY(1120px) rotate(360deg);opacity:0;}}
+canvas.mat-spark-canvas{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:2;pointer-events:none;}
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
-<div class="scanlines"></div>
-<div class="ui">
-  <div class="corner corner--tl"></div><div class="corner corner--tr"></div>
-  <div class="corner corner--bl"></div><div class="corner corner--br"></div>
-  <div class="top-bar">KYOUKAI &nbsp;/&nbsp; 棒入れ祭 &nbsp;──&nbsp; 奉納 進行中</div>
-  <div class="rec"><div class="rec-dot"></div>REC</div>
-  <div class="freq-block">
-    <div class="label">奉納回数</div>
-    <div class="freq-value" id="freq">----.---</div>
-    <div class="unit">────</div>
-  </div>
-  <div class="source-block">
-    <div class="label" style="text-align:right">状況</div>
-    <div class="source-value">参拝者</div>
-  </div>
-  <div class="frags" id="fragsEl"></div>
-  <div class="bottom-bar">
-    <div>奉納 進行中</div>
-    <div class="sig-bars" id="barsEl"></div>
-    <div id="ts"></div>
-  </div>
-</div>
+<div class="mat-stage"></div>
+<canvas class="mat-spark-canvas" id="mat-spark"></canvas>
+<div class="mat-label">KYOUKAI // 棒入れ祭</div>
+<div class="mat-counter" id="mat-counter">奉納回数 0</div>
+<div class="mat-gohei"></div>
+<div class="mat-gohei mat-gohei--right"></div>
+<div class="mat-hole"></div>
+<div class="mat-pole"></div>
+<div class="mat-voice-log" id="mat-voice"></div>
+<div class="mat-confetti-layer" id="mat-confetti"></div>
 <script>
-const canvas=document.getElementById('c');
-const ctx=canvas.getContext('2d');
-canvas.width=1920; canvas.height=1080;
-
-let sparks=[]; let festt=0;
-function spawnSpark(){
-  for(let i=0;i<3;i++) sparks.push({
-    x:Math.random()*1920, y:Math.random()*1080,
-    vx:(Math.random()-0.5)*3, vy:-1-Math.random()*3,
-    life:60+Math.random()*80, maxLife:0, r:2+Math.random()*4
-  });
+const sparkCanvas=document.getElementById('mat-spark');
+const sparkCtx=sparkCanvas.getContext('2d');
+sparkCanvas.width=1920;sparkCanvas.height=1080;
+let sparkParticles=[];
+function spawnAmbientSpark(){
+  sparkParticles.push({x:Math.random()*1920,y:1080,vx:(Math.random()-0.5)*1.2,vy:-2-Math.random()*2,life:60});
 }
-spawnSpark(); setInterval(spawnSpark,300);
-function drawCanvas(){
-  ctx.clearRect(0,0,1920,1080);
-  ctx.fillStyle='rgba(0,0,0,0.08)'; ctx.fillRect(0,0,1920,1080);
-  sparks=sparks.filter(s=>s.life>0);
-  sparks.forEach(s=>{
-    s.x+=s.vx; s.y+=s.vy; s.vy+=0.05; s.life--;
-    const alpha=s.life/100;
-    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-    ctx.fillStyle=`rgba(255,221,0,${alpha})`; ctx.fill();
+function drawAmbientSparks(){
+  sparkCtx.clearRect(0,0,1920,1080);
+  sparkParticles.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.life-=1;
+    sparkCtx.globalAlpha=Math.max(0,p.life/60);
+    sparkCtx.fillStyle='#ffcc55';
+    sparkCtx.fillRect(p.x,p.y,2,2);
   });
-  festt++;
-  requestAnimationFrame(drawCanvas);
+  sparkCtx.globalAlpha=1;
+  sparkParticles=sparkParticles.filter(p=>p.life>0);
+  requestAnimationFrame(drawAmbientSparks);
 }
-drawCanvas();
+drawAmbientSparks();
+setInterval(spawnAmbientSpark,300);
 
-let fv=80+Math.random()*900;
-const freqEl=document.getElementById('freq');
-setInterval(()=>{fv+=(Math.random()-.5)*.5;freqEl.textContent=fv.toFixed(3);},250);
-const fragsEl=document.getElementById('fragsEl');
-  const _f0=document.createElement('div');
-  _f0.className='frag';
-  _f0.textContent="奉納を開始";
-  _f0.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f0);
-  const _f1=document.createElement('div');
-  _f1.className='frag';
-  _f1.textContent="ヨイショ ──";
-  _f1.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f1);
-  const _f2=document.createElement('div');
-  _f2.className='frag';
-  _f2.textContent="まだ足りない";
-  _f2.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f2);
-  const _f3=document.createElement('div');
-  _f3.className='frag';
-  _f3.textContent="後退した";
-  _f3.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f3);
-  const _f4=document.createElement('div');
-  _f4.className='frag';
-  _f4.textContent="もう少し";
-  _f4.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f4);
-  const _f5=document.createElement('div');
-  _f5.className='frag';
-  _f5.textContent="観衆の声";
-  _f5.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f5);
-  const _f6=document.createElement('div');
-  _f6.className='frag';
-  _f6.textContent="紙吹雪 飛散";
-  _f6.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f6);
-  const _f7=document.createElement('div');
-  _f7.className='frag';
-  _f7.textContent="── 頑張れ";
-  _f7.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f7);
-  const _f8=document.createElement('div');
-  _f8.className='frag';
-  _f8.textContent="奉納完了 間近";
-  _f8.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f8);
-  const _f9=document.createElement('div');
-  _f9.className='frag';
-  _f9.textContent="ヨイショーー！";
-  _f9.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f9);
-const barsEl=document.getElementById('barsEl');
-[8,12,18,22,18,14,10,14,20,22,18,12].forEach((h,i)=>{
-  const b=document.createElement('div');b.className='sig-bar';b.style.height=h+'px';
-  b.style.animation=`barP ${(0.3+Math.random()*.8).toFixed(2)}s ease-in-out ${(Math.random()*.4).toFixed(2)}s infinite alternate`;
-  barsEl.appendChild(b);
-});
-const tsEl=document.getElementById('ts');
-setInterval(()=>{tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);},1000);
-tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);
+const VOICES=["ヨイショ！", "ヨイショー！", "オイサ！", "エンヤ！", "ソレ！", "押せー！"];
+const voiceEl=document.getElementById('mat-voice');
+const counterEl=document.getElementById('mat-counter');
+const confettiLayer=document.getElementById('mat-confetti');
+let count=0;
+function showVoice(){
+  voiceEl.textContent=VOICES[Math.floor(Math.random()*VOICES.length)];
+  voiceEl.style.opacity='1';
+  count+=1;
+  counterEl.textContent='奉納回数 '+count;
+  setTimeout(()=>{voiceEl.style.opacity='0';},1400);
+}
+voiceEl.style.transition='opacity 0.4s ease';
+setInterval(showVoice,2600);
+
+function spawnConfetti(){
+  const piece=document.createElement('div');
+  piece.className='mat-confetti-piece';
+  piece.style.left=(Math.random()*100)+'%';
+  const dur=2.2+Math.random()*1.6;
+  piece.style.animationDuration=dur+'s';
+  confettiLayer.appendChild(piece);
+  setTimeout(()=>piece.remove(),(dur+0.3)*1000);
+}
+setInterval(spawnConfetti,450);
 </script>
 </body>
 </html>

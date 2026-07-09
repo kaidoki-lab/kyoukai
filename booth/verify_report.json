@@ -238,7 +238,7 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 20
       }
     },
     "brb": {
@@ -305,7 +305,7 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 2
       }
     },
     "lower_third": {
