@@ -1374,6 +1374,10 @@ async def matsuri_room(request: Request) -> HTMLResponse:
 async def namahage_room(request: Request) -> HTMLResponse:
     return render_template(request, "namahage.html")
 
+@app.get("/avatar/namahage", response_class=HTMLResponse)
+async def namahage_avatar(request: Request) -> HTMLResponse:
+    return render_template(request, "namahage-avatar.html")
+
 @app.get("/dot-hanabi", response_class=HTMLResponse)
 async def dot_hanabi_room(request: Request) -> HTMLResponse:
     return render_template(request, "dot-hanabi.html")
