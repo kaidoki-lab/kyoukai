@@ -13,7 +13,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Render all post target room shorts.")
     parser.add_argument("--run-id", default="最新", help='run_id or "最新"')
     parser.add_argument("--duration", type=int, default=15, help="max duration seconds")
-    parser.add_argument("--start", type=float, default=0, help="start offset seconds")
+    parser.add_argument("--start", type=float, default=1, help="start offset seconds")
     parser.add_argument("--no-auto-record", action="store_true", help="do not record missing rooms")
     args = parser.parse_args()
 
@@ -24,6 +24,7 @@ def main() -> int:
         duration=min(args.duration, 15),
         start=args.start,
         auto_record=not args.no_auto_record,
+        flat_output=True,
     )
     success = sum(1 for item in results if item["status"] == "success")
     failed = sum(1 for item in results if item["status"] == "failed")

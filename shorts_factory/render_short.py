@@ -348,12 +348,12 @@ def run_rooms(
     duration: int,
     start: float,
     auto_record: bool,
-    flat_single_output: bool = False,
+    flat_output: bool = False,
 ) -> tuple[list[dict[str, Any]], tuple[Path, Path]]:
     results = []
     for room_id in room_ids:
         print(f"RENDER room={room_id}")
-        final_output = OUTPUT_SHORTS / f"{room_id}_short.mp4" if flat_single_output and len(room_ids) == 1 else None
+        final_output = OUTPUT_SHORTS / f"{room_id}_short.mp4" if flat_output else None
         result = render_one(
             room_id,
             run_id,
@@ -396,7 +396,7 @@ def main() -> int:
         duration=min(args.duration, 15),
         start=args.start,
         auto_record=not args.no_auto_record,
-        flat_single_output=not args.all,
+        flat_output=True,
     )
     success = sum(1 for item in results if item["status"] == "success")
     failed = sum(1 for item in results if item["status"] == "failed")
