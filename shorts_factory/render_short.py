@@ -461,18 +461,10 @@ def create_remix(
         return {"status": "failed", "output_video": "", "errors": ["リミックス結合に失敗しました。"]}
 
     output = output_dir / "kyoukai_remix_001.mp4"
-    font = choose_font()
-    fontfile = str(font).replace("\\", "/").replace(":", "\\:")
-    remix_caption = output.with_suffix(".caption.txt")
-    remix_caption.write_text("まだ開いてる\n部屋がある", encoding="utf-8")
     video_filter = (
         "scale=1080:1920:force_original_aspect_ratio=increase,"
         "crop=1080:1920,"
-        "format=yuv420p,"
-        f"drawtext=fontfile='{fontfile}':textfile='{escape_filter_path(remix_caption)}':"
-        "fontsize=58:fontcolor=white:borderw=4:bordercolor=black:"
-        "box=1:boxcolor=black@0.45:boxborderw=28:"
-        "line_spacing=12:x=(w-text_w)/2:y=150"
+        "format=yuv420p"
     )
     command = [str(FFMPEG), "-y", "-i", str(joined)]
     if with_bgm:
