@@ -142,6 +142,8 @@ def render_video(source: Path, output: Path, caption: str, duration: int, start:
     command = [
         str(FFMPEG),
         "-y",
+        "-stream_loop",
+        "-1",
         "-ss",
         str(start),
         "-t",
@@ -182,8 +184,9 @@ def render_one(
     room_id: str,
     run_id: str,
     duration: int = 15,
-    start: float = 0,
+    start: float = 1,
     auto_record: bool = True,
+    final_output: Path | None = None,
 ) -> dict[str, Any]:
     info = load_room_info(room_id)
     if not info.get("post_target"):
@@ -214,7 +217,7 @@ def render_one(
             "warnings": [],
         }
 
-    output = OUTPUT_SHORTS / run_id / f"{room_id}.mp4"
+    output = final_output or OUTPUT_SHORTS / run_id / f"{room_id}.mp4"
     try:
         render_video(recording, output, caption, duration, start)
     except Exception as exc:
@@ -339,11 +342,26 @@ def write_room_report(run_id: str, result: dict[str, Any]) -> tuple[Path, Path]:
     return json_path, md_path
 
 
-def run_rooms(room_ids: list[str], run_id: str, duration: int, start: float, auto_record: bool) -> tuple[list[dict[str, Any]], tuple[Path, Path]]:
+def run_rooms(
+    room_ids: list[str],
+    run_id: str,
+    duration: int,
+    start: float,
+    auto_record: bool,
+    flat_single_output: bool = False,
+) -> tuple[list[dict[str, Any]], tuple[Path, Path]]:
     results = []
     for room_id in room_ids:
         print(f"RENDER room={room_id}")
-        result = render_one(room_id, run_id, duration=duration, start=start, auto_record=auto_record)
+        final_output = OUTPUT_SHORTS / f"{room_id}_short.mp4" if flat_single_output and len(room_ids) == 1 else None
+        result = render_one(
+            room_id,
+            run_id,
+            duration=duration,
+            start=start,
+            auto_record=auto_record,
+            final_output=final_output,
+        )
         print(f"  status={result['status']} output={result.get('output_video') or '-'}")
         results.append(result)
         if len(room_ids) == 1:
@@ -359,7 +377,7 @@ def main() -> int:
     parser.add_argument("--room", default="", help="room_id")
     parser.add_argument("--all", action="store_true", help="render all post target rooms")
     parser.add_argument("--duration", type=int, default=15, help="max duration seconds")
-    parser.add_argument("--start", type=float, default=0, help="start offset seconds")
+    parser.add_argument("--start", type=float, default=1, help="start offset seconds")
     parser.add_argument("--no-auto-record", action="store_true", help="do not record missing rooms")
     args = parser.parse_args()
 
@@ -378,6 +396,7 @@ def main() -> int:
         duration=min(args.duration, 15),
         start=args.start,
         auto_record=not args.no_auto_record,
+        flat_single_output=not args.all,
     )
     success = sum(1 for item in results if item["status"] == "success")
     failed = sum(1 for item in results if item["status"] == "failed")
