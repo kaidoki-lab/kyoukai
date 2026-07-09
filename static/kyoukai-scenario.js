@@ -339,6 +339,7 @@
       "post_route_a",
       "post_route_b",
       "post_route_c",
+      "post_route_d",
       "signal_contaminated",
       "observation_signal_received",
       "unregistered_record_visible",
@@ -346,7 +347,12 @@
       "unregistered_container_active",
       "persistent_fragment_visible",
       "route_c_conversation",
-      "persistent_fragment_generation"
+      "persistent_fragment_generation",
+      "collective_reaction_ripple",
+      "shared_reaction_attempt",
+      "low_resolution_reaction",
+      "reaction_amplified_by_repetition",
+      "almost_speaking"
     ].indexOf(roomState) !== -1 || state.unlocked_rooms.indexOf(roomId) !== -1;
   }
 
@@ -625,7 +631,7 @@
     }).filter(Boolean).map(function (entry) {
       return {
         entry_id: entry.entry_id,
-        category: entry.route_id === "route_c" ? "Route_C" : entry.route_id === "route_b" ? "Route_B" : "Route_A",
+        category: entry.route_id === "route_d" ? "Route_D" : entry.route_id === "route_c" ? "Route_C" : entry.route_id === "route_b" ? "Route_B" : "Route_A",
         title: entry.title || "混線している観測",
         body: entry.text
       };

@@ -78,9 +78,39 @@
     failure_requirements: []
   };
 
+  var routeD = {
+    schema_version: 1,
+    route_id: "route_d",
+    name: "集まっているもの",
+    type: "normal",
+    theme: "単品では意味不明なものが、集まると別の反応になる",
+    status_default: "not_started",
+    shared_room_ids: ["kanrinin"],
+    reserved_room_ids: ["ripple", "colony", "dot-art", "matsuri", "namahage"],
+    start_requirements: [
+      { type: "mode_equals", value: "scenario" },
+      { type: "route_status_equals", route_id: "route_a", value: "completed" },
+      { type: "route_status_equals", route_id: "route_b", value: "completed" },
+      { type: "route_status_equals", route_id: "route_c", value: "completed" },
+      { type: "route_status_equals", route_id: "route_d", value: "not_started" },
+      { type: "active_route_equals", value: null },
+      { type: "floor_unlocked", floor_id: "floor_06" }
+    ],
+    completion_requirements: [
+      { type: "event_completed", event_id: "route_d_phone_001" },
+      { type: "event_completed", event_id: "route_d_room_ripple_001" },
+      { type: "event_completed", event_id: "route_d_room_colony_001" },
+      { type: "event_completed", event_id: "route_d_room_dot_art_001" },
+      { type: "event_completed", event_id: "route_d_room_matsuri_001" },
+      { type: "event_completed", event_id: "route_d_room_namahage_001" },
+      { type: "event_completed", event_id: "route_d_manager_return_001" }
+    ],
+    failure_requirements: []
+  };
+
   window.KYOUKAI_SCENARIO_EVENTS = {
-    version: "route-c-v1",
-    routes: [routeA, routeB, routeC],
+    version: "route-d-v1",
+    routes: [routeA, routeB, routeC, routeD],
     phoneEvents: [
       {
         event_id: "route_a_phone_001",
@@ -225,6 +255,60 @@
           { type: "append_diary_entry", entry_id: "route_c_diary_001" }
         ],
         next_events: ["route_c_room_null_001"]
+      },
+      {
+        event_id: "route_d_phone_001",
+        route_id: "route_d",
+        caller_id: "resident_collective_reaction_001",
+        caller_display_name: "複数",
+        caller: "複数",
+        room: "ripple",
+        floor: null,
+        priority: 10,
+        requirements: [
+          { type: "mode_equals", value: "scenario" },
+          { type: "route_status_equals", route_id: "route_a", value: "completed" },
+          { type: "route_status_equals", route_id: "route_b", value: "completed" },
+          { type: "route_status_equals", route_id: "route_c", value: "completed" },
+          { type: "route_status_equals", route_id: "route_d", value: "not_started" },
+          { type: "active_route_equals", value: null },
+          { type: "floor_unlocked", floor_id: "floor_06" },
+          { type: "room_stay_seconds", room_id: "kanrinin", operator: ">=", value: 20 },
+          { type: "room_reentered_after_event", room_id: "kanrinin", after_event_id: "route_c_manager_return_001" },
+          { type: "active_phone_event_equals", value: null },
+          { type: "event_not_completed", event_id: "route_d_phone_001" }
+        ],
+        phone_config: {
+          ring_audio: "/static/audio/kanrinin/red-phone-ring.mp3",
+          retry_enabled: true,
+          retry_trigger: "kanrinin_reentry",
+          retry_interval_seconds: 60
+        },
+        caller_profile: {
+          resident_type: "collective_reaction",
+          home_room_id: null,
+          identity_confirmed: false,
+          resident_number: null,
+          registered: false
+        },
+        conversation: [
+          { speaker: "caller", text: "……あ" },
+          { speaker: "caller", text: "……い" },
+          { speaker: "caller", text: "違う" },
+          { speaker: "caller", text: "まだ" },
+          { speaker: "caller", text: "声では" },
+          { speaker: "caller", text: "集めて" },
+          { speaker: "caller", text: "聞こえる形に" }
+        ],
+        effects: [
+          { type: "set_route_status", route_id: "route_d", value: "active" },
+          { type: "set_active_route", route_id: "route_d" },
+          { type: "complete_event", event_id: "route_d_phone_001" },
+          { type: "enable_event", event_id: "route_d_room_ripple_001" },
+          { type: "set_target_room", room_id: "ripple" },
+          { type: "append_diary_entry", entry_id: "route_d_diary_001" }
+        ],
+        next_events: ["route_d_room_ripple_001"]
       }
     ],
     roomEvents: [
@@ -502,6 +586,151 @@
           { type: "append_diary_entry", entry_id: "route_c_diary_004" }
         ],
         next_events: ["route_c_manager_return_001"]
+      },
+      {
+        event_id: "route_d_room_ripple_001",
+        route_id: "route_d",
+        room_id: "ripple",
+        requirements: [
+          { type: "route_status_equals", route_id: "route_d", value: "active" },
+          { type: "event_completed", event_id: "route_d_phone_001" },
+          { type: "event_enabled", event_id: "route_d_room_ripple_001" },
+          { type: "event_not_completed", event_id: "route_d_room_ripple_001" }
+        ],
+        room_state_before: "normal",
+        room_state_during: "collective_reaction_ripple",
+        room_state_after: "post_route_d",
+        messages: ["一つではない", "同じ場所からでもない", "重なると、音に近づく"],
+        interaction: { target: "route-d-ripple-center", action: "touch", repeatable: false },
+        completion_requirements: [
+          { type: "room_entered", room_id: "ripple" },
+          { type: "interaction_completed", target: "route-d-ripple-center" },
+          { type: "sequence_finished", event_id: "route_d_room_ripple_001" }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_d_room_ripple_001" },
+          { type: "set_room_state", room_id: "ripple", value: "post_route_d" },
+          { type: "enable_event", event_id: "route_d_room_colony_001" },
+          { type: "set_target_room", room_id: "colony" },
+          { type: "append_diary_entry", entry_id: "route_d_diary_002" }
+        ],
+        next_events: ["route_d_room_colony_001"]
+      },
+      {
+        event_id: "route_d_room_colony_001",
+        route_id: "route_d",
+        room_id: "colony",
+        requirements: [
+          { type: "route_status_equals", route_id: "route_d", value: "active" },
+          { type: "event_completed", event_id: "route_d_room_ripple_001" },
+          { type: "event_enabled", event_id: "route_d_room_colony_001" },
+          { type: "event_not_completed", event_id: "route_d_room_colony_001" }
+        ],
+        room_state_before: "normal",
+        room_state_during: "shared_reaction_attempt",
+        room_state_after: "post_route_d",
+        messages: ["同期：不完全", "個体差：残存", "発声：未成立"],
+        interaction: { target: "route-d-colony-core", action: "touch", repeatable: false },
+        completion_requirements: [
+          { type: "room_entered", room_id: "colony" },
+          { type: "interaction_completed", target: "route-d-colony-core" },
+          { type: "sequence_finished", event_id: "route_d_room_colony_001" }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_d_room_colony_001" },
+          { type: "set_room_state", room_id: "colony", value: "post_route_d" },
+          { type: "enable_event", event_id: "route_d_room_dot_art_001" },
+          { type: "set_target_room", room_id: "dot-art" },
+          { type: "append_diary_entry", entry_id: "route_d_diary_003" }
+        ],
+        next_events: ["route_d_room_dot_art_001"]
+      },
+      {
+        event_id: "route_d_room_dot_art_001",
+        route_id: "route_d",
+        room_id: "dot-art",
+        requirements: [
+          { type: "route_status_equals", route_id: "route_d", value: "active" },
+          { type: "event_completed", event_id: "route_d_room_colony_001" },
+          { type: "event_enabled", event_id: "route_d_room_dot_art_001" },
+          { type: "event_not_completed", event_id: "route_d_room_dot_art_001" }
+        ],
+        room_state_before: "normal",
+        room_state_during: "low_resolution_reaction",
+        room_state_after: "post_route_d",
+        messages: ["読めません", "聞こえません", "でも、向きがあります"],
+        interaction: { target: "route-d-dot-art-form", action: "touch", repeatable: false },
+        completion_requirements: [
+          { type: "room_entered", room_id: "dot-art" },
+          { type: "interaction_completed", target: "route-d-dot-art-form" },
+          { type: "sequence_finished", event_id: "route_d_room_dot_art_001" }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_d_room_dot_art_001" },
+          { type: "set_room_state", room_id: "dot-art", value: "post_route_d" },
+          { type: "enable_event", event_id: "route_d_room_matsuri_001" },
+          { type: "set_target_room", room_id: "matsuri" },
+          { type: "append_diary_entry", entry_id: "route_d_diary_004" }
+        ],
+        next_events: ["route_d_room_matsuri_001"]
+      },
+      {
+        event_id: "route_d_room_matsuri_001",
+        route_id: "route_d",
+        room_id: "matsuri",
+        requirements: [
+          { type: "route_status_equals", route_id: "route_d", value: "active" },
+          { type: "event_completed", event_id: "route_d_room_dot_art_001" },
+          { type: "event_enabled", event_id: "route_d_room_matsuri_001" },
+          { type: "event_not_completed", event_id: "route_d_room_matsuri_001" }
+        ],
+        room_state_before: "normal",
+        room_state_during: "reaction_amplified_by_repetition",
+        room_state_after: "post_route_d",
+        messages: ["混ざっています", "揃っていません", "大きくなっています"],
+        interaction: { target: "route-d-matsuri-repeat", action: "repeat", repeatable: false, required_count: 3 },
+        completion_requirements: [
+          { type: "room_entered", room_id: "matsuri" },
+          { type: "interaction_completed", target: "route-d-matsuri-repeat" },
+          { type: "sequence_finished", event_id: "route_d_room_matsuri_001" }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_d_room_matsuri_001" },
+          { type: "set_room_state", room_id: "matsuri", value: "post_route_d" },
+          { type: "enable_event", event_id: "route_d_room_namahage_001" },
+          { type: "set_target_room", room_id: "namahage" },
+          { type: "append_diary_entry", entry_id: "route_d_diary_005" }
+        ],
+        next_events: ["route_d_room_namahage_001"]
+      },
+      {
+        event_id: "route_d_room_namahage_001",
+        route_id: "route_d",
+        room_id: "namahage",
+        requirements: [
+          { type: "route_status_equals", route_id: "route_d", value: "active" },
+          { type: "event_completed", event_id: "route_d_room_matsuri_001" },
+          { type: "event_enabled", event_id: "route_d_room_namahage_001" },
+          { type: "event_not_completed", event_id: "route_d_room_namahage_001" }
+        ],
+        room_state_before: "normal",
+        room_state_during: "almost_speaking",
+        room_state_after: "post_route_d",
+        messages: ["見ています", "開きかけています", "まだ、声ではありません", "戻ってください"],
+        interaction: { target: "route-d-namahage-mouth", action: "hold", repeatable: false },
+        completion_requirements: [
+          { type: "room_entered", room_id: "namahage" },
+          { type: "interaction_completed", target: "route-d-namahage-mouth" },
+          { type: "sequence_finished", event_id: "route_d_room_namahage_001" }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_d_room_namahage_001" },
+          { type: "set_room_state", room_id: "namahage", value: "post_route_d" },
+          { type: "enable_event", event_id: "route_d_manager_return_001" },
+          { type: "set_target_room", room_id: "kanrinin" },
+          { type: "append_diary_entry", entry_id: "route_d_diary_006" }
+        ],
+        next_events: ["route_d_manager_return_001"]
       }
     ],
     managerEvents: [
@@ -611,6 +840,45 @@
           { type: "clear_target_room" },
           { type: "append_diary_entry", entry_id: "route_c_diary_complete" },
           { type: "enable_phone_pool", pool_id: "normal_route_phone_pool" },
+          { type: "enable_event", event_id: "route_d_phone_001" },
+          { type: "set_manager_state", state: "visible" }
+        ],
+        next_events: []
+      },
+      {
+        event_id: "route_d_manager_return_001",
+        route_id: "route_d",
+        room_id: "kanrinin",
+        requirements: [
+          { type: "route_status_equals", route_id: "route_d", value: "active" },
+          { type: "event_completed", event_id: "route_d_room_ripple_001" },
+          { type: "event_completed", event_id: "route_d_room_colony_001" },
+          { type: "event_completed", event_id: "route_d_room_dot_art_001" },
+          { type: "event_completed", event_id: "route_d_room_matsuri_001" },
+          { type: "event_completed", event_id: "route_d_room_namahage_001" },
+          { type: "event_enabled", event_id: "route_d_manager_return_001" },
+          { type: "event_not_completed", event_id: "route_d_manager_return_001" },
+          { type: "room_entered_after_event", room_id: "kanrinin", after_event_id: "route_d_room_namahage_001" }
+        ],
+        manager_state_sequence: ["visible", "visible", "busy", "visible"],
+        conversation: [
+          { speaker: "manager", text: "聞こえましたか" },
+          { speaker: "manager", text: "聞こえなかったなら、それで合っています" },
+          { speaker: "manager", text: "あれはまだ声ではありません" },
+          { speaker: "manager", text: "部屋ごとに残っていた反応を、無理に集めただけです" },
+          { speaker: "manager", text: "一つに見えても、一人とは限りません" },
+          { speaker: "manager", text: "一人に見えなくても、呼んでいるとは限りません" },
+          { speaker: "manager", text: "ここから先は、開けるだけでは進めません" },
+          { speaker: "manager", text: "触ったものが、次の形になります" }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_d_manager_return_001" },
+          { type: "set_route_status", route_id: "route_d", value: "completed" },
+          { type: "set_active_route", route_id: null },
+          { type: "increment_counter", counter_id: "completed_scenario_count", value: 1 },
+          { type: "clear_target_room" },
+          { type: "append_diary_entry", entry_id: "route_d_diary_complete" },
+          { type: "enable_phone_pool", pool_id: "normal_route_phone_pool" },
           { type: "set_manager_state", state: "visible" }
         ],
         next_events: []
@@ -700,6 +968,48 @@
         route_id: "route_c",
         title: "Route_C complete",
         text: "Collapse area and particle structure checked. The object is likely repeated generation, not restoration. Source and disposal remain unknown. Next floor unlocked."
+      },
+      {
+        entry_id: "route_d_diary_001",
+        route_id: "route_d",
+        title: "Route_D 1",
+        text: "複数の発信元を含む着信あり。音声は単一の声として成立していない。波形に伝播反応を確認。波紋を確認する。"
+      },
+      {
+        entry_id: "route_d_diary_002",
+        route_id: "route_d",
+        title: "Route_D 2",
+        text: "波紋内に複数の発生点を確認。波形は単一の震源を持たない。反応は群体領域へ伝播。"
+      },
+      {
+        entry_id: "route_d_diary_003",
+        route_id: "route_d",
+        title: "Route_D 3",
+        text: "群体領域で同期反応を確認。完全な統一には至らず。反応は低解像度の形へ移行。"
+      },
+      {
+        entry_id: "route_d_diary_004",
+        route_id: "route_d",
+        title: "Route_D 4",
+        text: "低解像度の発声形状を確認。文字、顔、音声波形のいずれにも確定せず。反応は反復操作により増幅可能。"
+      },
+      {
+        entry_id: "route_d_diary_005",
+        route_id: "route_d",
+        title: "Route_D 5",
+        text: "祭事操作により反応が増幅。掛け声に電話音声と一致する断片を確認。反応は発声器官を持つ対象へ移動。"
+      },
+      {
+        entry_id: "route_d_diary_006",
+        route_id: "route_d",
+        title: "Route_D 6",
+        text: "なまはげ面に発声直前の反応を確認。口元は開いたが、音声として成立せず。反応の集合は未完了のまま停止。管理人室へ戻る。"
+      },
+      {
+        entry_id: "route_d_diary_complete",
+        route_id: "route_d",
+        title: "Route_D complete",
+        text: "6F各領域で集合反応を確認。波形、群体、低解像度形状、祭事音、面反応は同一現象の断片である可能性あり。音声としては未成立。今後の進行には、開放ではなく接触条件が必要となる。"
       }
     ],
     branchSlots: [
@@ -708,7 +1018,8 @@
       { branch_id: "route_a_signal_alternate", enabled: false, attach_after_event: "route_a_room_signal_001" },
       { branch_id: "route_a_manager_absent", enabled: false, attach_after_event: "route_a_manager_return_001" },
       { branch_id: "route_b_unregistered_repeat", enabled: false, attach_after_event: "route_b_room_archive_001" },
-      { branch_id: "route_c_fragment_repeat", enabled: false, attach_after_event: "route_c_room_null_001" }
+      { branch_id: "route_c_fragment_repeat", enabled: false, attach_after_event: "route_c_room_null_001" },
+      { branch_id: "route_d_collective_repeat", enabled: false, attach_after_event: "route_d_room_ripple_001" }
     ]
   };
 })();

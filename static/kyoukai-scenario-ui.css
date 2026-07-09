@@ -160,3 +160,64 @@ body:has(#stage) .route-c-object {
   62% { opacity: 0.72; filter: blur(1px) hue-rotate(38deg); transform: translate(-50%, -50%) scale(0.82) rotate(18deg); }
   100% { opacity: 0.4; filter: blur(5px) contrast(0.82); transform: translate(-50%, -50%) scale(0.48) rotate(-12deg); }
 }
+
+.route-d-object {
+  position: fixed;
+  z-index: 92;
+  left: 50%;
+  top: 50%;
+  width: min(36vw, 180px);
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(circle, rgba(255,255,255,0.42) 0 2px, transparent 2px 9px),
+    conic-gradient(from 30deg, rgba(255, 69, 69, 0.58), rgba(78, 217, 202, 0.5), rgba(255, 230, 95, 0.48), rgba(255, 69, 69, 0.58));
+  box-shadow: 0 0 34px rgba(255,255,255,0.16), 0 0 42px rgba(78,217,202,0.25), inset 0 0 30px rgba(0,0,0,0.66);
+  cursor: pointer;
+  opacity: 0.84;
+  transform: translate(-50%, -50%) scale(0.94);
+  animation: route-d-gather 2.8s ease-in-out infinite;
+}
+
+.route-d-object--ripple { border-radius: 50%; }
+.route-d-object--colony { border-radius: 38% 62% 48% 52%; }
+.route-d-object--dot-art { image-rendering: pixelated; clip-path: polygon(8% 18%, 92% 18%, 92% 82%, 8% 82%); }
+.route-d-object--matsuri { border-radius: 12px; transform: translate(-50%, -50%) rotate(45deg) scale(0.84); }
+.route-d-object--namahage { border-radius: 44% 44% 54% 54%; clip-path: polygon(50% 2%, 92% 25%, 78% 96%, 50% 86%, 22% 96%, 8% 25%); }
+
+.route-d-object.is-active {
+  animation-duration: 720ms;
+  filter: contrast(1.35) saturate(1.35);
+}
+
+.scenario-line-overlay--route-d {
+  border-color: rgba(255, 230, 95, 0.58);
+  box-shadow: 0 0 30px rgba(255, 230, 95, 0.18), 0 0 18px rgba(78,217,202,0.14);
+}
+
+html[data-route-d-active-room] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 11px, rgba(255,255,255,0.05) 11px 12px),
+    radial-gradient(circle at 50% 50%, rgba(255, 230, 95, 0.12), transparent 48%);
+  mix-blend-mode: screen;
+  animation: route-d-screen-pulse 680ms ease-in-out infinite;
+}
+
+@keyframes route-d-gather {
+  0% { opacity: 0.42; transform: translate(-50%, -50%) scale(0.72) rotate(-8deg); }
+  40% { opacity: 0.94; transform: translate(-50%, -50%) scale(1.05) rotate(5deg); }
+  70% { opacity: 0.66; transform: translate(-50%, -50%) scale(0.86) rotate(-2deg); }
+  100% { opacity: 0.42; transform: translate(-50%, -50%) scale(0.72) rotate(-8deg); }
+}
+
+@keyframes route-d-screen-pulse {
+  0% { opacity: 0.2; transform: translateX(0); }
+  50% { opacity: 0.5; transform: translateX(1px); }
+  100% { opacity: 0.24; transform: translateX(-1px); }
+}

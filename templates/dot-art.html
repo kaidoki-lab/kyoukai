@@ -6,11 +6,14 @@
     <title>Four Edge Dots / KYOUKAI</title>
     <meta name="theme-color" content="#000000" />
     <link rel="stylesheet" href="/static/dot-art.css?v=2" />
+    <link rel="stylesheet" href="/static/kyoukai-scenario-ui.css?v=routed1" />
     <script defer src="/static/analytics.js"></script>
     <script defer src="/static/dot-art.js?v=2"></script>
   </head>
   <body>
+    <script>window.KYOUKAI_ROOM = 'dot-art';</script>
     <canvas id="dotArtCanvas" aria-label="上下左右からドットを発射するインタラクティブ作品"></canvas>
     <button class="sound-toggle" type="button" data-sound-toggle aria-label="音声を切り替える">音</button>
+    <script defer src="/static/kyoukai-route-d-room.js?v=routed1"></script>
   </body>
 </html>
