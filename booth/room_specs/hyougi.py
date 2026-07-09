@@ -67,12 +67,12 @@ html,body{{width:1920px;height:1080px;overflow:hidden;font-family:{_VERTICAL_FON
   repeating-linear-gradient(25deg,rgba(255,255,255,0.01) 0 2px,transparent 2px 7px);
   z-index:1;}}
 .hyo-columns{{position:absolute;inset:0;width:1920px;height:1080px;z-index:5;display:flex;flex-direction:row-reverse;justify-content:center;gap:64px;padding:90px 60px;}}
-.hyo-col{{writing-mode:vertical-rl;text-orientation:mixed;font-size:22px;letter-spacing:6px;line-height:2.4;color:rgba({rgb},0.5);opacity:0;animation:hyoRise 9s ease-in-out infinite;}}
+.hyo-col{{writing-mode:vertical-rl;text-orientation:mixed;font-size:22px;letter-spacing:6px;line-height:2.4;color:rgba({rgb},0.55);opacity:0;animation:hyoRise 9s ease-in-out infinite;}}
 @keyframes hyoRise{{0%,100%{{opacity:0;transform:translateY(20px)}}10%,80%{{opacity:1;transform:translateY(0)}}90%{{opacity:0}}}}
 .hyo-center{{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:6;text-align:center;}}
 .hyo-center-num{{writing-mode:vertical-rl;font-size:64px;letter-spacing:14px;color:rgba({rgb},0.85);text-shadow:0 0 24px rgba({rgb},0.2);}}
-.hyo-center-label{{margin-top:18px;font-size:12px;letter-spacing:8px;color:rgba({rgb},0.4);}}
-.hyo-footer{{position:absolute;bottom:56px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:6px;color:rgba({rgb},0.32);z-index:6;}}
+.hyo-center-label{{margin-top:18px;font-size:12px;letter-spacing:8px;color:rgba({rgb},0.55);}}
+.hyo-footer{{position:absolute;bottom:56px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:6px;color:rgba({rgb},0.35);z-index:6;}}
 canvas{{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:0;}}
 </style>
 </head>
@@ -140,10 +140,10 @@ html,body{{width:1920px;height:1080px;overflow:hidden;font-family:{_VERTICAL_FON
 
 /* .hyo- プレフィックス付き固有クラス群(白紙の議事用紙に時折「──」だけが打たれる。waitingとは全く異なる単一用紙構成) */
 .hyo-paper{{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:640px;height:880px;background:linear-gradient(180deg,rgba(30,26,18,0.5),rgba(10,8,4,0.7));border:1px solid rgba({rgb},0.22);box-shadow:0 0 60px rgba(0,0,0,0.6),inset 0 0 60px rgba(0,0,0,0.4);z-index:5;}}
-.hyo-paper-mark{{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);writing-mode:vertical-rl;font-size:46px;letter-spacing:24px;color:rgba({rgb},0.5);opacity:0;animation:hyoMark 4s ease-in-out infinite;}}
+.hyo-paper-mark{{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);writing-mode:vertical-rl;font-size:46px;letter-spacing:24px;color:rgba({rgb},0.55);opacity:0;animation:hyoMark 4s ease-in-out infinite;}}
 @keyframes hyoMark{{0%,60%{{opacity:0}}68%,88%{{opacity:0.8}}100%{{opacity:0}}}}
-.hyo-paper-label{{position:absolute;top:32px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:8px;color:rgba({rgb},0.35);text-transform:uppercase;}}
-.hyo-footer{{position:absolute;bottom:56px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:6px;color:rgba({rgb},0.3);z-index:6;}}
+.hyo-paper-label{{position:absolute;top:32px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:8px;color:rgba({rgb},0.55);text-transform:uppercase;}}
+.hyo-footer{{position:absolute;bottom:56px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:6px;color:rgba({rgb},0.35);z-index:6;}}
 canvas{{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:0;}}
 </style>
 </head>
@@ -199,13 +199,13 @@ html,body{{width:1920px;height:1080px;background:transparent;overflow:hidden;fon
   <div class="hyo-brush-line"></div>
   <div class="hyo-fuda-plate">
     <span class="hyo-fuda-name" id="name-el">名前</span>
-    <span class="hyo-fuda-title" id="title-el">KYOUKAI</span>
+    <span class="hyo-fuda-title" id="title-el">LIVE</span>
   </div>
 </div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
+document.getElementById('title-el').textContent=p.get('title')||'LIVE';
 </script>
 </body>
 </html>'''

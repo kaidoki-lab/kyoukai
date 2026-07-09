@@ -15,7 +15,7 @@ html,body{width:1920px;height:1080px;background:transparent;overflow:hidden;font
 .obsr-lt-wrap{position:absolute;bottom:86px;left:0;width:100%;display:flex;justify-content:center;}
 .obsr-lt-name{position:relative;font-size:34px;letter-spacing:5px;color:rgba(255,255,255,0.95);padding-bottom:10px;}
 .obsr-lt-pupil-underline{position:absolute;left:50%;bottom:0;width:26px;height:26px;margin-left:-13px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff 0%,#bcbcbc 55%,#050505 100%);box-shadow:0 0 12px rgba(255,255,255,0.6);transition:transform .4s ease;}
-.obsr-lt-title{position:absolute;left:0;bottom:54px;width:100%;text-align:center;font-size:11px;letter-spacing:5px;color:rgba(255,255,255,0.5);}
+.obsr-lt-title{position:absolute;left:0;bottom:54px;width:100%;text-align:center;font-size:11px;letter-spacing:5px;color:rgba(255,255,255,0.55);}
 </style>
 </head>
 <body>
@@ -25,11 +25,11 @@ html,body{width:1920px;height:1080px;background:transparent;overflow:hidden;font
     <div class="obsr-lt-pupil-underline" id="obsr-pupil"></div>
   </div>
 </div>
-<div class="obsr-lt-title" id="title-el">KYOUKAI</div>
+<div class="obsr-lt-title" id="title-el">LIVE</div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
+document.getElementById('title-el').textContent=p.get('title')||'LIVE';
 
 // 瞳孔型下線が視線カーソルのように左右にゆっくり動く(実際のマウス追従は不要な用途のため自律運動)
 const pupil=document.getElementById('obsr-pupil');

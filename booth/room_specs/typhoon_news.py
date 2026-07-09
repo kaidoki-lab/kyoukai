@@ -264,12 +264,12 @@ html,body{{width:1920px;height:1080px;background:transparent;overflow:hidden;fon
     <div class="tpn-lt-logo">KYK</div>
     <div class="tpn-lt-name" id="name-el">名前</div>
   </div>
-  <div class="tpn-lt-row2" id="title-el">KYOUKAI</div>
+  <div class="tpn-lt-row2" id="title-el">LIVE</div>
 </div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
+document.getElementById('title-el').textContent=p.get('title')||'LIVE';
 </script>
 </body>
 </html>'''

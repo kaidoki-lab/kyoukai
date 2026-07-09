@@ -15,18 +15,18 @@ html,body{width:1920px;height:1080px;background:transparent;overflow:hidden;font
 .null-lt-frame{position:absolute;bottom:78px;left:80px;padding:16px 26px;background:rgba(8,0,0,0.55);border:1px solid rgba(255,68,51,0.4);clip-path:polygon(0 0,96% 0,100% 30%,100% 100%,4% 100%,0 70%);animation:nullLtIn .5s ease both;}
 @keyframes nullLtIn{from{opacity:0;transform:translateY(10px) skewX(-2deg)}to{opacity:1;transform:translateY(0) skewX(0)}}
 .null-lt-name{font-size:32px;letter-spacing:2px;color:#ff4433;text-shadow:0 0 12px rgba(255,68,51,0.5);}
-.null-lt-title{position:absolute;left:80px;bottom:52px;font-size:11px;letter-spacing:4px;color:rgba(255,68,51,0.5);}
+.null-lt-title{position:absolute;left:80px;bottom:52px;font-size:11px;letter-spacing:4px;color:rgba(255,68,51,0.55);}
 </style>
 </head>
 <body>
 <div class="null-lt-frame">
   <span class="null-lt-name" id="name-el">名前</span>
 </div>
-<div class="null-lt-title" id="title-el">KYOUKAI</div>
+<div class="null-lt-title" id="title-el">LIVE</div>
 <script>
 const p=new URLSearchParams(window.location.search);
 const origName=p.get('name')||'名前';
-const origTitle=p.get('title')||'KYOUKAI';
+const origTitle=p.get('title')||'LIVE';
 const nameEl=document.getElementById('name-el');
 const titleEl=document.getElementById('title-el');
 nameEl.textContent=origName;

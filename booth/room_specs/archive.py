@@ -58,18 +58,18 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 .arc-shelf-grid{{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:28px;height:840px;}}
 .arc-card{{position:relative;border:1px solid rgba({rgb},0.28);background:linear-gradient(150deg,rgba({rgb},0.05),rgba(0,0,0,0.3));padding:22px;display:flex;flex-direction:column;justify-content:space-between;opacity:0.15;transform:scale(0.94);transition:opacity .5s ease,transform .5s ease;}}
 .arc-card.arc-card-active{{opacity:1;transform:scale(1);border-color:rgba({rgb},0.6);box-shadow:0 0 24px rgba({rgb},0.12);}}
-.arc-card-id{{font-size:12px;letter-spacing:2px;color:rgba({rgb},0.5);}}
-.arc-card-date{{font-size:10px;letter-spacing:2px;color:rgba({rgb},0.3);margin-top:4px;}}
+.arc-card-id{{font-size:12px;letter-spacing:2px;color:rgba({rgb},0.55);}}
+.arc-card-date{{font-size:10px;letter-spacing:2px;color:rgba({rgb},0.35);margin-top:4px;}}
 .arc-card-body{{font-size:14px;line-height:1.7;color:rgba({rgb},0.82);margin-top:14px;}}
-.arc-card-tag{{position:absolute;top:14px;right:16px;font-size:9px;letter-spacing:3px;color:rgba({rgb},0.4);}}
-.arc-footer{{position:absolute;bottom:56px;left:90px;right:90px;display:flex;justify-content:space-between;font-size:10px;letter-spacing:4px;color:rgba({rgb},0.35);}}
+.arc-card-tag{{position:absolute;top:14px;right:16px;font-size:9px;letter-spacing:3px;color:rgba({rgb},0.55);}}
+.arc-footer{{position:absolute;bottom:56px;left:90px;right:90px;display:flex;justify-content:space-between;font-size:10px;letter-spacing:4px;color:rgba({rgb},0.55);}}
 canvas{{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:1;}}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <div class="arc-shelf-wrap">
-  <div class="arc-shelf-title">KYOUKAI ARCHIVE // カルテラック照合中</div>
+  <div class="arc-shelf-title">ARCHIVE // カルテラック照合中</div>
   <div class="arc-shelf-grid" id="arc-grid"></div>
   <div class="arc-footer">
     <div>記録 照合中</div>
@@ -147,9 +147,9 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 .arc-flip-card{{width:560px;height:400px;position:relative;transform-style:preserve-3d;animation:arcFlip 3.6s ease-in-out infinite;border:1px solid rgba({rgb},0.35);background:linear-gradient(150deg,rgba({rgb},0.06),rgba(0,0,0,0.35));padding:32px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 0 40px rgba({rgb},0.1);}}
 @keyframes arcFlip{{0%,40%{{transform:rotateY(0deg)}}50%{{transform:rotateY(90deg)}}60%,100%{{transform:rotateY(0deg)}}}}
 .arc-flip-id{{font-size:14px;letter-spacing:3px;color:rgba({rgb},0.6);}}
-.arc-flip-status{{font-size:12px;letter-spacing:5px;color:rgba({rgb},0.42);text-transform:uppercase;margin-top:20px;}}
+.arc-flip-status{{font-size:12px;letter-spacing:5px;color:rgba({rgb},0.55);text-transform:uppercase;margin-top:20px;}}
 .arc-flip-body{{font-size:17px;line-height:1.9;color:rgba({rgb},0.86);margin-top:24px;}}
-.arc-flip-footer{{position:absolute;bottom:56px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:6px;color:rgba({rgb},0.3);}}
+.arc-flip-footer{{position:absolute;bottom:56px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:6px;color:rgba({rgb},0.35);}}
 canvas{{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:1;}}
 </style>
 </head>
@@ -221,12 +221,12 @@ html,body{{width:1920px;height:1080px;background:transparent;overflow:hidden;fon
   <div class="arc-index-tab">FILE COPY</div>
   <div class="arc-index-name" id="name-el">名前</div>
   <div class="arc-index-sep"></div>
-  <div class="arc-index-title" id="title-el">KYOUKAI</div>
+  <div class="arc-index-title" id="title-el">LIVE</div>
 </div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
+document.getElementById('title-el').textContent=p.get('title')||'LIVE';
 </script>
 </body>
 </html>'''

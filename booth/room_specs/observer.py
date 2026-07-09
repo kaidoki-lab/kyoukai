@@ -67,14 +67,14 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 .obsr-pupil{{position:absolute;left:50%;top:50%;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff 0%,#d9d9d9 55%,#050505 100%);box-shadow:0 0 60px rgba({rgb},0.35);animation:obsrPupilPulse 4.5s ease-in-out infinite;}}
 @keyframes obsrPupilPulse{{0%,100%{{transform:scale(1)}}50%{{transform:scale(1.06)}}}}
 .obsr-caption{{position:absolute;bottom:96px;left:0;width:100%;text-align:center;font-size:13px;letter-spacing:10px;color:rgba({rgb},0.55);text-transform:uppercase;}}
-.obsr-corner-label{{position:absolute;top:64px;left:90px;font-size:12px;letter-spacing:5px;color:rgba({rgb},0.4);}}
-.obsr-whisper{{position:absolute;font-size:15px;letter-spacing:3px;color:rgba({rgb},0.0);white-space:nowrap;pointer-events:none;}}
+.obsr-corner-label{{position:absolute;top:64px;left:90px;font-size:12px;letter-spacing:5px;color:rgba({rgb},0.55);}}
+.obsr-whisper{{position:absolute;font-size:15px;letter-spacing:3px;color:rgba({rgb},0.35);white-space:nowrap;pointer-events:none;}}
 canvas{{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:1;}}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div class="obsr-corner-label">KYOUKAI // {NAME}</div>
+<div class="obsr-corner-label">OBSERVATION</div>
 <div class="obsr-stage">
   <div class="obsr-iris-wrap">
     <div class="obsr-ring obsr-ring--outer"></div>
@@ -144,7 +144,7 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 @keyframes obsrBlink{{0%,84%,100%{{transform:scaleY(1)}}88%{{transform:scaleY(0.05)}}92%{{transform:scaleY(1)}}}}
 .obsr-eye-pupil{{position:absolute;left:50%;top:50%;width:180px;height:180px;margin:-90px 0 0 -90px;border-radius:50%;background:#050505;box-shadow:0 0 90px rgba({rgb},0.3);}}
 .obsr-eye-msg{{position:absolute;bottom:110px;left:0;width:100%;text-align:center;font-size:34px;letter-spacing:6px;color:{color};text-shadow:0 0 16px rgba({rgb},0.4);}}
-.obsr-eye-sub{{position:absolute;top:110px;left:0;width:100%;text-align:center;font-size:12px;letter-spacing:6px;color:rgba({rgb},0.4);}}
+.obsr-eye-sub{{position:absolute;top:110px;left:0;width:100%;text-align:center;font-size:12px;letter-spacing:6px;color:rgba({rgb},0.55);}}
 canvas{{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:1;}}
 </style>
 </head>
@@ -194,7 +194,7 @@ html,body{{width:1920px;height:1080px;background:transparent;overflow:hidden;fon
 .obsr-lt-wrap{{position:absolute;bottom:86px;left:0;width:100%;display:flex;justify-content:center;}}
 .obsr-lt-name{{position:relative;font-size:34px;letter-spacing:5px;color:rgba(255,255,255,0.95);padding-bottom:10px;}}
 .obsr-lt-pupil-underline{{position:absolute;left:50%;bottom:0;width:26px;height:26px;margin-left:-13px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff 0%,#bcbcbc 55%,#050505 100%);box-shadow:0 0 12px rgba({rgb},0.6);transition:transform .4s ease;}}
-.obsr-lt-title{{position:absolute;left:0;bottom:54px;width:100%;text-align:center;font-size:11px;letter-spacing:5px;color:rgba({rgb},0.5);}}
+.obsr-lt-title{{position:absolute;left:0;bottom:54px;width:100%;text-align:center;font-size:11px;letter-spacing:5px;color:rgba({rgb},0.55);}}
 </style>
 </head>
 <body>
@@ -204,11 +204,11 @@ html,body{{width:1920px;height:1080px;background:transparent;overflow:hidden;fon
     <div class="obsr-lt-pupil-underline" id="obsr-pupil"></div>
   </div>
 </div>
-<div class="obsr-lt-title" id="title-el">KYOUKAI</div>
+<div class="obsr-lt-title" id="title-el">LIVE</div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
+document.getElementById('title-el').textContent=p.get('title')||'LIVE';
 
 // 瞳孔型下線が視線カーソルのように左右にゆっくり動く(実際のマウス追従は不要な用途のため自律運動)
 const pupil=document.getElementById('obsr-pupil');

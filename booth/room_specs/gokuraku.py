@@ -74,7 +74,7 @@ canvas.gok-drawer-spectrum{{display:block;}}
 </style>
 </head>
 <body>
-<div class="gok-label">KYOUKAI // {NAME}</div>
+<div class="gok-label">ARCHIVE CABINET</div>
 <div class="gok-cabinet">{drawers_html}</div>
 <div class="gok-fragment-log" id="gok-log">引き出し 1</div>
 <script>
@@ -220,11 +220,11 @@ html,body{{width:1920px;height:1080px;background:transparent;overflow:hidden;fon
     <div class="gok-lt-bar"></div><div class="gok-lt-bar"></div><div class="gok-lt-bar"></div><div class="gok-lt-bar"></div>
   </div>
 </div>
-<div class="gok-lt-title" id="title-el">KYOUKAI</div>
+<div class="gok-lt-title" id="title-el">LIVE</div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
+document.getElementById('title-el').textContent=p.get('title')||'LIVE';
 </script>
 </body>
 </html>'''

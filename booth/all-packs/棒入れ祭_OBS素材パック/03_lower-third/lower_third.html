@@ -26,11 +26,11 @@ html,body{width:1920px;height:1080px;background:transparent;overflow:hidden;font
 <div class="mat-lt-frame">
   <span class="mat-lt-name" id="name-el">名前</span>
 </div>
-<div class="mat-lt-title" id="title-el">KYOUKAI</div>
+<div class="mat-lt-title" id="title-el">LIVE</div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
+document.getElementById('title-el').textContent=p.get('title')||'LIVE';
 
 const COLORS=["#e0c66a", "#d8483f", "#f4efe0", "#9bb15b"];
 const layer=document.getElementById('mat-lt-confetti');

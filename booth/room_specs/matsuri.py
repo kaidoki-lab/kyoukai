@@ -92,7 +92,7 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 @keyframes matPoleSway{{0%,100%{{transform:rotate(-2deg);}}50%{{transform:rotate(2deg);}}}}
 .mat-gohei{{position:absolute;top:120px;left:120px;width:100px;height:180px;background:url('{gohei_rel}') center/contain no-repeat;z-index:5;opacity:0.85;}}
 .mat-gohei--right{{left:auto;right:120px;}}
-.mat-counter{{position:absolute;top:64px;right:96px;font-size:12px;letter-spacing:3px;color:rgba({rgb},0.5);z-index:6;}}
+.mat-counter{{position:absolute;top:64px;right:96px;font-size:12px;letter-spacing:3px;color:rgba({rgb},0.55);z-index:6;}}
 .mat-voice-log{{position:absolute;bottom:80px;left:0;width:100%;text-align:center;font-size:26px;letter-spacing:6px;color:{color};z-index:6;min-height:36px;text-shadow:0 0 16px rgba({rgb},0.6);}}
 .mat-confetti-layer{{position:absolute;inset:0;z-index:7;pointer-events:none;overflow:hidden;}}
 .mat-confetti-piece{{position:absolute;top:-40px;width:26px;height:26px;background:url('{confetti_rel}') center/contain no-repeat;animation:matConfettiFall linear forwards;}}
@@ -103,7 +103,7 @@ canvas.mat-spark-canvas{{position:absolute;top:0;left:0;width:1920px;height:1080
 <body>
 <div class="mat-stage"></div>
 <canvas class="mat-spark-canvas" id="mat-spark"></canvas>
-<div class="mat-label">KYOUKAI // {NAME}</div>
+<div class="mat-label">FESTIVAL STANDBY</div>
 <div class="mat-counter" id="mat-counter">奉納回数 0</div>
 <div class="mat-gohei"></div>
 <div class="mat-gohei mat-gohei--right"></div>
@@ -273,11 +273,11 @@ html,body{{width:1920px;height:1080px;background:transparent;overflow:hidden;fon
 <div class="mat-lt-frame">
   <span class="mat-lt-name" id="name-el">名前</span>
 </div>
-<div class="mat-lt-title" id="title-el">KYOUKAI</div>
+<div class="mat-lt-title" id="title-el">LIVE</div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
+document.getElementById('title-el').textContent=p.get('title')||'LIVE';
 
 const COLORS={colors_js};
 const layer=document.getElementById('mat-lt-confetti');

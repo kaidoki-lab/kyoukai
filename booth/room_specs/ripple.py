@@ -60,12 +60,12 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 /* .rpl- プレフィックス付き固有クラス群(本体と同じドットグリッド+自動波紋が主役) */
 .rpl-grid-canvas{{position:absolute;inset:0;width:1920px;height:1080px;}}
 .rpl-header{{position:absolute;top:56px;left:0;width:100%;text-align:center;font-size:13px;letter-spacing:8px;color:rgba({rgb},0.6);z-index:6;}}
-.rpl-footer{{position:absolute;bottom:56px;left:0;width:100%;text-align:center;font-size:13px;letter-spacing:5px;color:rgba({rgb},0.45);z-index:6;}}
+.rpl-footer{{position:absolute;bottom:56px;left:0;width:100%;text-align:center;font-size:13px;letter-spacing:5px;color:rgba({rgb},0.55);z-index:6;}}
 </style>
 </head>
 <body>
 <canvas class="rpl-grid-canvas" id="rplCanvas"></canvas>
-<div class="rpl-header">KYOUKAI // {NAME}</div>
+<div class="rpl-header">RIPPLE FIELD</div>
 <div class="rpl-footer">触れると世界が応答します(待機中は自動応答)</div>
 <script>
 (function(){{
@@ -286,12 +286,12 @@ html,body{{width:1920px;height:1080px;background:transparent;overflow:hidden;fon
 <div class="rpl-lt-wrap">
   <canvas class="rpl-lt-canvas" id="rplLtCanvas" width="500" height="140"></canvas>
   <div class="rpl-lt-name" id="name-el">名前</div>
-  <div class="rpl-lt-title" id="title-el">KYOUKAI</div>
+  <div class="rpl-lt-title" id="title-el">LIVE</div>
 </div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
+document.getElementById('title-el').textContent=p.get('title')||'LIVE';
 
 (function(){{
   var cv=document.getElementById('rplLtCanvas');

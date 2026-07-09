@@ -62,6 +62,12 @@
   - `final_check.py` 実行 → **ALL PASS**(zip17本+サイズ上限全pass、サムネイル64枚全1920x1080、listings20ファイル(16部屋+4付随)、verify_report.json 48/48 pass)
   - ROADMAP.mdの工程6を「完了」に更新済み。完了条件のうち「コミット完了」のみ親セッション側の作業のため未チェック
   - これでROADMAP.md「部屋別個性化リニューアル」の全6工程が完了
+- BOOTHパックのユーザーフィードバック対応（ROADMAP.md工程外）: ブランド表記除去+文字コントラスト引き上げを実装
+  - `booth/room_specs/`全16ファイルのwaiting/brb/lower_thirdから画面表示される「KYOUKAI」表記を全除去。ヘッダー帯(`KYOUKAI // {部屋名}`等)は部屋の機能を表す汎用英語ラベル(PROCESSING CONSOLE/RECEPTION DESK/OBSERVATION LOG/ARCHIVE CABINET等)に置換、lower_thirdのデフォルト肩書きは`p.get('title')||'KYOUKAI'`→`||'LIVE'`に統一（daimyojin/fukashitsu/gokuraku/kanrinin/matsuri/namahage/null/observer/particles/ripple/observation/archive/hyougi/exit/typhoon_news/maの全15ファイルの`title-el`初期値・JS両方を修正）。台風ニュースの局ロゴ「KYK」は世界観の範囲内として維持
+  - 文字の不透明度に下限を設定: 主要テキスト0.85以上、補助テキスト(ラベル/ステータス行)0.55以上、装飾テキスト0.35程度まで許容というルールをPythonスクリプトで機械的に適用(`color:rgba({rgb},X)`のうち0.55未満は0.55へ、0.35未満0.55未満の間は0.35へ底上げ。border-color/text-decoration-color等の非テキストプロパティは対象外)。16ファイル合計83箇所を修正（archive 10, observation 11, hyougi 8等）
+  - `python generate_packs.py`で48ファイル+zip17本を再生成 → `verify_packs.py` 48/48 pass → `booth/all-packs/`全HTMLをgrepし画面内「KYOUKAI」表記が0件（typhoon-newsの「KYK」のみ残存、意図通り）であることを確認 → `screenshot_packs.py`→`make_thumbnails.py`で新デザインのサムネイル64枚を再生成 → `final_check.py` **ALL PASS**
+  - daimyojin/observation/exitの生成後スクリーンショットをReadで目視確認し、ブランド表記が画面から消え文字が読みやすくなったことを確認
+  - ROADMAP.mdの工程外作業のため進捗表記の書き換えは対象外
 
 ## 以前やったこと（2026-07-08）
 
@@ -151,7 +157,9 @@
 - **ローカル**: `C:/Users/pc/Documents/Claude/Projects/kyoukai` が最新
 - **ブランチ**: main、本サイト側は全変更プッシュ済み
 - **最新コミット**: `9320147 Add Amazon/Rakuten areas to kanrinin; update room image`
-- **OBSパック 部屋別個性化リニューアル（`ROADMAP.md` 現行版）**: 全6工程（工程1: 基盤リファクタ／工程2: グループA=観測域・記録室・評議録・境界域／工程3: グループB=崩落域・逆観測室・悪魔の間・なまはげ／工程4: グループC=AI大明神・極楽域・棒入れ祭・管理人室／工程5: グループD=粒子観測・波紋域・卵部屋・台風ニュース／工程6: 全再生成・検証拡張・商品資材更新）が完了。16部屋全てが専用実装になり、`legacy_templates.py`はroom_specs全16ファイルから参照されなくなった(`__init__.py`のローダー内でのみ利用)。`verify_packs.py`に差別化チェック(部屋固有クラス3個以上・brb.html body構造相互相違)、`final_check.py`に単品zipサイズ上限(5MB)チェックを追加済み。`final_check.py`はALL PASS(zip17本・サムネイル64枚・listings20ファイル・verify_report 48/48)。`booth/all-packs/`・`booth/thumbnails/`・`booth/listings/`・`booth/verify_report.json`・`booth/room_specs/`・`booth/pack_base.py`・`booth/asset_extract.py`・`booth/legacy_templates.py`・`booth/diff_check.py`は現状未コミット
+- **OBSパック 部屋別個性化リニューアル（`ROADMAP.md` 現行版）**: 全6工程（工程1: 基盤リファクタ／工程2: グループA=観測域・記録室・評議録・境界域／工程3: グループB=崩落域・逆観測室・悪魔の間・なまはげ／工程4: グループC=AI大明神・極楽域・棒入れ祭・管理人室／工程5: グループD=粒子観測・波紋域・卵部屋・台風ニュース／工程6: 全再生成・検証拡張・商品資材更新）が完了。16部屋全てが専用実装になり、`legacy_templates.py`はroom_specs全16ファイルから参照されなくなった(`__init__.py`のローダー内でのみ利用)。`verify_packs.py`に差別化チェック(部屋固有クラス3個以上・brb.html body構造相互相違)、`final_check.py`に単品zipサイズ上限(5MB)チェックを追加済み
+- **BOOTHパック ユーザーフィードバック対応（ROADMAP.md工程外）完了**: 画面内「KYOUKAI」ブランド表記を16部屋全room_specsから除去（汎用英語ラベルへ置換、lower_thirdデフォルト肩書きは`'LIVE'`に統一。台風ニュースの「KYK」局ロゴのみ意図的に維持）。文字の不透明度下限（主要0.85/補助0.55/装飾0.35）を83箇所で機械的に底上げ。`generate_packs.py`→`verify_packs.py`(48/48)→`screenshot_packs.py`→`make_thumbnails.py`→`final_check.py`(ALL PASS)まで再実行済み
+- `final_check.py`はALL PASS(zip17本・サムネイル64枚・listings20ファイル・verify_report 48/48)。`booth/all-packs/`・`booth/thumbnails/`・`booth/listings/`・`booth/verify_report.json`・`booth/room_specs/`・`booth/pack_base.py`・`booth/asset_extract.py`・`booth/legacy_templates.py`・`booth/diff_check.py`は現状未コミット
 - 旧世代のBOOTH販売展開（前ラウンド）成果物（`booth/all-packs`旧版, `booth/thumbnails`, `booth/listings`, `booth/signal-pack`, `booth/verify_report.json`旧版）はユーザー指示で削除済み（git履歴には残っている。コミット`3101d72`）
 
 ---
@@ -175,8 +183,8 @@
 
 3. **観測域（/observation）の更新** — 更新頻度を上げたい部屋、未着手
 
-### OBSパック 部屋別個性化リニューアル（`ROADMAP.md`）
-- 全6工程実装完了。残るは `ROADMAP.md`・`booth/`配下の新規/変更ファイルのコミットのみ（親セッション側の作業。まろに確認してから実施）
+### OBSパック 部屋別個性化リニューアル（`ROADMAP.md`）+ ブランド表記/コントラスト修正
+- 全6工程実装完了＋ユーザーフィードバック対応（ブランド表記除去・文字コントラスト引き上げ）完了。残るは `ROADMAP.md`・`booth/`配下の新規/変更ファイルのコミットのみ（親セッション側の作業。まろに確認してから実施）
 - コミット後、BOOTH出品作業（`booth/listings/_出品手順.md`参照）・OBS実機確認（`booth/listings/_OBS実機確認手順.md`参照）はユーザー操作待ち
 
 ---

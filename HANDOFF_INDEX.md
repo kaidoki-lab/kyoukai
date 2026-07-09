@@ -11,4 +11,4 @@
 | 2026-06-30 | KYOUKAI | 管理人室・棒入れ祭・なまはげ実装完了。本番vercel欠落修正済み。次→観測域更新・音素材追加 |
 | 2026-06-30 | KYOUKAI | 室内画像差し替え・Amazon棚追加・楽天ウィジェット位置調整待ち。HANDOFF最新化済み |
 | 2026-07-08 | KYOUKAI | BOOTH販売展開 工程1〜6すべて実装完了。final_check.py ALL PASS、残タスクはOBS実機確認のみ |
-| 2026-07-09 | KYOUKAI | OBSパック部屋別個性化リニューアル 全6工程完了。final_check.py ALL PASS、残タスクはコミットとOBS実機確認のみ |
+| 2026-07-09 | KYOUKAI | OBSパック部屋別個性化リニューアル全6工程+ブランド表記除去/コントラスト修正完了。final_check.py ALL PASS、残タスクはコミットとOBS実機確認のみ |

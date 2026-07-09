@@ -71,13 +71,13 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 .obs-terminal{{position:absolute;inset:0;width:1920px;height:1080px;z-index:10;padding:64px 90px;display:flex;flex-direction:column;}}
 .obs-terminal-head{{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid rgba({rgb},0.28);padding-bottom:18px;margin-bottom:10px;}}
 .obs-terminal-title{{font-size:15px;letter-spacing:6px;color:rgba({rgb},0.7);text-transform:uppercase;}}
-.obs-counter{{font-size:13px;letter-spacing:3px;color:rgba({rgb},0.4);}}
+.obs-counter{{font-size:13px;letter-spacing:3px;color:rgba({rgb},0.55);}}
 .obs-log-table{{flex:1;overflow:hidden;position:relative;margin-top:8px;}}
 .obs-log-row{{position:absolute;left:0;width:100%;display:flex;gap:28px;font-size:15px;letter-spacing:1px;padding:5px 0;white-space:nowrap;}}
-.obs-log-row .obs-log-idx{{width:70px;color:rgba({rgb},0.35);flex-shrink:0;}}
-.obs-log-row .obs-log-ts{{width:190px;color:rgba({rgb},0.32);flex-shrink:0;}}
+.obs-log-row .obs-log-idx{{width:70px;color:rgba({rgb},0.55);flex-shrink:0;}}
+.obs-log-row .obs-log-ts{{width:190px;color:rgba({rgb},0.35);flex-shrink:0;}}
 .obs-log-row .obs-log-text{{color:rgba({rgb},0.82);}}
-.obs-footer{{display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba({rgb},0.2);padding-top:16px;margin-top:10px;font-size:11px;letter-spacing:4px;color:rgba({rgb},0.35);}}
+.obs-footer{{display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba({rgb},0.2);padding-top:16px;margin-top:10px;font-size:11px;letter-spacing:4px;color:rgba({rgb},0.55);}}
 .obs-footer .obs-cursor{{display:inline-block;width:10px;height:16px;background:{color};margin-left:6px;vertical-align:-3px;animation:obsBlink 1.1s step-end infinite;}}
 @keyframes obsBlink{{0%,100%{{opacity:1}}50%{{opacity:0}}}}
 .obs-scan{{position:absolute;inset:0;pointer-events:none;z-index:20;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,0.14) 3px,rgba(0,0,0,0.14) 4px);}}
@@ -88,7 +88,7 @@ canvas{{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:1;}}
 <canvas id="c"></canvas>
 <div class="obs-terminal">
   <div class="obs-terminal-head">
-    <div class="obs-terminal-title">KYOUKAI OBSERVATION LOG // {NAME}</div>
+    <div class="obs-terminal-title">OBSERVATION LOG</div>
     <div class="obs-counter" id="obs-count">OBS_ID 000000</div>
   </div>
   <div class="obs-log-table" id="obs-table"></div>
@@ -176,12 +176,12 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 /* .obs- プレフィックス付き固有クラス群(waitingとは骨格が異なる: 左寄せ端末停止画面) */
 .obs-halt-frame{{position:absolute;inset:0;width:1920px;height:1080px;z-index:10;display:flex;align-items:center;padding-left:140px;}}
 .obs-halt-panel{{width:1180px;border-left:2px solid rgba({rgb},0.4);padding-left:48px;}}
-.obs-halt-label{{font-size:12px;letter-spacing:8px;color:rgba({rgb},0.4);margin-bottom:26px;text-transform:uppercase;}}
-.obs-halt-line{{font-size:15px;letter-spacing:1px;color:rgba({rgb},0.28);padding:4px 0;text-decoration:line-through;text-decoration-color:rgba({rgb},0.15);}}
+.obs-halt-label{{font-size:12px;letter-spacing:8px;color:rgba({rgb},0.55);margin-bottom:26px;text-transform:uppercase;}}
+.obs-halt-line{{font-size:15px;letter-spacing:1px;color:rgba({rgb},0.35);padding:4px 0;text-decoration:line-through;text-decoration-color:rgba({rgb},0.15);}}
 .obs-halt-current{{font-size:26px;letter-spacing:2px;color:rgba({rgb},0.85);margin:22px 0;min-height:34px;}}
 .obs-halt-cursor{{display:inline-block;width:16px;height:30px;background:{color};margin-left:8px;vertical-align:-6px;animation:obsHaltBlink 1s step-end infinite;box-shadow:0 0 14px {color};}}
 @keyframes obsHaltBlink{{0%,100%{{opacity:1}}50%{{opacity:0}}}}
-.obs-halt-footer{{margin-top:36px;font-size:11px;letter-spacing:5px;color:rgba({rgb},0.3);}}
+.obs-halt-footer{{margin-top:36px;font-size:11px;letter-spacing:5px;color:rgba({rgb},0.35);}}
 canvas{{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:1;}}
 </style>
 </head>
@@ -263,11 +263,11 @@ html,body{{width:1920px;height:1080px;background:transparent;overflow:hidden;fon
   <span class="obs-prompt-name" id="name-el">名前</span>
   <span class="obs-prompt-cursor"></span>
 </div>
-<div class="obs-prompt-sub" id="title-el">KYOUKAI</div>
+<div class="obs-prompt-sub" id="title-el">LIVE</div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
+document.getElementById('title-el').textContent=p.get('title')||'LIVE';
 </script>
 </body>
 </html>'''

@@ -25,13 +25,13 @@ html,body{width:1920px;height:1080px;background:transparent;overflow:hidden;font
   <div class="hyo-brush-line"></div>
   <div class="hyo-fuda-plate">
     <span class="hyo-fuda-name" id="name-el">名前</span>
-    <span class="hyo-fuda-title" id="title-el">KYOUKAI</span>
+    <span class="hyo-fuda-title" id="title-el">LIVE</span>
   </div>
 </div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
+document.getElementById('title-el').textContent=p.get('title')||'LIVE';
 </script>
 </body>
 </html>

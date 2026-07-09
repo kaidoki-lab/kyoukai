@@ -64,14 +64,14 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 .ma-sigil::before,.ma-sigil::after{{content:'';position:absolute;inset:34px;border:1px solid rgba({rgb},0.22);border-radius:50%;}}
 .ma-sigil::after{{inset:70px;border-color:rgba({rgb},0.15);}}
 @keyframes maSigilSpin{{from{{transform:rotate(0deg)}}to{{transform:rotate(360deg)}}}}
-.ma-label{{position:absolute;top:70px;left:0;width:100%;text-align:center;font-size:13px;letter-spacing:10px;color:rgba({rgb},0.4);text-transform:uppercase;}}
-.ma-silence-line{{position:absolute;bottom:110px;left:0;width:100%;text-align:center;font-size:20px;letter-spacing:3px;color:rgba({rgb},0.0);transition:color 2s ease;}}
+.ma-label{{position:absolute;top:70px;left:0;width:100%;text-align:center;font-size:13px;letter-spacing:10px;color:rgba({rgb},0.55);text-transform:uppercase;}}
+.ma-silence-line{{position:absolute;bottom:110px;left:0;width:100%;text-align:center;font-size:20px;letter-spacing:3px;color:rgba({rgb},0.35);transition:color 2s ease;}}
 canvas{{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:1;}}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div class="ma-label">KYOUKAI // {NAME} // 存在確認</div>
+<div class="ma-label">PRESENCE CHECK</div>
 <div class="ma-void">
   <div class="ma-glow-core"></div>
   <div class="ma-sigil"></div>
@@ -124,7 +124,7 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 .ma-brb-glow{{position:absolute;left:50%;top:50%;width:900px;height:900px;margin:-450px 0 0 -450px;border-radius:50%;background:radial-gradient(circle,rgba({rgb},0.42) 0%,rgba({rgb},0.1) 50%,rgba(0,0,0,0) 75%);animation:maBrbBreathe 6.4s ease-in-out infinite;}}
 @keyframes maBrbBreathe{{0%,100%{{transform:scale(0.8);opacity:0.5}}50%{{transform:scale(1.18);opacity:1}}}}
 .ma-brb-msg{{position:relative;z-index:10;font-size:30px;letter-spacing:4px;color:{color};text-shadow:0 0 24px rgba({rgb},0.7);min-height:44px;text-align:center;}}
-.ma-brb-sub{{position:relative;z-index:10;font-size:12px;letter-spacing:6px;color:rgba({rgb},0.4);margin-top:24px;}}
+.ma-brb-sub{{position:relative;z-index:10;font-size:12px;letter-spacing:6px;color:rgba({rgb},0.55);margin-top:24px;}}
 canvas{{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:1;}}
 </style>
 </head>
@@ -192,11 +192,11 @@ html,body{{width:1920px;height:1080px;background:transparent;overflow:hidden;fon
 <div class="ma-lt-frame">
   <span class="ma-lt-name" id="name-el">名前</span>
 </div>
-<div class="ma-lt-title" id="title-el">KYOUKAI</div>
+<div class="ma-lt-title" id="title-el">LIVE</div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
+document.getElementById('title-el').textContent=p.get('title')||'LIVE';
 </script>
 </body>
 </html>'''

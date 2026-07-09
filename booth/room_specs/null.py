@@ -77,7 +77,7 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 .null-panel--gauge{{bottom:130px;right:90px;width:340px;}}
 .null-code{{font-size:120px;letter-spacing:6px;color:{color};text-shadow:0 0 22px rgba({rgb},0.6);}}
 .null-sub{{font-size:14px;letter-spacing:5px;color:rgba({rgb},0.55);margin-top:8px;}}
-.null-status-label{{font-size:12px;letter-spacing:4px;color:rgba({rgb},0.5);}}
+.null-status-label{{font-size:12px;letter-spacing:4px;color:rgba({rgb},0.55);}}
 .null-status-value{{font-size:22px;margin-top:6px;color:{color};}}
 .null-frag-line{{font-size:16px;letter-spacing:1px;color:rgba({rgb},0.75);padding:4px 0;white-space:nowrap;}}
 .null-gauge-bar{{width:100%;height:10px;background:rgba({rgb},0.12);margin-top:10px;position:relative;overflow:hidden;}}
@@ -91,7 +91,7 @@ canvas{{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:1;}}
 <div class="null-tilt-root" id="null-root">
   <div class="null-panel null-panel--title">
     <div class="null-code" id="null-code">404</div>
-    <div class="null-sub">KYOUKAI // {NAME} // COLLAPSE STANDBY</div>
+    <div class="null-sub">COLLAPSE STANDBY</div>
   </div>
   <div class="null-panel null-panel--status">
     <div class="null-status-label">崩壊度</div>
@@ -194,7 +194,7 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 /* .null- プレフィックス付き固有クラス群(waitingとは骨格が異なる: 中央崩壊→再構築サイクル) */
 .null-collapse-stage{{position:absolute;inset:0;width:1920px;height:1080px;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;}}
 .null-collapse-msg{{font-size:42px;letter-spacing:6px;text-align:center;color:{color};text-shadow:0 0 20px rgba({rgb},0.6);}}
-.null-collapse-sub{{font-size:14px;letter-spacing:5px;color:rgba({rgb},0.5);margin-top:26px;}}
+.null-collapse-sub{{font-size:14px;letter-spacing:5px;color:rgba({rgb},0.55);margin-top:26px;}}
 .null-rows{{position:absolute;top:0;left:0;width:100%;height:100%;z-index:5;pointer-events:none;}}
 .null-glitch-row{{position:absolute;left:0;width:100%;height:4px;background:rgba({rgb},0.5);opacity:0;}}
 canvas{{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:1;}}
@@ -282,18 +282,18 @@ html,body{{width:1920px;height:1080px;background:transparent;overflow:hidden;fon
 .null-lt-frame{{position:absolute;bottom:78px;left:80px;padding:16px 26px;background:rgba(8,0,0,0.55);border:1px solid rgba({rgb},0.4);clip-path:polygon(0 0,96% 0,100% 30%,100% 100%,4% 100%,0 70%);animation:nullLtIn .5s ease both;}}
 @keyframes nullLtIn{{from{{opacity:0;transform:translateY(10px) skewX(-2deg)}}to{{opacity:1;transform:translateY(0) skewX(0)}}}}
 .null-lt-name{{font-size:32px;letter-spacing:2px;color:{color};text-shadow:0 0 12px rgba({rgb},0.5);}}
-.null-lt-title{{position:absolute;left:80px;bottom:52px;font-size:11px;letter-spacing:4px;color:rgba({rgb},0.5);}}
+.null-lt-title{{position:absolute;left:80px;bottom:52px;font-size:11px;letter-spacing:4px;color:rgba({rgb},0.55);}}
 </style>
 </head>
 <body>
 <div class="null-lt-frame">
   <span class="null-lt-name" id="name-el">名前</span>
 </div>
-<div class="null-lt-title" id="title-el">KYOUKAI</div>
+<div class="null-lt-title" id="title-el">LIVE</div>
 <script>
 const p=new URLSearchParams(window.location.search);
 const origName=p.get('name')||'名前';
-const origTitle=p.get('title')||'KYOUKAI';
+const origTitle=p.get('title')||'LIVE';
 const nameEl=document.getElementById('name-el');
 const titleEl=document.getElementById('title-el');
 nameEl.textContent=origName;

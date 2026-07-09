@@ -43,11 +43,11 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 
 /* .exit- プレフィックス付き固有クラス群(ロード画面そのもの) */
 .exit-load-stage{{position:absolute;inset:0;width:1920px;height:1080px;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;}}
-.exit-load-label{{font-size:13px;letter-spacing:10px;color:rgba({rgb},0.4);text-transform:uppercase;margin-bottom:40px;}}
+.exit-load-label{{font-size:13px;letter-spacing:10px;color:rgba({rgb},0.55);text-transform:uppercase;margin-bottom:40px;}}
 .exit-load-bar-track{{width:900px;height:6px;background:rgba({rgb},0.12);position:relative;overflow:hidden;}}
 .exit-load-bar-fill{{position:absolute;top:0;left:0;height:100%;width:0%;background:linear-gradient(to right,rgba({rgb},0.3),{color});box-shadow:0 0 16px rgba({rgb},0.4);}}
 .exit-load-pct{{margin-top:22px;font-size:32px;letter-spacing:4px;color:rgba({rgb},0.8);}}
-.exit-load-messages{{margin-top:32px;height:22px;font-size:12px;letter-spacing:5px;color:rgba({rgb},0.4);}}
+.exit-load-messages{{margin-top:32px;height:22px;font-size:12px;letter-spacing:5px;color:rgba({rgb},0.55);}}
 .exit-load-frames{{position:absolute;inset:0;pointer-events:none;z-index:5;}}
 .exit-load-frame{{position:absolute;border:1px solid rgba({rgb},0.1);}}
 canvas{{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:1;}}
@@ -133,7 +133,7 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 @keyframes exitTunnelMove{{from{{transform:scale(0.05);opacity:0;}}30%{{opacity:1;}}to{{transform:scale(2.2);opacity:0;}}}}
 .exit-connect-msg{{position:relative;z-index:6;text-align:center;}}
 .exit-connect-main{{font-size:44px;letter-spacing:10px;color:rgba({rgb},0.85);text-shadow:0 0 30px rgba({rgb},0.3);}}
-.exit-connect-sub{{margin-top:22px;font-size:12px;letter-spacing:6px;color:rgba({rgb},0.4);}}
+.exit-connect-sub{{margin-top:22px;font-size:12px;letter-spacing:6px;color:rgba({rgb},0.55);}}
 canvas{{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:1;}}
 </style>
 </head>
@@ -205,14 +205,14 @@ html,body{{width:1920px;height:1080px;background:transparent;overflow:hidden;fon
   <div class="exit-outer-border">
     <div class="exit-inner-border">
       <div class="exit-name" id="name-el">名前</div>
-      <div class="exit-title" id="title-el">KYOUKAI</div>
+      <div class="exit-title" id="title-el">LIVE</div>
     </div>
   </div>
 </div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
+document.getElementById('title-el').textContent=p.get('title')||'LIVE';
 </script>
 </body>
 </html>'''

@@ -110,7 +110,7 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 .kan-bell-icon{{width:88px;height:88px;margin:0 auto 20px;border-radius:50%;background:radial-gradient(circle,rgba(255,60,40,0.85),rgba(120,10,0,0.15));box-shadow:0 0 24px rgba(255,60,40,0.5);animation:kanBellIdle 2.6s ease-in-out infinite;}}
 @keyframes kanBellIdle{{0%,100%{{opacity:0.5;}}50%{{opacity:0.9;}}}}
 .kan-bell-counter{{text-align:center;font-size:38px;letter-spacing:3px;color:{color};}}
-.kan-bell-counter-label{{text-align:center;font-size:11px;letter-spacing:3px;color:rgba({rgb},0.5);margin-top:8px;}}
+.kan-bell-counter-label{{text-align:center;font-size:11px;letter-spacing:3px;color:rgba({rgb},0.55);margin-top:8px;}}
 canvas.kan-dust-canvas{{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:5;pointer-events:none;}}
 </style>
 </head>
@@ -118,7 +118,7 @@ canvas.kan-dust-canvas{{position:absolute;top:0;left:0;width:1920px;height:1080p
 <div class="kan-photo-band"></div>
 <div class="kan-photo-fade"></div>
 <canvas class="kan-dust-canvas" id="kan-dust"></canvas>
-<div class="kan-header">KYOUKAI // {NAME} // 受付</div>
+<div class="kan-header">RECEPTION DESK</div>
 <div class="kan-desk">
   <div class="kan-diary-pane">
     <div class="kan-diary-page">
@@ -302,11 +302,11 @@ html,body{{width:1920px;height:1080px;background:transparent;overflow:hidden;fon
   <div class="kan-lt-label">宿帳</div>
   <span class="kan-lt-name" id="name-el">名前</span>
 </div>
-<div class="kan-lt-title" id="title-el">KYOUKAI</div>
+<div class="kan-lt-title" id="title-el">LIVE</div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
+document.getElementById('title-el').textContent=p.get('title')||'LIVE';
 </script>
 </body>
 </html>'''

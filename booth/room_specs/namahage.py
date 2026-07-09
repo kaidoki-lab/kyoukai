@@ -96,7 +96,7 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 <div class="nmh-bg"></div>
 <div class="nmh-bg-fade-left"></div>
 <div class="nmh-bg-fade-right"></div>
-<div class="nmh-label">KYOUKAI // {NAME}</div>
+<div class="nmh-label">WATCHING</div>
 <div class="nmh-eye-layer">
   <canvas class="nmh-eye-canvas" id="eyeL" width="{_GRID_COLS}" height="{_GRID_ROWS}"></canvas>
   <canvas class="nmh-eye-canvas" id="eyeR" width="{_GRID_COLS}" height="{_GRID_ROWS}"></canvas>
@@ -249,11 +249,11 @@ html,body{{width:1920px;height:1080px;background:transparent;overflow:hidden;fon
   </div>
   <span class="nmh-lt-name" id="name-el">名前</span>
 </div>
-<div class="nmh-lt-title" id="title-el">KYOUKAI</div>
+<div class="nmh-lt-title" id="title-el">LIVE</div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
+document.getElementById('title-el').textContent=p.get('title')||'LIVE';
 </script>
 </body>
 </html>'''

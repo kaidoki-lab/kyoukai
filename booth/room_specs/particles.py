@@ -62,13 +62,13 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 .ptc-header{{position:absolute;top:56px;left:64px;font-size:13px;letter-spacing:6px;color:rgba({rgb},0.7);z-index:6;}}
 .ptc-coord{{position:absolute;top:56px;right:64px;font-size:13px;letter-spacing:2px;color:rgba({rgb},0.85);text-align:right;z-index:6;}}
 .ptc-coord span{{display:block;}}
-.ptc-footer{{position:absolute;bottom:56px;left:0;width:100%;text-align:center;font-size:13px;letter-spacing:6px;color:rgba({rgb},0.5);z-index:6;}}
+.ptc-footer{{position:absolute;bottom:56px;left:0;width:100%;text-align:center;font-size:13px;letter-spacing:6px;color:rgba({rgb},0.55);z-index:6;}}
 </style>
 </head>
 <body>
 <canvas class="ptc-stage" id="ptcCanvas"></canvas>
 <canvas class="ptc-reticle-layer" id="ptcReticle"></canvas>
-<div class="ptc-header">KYOUKAI // {NAME}</div>
+<div class="ptc-header">PARTICLE OBSERVATION</div>
 <div class="ptc-coord" id="ptcCoord"><span>X: ----</span><span>Y: ----</span></div>
 <div class="ptc-footer">観測レティクルが最も近い粒子を追跡しています</div>
 <script>
@@ -311,12 +311,12 @@ html,body{{width:1920px;height:1080px;background:transparent;overflow:hidden;fon
 <div class="ptc-lt-wrap">
   <canvas class="ptc-lt-orbit" id="ptcOrbit" width="420" height="140"></canvas>
   <div class="ptc-lt-name" id="name-el">名前</div>
-  <div class="ptc-lt-title" id="title-el">KYOUKAI</div>
+  <div class="ptc-lt-title" id="title-el">LIVE</div>
 </div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
+document.getElementById('title-el').textContent=p.get('title')||'LIVE';
 
 (function(){{
   var cv=document.getElementById('ptcOrbit');

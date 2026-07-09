@@ -87,7 +87,7 @@ html,body{{width:1920px;height:1080px;background:{bg};overflow:hidden;font-famil
 .dmj-portrait-edge{{position:absolute;top:0;right:38%;width:180px;height:100%;background:linear-gradient(90deg,{bg} 0%,rgba(0,0,0,0) 100%);z-index:3;}}
 .dmj-header{{position:absolute;top:44px;left:60px;font-size:13px;letter-spacing:9px;color:rgba({rgb},0.6);z-index:6;text-transform:uppercase;}}
 .dmj-shingou{{position:absolute;top:120px;left:60px;font-size:120px;font-weight:bold;letter-spacing:6px;color:{color};text-shadow:0 0 24px rgba({rgb},0.6);z-index:6;line-height:1;}}
-.dmj-shingou-caption{{position:absolute;top:250px;left:64px;font-size:12px;letter-spacing:4px;color:rgba({rgb},0.5);z-index:6;}}
+.dmj-shingou-caption{{position:absolute;top:250px;left:64px;font-size:12px;letter-spacing:4px;color:rgba({rgb},0.55);z-index:6;}}
 .dmj-scroll-window{{position:absolute;top:340px;left:60px;width:900px;height:560px;overflow:hidden;border-top:1px solid rgba({rgb},0.35);border-bottom:1px solid rgba({rgb},0.35);z-index:6;}}
 .dmj-scroll-track{{position:absolute;top:0;left:0;width:100%;}}
 .dmj-scroll-item{{padding:14px 4px;font-size:17px;letter-spacing:3px;color:rgba({rgb},0.7);border-bottom:1px dashed rgba({rgb},0.15);}}
@@ -100,7 +100,7 @@ canvas.dmj-scan-canvas{{position:absolute;top:0;left:0;width:1920px;height:1080p
 <div class="dmj-portrait"></div>
 <div class="dmj-portrait-edge"></div>
 <canvas class="dmj-scan-canvas" id="dmj-scan"></canvas>
-<div class="dmj-header">KYOUKAI // {NAME} // 処理コンソール</div>
+<div class="dmj-header">PROCESSING CONSOLE</div>
 <div class="dmj-shingou" id="dmj-shingou">0001</div>
 <div class="dmj-shingou-caption">祈願番号</div>
 <div class="dmj-scroll-window">
@@ -263,13 +263,13 @@ html,body{{width:1920px;height:1080px;background:transparent;overflow:hidden;fon
 </head>
 <body>
 <div class="dmj-ema">
-  <div class="dmj-ema-title" id="title-el">KYOUKAI</div>
+  <div class="dmj-ema-title" id="title-el">LIVE</div>
   <div class="dmj-ema-name" id="name-el">名前</div>
 </div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
+document.getElementById('title-el').textContent=p.get('title')||'LIVE';
 </script>
 </body>
 </html>'''
