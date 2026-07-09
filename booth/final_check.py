@@ -74,6 +74,20 @@ def check_zips():
         ),
     )
 
+    print("")
+    print("=== 1b. zipサイズ検証（単品5MB以内） ===")
+    MAX_SINGLE_ZIP_BYTES = 5 * 1024 * 1024
+    for room in ROOMS:
+        name = "{}_OBS素材パック.zip".format(room["name"])
+        path = ALL_PACKS_DIR / name
+        if not path.is_file():
+            continue
+        size = path.stat().st_size
+        report(
+            size <= MAX_SINGLE_ZIP_BYTES,
+            "zipサイズ: {} = {:.2f}MB (上限5MB)".format(name, size / (1024 * 1024)),
+        )
+
 
 def check_thumbnails():
     print("")

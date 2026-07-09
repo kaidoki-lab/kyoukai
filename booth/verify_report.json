@@ -6,7 +6,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 10
       }
     },
     "brb": {
@@ -15,7 +16,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 7
       }
     },
     "lower_third": {
@@ -24,7 +26,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "name_el_text": "名前"
+        "name_el_text": "名前",
+        "prefixed_class_count": 3
       }
     }
   },
@@ -35,7 +38,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 2
+        "canvas_count": 2,
+        "prefixed_class_count": 7
       }
     },
     "brb": {
@@ -44,7 +48,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 4
       }
     },
     "lower_third": {
@@ -53,7 +58,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "name_el_text": "名前"
+        "name_el_text": "名前",
+        "prefixed_class_count": 5
       }
     }
   },
@@ -64,7 +70,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 13
       }
     },
     "brb": {
@@ -73,7 +80,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 4
       }
     },
     "lower_third": {
@@ -82,7 +90,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "name_el_text": "名前"
+        "name_el_text": "名前",
+        "prefixed_class_count": 3
       }
     }
   },
@@ -93,7 +102,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 13
       }
     },
     "brb": {
@@ -102,7 +112,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 5
       }
     },
     "lower_third": {
@@ -111,7 +122,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "name_el_text": "名前"
+        "name_el_text": "名前",
+        "prefixed_class_count": 5
       }
     }
   },
@@ -122,7 +134,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 8
       }
     },
     "brb": {
@@ -131,7 +144,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 5
       }
     },
     "lower_third": {
@@ -140,7 +154,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "name_el_text": "名前"
+        "name_el_text": "名前",
+        "prefixed_class_count": 5
       }
     }
   },
@@ -151,7 +166,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 14
       }
     },
     "brb": {
@@ -160,7 +176,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 5
       }
     },
     "lower_third": {
@@ -169,7 +186,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "name_el_text": "名前"
+        "name_el_text": "名前",
+        "prefixed_class_count": 3
       }
     }
   },
@@ -180,7 +198,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 5
       }
     },
     "brb": {
@@ -189,7 +208,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 4
       }
     },
     "lower_third": {
@@ -198,7 +218,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "name_el_text": "名前"
+        "name_el_text": "名前",
+        "prefixed_class_count": 3
       }
     }
   },
@@ -209,7 +230,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 11
       }
     },
     "brb": {
@@ -218,7 +240,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 3
       }
     },
     "lower_third": {
@@ -227,7 +250,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "name_el_text": "名前"
+        "name_el_text": "名前",
+        "prefixed_class_count": 5
       }
     }
   },
@@ -238,7 +262,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 20
+        "canvas_count": 20,
+        "prefixed_class_count": 6
       }
     },
     "brb": {
@@ -247,7 +272,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 5
       }
     },
     "lower_third": {
@@ -256,7 +282,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "name_el_text": "名前"
+        "name_el_text": "名前",
+        "prefixed_class_count": 6
       }
     }
   },
@@ -267,7 +294,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 3
       }
     },
     "brb": {
@@ -276,7 +304,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 3
       }
     },
     "lower_third": {
@@ -285,7 +314,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "name_el_text": "名前"
+        "name_el_text": "名前",
+        "prefixed_class_count": 4
       }
     }
   },
@@ -296,7 +326,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 18
       }
     },
     "brb": {
@@ -305,7 +336,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 2
+        "canvas_count": 2,
+        "prefixed_class_count": 3
       }
     },
     "lower_third": {
@@ -314,7 +346,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "name_el_text": "名前"
+        "name_el_text": "名前",
+        "prefixed_class_count": 4
       }
     }
   },
@@ -325,7 +358,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 2
+        "canvas_count": 2,
+        "prefixed_class_count": 5
       }
     },
     "brb": {
@@ -334,7 +368,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 3
       }
     },
     "lower_third": {
@@ -343,7 +378,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "name_el_text": "名前"
+        "name_el_text": "名前",
+        "prefixed_class_count": 4
       }
     }
   },
@@ -354,7 +390,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 12
       }
     },
     "brb": {
@@ -363,7 +400,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 7
       }
     },
     "lower_third": {
@@ -372,7 +410,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "name_el_text": "名前"
+        "name_el_text": "名前",
+        "prefixed_class_count": 5
       }
     }
   },
@@ -383,7 +422,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 10
       }
     },
     "brb": {
@@ -392,7 +432,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 6
       }
     },
     "lower_third": {
@@ -401,7 +442,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "name_el_text": "名前"
+        "name_el_text": "名前",
+        "prefixed_class_count": 5
       }
     }
   },
@@ -412,7 +454,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 7
       }
     },
     "brb": {
@@ -421,7 +464,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 4
       }
     },
     "lower_third": {
@@ -430,7 +474,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "name_el_text": "名前"
+        "name_el_text": "名前",
+        "prefixed_class_count": 5
       }
     }
   },
@@ -441,7 +486,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 10
       }
     },
     "brb": {
@@ -450,7 +496,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "canvas_count": 1
+        "canvas_count": 1,
+        "prefixed_class_count": 6
       }
     },
     "lower_third": {
@@ -459,7 +506,8 @@
       "console_errors": [],
       "page_errors": [],
       "detail": {
-        "name_el_text": "名前"
+        "name_el_text": "名前",
+        "prefixed_class_count": 4
       }
     }
   }

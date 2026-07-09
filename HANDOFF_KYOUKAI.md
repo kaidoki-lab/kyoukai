@@ -52,6 +52,16 @@
   - verify_packs.pyの「waiting/brbにcanvas要素必須」契約に対し、初回実装で卵部屋brb(卵のみのDOM構成)・台風ニュースwaiting(パネルのみのDOM構成)がcanvas 0件で不合格になったため、演出言語に沿った補助Canvas(卵部屋=鼓動同期の明滅リング、台風ニュース=雨筋レイヤー)を追加して契約を満たした
   - 検証: `python generate_packs.py`で48ファイル+zip17本再生成 → `verify_packs.py` 48/48 pass → `diff_check.py particles ripple fukashitsu typhoon-news --commit b7ca038`で12/12 DIFF確認 → `legacy_templates`参照がroom_specs全16ファイルから消えていることをgrepで確認(`__init__.py`のローダーのみ残存、契約通り) → `screenshot_packs.py`を全16部屋(48ファイル)に対して再実行し輝度チェック全pass(particles waiting=3.49, ripple waiting=4.99, fukashitsu waiting=59.83, typhoon-news waiting=38.84含む) → zipサイズ確認(fukashitsu 1.26MB, typhoon-news 1.70MBで全て5MB以内)
   - ROADMAP.mdの工程5を「完了」に更新済み、完了条件チェックボックス全て[x]
+- OBSパック「部屋別個性化リニューアル」の工程6「全再生成・検証拡張・商品資材更新」を実装
+  - `booth/verify_packs.py` に差別化チェックを追加: 部屋ID→CSSクラスプレフィックス対応表(`ROOM_CLASS_PREFIX`: obs-/hyo-/null-/obsr-/exit-/arc-/ma-/dmj-/gok-/ptc-/rpl-/kan-/nmh-/mat-/fks-/tpn-。実クラス名をgrepで確認して確定)を新設し、各HTMLに固有クラスが3個以上存在するかを`count_prefixed_classes()`で検証。全部屋のbrb.html body構造(タグ出現順のsha256ハッシュ)が互いに異なることを`body_structure_hash()`で検証し、重複があれば該当部屋をFAIL扱いにする仕組みを追加
+  - `booth/final_check.py` に単品zipサイズ上限チェック(1本5MB以内)を追加(`check_zips()`内に1b節として実装)
+  - `python generate_packs.py`で48ファイル+zip17本を再生成 → `verify_packs.py`(拡張版)で48/48 pass(差別化チェック・brb構造相違チェック含め全pass)
+  - `screenshot_packs.py` → `make_thumbnails.py` を再実行しサムネイル64枚(16部屋×4枚、00_main含む)を新デザインで更新。悪魔の間・逆観測室・崩落域のサムネをReadで目視確認し、半透明帯により文字が沈んでいないことを確認
+  - `make_listings.py` のWORLDVIEW辞書を新デザイン(観測ログ端末/縦書き議事/傾き崩壊UI/瞳孔円環/ロード画面/ファイル棚グリッド/呼吸する赤い光/本体画像+祈願札/引き出し棚/観測レティクル/黒戻し波紋/受付カウンター本体画像/ドット目Canvas/棒穴紙吹雪素材/孵化装置本体画像/ニュース速報帯)を反映して再生成。禁止ワード検査は全16件PASS
+  - `booth/listings/_series.md`・`_bundle.md`・`_出品手順.md`・`_OBS実機確認手順.md`をgit履歴(コミット`3101d72`の親)から復元(内容は部屋別演出に依存しない汎用手順のため無変更で再利用)
+  - `final_check.py` 実行 → **ALL PASS**(zip17本+サイズ上限全pass、サムネイル64枚全1920x1080、listings20ファイル(16部屋+4付随)、verify_report.json 48/48 pass)
+  - ROADMAP.mdの工程6を「完了」に更新済み。完了条件のうち「コミット完了」のみ親セッション側の作業のため未チェック
+  - これでROADMAP.md「部屋別個性化リニューアル」の全6工程が完了
 
 ## 以前やったこと（2026-07-08）
 
@@ -141,7 +151,7 @@
 - **ローカル**: `C:/Users/pc/Documents/Claude/Projects/kyoukai` が最新
 - **ブランチ**: main、本サイト側は全変更プッシュ済み
 - **最新コミット**: `9320147 Add Amazon/Rakuten areas to kanrinin; update room image`
-- **OBSパック 部屋別個性化リニューアル（`ROADMAP.md` 現行版）**: 工程1（基盤リファクタ）・工程2（部屋実装グループA: 観測域・記録室・評議録・境界域）・工程3（部屋実装グループB: 崩落域・逆観測室・悪魔の間・なまはげ）・工程4（部屋実装グループC: AI大明神・極楽域・棒入れ祭・管理人室）・工程5（部屋実装グループD: 粒子観測・波紋域・卵部屋・台風ニュース）完了。工程6（全再生成・検証拡張・商品資材更新）は未着手。これで16部屋全てが専用実装になり、`legacy_templates.py`はroom_specs全16ファイルから参照されなくなった(`__init__.py`のローダー内でのみ利用)。`booth/all-packs/`・`booth/verify_report.json`・`booth/room_specs/`・`booth/pack_base.py`・`booth/asset_extract.py`・`booth/legacy_templates.py`・`booth/diff_check.py`は現状未コミット
+- **OBSパック 部屋別個性化リニューアル（`ROADMAP.md` 現行版）**: 全6工程（工程1: 基盤リファクタ／工程2: グループA=観測域・記録室・評議録・境界域／工程3: グループB=崩落域・逆観測室・悪魔の間・なまはげ／工程4: グループC=AI大明神・極楽域・棒入れ祭・管理人室／工程5: グループD=粒子観測・波紋域・卵部屋・台風ニュース／工程6: 全再生成・検証拡張・商品資材更新）が完了。16部屋全てが専用実装になり、`legacy_templates.py`はroom_specs全16ファイルから参照されなくなった(`__init__.py`のローダー内でのみ利用)。`verify_packs.py`に差別化チェック(部屋固有クラス3個以上・brb.html body構造相互相違)、`final_check.py`に単品zipサイズ上限(5MB)チェックを追加済み。`final_check.py`はALL PASS(zip17本・サムネイル64枚・listings20ファイル・verify_report 48/48)。`booth/all-packs/`・`booth/thumbnails/`・`booth/listings/`・`booth/verify_report.json`・`booth/room_specs/`・`booth/pack_base.py`・`booth/asset_extract.py`・`booth/legacy_templates.py`・`booth/diff_check.py`は現状未コミット
 - 旧世代のBOOTH販売展開（前ラウンド）成果物（`booth/all-packs`旧版, `booth/thumbnails`, `booth/listings`, `booth/signal-pack`, `booth/verify_report.json`旧版）はユーザー指示で削除済み（git履歴には残っている。コミット`3101d72`）
 
 ---
@@ -166,8 +176,8 @@
 3. **観測域（/observation）の更新** — 更新頻度を上げたい部屋、未着手
 
 ### OBSパック 部屋別個性化リニューアル（`ROADMAP.md`）
-- 工程6: 全再生成・検証拡張（verify_packs差別化チェック・final_checkのzipサイズ上限）・thumbnails/listings再生成・コミット（唯一の残工程）
-- 工程1〜6完了後、`ROADMAP.md`・`booth/`配下の新規/変更ファイルをコミットするかどうかまろに確認する（現状未コミット）
+- 全6工程実装完了。残るは `ROADMAP.md`・`booth/`配下の新規/変更ファイルのコミットのみ（親セッション側の作業。まろに確認してから実施）
+- コミット後、BOOTH出品作業（`booth/listings/_出品手順.md`参照）・OBS実機確認（`booth/listings/_OBS実機確認手順.md`参照）はユーザー操作待ち
 
 ---
 
