@@ -6,6 +6,7 @@ import argparse
 import json
 import os
 import random
+import shutil
 import subprocess
 import sys
 from datetime import datetime
@@ -22,6 +23,7 @@ OUTPUT_REPORTS = SHORTS_ROOT / "output_reports"
 OUTPUT_RECORDINGS = SHORTS_ROOT / "output_recordings"
 OUTPUT_SHORTS = SHORTS_ROOT / "output_shorts"
 OUTPUT_POST_READY = OUTPUT_SHORTS / "post_ready"
+DESKTOP_REMIX_DIR = Path.home() / "Desktop" / "ショート_リミックス"
 ROOMS_DIR = ROOT / "data" / "rooms"
 FFMPEG = SHORTS_ROOT / "tools" / "ffmpeg" / "ffmpeg-8.1.1-essentials_build" / "bin" / "ffmpeg.exe"
 DEFAULT_BGM_CANDIDATES = [
@@ -49,6 +51,13 @@ def display_path(path: Path) -> str:
 
 def post_ready_dir(run_id: str) -> Path:
     return OUTPUT_POST_READY / run_id
+
+
+def save_remix_to_desktop(path: Path) -> Path:
+    DESKTOP_REMIX_DIR.mkdir(parents=True, exist_ok=True)
+    desktop_output = DESKTOP_REMIX_DIR / path.name
+    shutil.copy2(path, desktop_output)
+    return desktop_output
 
 
 def find_latest_run_id() -> str:
@@ -485,9 +494,11 @@ def create_remix(
     log_path.write_text(completed.stdout + "\n\n" + completed.stderr, encoding="utf-8")
     if completed.returncode != 0 or not output.exists():
         return {"status": "failed", "output_video": "", "errors": [f"リミックス出力に失敗しました: {log_path}"]}
+    desktop_output = save_remix_to_desktop(output)
     return {
         "status": "success",
         "output_video": display_path(output),
+        "desktop_output": str(desktop_output),
         "source_rooms": [item["room_id"] for item in selected],
         "bgm_enabled": with_bgm,
         "bgm_file": display_path(bgm_path) if bgm_path else "",
