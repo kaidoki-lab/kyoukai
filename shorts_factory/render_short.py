@@ -60,6 +60,21 @@ def save_remix_to_desktop(path: Path) -> Path:
     return desktop_output
 
 
+def next_remix_output(output_dir: Path) -> Path:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    DESKTOP_REMIX_DIR.mkdir(parents=True, exist_ok=True)
+    used_numbers: set[int] = set()
+    for folder in (output_dir, DESKTOP_REMIX_DIR):
+        for path in folder.glob("kyoukai_remix_*.mp4"):
+            suffix = path.stem.replace("kyoukai_remix_", "", 1)
+            if suffix.isdigit():
+                used_numbers.add(int(suffix))
+    next_number = 1
+    while next_number in used_numbers:
+        next_number += 1
+    return output_dir / f"kyoukai_remix_{next_number:03d}.mp4"
+
+
 def find_latest_run_id() -> str:
     report_runs = [
         path.name
@@ -389,7 +404,13 @@ def create_remix(
     for item in results:
         if item.get("status") == "success" and item["room_id"] not in priority:
             ordered.append(item)
-    selected = ordered[:12]
+    selected = ordered[:]
+    if len(selected) > 5:
+        fixed = selected[:5]
+        remaining = selected[5:]
+        random.shuffle(remaining)
+        selected = fixed + remaining
+    selected = selected[:12]
     if len(selected) < 2:
         return {
             "status": "skipped",
@@ -412,7 +433,7 @@ def create_remix(
             str(FFMPEG),
             "-y",
             "-ss",
-            str(0.5 + (index % 4) * 0.7),
+            f"{random.uniform(0.3, 3.0):.2f}",
             "-t",
             str(segment_duration),
             "-i",
@@ -460,7 +481,7 @@ def create_remix(
     if completed.returncode != 0 or not joined.exists():
         return {"status": "failed", "output_video": "", "errors": ["リミックス結合に失敗しました。"]}
 
-    output = output_dir / "kyoukai_remix_001.mp4"
+    output = next_remix_output(output_dir)
     video_filter = (
         "scale=1080:1920:force_original_aspect_ratio=increase,"
         "crop=1080:1920,"
