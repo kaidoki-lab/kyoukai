@@ -27,12 +27,22 @@ DESKTOP_REMIX_DIR = Path.home() / "Desktop" / "ショート_リミックス"
 ROOMS_DIR = ROOT / "data" / "rooms"
 FFMPEG = SHORTS_ROOT / "tools" / "ffmpeg" / "ffmpeg-8.1.1-essentials_build" / "bin" / "ffmpeg.exe"
 DEFAULT_BGM_CANDIDATES = [
-    ROOT / "assets" / "bgm" / "kyoukai_main.mp3",
-    ROOT / "static" / "bgm" / "bgm_home.mp3",
-    ROOT / "static" / "bgm" / "bgm_exit.mp3",
-    ROOT / "static" / "bgm" / "bgm_null.mp3",
-    ROOT / "static" / "bgm" / "bgm_observer.mp3",
+    Path.home() / "Downloads" / "課長の勝ち.mp3",
+    Path.home() / "Downloads" / "悪い子はいねえがーーー！！！.mp3",
+    Path.home() / "Downloads" / "かちゃ しゅる.mp3",
+    Path.home() / "Downloads" / "落ちたのに飛んだ (Loop Version).mp3",
+    Path.home() / "Downloads" / "喉の奥の夜.mp3",
+    Path.home() / "Downloads" / "アルマジロストライク.mp3",
+    Path.home() / "Downloads" / "キツネ足八本.mp3",
+    Path.home() / "Downloads" / "白い湯気.mp3",
+    Path.home() / "Downloads" / "Tulip Street2.mp3",
+    Path.home() / "Downloads" / "パンダプリンちん！2.mp3",
+    Path.home() / "Downloads" / "白い月まんじゅう.mp3",
+    Path.home() / "Downloads" / "さっぱり仮面音頭.mp3",
+    Path.home() / "Downloads" / "海底鉱脈 ざぶん.mp3",
 ]
+RECENT_BGM_HISTORY = OUTPUT_SHORTS / "recent_bgm_history.json"
+RECENT_BGM_LIMIT = 6
 FONTS = [
     Path("C:/Windows/Fonts/YuGothM.ttc"),
     Path("C:/Windows/Fonts/YuGothB.ttc"),
@@ -176,10 +186,40 @@ def resolve_bgm_path(path_text: str | None) -> Path | None:
     return paths[0] if paths else None
 
 
+def load_recent_bgm_history() -> list[str]:
+    if not RECENT_BGM_HISTORY.exists():
+        return []
+    try:
+        data = json.loads(RECENT_BGM_HISTORY.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return []
+    if not isinstance(data, list):
+        return []
+    return [str(item) for item in data]
+
+
+def save_recent_bgm_history(history: list[str]) -> None:
+    RECENT_BGM_HISTORY.parent.mkdir(parents=True, exist_ok=True)
+    RECENT_BGM_HISTORY.write_text(
+        json.dumps(history[-RECENT_BGM_LIMIT:], ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+
 def choose_bgm_path(bgm_paths: list[Path] | None) -> Path | None:
     if not bgm_paths:
         return None
-    return random.choice(bgm_paths)
+    history = load_recent_bgm_history()
+    recent = set(history[-RECENT_BGM_LIMIT:])
+    fresh_paths = [path for path in bgm_paths if str(path) not in recent]
+    candidates = fresh_paths or bgm_paths
+    selected = random.choice(candidates)
+    save_recent_bgm_history(history + [str(selected)])
+    return selected
+
+
+def random_bgm_start() -> float:
+    return round(random.uniform(0, 60), 2)
 
 
 def ensure_recording(room_id: str, run_id: str, auto_record: bool = True) -> tuple[Path | None, list[str]]:
@@ -247,7 +287,7 @@ def render_video(
     if with_bgm:
         if bgm_path is None or not bgm_path.exists():
             raise FileNotFoundError("BGMファイルが見つかりません。")
-        command.extend(["-stream_loop", "-1", "-i", str(bgm_path)])
+        command.extend(["-stream_loop", "-1", "-ss", str(random_bgm_start()), "-i", str(bgm_path)])
     if with_bgm:
         command.extend(
             [
@@ -492,7 +532,18 @@ def create_remix(
         bgm_path = bgm_path or choose_bgm_path(bgm_paths)
         if bgm_path is None or not bgm_path.exists():
             return {"status": "failed", "output_video": "", "errors": ["BGMファイルが見つかりません。"]}
-        command.extend(["-stream_loop", "-1", "-i", str(bgm_path), "-map", "0:v:0", "-map", "1:a:0"])
+        command.extend([
+            "-stream_loop",
+            "-1",
+            "-ss",
+            str(random_bgm_start()),
+            "-i",
+            str(bgm_path),
+            "-map",
+            "0:v:0",
+            "-map",
+            "1:a:0",
+        ])
     else:
         command.append("-an")
     command.extend(["-vf", video_filter])
