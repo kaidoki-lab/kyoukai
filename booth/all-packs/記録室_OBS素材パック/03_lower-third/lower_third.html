@@ -5,60 +5,32 @@
 <title>記録室 - ローワーサード</title>
 <!--
   OBS設定: ブラウザソース → このHTMLを指定 → 幅1920 高さ1080
-  名前変更: ファイル内の '名前' と 'KYOUKAI' を書き換えてください
+  名前変更: ?name=&title= のURLパラメータで指定してください
 -->
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:1920px;height:1080px;background:transparent;overflow:hidden;font-family:'Courier New',monospace;}
-.lt{position:absolute;bottom:72px;left:72px;display:flex;align-items:center;gap:0;animation:slideIn .8s cubic-bezier(.16,1,.3,1) both;}
-@keyframes slideIn{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
-.accent{width:3px;height:72px;background:linear-gradient(to bottom,transparent,#8899aa,transparent);margin-right:20px;flex-shrink:0;}
-.texts{display:flex;flex-direction:column;gap:6px;}
-.name{font-size:38px;letter-spacing:4px;color:rgba(255,255,255,.92);line-height:1;}
-.title-row{display:flex;align-items:center;gap:12px;}
-.title-label{font-size:11px;letter-spacing:5px;color:#8899aa;text-transform:uppercase;}
-.title-sep{width:24px;height:1px;background:rgba(136,153,170,.4);}
-.title-text{font-size:11px;letter-spacing:3px;color:rgba(136,153,170,.6);text-transform:uppercase;}
-.right-block{position:absolute;bottom:72px;right:72px;display:flex;align-items:center;gap:14px;animation:slideIn .8s .1s cubic-bezier(.16,1,.3,1) both;}
-.live-dot{width:7px;height:7px;border-radius:50%;background:#8899aa;box-shadow:0 0 8px #8899aa;animation:blink 1.4s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
-.live-label{font-size:10px;letter-spacing:5px;color:rgba(136,153,170,.5);}
-.mini-bars{display:flex;gap:2px;align-items:flex-end;}
-.mini-bar{width:3px;background:rgba(136,153,170,.5);}
-@keyframes mb{from{opacity:.2}to{opacity:.8}}
-.line{position:absolute;bottom:55px;left:72px;right:72px;height:1px;background:rgba(136,153,170,.12);overflow:hidden;}
-.line::after{content:'';position:absolute;top:0;left:-40%;width:40%;height:100%;background:linear-gradient(to right,transparent,rgba(136,153,170,.6),transparent);animation:scan 4s linear infinite;}
-@keyframes scan{from{left:-40%}to{left:100%}}
+html,body{width:1920px;height:1080px;background:transparent;overflow:hidden;font-family:Consolas,'Courier New',monospace;}
+
+/* .arc- プレフィックス付き固有クラス群(インデックスカード/ラベルシール風) */
+.arc-index-card{position:absolute;bottom:76px;left:76px;width:520px;padding:18px 24px;background:linear-gradient(150deg,rgba(240,238,230,0.92),rgba(220,218,208,0.86));border:1px solid rgba(40,40,36,0.3);box-shadow:0 14px 30px rgba(0,0,0,0.4);transform:rotate(-1.2deg);animation:arcCardIn .6s ease both;}
+@keyframes arcCardIn{from{opacity:0;transform:rotate(-1.2deg) translateY(20px)}to{opacity:1;transform:rotate(-1.2deg) translateY(0)}}
+.arc-index-tab{position:absolute;top:-14px;left:24px;padding:3px 14px;background:rgba(136,153,170,0.85);color:#020408;font-size:10px;letter-spacing:3px;}
+.arc-index-name{font-size:26px;letter-spacing:2px;color:#191915;margin-top:8px;}
+.arc-index-sep{width:100%;height:1px;background:rgba(40,40,36,0.25);margin:10px 0;}
+.arc-index-title{font-size:11px;letter-spacing:4px;color:#5c5c54;text-transform:uppercase;}
 </style>
 </head>
 <body>
-<div class="lt">
-  <div class="accent"></div>
-  <div class="texts">
-    <div class="name" id="name-el">名前</div>
-    <div class="title-row">
-      <div class="title-label">記録室</div>
-      <div class="title-sep"></div>
-      <div class="title-text" id="title-el">KYOUKAI</div>
-    </div>
-  </div>
+<div class="arc-index-card">
+  <div class="arc-index-tab">FILE COPY</div>
+  <div class="arc-index-name" id="name-el">名前</div>
+  <div class="arc-index-sep"></div>
+  <div class="arc-index-title" id="title-el">KYOUKAI</div>
 </div>
-<div class="right-block">
-  <div class="mini-bars" id="mbars"></div>
-  <div class="live-dot"></div>
-  <div class="live-label">受信中</div>
-</div>
-<div class="line"></div>
 <script>
 const p=new URLSearchParams(window.location.search);
 document.getElementById('name-el').textContent=p.get('name')||'名前';
 document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
-const mb=document.getElementById('mbars');
-[6,9,13,9,6,9,13].forEach((h,i)=>{
-  const b=document.createElement('div');b.className='mini-bar';b.style.height=h+'px';
-  b.style.animation=`mb ${(.3+Math.random()*.5).toFixed(2)}s ease-in-out ${(i*.05).toFixed(2)}s infinite alternate`;
-  mb.appendChild(b);
-});
 </script>
 </body>
 </html>

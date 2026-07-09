@@ -15,6 +15,15 @@
   - `booth/generate_packs.py` を生成フロー（生成・zip・バンドル）のみに簡素化。`room_specs.load_all_specs()`経由で生成。他スクリプト（final_check/screenshot_packs/make_thumbnails/make_listings）が`from generate_packs import ROOMS`で参照する互換性は`legacy_templates.ROOMS`の再エクスポートで維持
   - 検証: 旧成果物削除済みのため`python generate_packs.py`で48ファイル+zip17本を新規生成 → 全64ファイル（html+README.txt）が削除前コミット（`4de9a6f`）と**バイト完全一致**であることをスクリプトで確認。`verify_packs.py`は48/48 pass。`final_check.py`はzip検証(17/17)・verify_report検証(48/48)がPASS（thumbnails/listingsは工程6で再生成予定のため、この工程ではFAILのままでよい契約どおり）
   - ROADMAP.mdの工程1を「完了」に更新済み、完了条件チェックボックス全て[x]
+- OBSパック「部屋別個性化リニューアル」の工程2「部屋実装グループA（観測域・記録室・評議録・境界域）」を実装
+  - `room_specs/observation.py`: 観測域を専用実装化。waitingは端末画面全体が流れるログテーブル(`.obs-log-table`)+観測カウンタ、brbはログ停止+静止カーソル明滅+時折1行追記、lower_thirdは端末プロンプト風`> 名前 _`。一次データは`static/space.css`のmonoフォント(`--sp-mono`)、`data/kyoukai_world.md`の観測ログ文体(感情を排した観測記録)を`asset_extract.read_source`で実読込して反映
+  - `room_specs/archive.py`: 記録室を専用実装化。waitingはファイル棚グリッド(`.arc-shelf-grid`、カードが差し替わる)、brbは「照合中」ファイルカードが1枚ずつ`rotateY`でめくれる、lower_thirdはインデックスカード風。一次データは`templates/archive.html`のカードフォーマット(`archive-card-meta`: 日付/ID/内容)を実読込・アサーションで確認
+  - `room_specs/hyougi.py`: 評議録を専用実装化。waitingは`writing-mode:vertical-rl`の縦書き議事断片+和紙質感+中央議題番号、brbは白紙の議事用紙に時折「──」、lower_thirdは毛筆風縦線+発言者札。落とし穴対応として等幅フォールバック(`'MS Mincho','Yu Mincho','Courier New',monospace`)を明示指定。一次データは`templates/hyougi.html`実読込で配色トーンを確認
+  - `room_specs/exit.py`: 境界域を専用実装化。waitingはロード画面そのもの(プログレスバーが8%〜94%を往復)、brbは同心円リングが流れる通路奥行き表現+接続メッセージ、lower_thirdは境界線をまたぐ二重枠。一次データは`templates/exit.html`のロード演出文言(`exit-loader`)を実読込で確認
+  - 各部屋、waiting/brb/lower_thirdでレイアウト骨格自体を変更（共通の「中央メッセージ+SIGNALメーター」使い回しなし）。部屋固有CSSクラスは部屋IDプレフィックス(`.obs-` `.arc-` `.hyo-` `.exit-`)で15〜24個ずつ付与（要件の3個以上を大幅に満たす）
+  - `booth/diff_check.py` を新規作成。`git archive --format=zip`で指定コミット時点のbooth/一式を一時展開し、旧room_specsから再生成したHTMLと現行HTMLをPlaywrightでスクショ→Pillowでピクセル差分判定。Windows上で日本語ファイル名を含むtar展開が失敗する問題があったためzip形式に変更して解決
+  - 検証: `python generate_packs.py`で48ファイル+zip17本再生成 → `verify_packs.py` 48/48 pass → `diff_check.py observation archive hyougi exit --commit b7ca038` で対象12ファイル全てDIFF(旧デザインとの差分あり)を確認
+  - ROADMAP.mdの工程2を「完了」に更新済み、完了条件チェックボックス全て[x]
 
 ## 以前やったこと（2026-07-08）
 
@@ -104,7 +113,7 @@
 - **ローカル**: `C:/Users/pc/Documents/Claude/Projects/kyoukai` が最新
 - **ブランチ**: main、本サイト側は全変更プッシュ済み
 - **最新コミット**: `9320147 Add Amazon/Rakuten areas to kanrinin; update room image`
-- **OBSパック 部屋別個性化リニューアル（`ROADMAP.md` 現行版）**: 工程1（基盤リファクタ）完了。工程2〜6は未着手。`booth/all-packs/`・`booth/verify_report.json`・`booth/room_specs/`・`booth/pack_base.py`・`booth/asset_extract.py`・`booth/legacy_templates.py`は現状未コミット
+- **OBSパック 部屋別個性化リニューアル（`ROADMAP.md` 現行版）**: 工程1（基盤リファクタ）・工程2（部屋実装グループA: 観測域・記録室・評議録・境界域）完了。工程3〜6は未着手。`booth/all-packs/`・`booth/verify_report.json`・`booth/room_specs/`・`booth/pack_base.py`・`booth/asset_extract.py`・`booth/legacy_templates.py`・`booth/diff_check.py`は現状未コミット
 - 旧世代のBOOTH販売展開（前ラウンド）成果物（`booth/all-packs`旧版, `booth/thumbnails`, `booth/listings`, `booth/signal-pack`, `booth/verify_report.json`旧版）はユーザー指示で削除済み（git履歴には残っている。コミット`3101d72`）
 
 ---
@@ -129,8 +138,7 @@
 3. **観測域（/observation）の更新** — 更新頻度を上げたい部屋、未着手
 
 ### OBSパック 部屋別個性化リニューアル（`ROADMAP.md`）
-- 工程2: 部屋実装グループA（観測域・記録室・評議録・境界域）— `room_specs/observation.py`/`archive.py`/`hyougi.py`/`exit.py`を専用実装化。`booth/diff_check.py`もこの工程で新規作成する
-- 工程3: 部屋実装グループB（崩落域・逆観測室・悪魔の間・なまはげ）— 悪魔の間は方式Aへ変更済みなのでコード演出で表現（アセット同梱なし）
+- 工程3: 部屋実装グループB（崩落域・逆観測室・悪魔の間・なまはげ）— 悪魔の間は方式Aへ変更済みなのでコード演出で表現（アセット同梱なし）。`booth/diff_check.py`は工程2で作成済みなのでそのまま使う（`python diff_check.py <room_id...> --commit <commit>`）
 - 工程4: 部屋実装グループC（AI大明神・極楽域・棒入れ祭・管理人室）— 極楽域は方式Aへ変更済み
 - 工程5: 部屋実装グループD（粒子観測・波紋域・卵部屋・台風ニュース）
 - 工程6: 全再生成・検証拡張（verify_packs差別化チェック・final_checkのzipサイズ上限）・thumbnails/listings再生成・コミット

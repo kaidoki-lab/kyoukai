@@ -5,148 +5,67 @@
 <title>評議録 - 待機画面</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:1920px;height:1080px;background:#080600;overflow:hidden;font-family:'Courier New',monospace;color:#ccbb99;}
-canvas{position:absolute;top:0;left:0;width:1920px;height:1080px;}
-.scanlines{position:absolute;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,0.12) 3px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:20;}
-.ui{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:10;}
-.corner{position:absolute;width:36px;height:36px;}
-.corner--tl{top:48px;left:48px;border-top:1px solid #ccbb99;border-left:1px solid #ccbb99;opacity:.5;}
-.corner--tr{top:48px;right:48px;border-top:1px solid #ccbb99;border-right:1px solid #ccbb99;opacity:.5;}
-.corner--bl{bottom:48px;left:48px;border-bottom:1px solid #ccbb99;border-left:1px solid #ccbb99;opacity:.5;}
-.corner--br{bottom:48px;right:48px;border-bottom:1px solid #ccbb99;border-right:1px solid #ccbb99;opacity:.5;}
-.top-bar{position:absolute;top:54px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:8px;color:rgba(204,187,153,0.35);text-transform:uppercase;}
-.rec{position:absolute;top:50px;right:100px;display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:4px;color:rgba(204,187,153,0.5);}
-.rec-dot{width:7px;height:7px;border-radius:50%;background:#ccbb99;box-shadow:0 0 6px #ccbb99;animation:blink 1.4s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
-.freq-block{position:absolute;left:100px;top:50%;transform:translateY(-50%);}
-.label{font-size:10px;letter-spacing:4px;color:rgba(204,187,153,0.3);margin-bottom:6px;}
-.freq-value{font-size:38px;letter-spacing:3px;color:rgba(204,187,153,0.75);text-shadow:0 0 20px rgba(204,187,153,0.3);}
-.unit{font-size:10px;letter-spacing:4px;color:rgba(204,187,153,0.2);margin-top:4px;}
-.source-block{position:absolute;right:100px;top:50%;transform:translateY(-50%);text-align:right;}
-.source-value{font-size:16px;letter-spacing:4px;color:rgba(204,187,153,0.45);margin-top:6px;}
-.frags{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;}
-.frag{position:absolute;font-size:10px;letter-spacing:2px;color:rgba(204,187,153,0.18);white-space:nowrap;}
-@keyframes fragFade{0%,100%{opacity:0}15%,85%{opacity:1}}
-.bottom-bar{position:absolute;bottom:56px;left:100px;right:100px;display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:4px;color:rgba(204,187,153,0.3);}
-.sig-bars{display:flex;gap:3px;align-items:flex-end;}
-.sig-bar{width:4px;background:rgba(204,187,153,0.6);}
-@keyframes barP{from{opacity:0.2}to{opacity:0.9}}
+html,body{width:1920px;height:1080px;overflow:hidden;font-family:'MS Mincho', 'Yu Mincho', 'Courier New', monospace;color:#ccbb99;
+  background:radial-gradient(circle at 50% 44%,rgba(255,220,160,0.10),transparent 40%),#080600;}
+
+/* .hyo- プレフィックス付き固有クラス群(縦書き議事断片+和紙質感+中央議題番号) */
+.hyo-washi{position:absolute;inset:0;width:1920px;height:1080px;background:
+  repeating-linear-gradient(115deg,rgba(255,255,255,0.012) 0 2px,transparent 2px 6px),
+  repeating-linear-gradient(25deg,rgba(255,255,255,0.01) 0 2px,transparent 2px 7px);
+  z-index:1;}
+.hyo-columns{position:absolute;inset:0;width:1920px;height:1080px;z-index:5;display:flex;flex-direction:row-reverse;justify-content:center;gap:64px;padding:90px 60px;}
+.hyo-col{writing-mode:vertical-rl;text-orientation:mixed;font-size:22px;letter-spacing:6px;line-height:2.4;color:rgba(204,187,153,0.5);opacity:0;animation:hyoRise 9s ease-in-out infinite;}
+@keyframes hyoRise{0%,100%{opacity:0;transform:translateY(20px)}10%,80%{opacity:1;transform:translateY(0)}90%{opacity:0}}
+.hyo-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:6;text-align:center;}
+.hyo-center-num{writing-mode:vertical-rl;font-size:64px;letter-spacing:14px;color:rgba(204,187,153,0.85);text-shadow:0 0 24px rgba(204,187,153,0.2);}
+.hyo-center-label{margin-top:18px;font-size:12px;letter-spacing:8px;color:rgba(204,187,153,0.4);}
+.hyo-footer{position:absolute;bottom:56px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:6px;color:rgba(204,187,153,0.32);z-index:6;}
+canvas{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:0;}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div class="scanlines"></div>
-<div class="ui">
-  <div class="corner corner--tl"></div><div class="corner corner--tr"></div>
-  <div class="corner corner--bl"></div><div class="corner corner--br"></div>
-  <div class="top-bar">KYOUKAI &nbsp;/&nbsp; 評議録 &nbsp;──&nbsp; 記録 進行中</div>
-  <div class="rec"><div class="rec-dot"></div>REC</div>
-  <div class="freq-block">
-    <div class="label">議事番号</div>
-    <div class="freq-value" id="freq">----.---</div>
-    <div class="unit">────</div>
-  </div>
-  <div class="source-block">
-    <div class="label" style="text-align:right">発言者</div>
-    <div class="source-value">不明</div>
-  </div>
-  <div class="frags" id="fragsEl"></div>
-  <div class="bottom-bar">
-    <div>記録 進行中</div>
-    <div class="sig-bars" id="barsEl"></div>
-    <div id="ts"></div>
-  </div>
+<div class="hyo-washi"></div>
+<div class="hyo-columns" id="hyo-columns"></div>
+<div class="hyo-center">
+  <div class="hyo-center-num" id="hyo-num">議題　第〇〇号</div>
+  <div class="hyo-center-label">記録 進行中</div>
 </div>
+<div class="hyo-footer">記録は継続されています</div>
 <script>
 const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
-canvas.width=1920; canvas.height=1080;
-
-let twLines=[]; let twTimer=0;
-const twTexts=["誰かが発言した", "議題 曖昧", "結論 未達", "── いや", "それは違う", "合意 不成立", "記録のみ残る", "発言者 不明", "── おそらく", "再度 確認"];
-function drawCanvas(){
-  ctx.clearRect(0,0,1920,1080);
-  ctx.fillStyle='rgba(0,0,0,0.04)'; ctx.fillRect(0,0,1920,1080);
-  twTimer++;
-  if(twTimer%120===0){
-    twLines.push({text:twTexts[Math.floor(Math.random()*twTexts.length)],x:100+Math.random()*1600,y:100+Math.random()*880,life:300,alpha:0});
+canvas.width=1920;canvas.height=1080;
+function drawGrain(){
+  ctx.fillStyle='rgba(204,187,153,0.008)';
+  for(let i=0;i<60;i++){
+    ctx.fillRect(Math.random()*1920,Math.random()*1080,1,1);
   }
-  twLines=twLines.filter(l=>l.life>0);
-  twLines.forEach(l=>{
-    l.life--;
-    if(l.life>250) l.alpha=Math.min(0.7,(300-l.life)/50*0.7);
-    else if(l.life<50) l.alpha=l.life/50*0.7;
-    ctx.font='15px "Courier New"';
-    ctx.fillStyle=`rgba(204,187,153,${l.alpha})`;
-    ctx.fillText(l.text, l.x, l.y);
-  });
-  requestAnimationFrame(drawCanvas);
+  requestAnimationFrame(drawGrain);
 }
-drawCanvas();
+drawGrain();
 
-let fv=80+Math.random()*900;
-const freqEl=document.getElementById('freq');
-setInterval(()=>{fv+=(Math.random()-.5)*.5;freqEl.textContent=fv.toFixed(3);},250);
-const fragsEl=document.getElementById('fragsEl');
-  const _f0=document.createElement('div');
-  _f0.className='frag';
-  _f0.textContent="誰かが発言した";
-  _f0.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f0);
-  const _f1=document.createElement('div');
-  _f1.className='frag';
-  _f1.textContent="議題 曖昧";
-  _f1.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f1);
-  const _f2=document.createElement('div');
-  _f2.className='frag';
-  _f2.textContent="結論 未達";
-  _f2.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f2);
-  const _f3=document.createElement('div');
-  _f3.className='frag';
-  _f3.textContent="── いや";
-  _f3.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f3);
-  const _f4=document.createElement('div');
-  _f4.className='frag';
-  _f4.textContent="それは違う";
-  _f4.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f4);
-  const _f5=document.createElement('div');
-  _f5.className='frag';
-  _f5.textContent="合意 不成立";
-  _f5.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f5);
-  const _f6=document.createElement('div');
-  _f6.className='frag';
-  _f6.textContent="記録のみ残る";
-  _f6.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f6);
-  const _f7=document.createElement('div');
-  _f7.className='frag';
-  _f7.textContent="発言者 不明";
-  _f7.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f7);
-  const _f8=document.createElement('div');
-  _f8.className='frag';
-  _f8.textContent="── おそらく";
-  _f8.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f8);
-  const _f9=document.createElement('div');
-  _f9.className='frag';
-  _f9.textContent="再度 確認";
-  _f9.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f9);
-const barsEl=document.getElementById('barsEl');
-[8,12,18,22,18,14,10,14,20,22,18,12].forEach((h,i)=>{
-  const b=document.createElement('div');b.className='sig-bar';b.style.height=h+'px';
-  b.style.animation=`barP ${(0.3+Math.random()*.8).toFixed(2)}s ease-in-out ${(Math.random()*.4).toFixed(2)}s infinite alternate`;
-  barsEl.appendChild(b);
-});
-const tsEl=document.getElementById('ts');
-setInterval(()=>{tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);},1000);
-tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);
+const FRAGS=["誰かが発言した", "議題は曖昧なままだ", "── いや、それは違う", "結論はまだ出ていない", "合意は不成立である", "記録のみが残る", "発言者は不明のままだ", "── おそらく、そうだろう", "再度確認を求める", "議事は継続する"];
+const colWrap=document.getElementById('hyo-columns');
+const COLS=6;
+for(let i=0;i<COLS;i++){
+  const col=document.createElement('div');
+  col.className='hyo-col';
+  col.textContent=FRAGS[i%FRAGS.length];
+  col.style.animationDelay=(i*1.4)+'s';
+  colWrap.appendChild(col);
+}
+setInterval(()=>{
+  const col=colWrap.children[Math.floor(Math.random()*COLS)];
+  col.textContent=FRAGS[Math.floor(Math.random()*FRAGS.length)];
+},3000);
+
+const numEl=document.getElementById('hyo-num');
+let n=1;
+setInterval(()=>{
+  n=(n%99)+1;
+  numEl.textContent='議題　第'+String(n).padStart(2,'0')+'号';
+},8000);
 </script>
 </body>
 </html>

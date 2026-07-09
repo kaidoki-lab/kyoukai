@@ -143,7 +143,7 @@ SPEC = {
 
 ### 工程2: 部屋実装グループA（観測域・記録室・評議録・境界域）
 
-状態: 未着手
+状態: 完了
 
 **目的**: 記録・文書系4部屋のwaiting/brb/lower_thirdをデザイン指針表に従いフルリニューアルする。
 
@@ -157,10 +157,10 @@ SPEC = {
 - 実装後 `python generate_packs.py` → 対象4部屋のHTMLをChromiumで開き目視相当の確認（Playwrightでスクショを撮り、旧デザインと異なることをピクセル差分で確認するスクリプト `booth/diff_check.py` をこの工程で作成し、以降の工程でも使う）。
 
 **完了条件**:
-- [ ] 4部屋×3ファイルが専用実装になっている（legacy_templates への委譲が残っていない）
-- [ ] verify_packs.py で対象12ファイルがpass（JSエラーなし）
-- [ ] diff_check.py で対象12ファイル全てが旧版とピクセル差分あり
-- [ ] 4部屋のwaiting同士・brb同士を比較して同一レイアウト骨格の使い回しがない（reviewerがHTML構造を比較）
+- [x] 4部屋×3ファイルが専用実装になっている（legacy_templates への委譲が残っていない）
+- [x] verify_packs.py で対象12ファイルがpass（JSエラーなし）
+- [x] diff_check.py で対象12ファイル全てが旧版とピクセル差分あり
+- [x] 4部屋のwaiting同士・brb同士を比較して同一レイアウト骨格の使い回しがない（reviewerがHTML構造を比較）
 
 **落とし穴**:
 - 評議録の縦書きは `writing-mode: vertical-rl` を使う。Chromium(OBS)では動くがフォント次第で崩れるため等幅フォールバックを指定。
