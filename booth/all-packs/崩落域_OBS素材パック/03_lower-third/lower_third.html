@@ -5,60 +5,44 @@
 <title>崩落域 - ローワーサード</title>
 <!--
   OBS設定: ブラウザソース → このHTMLを指定 → 幅1920 高さ1080
-  名前変更: ファイル内の '名前' と 'KYOUKAI' を書き換えてください
+  名前変更: ?name=&title= のURLパラメータで指定してください
 -->
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:1920px;height:1080px;background:transparent;overflow:hidden;font-family:'Courier New',monospace;}
-.lt{position:absolute;bottom:72px;left:72px;display:flex;align-items:center;gap:0;animation:slideIn .8s cubic-bezier(.16,1,.3,1) both;}
-@keyframes slideIn{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
-.accent{width:3px;height:72px;background:linear-gradient(to bottom,transparent,#ff4433,transparent);margin-right:20px;flex-shrink:0;}
-.texts{display:flex;flex-direction:column;gap:6px;}
-.name{font-size:38px;letter-spacing:4px;color:rgba(255,255,255,.92);line-height:1;}
-.title-row{display:flex;align-items:center;gap:12px;}
-.title-label{font-size:11px;letter-spacing:5px;color:#ff4433;text-transform:uppercase;}
-.title-sep{width:24px;height:1px;background:rgba(255,68,51,.4);}
-.title-text{font-size:11px;letter-spacing:3px;color:rgba(255,68,51,.6);text-transform:uppercase;}
-.right-block{position:absolute;bottom:72px;right:72px;display:flex;align-items:center;gap:14px;animation:slideIn .8s .1s cubic-bezier(.16,1,.3,1) both;}
-.live-dot{width:7px;height:7px;border-radius:50%;background:#ff4433;box-shadow:0 0 8px #ff4433;animation:blink 1.4s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
-.live-label{font-size:10px;letter-spacing:5px;color:rgba(255,68,51,.5);}
-.mini-bars{display:flex;gap:2px;align-items:flex-end;}
-.mini-bar{width:3px;background:rgba(255,68,51,.5);}
-@keyframes mb{from{opacity:.2}to{opacity:.8}}
-.line{position:absolute;bottom:55px;left:72px;right:72px;height:1px;background:rgba(255,68,51,.12);overflow:hidden;}
-.line::after{content:'';position:absolute;top:0;left:-40%;width:40%;height:100%;background:linear-gradient(to right,transparent,rgba(255,68,51,.6),transparent);animation:scan 4s linear infinite;}
-@keyframes scan{from{left:-40%}to{left:100%}}
+
+/* .null- プレフィックス付き固有クラス群(文字が欠落・復元するテロップ) */
+.null-lt-frame{position:absolute;bottom:78px;left:80px;padding:16px 26px;background:rgba(8,0,0,0.55);border:1px solid rgba(255,68,51,0.4);clip-path:polygon(0 0,96% 0,100% 30%,100% 100%,4% 100%,0 70%);animation:nullLtIn .5s ease both;}
+@keyframes nullLtIn{from{opacity:0;transform:translateY(10px) skewX(-2deg)}to{opacity:1;transform:translateY(0) skewX(0)}}
+.null-lt-name{font-size:32px;letter-spacing:2px;color:#ff4433;text-shadow:0 0 12px rgba(255,68,51,0.5);}
+.null-lt-title{position:absolute;left:80px;bottom:52px;font-size:11px;letter-spacing:4px;color:rgba(255,68,51,0.5);}
 </style>
 </head>
 <body>
-<div class="lt">
-  <div class="accent"></div>
-  <div class="texts">
-    <div class="name" id="name-el">名前</div>
-    <div class="title-row">
-      <div class="title-label">崩落域</div>
-      <div class="title-sep"></div>
-      <div class="title-text" id="title-el">KYOUKAI</div>
-    </div>
-  </div>
+<div class="null-lt-frame">
+  <span class="null-lt-name" id="name-el">名前</span>
 </div>
-<div class="right-block">
-  <div class="mini-bars" id="mbars"></div>
-  <div class="live-dot"></div>
-  <div class="live-label">受信中</div>
-</div>
-<div class="line"></div>
+<div class="null-lt-title" id="title-el">KYOUKAI</div>
 <script>
 const p=new URLSearchParams(window.location.search);
-document.getElementById('name-el').textContent=p.get('name')||'名前';
-document.getElementById('title-el').textContent=p.get('title')||'KYOUKAI';
-const mb=document.getElementById('mbars');
-[6,9,13,9,6,9,13].forEach((h,i)=>{
-  const b=document.createElement('div');b.className='mini-bar';b.style.height=h+'px';
-  b.style.animation=`mb ${(.3+Math.random()*.5).toFixed(2)}s ease-in-out ${(i*.05).toFixed(2)}s infinite alternate`;
-  mb.appendChild(b);
-});
+const origName=p.get('name')||'名前';
+const origTitle=p.get('title')||'KYOUKAI';
+const nameEl=document.getElementById('name-el');
+const titleEl=document.getElementById('title-el');
+nameEl.textContent=origName;
+titleEl.textContent=origTitle;
+
+const NOISE="░▒▓█▌▐▀▄╬╪╫▪▬►◄↕§▲▼╳╱";
+function corrupt(text,ratio){
+  return text.split('').map(ch=>{
+    if(ch===' ')return ch;
+    return Math.random()<ratio?NOISE[Math.floor(Math.random()*NOISE.length)]:ch;
+  }).join('');
+}
+setInterval(()=>{
+  nameEl.textContent=corrupt(origName,0.3);
+  setTimeout(()=>{nameEl.textContent=origName;},350);
+},3200);
 </script>
 </body>
 </html>

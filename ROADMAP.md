@@ -172,7 +172,7 @@ SPEC = {
 
 ### 工程3: 部屋実装グループB（崩落域・逆観測室・悪魔の間・なまはげ）
 
-状態: 未着手
+状態: 完了
 
 **目的**: ダーク・存在系4部屋のフルリニューアル。
 
@@ -186,10 +186,10 @@ SPEC = {
 - 工程2で作成した diff_check.py で旧版との差分を確認。
 
 **完了条件**:
-- [ ] 4部屋×3ファイルが専用実装（legacy委譲なし）
-- [ ] verify_packs.py 対象12ファイルpass
-- [ ] diff_check.py 対象12ファイル差分あり
-- [ ] screenshot_packs.py を対象4部屋に対して再実行し輝度チェックpass
+- [x] 4部屋×3ファイルが専用実装（legacy委譲なし）
+- [x] verify_packs.py 対象12ファイルpass
+- [x] diff_check.py 対象12ファイル差分あり
+- [x] screenshot_packs.py を対象4部屋に対して再実行し輝度チェックpass
 
 **落とし穴**:
 - 悪魔の間・なまはげは黒背景率が高く輝度チェックに落ちやすい。演出の光量で閾値(1.0/observerのみ0.3)を超えるよう調整するか、閾値定数の部屋別上書きを追加する（screenshot_packs.pyのBRIGHTNESS_THRESHOLD_OVERRIDESに追記でよい）。

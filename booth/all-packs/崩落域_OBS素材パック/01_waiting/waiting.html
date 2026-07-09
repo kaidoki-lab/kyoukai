@@ -6,146 +6,111 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:1920px;height:1080px;background:#080000;overflow:hidden;font-family:'Courier New',monospace;color:#ff4433;}
-canvas{position:absolute;top:0;left:0;width:1920px;height:1080px;}
-.scanlines{position:absolute;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,0.12) 3px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:20;}
-.ui{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:10;}
-.corner{position:absolute;width:36px;height:36px;}
-.corner--tl{top:48px;left:48px;border-top:1px solid #ff4433;border-left:1px solid #ff4433;opacity:.5;}
-.corner--tr{top:48px;right:48px;border-top:1px solid #ff4433;border-right:1px solid #ff4433;opacity:.5;}
-.corner--bl{bottom:48px;left:48px;border-bottom:1px solid #ff4433;border-left:1px solid #ff4433;opacity:.5;}
-.corner--br{bottom:48px;right:48px;border-bottom:1px solid #ff4433;border-right:1px solid #ff4433;opacity:.5;}
-.top-bar{position:absolute;top:54px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:8px;color:rgba(255,68,51,0.35);text-transform:uppercase;}
-.rec{position:absolute;top:50px;right:100px;display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:4px;color:rgba(255,68,51,0.5);}
-.rec-dot{width:7px;height:7px;border-radius:50%;background:#ff4433;box-shadow:0 0 6px #ff4433;animation:blink 1.4s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
-.freq-block{position:absolute;left:100px;top:50%;transform:translateY(-50%);}
-.label{font-size:10px;letter-spacing:4px;color:rgba(255,68,51,0.3);margin-bottom:6px;}
-.freq-value{font-size:38px;letter-spacing:3px;color:rgba(255,68,51,0.75);text-shadow:0 0 20px rgba(255,68,51,0.3);}
-.unit{font-size:10px;letter-spacing:4px;color:rgba(255,68,51,0.2);margin-top:4px;}
-.source-block{position:absolute;right:100px;top:50%;transform:translateY(-50%);text-align:right;}
-.source-value{font-size:16px;letter-spacing:4px;color:rgba(255,68,51,0.45);margin-top:6px;}
-.frags{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;}
-.frag{position:absolute;font-size:10px;letter-spacing:2px;color:rgba(255,68,51,0.18);white-space:nowrap;}
-@keyframes fragFade{0%,100%{opacity:0}15%,85%{opacity:1}}
-.bottom-bar{position:absolute;bottom:56px;left:100px;right:100px;display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:4px;color:rgba(255,68,51,0.3);}
-.sig-bars{display:flex;gap:3px;align-items:flex-end;}
-.sig-bar{width:4px;background:rgba(255,68,51,0.6);}
-@keyframes barP{from{opacity:0.2}to{opacity:0.9}}
+
+/* .null- プレフィックス付き固有クラス群(傾き崩落レイアウト) */
+.null-tilt-root{position:absolute;inset:0;width:1920px;height:1080px;z-index:10;transform-origin:50% 40%;animation:nullTiltDrift 9s ease-in-out infinite;}
+@keyframes nullTiltDrift{0%{transform:rotate(0deg) translateY(0)}30%{transform:rotate(-0.6deg) translateY(4px)}55%{transform:rotate(0.3deg) translateY(-3px)}80%{transform:rotate(-0.2deg) translateY(2px)}100%{transform:rotate(0deg) translateY(0)}}
+.null-panel{position:absolute;border:1px solid rgba(255,68,51,0.35);background:rgba(20,0,0,0.35);padding:22px 28px;}
+.null-panel--title{top:70px;left:90px;width:560px;}
+.null-panel--status{top:70px;right:90px;width:340px;text-align:right;}
+.null-panel--fragments{bottom:130px;left:90px;width:900px;height:280px;overflow:hidden;}
+.null-panel--gauge{bottom:130px;right:90px;width:340px;}
+.null-code{font-size:120px;letter-spacing:6px;color:#ff4433;text-shadow:0 0 22px rgba(255,68,51,0.6);}
+.null-sub{font-size:14px;letter-spacing:5px;color:rgba(255,68,51,0.55);margin-top:8px;}
+.null-status-label{font-size:12px;letter-spacing:4px;color:rgba(255,68,51,0.5);}
+.null-status-value{font-size:22px;margin-top:6px;color:#ff4433;}
+.null-frag-line{font-size:16px;letter-spacing:1px;color:rgba(255,68,51,0.75);padding:4px 0;white-space:nowrap;}
+.null-gauge-bar{width:100%;height:10px;background:rgba(255,68,51,0.12);margin-top:10px;position:relative;overflow:hidden;}
+.null-gauge-fill{position:absolute;left:0;top:0;bottom:0;width:20%;background:#ff4433;box-shadow:0 0 12px #ff4433;}
+.null-slip{position:absolute;pointer-events:none;}
+canvas{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:1;}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div class="scanlines"></div>
-<div class="ui">
-  <div class="corner corner--tl"></div><div class="corner corner--tr"></div>
-  <div class="corner corner--bl"></div><div class="corner corner--br"></div>
-  <div class="top-bar">KYOUKAI &nbsp;/&nbsp; 崩落域 &nbsp;──&nbsp; 崩壊 進行中</div>
-  <div class="rec"><div class="rec-dot"></div>REC</div>
-  <div class="freq-block">
-    <div class="label">崩壊度</div>
-    <div class="freq-value" id="freq">----.---</div>
-    <div class="unit">────</div>
+<div class="null-tilt-root" id="null-root">
+  <div class="null-panel null-panel--title">
+    <div class="null-code" id="null-code">404</div>
+    <div class="null-sub">KYOUKAI // 崩落域 // COLLAPSE STANDBY</div>
   </div>
-  <div class="source-block">
-    <div class="label" style="text-align:right">崩壊源</div>
-    <div class="source-value">不明</div>
+  <div class="null-panel null-panel--status">
+    <div class="null-status-label">崩壊度</div>
+    <div class="null-status-value" id="null-degree">12%</div>
   </div>
-  <div class="frags" id="fragsEl"></div>
-  <div class="bottom-bar">
-    <div>崩壊 進行中</div>
-    <div class="sig-bars" id="barsEl"></div>
-    <div id="ts"></div>
+  <div class="null-panel null-panel--fragments" id="null-frag-panel"></div>
+  <div class="null-panel null-panel--gauge">
+    <div class="null-status-label">構造維持率</div>
+    <div class="null-gauge-bar"><div class="null-gauge-fill" id="null-gauge"></div></div>
   </div>
 </div>
 <script>
 const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
-canvas.width=1920; canvas.height=1080;
-
-let gt=0;
-function drawCanvas(){
-  const id=ctx.createImageData(1920,1080); const d=id.data;
-  for(let i=0;i<d.length;i+=4){
-    const on=Math.random()>0.88;
-    const v=on?Math.floor(30+Math.random()*80):0;
-    d[i]=v; d[i+1]=Math.floor(v*0.2); d[i+2]=Math.floor(v*0.2); d[i+3]=on?210:0;
+canvas.width=1920;canvas.height=1080;
+const NOISE="░▒▓█▌▐▀▄╬╪╫▪▬►◄↕§▲▼╳╱";
+function drawStatic(){
+  ctx.clearRect(0,0,1920,1080);
+  ctx.fillStyle='rgba(255,68,51,0.03)';
+  for(let i=0;i<40;i++){
+    const x=Math.random()*1920,y=Math.random()*1080,w=Math.random()*120+20,h=1;
+    ctx.fillRect(x,y,w,h);
   }
-  ctx.putImageData(id,0,0);
-  if(Math.random()<0.04){
-    for(let r=0;r<3;r++){
-      const y=Math.floor(Math.random()*1080); const h=Math.floor(Math.random()*20)+2;
-      const shift=Math.floor((Math.random()-0.5)*80);
-      try{const seg=ctx.getImageData(0,y,1920,h); ctx.putImageData(seg,shift,y);}catch(e){}
-    }
-  }
-  gt++;
-  requestAnimationFrame(drawCanvas);
+  requestAnimationFrame(drawStatic);
 }
-drawCanvas();
+drawStatic();
 
-let fv=80+Math.random()*900;
-const freqEl=document.getElementById('freq');
-setInterval(()=>{fv+=(Math.random()-.5)*.5;freqEl.textContent=fv.toFixed(3);},250);
-const fragsEl=document.getElementById('fragsEl');
-  const _f0=document.createElement('div');
-  _f0.className='frag';
-  _f0.textContent="接続 悪化";
-  _f0.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f0);
-  const _f1=document.createElement('div');
-  _f1.className='frag';
-  _f1.textContent="データ 欠損";
-  _f1.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f1);
-  const _f2=document.createElement('div');
-  _f2.className='frag';
-  _f2.textContent="── 取得失敗";
-  _f2.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f2);
-  const _f3=document.createElement('div');
-  _f3.className='frag';
-  _f3.textContent="崩壊度 上昇";
-  _f3.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f3);
-  const _f4=document.createElement('div');
-  _f4.className='frag';
-  _f4.textContent="ERROR";
-  _f4.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f4);
-  const _f5=document.createElement('div');
-  _f5.className='frag';
-  _f5.textContent="NULL";
-  _f5.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f5);
-  const _f6=document.createElement('div');
-  _f6.className='frag';
-  _f6.textContent="── ──";
-  _f6.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f6);
-  const _f7=document.createElement('div');
-  _f7.className='frag';
-  _f7.textContent="回復 不能";
-  _f7.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f7);
-  const _f8=document.createElement('div');
-  _f8.className='frag';
-  _f8.textContent="押すな";
-  _f8.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f8);
-  const _f9=document.createElement('div');
-  _f9.className='frag';
-  _f9.textContent="悪化している";
-  _f9.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f9);
-const barsEl=document.getElementById('barsEl');
-[8,12,18,22,18,14,10,14,20,22,18,12].forEach((h,i)=>{
-  const b=document.createElement('div');b.className='sig-bar';b.style.height=h+'px';
-  b.style.animation=`barP ${(0.3+Math.random()*.8).toFixed(2)}s ease-in-out ${(Math.random()*.4).toFixed(2)}s infinite alternate`;
-  barsEl.appendChild(b);
+const FRAGMENTS=["接続 悪化", "データ 欠損", "── 取得失敗", "崩壊度 上昇", "ERROR", "NULL", "── ──", "回復 不能", "座標 消失", "悪化している"];
+const fragPanel=document.getElementById('null-frag-panel');
+function corrupt(text,ratio){
+  return text.split('').map(ch=>{
+    if(ch===' ')return ch;
+    return Math.random()<ratio?NOISE[Math.floor(Math.random()*NOISE.length)]:ch;
+  }).join('');
+}
+const rows=[];
+for(let i=0;i<8;i++){
+  const d=document.createElement('div');
+  d.className='null-frag-line';
+  d.textContent=FRAGMENTS[i%FRAGMENTS.length];
+  fragPanel.appendChild(d);
+  rows.push(d);
+}
+setInterval(()=>{
+  const row=rows[Math.floor(Math.random()*rows.length)];
+  const base=FRAGMENTS[Math.floor(Math.random()*FRAGMENTS.length)];
+  row.textContent=corrupt(base,0.35);
+  setTimeout(()=>{row.textContent=base;},600);
+},1300);
+
+const codeEl=document.getElementById('null-code');
+setInterval(()=>{
+  const orig='404';
+  const chars=orig.split('');
+  const idx=Math.floor(Math.random()*chars.length);
+  chars[idx]=NOISE[Math.floor(Math.random()*NOISE.length)];
+  codeEl.textContent=chars.join('');
+  setTimeout(()=>{codeEl.textContent=orig;},150);
+},2600);
+
+const degreeEl=document.getElementById('null-degree');
+const gaugeEl=document.getElementById('null-gauge');
+let deg=12;
+setInterval(()=>{
+  deg=(deg+Math.floor(Math.random()*9)-2+100)%100;
+  degreeEl.textContent=deg+'%';
+  gaugeEl.style.width=(100-deg)+'%';
+},1800);
+
+// UI部品がずり落ちる演出(パネルごとに個別のドリフト)
+const panels=document.querySelectorAll('.null-panel');
+panels.forEach((p,i)=>{
+  let offset=0;
+  setInterval(()=>{
+    offset=(offset+Math.random()*3-1);
+    offset=Math.max(-6,Math.min(6,offset));
+    p.style.transform=`translate(${offset}px, ${Math.abs(offset)*0.6}px)`;
+  },1500+i*200);
 });
-const tsEl=document.getElementById('ts');
-setInterval(()=>{tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);},1000);
-tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);
 </script>
 </body>
 </html>

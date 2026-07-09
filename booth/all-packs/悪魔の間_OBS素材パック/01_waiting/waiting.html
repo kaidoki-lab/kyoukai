@@ -6,139 +6,52 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:1920px;height:1080px;background:#040000;overflow:hidden;font-family:'Courier New',monospace;color:#cc1122;}
-canvas{position:absolute;top:0;left:0;width:1920px;height:1080px;}
-.scanlines{position:absolute;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,0.12) 3px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:20;}
-.ui{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:10;}
-.corner{position:absolute;width:36px;height:36px;}
-.corner--tl{top:48px;left:48px;border-top:1px solid #cc1122;border-left:1px solid #cc1122;opacity:.5;}
-.corner--tr{top:48px;right:48px;border-top:1px solid #cc1122;border-right:1px solid #cc1122;opacity:.5;}
-.corner--bl{bottom:48px;left:48px;border-bottom:1px solid #cc1122;border-left:1px solid #cc1122;opacity:.5;}
-.corner--br{bottom:48px;right:48px;border-bottom:1px solid #cc1122;border-right:1px solid #cc1122;opacity:.5;}
-.top-bar{position:absolute;top:54px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:8px;color:rgba(204,17,34,0.35);text-transform:uppercase;}
-.rec{position:absolute;top:50px;right:100px;display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:4px;color:rgba(204,17,34,0.5);}
-.rec-dot{width:7px;height:7px;border-radius:50%;background:#cc1122;box-shadow:0 0 6px #cc1122;animation:blink 1.4s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
-.freq-block{position:absolute;left:100px;top:50%;transform:translateY(-50%);}
-.label{font-size:10px;letter-spacing:4px;color:rgba(204,17,34,0.3);margin-bottom:6px;}
-.freq-value{font-size:38px;letter-spacing:3px;color:rgba(204,17,34,0.75);text-shadow:0 0 20px rgba(204,17,34,0.3);}
-.unit{font-size:10px;letter-spacing:4px;color:rgba(204,17,34,0.2);margin-top:4px;}
-.source-block{position:absolute;right:100px;top:50%;transform:translateY(-50%);text-align:right;}
-.source-value{font-size:16px;letter-spacing:4px;color:rgba(204,17,34,0.45);margin-top:6px;}
-.frags{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;}
-.frag{position:absolute;font-size:10px;letter-spacing:2px;color:rgba(204,17,34,0.18);white-space:nowrap;}
-@keyframes fragFade{0%,100%{opacity:0}15%,85%{opacity:1}}
-.bottom-bar{position:absolute;bottom:56px;left:100px;right:100px;display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:4px;color:rgba(204,17,34,0.3);}
-.sig-bars{display:flex;gap:3px;align-items:flex-end;}
-.sig-bar{width:4px;background:rgba(204,17,34,0.6);}
-@keyframes barP{from{opacity:0.2}to{opacity:0.9}}
+
+/* .ma- プレフィックス付き固有クラス群(計器なし・呼吸する光のみ) */
+.ma-void{position:absolute;inset:0;width:1920px;height:1080px;z-index:5;}
+.ma-glow-core{position:absolute;left:50%;top:50%;width:640px;height:640px;margin:-320px 0 0 -320px;border-radius:50%;background:radial-gradient(circle,rgba(204,17,34,0.5) 0%,rgba(204,17,34,0.14) 45%,rgba(0,0,0,0) 72%);animation:maBreathe 5.2s ease-in-out infinite;}
+@keyframes maBreathe{0%,100%{transform:scale(0.85);opacity:0.55}50%{transform:scale(1.12);opacity:0.95}}
+.ma-sigil{position:absolute;left:50%;top:50%;width:360px;height:360px;margin:-180px 0 0 -180px;border:1px solid rgba(204,17,34,0.35);border-radius:50%;animation:maSigilSpin 40s linear infinite;}
+.ma-sigil::before,.ma-sigil::after{content:'';position:absolute;inset:34px;border:1px solid rgba(204,17,34,0.22);border-radius:50%;}
+.ma-sigil::after{inset:70px;border-color:rgba(204,17,34,0.15);}
+@keyframes maSigilSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.ma-label{position:absolute;top:70px;left:0;width:100%;text-align:center;font-size:13px;letter-spacing:10px;color:rgba(204,17,34,0.4);text-transform:uppercase;}
+.ma-silence-line{position:absolute;bottom:110px;left:0;width:100%;text-align:center;font-size:20px;letter-spacing:3px;color:rgba(204,17,34,0.0);transition:color 2s ease;}
+canvas{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:1;}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div class="scanlines"></div>
-<div class="ui">
-  <div class="corner corner--tl"></div><div class="corner corner--tr"></div>
-  <div class="corner corner--bl"></div><div class="corner corner--br"></div>
-  <div class="top-bar">KYOUKAI &nbsp;/&nbsp; 悪魔の間 &nbsp;──&nbsp; 存在 確認</div>
-  <div class="rec"><div class="rec-dot"></div>REC</div>
-  <div class="freq-block">
-    <div class="label">訪問回数</div>
-    <div class="freq-value" id="freq">----.---</div>
-    <div class="unit">────</div>
-  </div>
-  <div class="source-block">
-    <div class="label" style="text-align:right">存在</div>
-    <div class="source-value">大魔将</div>
-  </div>
-  <div class="frags" id="fragsEl"></div>
-  <div class="bottom-bar">
-    <div>存在 確認</div>
-    <div class="sig-bars" id="barsEl"></div>
-    <div id="ts"></div>
-  </div>
+<div class="ma-label">KYOUKAI // 悪魔の間 // 存在確認</div>
+<div class="ma-void">
+  <div class="ma-glow-core"></div>
+  <div class="ma-sigil"></div>
 </div>
+<div class="ma-silence-line" id="ma-silence"></div>
 <script>
 const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
-canvas.width=1920; canvas.height=1080;
-
-let bt=0;
-function drawCanvas(){
+canvas.width=1920;canvas.height=1080;
+let t=0;
+function draw(){
   ctx.clearRect(0,0,1920,1080);
-  const b=(Math.sin(bt*0.015)+1)/2;
-  const g=ctx.createRadialGradient(960,540,0,960,540,300+b*80);
-  g.addColorStop(0,`rgba(204,17,34,${0.08+b*0.05})`);
-  g.addColorStop(0.6,`rgba(204,17,34,0.02)`);
-  g.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=g; ctx.fillRect(0,0,1920,1080);
-  bt++;
-  requestAnimationFrame(drawCanvas);
+  const breathe=(Math.sin(t)+1)/2;
+  ctx.fillStyle='rgba(204,17,34,'+(0.02+breathe*0.02)+')';
+  ctx.fillRect(0,0,1920,1080);
+  t+=0.012;
+  requestAnimationFrame(draw);
 }
-drawCanvas();
+draw();
 
-let fv=80+Math.random()*900;
-const freqEl=document.getElementById('freq');
-setInterval(()=>{fv+=(Math.random()-.5)*.5;freqEl.textContent=fv.toFixed(3);},250);
-const fragsEl=document.getElementById('fragsEl');
-  const _f0=document.createElement('div');
-  _f0.className='frag';
-  _f0.textContent="また来たか";
-  _f0.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f0);
-  const _f1=document.createElement('div');
-  _f1.className='frag';
-  _f1.textContent="── 黙れ";
-  _f1.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f1);
-  const _f2=document.createElement('div');
-  _f2.className='frag';
-  _f2.textContent="なぜここへ";
-  _f2.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f2);
-  const _f3=document.createElement('div');
-  _f3.className='frag';
-  _f3.textContent="帰れ";
-  _f3.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f3);
-  const _f4=document.createElement('div');
-  _f4.className='frag';
-  _f4.textContent="── いや";
-  _f4.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f4);
-  const _f5=document.createElement('div');
-  _f5.className='frag';
-  _f5.textContent="少し";
-  _f5.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f5);
-  const _f6=document.createElement('div');
-  _f6.className='frag';
-  _f6.textContent="待て";
-  _f6.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f6);
-  const _f7=document.createElement('div');
-  _f7.className='frag';
-  _f7.textContent="何を求める";
-  _f7.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f7);
-  const _f8=document.createElement('div');
-  _f8.className='frag';
-  _f8.textContent="大魔将は";
-  _f8.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f8);
-  const _f9=document.createElement('div');
-  _f9.className='frag';
-  _f9.textContent="見ている";
-  _f9.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f9);
-const barsEl=document.getElementById('barsEl');
-[8,12,18,22,18,14,10,14,20,22,18,12].forEach((h,i)=>{
-  const b=document.createElement('div');b.className='sig-bar';b.style.height=h+'px';
-  b.style.animation=`barP ${(0.3+Math.random()*.8).toFixed(2)}s ease-in-out ${(Math.random()*.4).toFixed(2)}s infinite alternate`;
-  barsEl.appendChild(b);
-});
-const tsEl=document.getElementById('ts');
-setInterval(()=>{tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);},1000);
-tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);
+// 台詞は「大魔将」の沈黙がちな口調を踏襲し、長い無言のあとに短く現れる
+const LINES=["……帰れ。", "長居はするな。", "……少しだけ、暇だった。", "闇とはな、恐ろしいものではない。", "ただ、静かなのだ。", "待っていたわけでは、ない。", "……ゆっくりしていけ。", "貴様は物好きだな。"];
+const silenceEl=document.getElementById('ma-silence');
+function showSilenceLine(){
+  silenceEl.textContent=LINES[Math.floor(Math.random()*LINES.length)];
+  silenceEl.style.color='rgba(204,17,34,0.5)';
+  setTimeout(()=>{silenceEl.style.color='rgba(204,17,34,0)';},2600);
+}
+setInterval(showSilenceLine,7000);
 </script>
 </body>
 </html>

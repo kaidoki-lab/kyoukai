@@ -24,6 +24,14 @@
   - `booth/diff_check.py` を新規作成。`git archive --format=zip`で指定コミット時点のbooth/一式を一時展開し、旧room_specsから再生成したHTMLと現行HTMLをPlaywrightでスクショ→Pillowでピクセル差分判定。Windows上で日本語ファイル名を含むtar展開が失敗する問題があったためzip形式に変更して解決
   - 検証: `python generate_packs.py`で48ファイル+zip17本再生成 → `verify_packs.py` 48/48 pass → `diff_check.py observation archive hyougi exit --commit b7ca038` で対象12ファイル全てDIFF(旧デザインとの差分あり)を確認
   - ROADMAP.mdの工程2を「完了」に更新済み、完了条件チェックボックス全て[x]
+- OBSパック「部屋別個性化リニューアル」の工程3「部屋実装グループB（崩落域・逆観測室・悪魔の間・なまはげ）」を実装
+  - `room_specs/null.py`: 崩落域を専用実装化。waitingは画面全体が`transform`でゆっくり傾き・各パネルが個別にずり落ちる演出(`.null-tilt-root`)+404文字の断続的な文字化け、brbは周期的な崩壊→再構築サイクル(パネル縮小+行ズレグリッチ強化)、lower_thirdは名前の文字が時々欠落・復元。一次データは`static/kyoukai-404.js`のNOISE文字集合・corrupt()のratio刻みを`asset_extract.read_source`で実読込
+  - `room_specs/observer.py`: 逆観測室を専用実装化。waitingは中央に瞳孔のような多重円環(`.obsr-iris-wrap`)+UI最小限+時折フェードする囁き文、brbは巨大な目がゆっくり開閉(`clip-path`+`scaleY`)し「観測は続いています」、lower_thirdは名前の下に瞳孔型下線が左右に揺れる。一次データは`templates/observer.html`の語りかけ文体・白基調配色を実読込
+  - `room_specs/ma.py`: 悪魔の間を専用実装化(方式A・画像なし)。waitingは呼吸する赤い光の同心グロー+紋様の回転リング(計器なし)、brbは光が強く呼吸し「大魔将」の沈黙がちな台詞が間欠フェード表示、lower_thirdは紋様付き黒枠+刻印風の赤い名前。一次データは`static/ma.js`のCONVS会話データ(「……帰れ。」等の間を強く意識した台詞)を実読込
+  - `room_specs/namahage.py`: なまはげを専用実装化(方式B・画像同梱)。waitingは本体画像`static/images/namahage/namahage-room-9x16.png`を`pack_base.bg_image_css`で中央配置+左右暗色グラデーション+16x12ドット目Canvas(`image-rendering:pixelated`)を本体と同座標比率で重ね、視線移動・まばたきを本体`namahage.js`のGAZE_POSITIONS相当で再現。brbは目が明滅し「──いるか」等が間欠表示、lower_thirdは名前の横にドット目が付き時々瞬き。画像は`asset_extract.copy_image`でパックの`assets/`へ同梱
+  - 各部屋、部屋IDプレフィックス付きCSSクラス(`.null-` `.obsr-` `.ma-` `.nmh-`)を10個以上ずつ付与
+  - 検証: `python generate_packs.py`で48ファイル+zip17本再生成 → `verify_packs.py` 48/48 pass（逆観測室lower_thirdで`#name-el`のtextContentが子要素混入によりズレるバグを1回発見・修正して再検証pass）→ `diff_check.py null observer ma namahage --commit b7ca038` で対象12ファイル全てDIFF確認 → `screenshot_packs.py`を全16部屋(48ファイル)に対して再実行し輝度チェック全pass（悪魔の間・なまはげも含め閾値の部屋別上書きなしで通過。brightness値は各waiting 2.99〜8.04、brb 3.27〜4.57）
+  - ROADMAP.mdの工程3を「完了」に更新済み、完了条件チェックボックス全て[x]
 
 ## 以前やったこと（2026-07-08）
 
@@ -113,7 +121,7 @@
 - **ローカル**: `C:/Users/pc/Documents/Claude/Projects/kyoukai` が最新
 - **ブランチ**: main、本サイト側は全変更プッシュ済み
 - **最新コミット**: `9320147 Add Amazon/Rakuten areas to kanrinin; update room image`
-- **OBSパック 部屋別個性化リニューアル（`ROADMAP.md` 現行版）**: 工程1（基盤リファクタ）・工程2（部屋実装グループA: 観測域・記録室・評議録・境界域）完了。工程3〜6は未着手。`booth/all-packs/`・`booth/verify_report.json`・`booth/room_specs/`・`booth/pack_base.py`・`booth/asset_extract.py`・`booth/legacy_templates.py`・`booth/diff_check.py`は現状未コミット
+- **OBSパック 部屋別個性化リニューアル（`ROADMAP.md` 現行版）**: 工程1（基盤リファクタ）・工程2（部屋実装グループA: 観測域・記録室・評議録・境界域）・工程3（部屋実装グループB: 崩落域・逆観測室・悪魔の間・なまはげ）完了。工程4〜6は未着手。`booth/all-packs/`・`booth/verify_report.json`・`booth/room_specs/`・`booth/pack_base.py`・`booth/asset_extract.py`・`booth/legacy_templates.py`・`booth/diff_check.py`は現状未コミット
 - 旧世代のBOOTH販売展開（前ラウンド）成果物（`booth/all-packs`旧版, `booth/thumbnails`, `booth/listings`, `booth/signal-pack`, `booth/verify_report.json`旧版）はユーザー指示で削除済み（git履歴には残っている。コミット`3101d72`）
 
 ---
@@ -138,7 +146,6 @@
 3. **観測域（/observation）の更新** — 更新頻度を上げたい部屋、未着手
 
 ### OBSパック 部屋別個性化リニューアル（`ROADMAP.md`）
-- 工程3: 部屋実装グループB（崩落域・逆観測室・悪魔の間・なまはげ）— 悪魔の間は方式Aへ変更済みなのでコード演出で表現（アセット同梱なし）。`booth/diff_check.py`は工程2で作成済みなのでそのまま使う（`python diff_check.py <room_id...> --commit <commit>`）
 - 工程4: 部屋実装グループC（AI大明神・極楽域・棒入れ祭・管理人室）— 極楽域は方式Aへ変更済み
 - 工程5: 部屋実装グループD（粒子観測・波紋域・卵部屋・台風ニュース）
 - 工程6: 全再生成・検証拡張（verify_packs差別化チェック・final_checkのzipサイズ上限）・thumbnails/listings再生成・コミット
