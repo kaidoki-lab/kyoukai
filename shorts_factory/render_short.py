@@ -44,6 +44,10 @@ DEFAULT_BGM_CANDIDATES = [
 RECENT_BGM_HISTORY = OUTPUT_SHORTS / "recent_bgm_history.json"
 RECENT_BGM_LIMIT = 6
 FONTS = [
+    ROOT / "assets" / "fonts" / "MPLUSRounded1c-ExtraBold.ttf",
+    Path("C:/Windows/Fonts/NotoSansJP-VF.ttf"),
+    Path("C:/Windows/Fonts/BIZ-UDGothicB.ttc"),
+    Path("C:/Windows/Fonts/UDDigiKyokashoN-B.ttc"),
     Path("C:/Windows/Fonts/YuGothM.ttc"),
     Path("C:/Windows/Fonts/YuGothB.ttc"),
     Path("C:/Windows/Fonts/meiryo.ttc"),
