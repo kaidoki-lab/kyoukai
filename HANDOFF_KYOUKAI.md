@@ -1,10 +1,22 @@
-# HANDOFF_KYOUKAI.md — 2026-07-08（最新）
+# HANDOFF_KYOUKAI.md — 2026-07-09（最新）
 
 このファイルを新規チャット・Claude Code・Codex の冒頭に貼るだけで再開できます。
 
 ---
 
-## 直近でやったこと（2026-07-08）
+## 直近でやったこと（2026-07-09）
+
+- OBSパック「部屋別個性化リニューアル」（`ROADMAP.md` 新版、前ラウンドの`ROADMAP_BOOTH販売展開_完了.md`の続き）の工程1「基盤リファクタ（pack_base + room_specs + asset_extract）」を実装
+  - `booth/pack_base.py` を新規作成: `html_shell()`、選択式ヘルパー（`scanlines_css`/`rec_indicator_html`/`corner_frame_css`/`blink_keyframes`/`bg_image_css`）、`write_pack()`、`make_zip()`
+  - `booth/asset_extract.py` を新規作成: `PROJECT_ROOT`（booth/の親）、`copy_image()`（長辺1500px縮小+PNG/JPEG/WEBP最適化）、`read_source()`（存在しない場合は例外で落とす設計）
+  - `ASSET_MAP` を実地調査で確定: kanrinin/namahage/matsuri/fukashitsu/typhoon-newsは方式B画像が実在。**daimyojinも`static/images/daimyojin/daimyojin_pc.webp`等が実在し方式B確定**。**ma・gokurakuは部屋専用の本体背景画像が存在しないため方式Aへ変更**（ROADMAP.mdの部屋別デザイン指針表・実装方式説明を更新済み）
+  - `booth/room_specs/`（16ファイル+`__init__.py`）を新規作成。工程1時点では全て`legacy_templates.py`の関数を呼ぶ薄いラッパー（見た目は1pxも変えていない）。`typhoon-news`は`typhoon_news.py`というファイル名でid='typhoon-news'を維持
+  - `booth/legacy_templates.py` を新規作成。現行`generate_packs.py`のROOMS/CANVAS_JS/waiting_html/brb_html/lower_third_html/readme_txtをそのまま移設
+  - `booth/generate_packs.py` を生成フロー（生成・zip・バンドル）のみに簡素化。`room_specs.load_all_specs()`経由で生成。他スクリプト（final_check/screenshot_packs/make_thumbnails/make_listings）が`from generate_packs import ROOMS`で参照する互換性は`legacy_templates.ROOMS`の再エクスポートで維持
+  - 検証: 旧成果物削除済みのため`python generate_packs.py`で48ファイル+zip17本を新規生成 → 全64ファイル（html+README.txt）が削除前コミット（`4de9a6f`）と**バイト完全一致**であることをスクリプトで確認。`verify_packs.py`は48/48 pass。`final_check.py`はzip検証(17/17)・verify_report検証(48/48)がPASS（thumbnails/listingsは工程6で再生成予定のため、この工程ではFAILのままでよい契約どおり）
+  - ROADMAP.mdの工程1を「完了」に更新済み、完了条件チェックボックス全て[x]
+
+## 以前やったこと（2026-07-08）
 
 - BOOTH販売展開プロジェクト（`booth/ROADMAP.md` 相当、実体は `ROADMAP.md`）の工程1「全パックHTML品質検証と修正」を実装
   - `booth/verify_packs.py` を新規作成。Playwright(chromium, headless)で16部屋×3種=48HTMLを検証
@@ -92,7 +104,8 @@
 - **ローカル**: `C:/Users/pc/Documents/Claude/Projects/kyoukai` が最新
 - **ブランチ**: main、本サイト側は全変更プッシュ済み
 - **最新コミット**: `9320147 Add Amazon/Rakuten areas to kanrinin; update room image`
-- **BOOTH販売展開（`ROADMAP.md` 参照）**: 工程1〜6すべて実装完了・未コミット。工程6は機械的チェック（`final_check.py`）は全pass。残るはユーザーによるOBS実機確認のみ（`booth/listings/_OBS実機確認手順.md` 参照）
+- **OBSパック 部屋別個性化リニューアル（`ROADMAP.md` 現行版）**: 工程1（基盤リファクタ）完了。工程2〜6は未着手。`booth/all-packs/`・`booth/verify_report.json`・`booth/room_specs/`・`booth/pack_base.py`・`booth/asset_extract.py`・`booth/legacy_templates.py`は現状未コミット
+- 旧世代のBOOTH販売展開（前ラウンド）成果物（`booth/all-packs`旧版, `booth/thumbnails`, `booth/listings`, `booth/signal-pack`, `booth/verify_report.json`旧版）はユーザー指示で削除済み（git履歴には残っている。コミット`3101d72`）
 
 ---
 
@@ -115,11 +128,13 @@
 
 3. **観測域（/observation）の更新** — 更新頻度を上げたい部屋、未着手
 
-### BOOTH販売展開（`ROADMAP.md`）
-- 工程6: 機械的チェック（`booth/final_check.py`）は完了・ALL PASS。残タスクはユーザーによるOBS実機確認のみ
-  - 手順書: `booth/listings/_OBS実機確認手順.md`（任意の1部屋分のwaiting/brb/lower_thirdをOBS Studioのブラウザソースで確認）
-  - 確認完了後、ROADMAP.mdの工程6の完了条件2つ目にチェックを入れ、状態を「完了」に更新すること
-- 全工程完了後、`ROADMAP.md`・`booth/`配下の新規/変更ファイルをコミットするかどうかまろに確認する（現状未コミット）
+### OBSパック 部屋別個性化リニューアル（`ROADMAP.md`）
+- 工程2: 部屋実装グループA（観測域・記録室・評議録・境界域）— `room_specs/observation.py`/`archive.py`/`hyougi.py`/`exit.py`を専用実装化。`booth/diff_check.py`もこの工程で新規作成する
+- 工程3: 部屋実装グループB（崩落域・逆観測室・悪魔の間・なまはげ）— 悪魔の間は方式Aへ変更済みなのでコード演出で表現（アセット同梱なし）
+- 工程4: 部屋実装グループC（AI大明神・極楽域・棒入れ祭・管理人室）— 極楽域は方式Aへ変更済み
+- 工程5: 部屋実装グループD（粒子観測・波紋域・卵部屋・台風ニュース）
+- 工程6: 全再生成・検証拡張（verify_packs差別化チェック・final_checkのzipサイズ上限）・thumbnails/listings再生成・コミット
+- 工程1〜6完了後、`ROADMAP.md`・`booth/`配下の新規/変更ファイルをコミットするかどうかまろに確認する（現状未コミット）
 
 ---
 
@@ -167,6 +182,17 @@
 
 ### キャッシュバスト
 CSS・JS変更後はHTMLの `?v=N` を上げること（現在 `kanrinin.js?v=2`、`kanrinin.css?v=scenario1`）
+
+### booth/（OBSパック）の構成（工程1リファクタ後）
+```
+booth/pack_base.py        # HTMLシェル・共通CSS部品(任意利用)・write_pack/make_zip
+booth/asset_extract.py    # PROJECT_ROOT・copy_image・read_source・ASSET_MAP(部屋ID→本体画像パス)
+booth/legacy_templates.py # 旧世代テンプレート一式(ROOMS/CANVAS_JS/waiting_html等)。room_specsが工程2以降で専用実装に置き換わるまでの移行措置
+booth/room_specs/         # 部屋別テンプレート16ファイル+__init__.py(load_all_specs)
+booth/generate_packs.py   # 生成フロー本体。room_specs.load_all_specs()経由。ROOMSはlegacy_templatesから再エクスポート(final_check等の互換維持)
+```
+- ASSET_MAP実地調査結果: 方式B(画像同梱)確定 = kanrinin, namahage, matsuri, fukashitsu, typhoon-news, daimyojin。方式A(コード演出)へ変更 = ma, gokuraku（部屋専用の本体背景画像が存在しないため）
+- room_specsのファイル名はハイフン不可のため `typhoon-news` は `typhoon_news.py`（SPEC内idは`typhoon-news`のまま）
 
 ### 主要ファイル
 ```

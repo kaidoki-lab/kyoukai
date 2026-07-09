@@ -1,0 +1,466 @@
+{
+  "AI大明神": {
+    "waiting": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "brb": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "lower_third": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "name_el_text": "名前"
+      }
+    }
+  },
+  "なまはげ": {
+    "waiting": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "brb": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "lower_third": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "name_el_text": "名前"
+      }
+    }
+  },
+  "卵部屋": {
+    "waiting": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "brb": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "lower_third": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "name_el_text": "名前"
+      }
+    }
+  },
+  "台風ニュース": {
+    "waiting": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "brb": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "lower_third": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "name_el_text": "名前"
+      }
+    }
+  },
+  "境界域": {
+    "waiting": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "brb": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "lower_third": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "name_el_text": "名前"
+      }
+    }
+  },
+  "崩落域": {
+    "waiting": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "brb": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "lower_third": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "name_el_text": "名前"
+      }
+    }
+  },
+  "悪魔の間": {
+    "waiting": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "brb": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "lower_third": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "name_el_text": "名前"
+      }
+    }
+  },
+  "棒入れ祭": {
+    "waiting": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "brb": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "lower_third": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "name_el_text": "名前"
+      }
+    }
+  },
+  "極楽域": {
+    "waiting": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "brb": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "lower_third": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "name_el_text": "名前"
+      }
+    }
+  },
+  "波紋域": {
+    "waiting": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "brb": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "lower_third": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "name_el_text": "名前"
+      }
+    }
+  },
+  "管理人室": {
+    "waiting": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "brb": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "lower_third": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "name_el_text": "名前"
+      }
+    }
+  },
+  "粒子観測": {
+    "waiting": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "brb": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "lower_third": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "name_el_text": "名前"
+      }
+    }
+  },
+  "観測域": {
+    "waiting": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "brb": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "lower_third": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "name_el_text": "名前"
+      }
+    }
+  },
+  "記録室": {
+    "waiting": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "brb": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "lower_third": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "name_el_text": "名前"
+      }
+    }
+  },
+  "評議録": {
+    "waiting": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "brb": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "lower_third": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "name_el_text": "名前"
+      }
+    }
+  },
+  "逆観測室": {
+    "waiting": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "brb": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "canvas_count": 1
+      }
+    },
+    "lower_third": {
+      "pass": true,
+      "reasons": [],
+      "console_errors": [],
+      "page_errors": [],
+      "detail": {
+        "name_el_text": "名前"
+      }
+    }
+  }
+}
