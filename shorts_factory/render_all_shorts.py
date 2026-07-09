@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from render_short import all_room_ids, create_remix, normalize_run_id, resolve_bgm_path, run_rooms
+from render_short import all_room_ids, available_bgm_paths, create_remix, normalize_run_id, post_ready_dir, run_rooms
 
 
 def main() -> int:
@@ -22,8 +22,9 @@ def main() -> int:
     args = parser.parse_args()
 
     run_id = normalize_run_id(args.run_id)
-    bgm_path = resolve_bgm_path(args.bgm) if args.with_bgm else None
-    if args.with_bgm and bgm_path is None:
+    output_dir = post_ready_dir(run_id)
+    bgm_paths = available_bgm_paths(args.bgm) if args.with_bgm else []
+    if args.with_bgm and not bgm_paths:
         print("ERROR: BGMファイルが見つかりません。")
         return 1
     room_ids = all_room_ids() if not args.post_target_only else [
@@ -37,12 +38,13 @@ def main() -> int:
         start=args.start,
         auto_record=not args.no_auto_record,
         flat_output=True,
+        output_dir=output_dir,
         allow_non_post_target=not args.post_target_only,
         with_bgm=args.with_bgm,
-        bgm_path=bgm_path,
+        bgm_paths=bgm_paths,
         bgm_volume=args.bgm_volume,
     )
-    remix = create_remix(results, with_bgm=args.with_bgm, bgm_path=bgm_path, bgm_volume=args.bgm_volume)
+    remix = create_remix(results, output_dir=output_dir, with_bgm=args.with_bgm, bgm_paths=bgm_paths, bgm_volume=args.bgm_volume)
     success = sum(1 for item in results if item["status"] == "success")
     failed = sum(1 for item in results if item["status"] == "failed")
     skipped = sum(1 for item in results if item["status"] == "skipped")
