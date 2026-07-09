@@ -6,139 +6,115 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:1920px;height:1080px;background:#050003;overflow:hidden;font-family:'Courier New',monospace;color:#ffaacc;}
-canvas{position:absolute;top:0;left:0;width:1920px;height:1080px;}
-.scanlines{position:absolute;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,0.12) 3px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:20;}
-.ui{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:10;}
-.corner{position:absolute;width:36px;height:36px;}
-.corner--tl{top:48px;left:48px;border-top:1px solid #ffaacc;border-left:1px solid #ffaacc;opacity:.5;}
-.corner--tr{top:48px;right:48px;border-top:1px solid #ffaacc;border-right:1px solid #ffaacc;opacity:.5;}
-.corner--bl{bottom:48px;left:48px;border-bottom:1px solid #ffaacc;border-left:1px solid #ffaacc;opacity:.5;}
-.corner--br{bottom:48px;right:48px;border-bottom:1px solid #ffaacc;border-right:1px solid #ffaacc;opacity:.5;}
-.top-bar{position:absolute;top:54px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:8px;color:rgba(255,170,204,0.35);text-transform:uppercase;}
-.rec{position:absolute;top:50px;right:100px;display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:4px;color:rgba(255,170,204,0.5);}
-.rec-dot{width:7px;height:7px;border-radius:50%;background:#ffaacc;box-shadow:0 0 6px #ffaacc;animation:blink 1.4s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
-.freq-block{position:absolute;left:100px;top:50%;transform:translateY(-50%);}
-.label{font-size:10px;letter-spacing:4px;color:rgba(255,170,204,0.3);margin-bottom:6px;}
-.freq-value{font-size:38px;letter-spacing:3px;color:rgba(255,170,204,0.75);text-shadow:0 0 20px rgba(255,170,204,0.3);}
-.unit{font-size:10px;letter-spacing:4px;color:rgba(255,170,204,0.2);margin-top:4px;}
-.source-block{position:absolute;right:100px;top:50%;transform:translateY(-50%);text-align:right;}
-.source-value{font-size:16px;letter-spacing:4px;color:rgba(255,170,204,0.45);margin-top:6px;}
-.frags{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;}
-.frag{position:absolute;font-size:10px;letter-spacing:2px;color:rgba(255,170,204,0.18);white-space:nowrap;}
-@keyframes fragFade{0%,100%{opacity:0}15%,85%{opacity:1}}
-.bottom-bar{position:absolute;bottom:56px;left:100px;right:100px;display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:4px;color:rgba(255,170,204,0.3);}
-.sig-bars{display:flex;gap:3px;align-items:flex-end;}
-.sig-bar{width:4px;background:rgba(255,170,204,0.6);}
-@keyframes barP{from{opacity:0.2}to{opacity:0.9}}
+
+/* .fks- プレフィックス付き固有クラス群(孵化装置ビュー: 中央画像+卵形粒子明滅+左右計器パネル) */
+.fks-bg{position:absolute;top:0;left:0;width:1920px;height:1080px;background-color:#050003;background-image:url('assets/fukashitsu-room-9x16.png');background-repeat:no-repeat;background-position:center center;background-size:auto 1080px;z-index:1;}
+.fks-bg-fade-left{position:absolute;top:0;left:0;width:30%;height:100%;background:linear-gradient(to right,#050003 0%,rgba(0,0,0,0) 100%);z-index:2;}
+.fks-bg-fade-right{position:absolute;top:0;right:0;width:30%;height:100%;background:linear-gradient(to left,#050003 0%,rgba(0,0,0,0) 100%);z-index:2;}
+.fks-header{position:absolute;top:44px;left:0;width:100%;text-align:center;font-size:13px;letter-spacing:8px;color:rgba(255,170,204,0.75);z-index:6;}
+.fks-egg-canvas{position:absolute;left:50%;top:50%;width:520px;height:640px;margin:-320px 0 0 -260px;z-index:5;}
+.fks-panel{position:absolute;top:220px;width:300px;padding:24px;background:rgba(10,0,6,0.5);border:1px solid rgba(255,170,204,0.3);border-radius:16px;z-index:6;}
+.fks-panel--left{left:64px;}
+.fks-panel--right{right:64px;}
+.fks-gauge{margin-bottom:22px;}
+.fks-gauge:last-child{margin-bottom:0;}
+.fks-gauge-label{font-size:12px;letter-spacing:4px;margin-bottom:8px;opacity:0.8;}
+.fks-gauge-bar{width:100%;height:14px;border-radius:7px;background:rgba(255,255,255,0.08);overflow:hidden;}
+.fks-gauge-fill{height:100%;border-radius:7px;transition:width 0.6s ease;}
+.fks-caption{position:absolute;bottom:56px;left:0;width:100%;text-align:center;font-size:14px;letter-spacing:5px;color:rgba(255,170,204,0.65);z-index:6;}
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
-<div class="scanlines"></div>
-<div class="ui">
-  <div class="corner corner--tl"></div><div class="corner corner--tr"></div>
-  <div class="corner corner--bl"></div><div class="corner corner--br"></div>
-  <div class="top-bar">KYOUKAI &nbsp;/&nbsp; 卵部屋 &nbsp;──&nbsp; 孵化 観測中</div>
-  <div class="rec"><div class="rec-dot"></div>REC</div>
-  <div class="freq-block">
-    <div class="label">温度</div>
-    <div class="freq-value" id="freq">----.---</div>
-    <div class="unit">────</div>
+<div class="fks-bg"></div>
+<div class="fks-bg-fade-left"></div>
+<div class="fks-bg-fade-right"></div>
+<div class="fks-header">KYOUKAI // 卵部屋</div>
+<canvas class="fks-egg-canvas" id="fksEgg" width="260" height="320"></canvas>
+<div class="fks-panel fks-panel--left">
+  <div class="fks-gauge">
+    <div class="fks-gauge-label">栄養</div>
+    <div class="fks-gauge-bar"><div class="fks-gauge-fill" id="gauge-r" style="background:rgb(255,132,132);width:40%;"></div></div>
   </div>
-  <div class="source-block">
-    <div class="label" style="text-align:right">状態</div>
-    <div class="source-value">卵</div>
-  </div>
-  <div class="frags" id="fragsEl"></div>
-  <div class="bottom-bar">
-    <div>孵化 観測中</div>
-    <div class="sig-bars" id="barsEl"></div>
-    <div id="ts"></div>
+  <div class="fks-gauge">
+    <div class="fks-gauge-label">酸素</div>
+    <div class="fks-gauge-bar"><div class="fks-gauge-fill" id="gauge-b" style="background:rgb(132,186,255);width:55%;"></div></div>
   </div>
 </div>
+<div class="fks-panel fks-panel--right">
+  <div class="fks-gauge">
+    <div class="fks-gauge-label">温度</div>
+    <div class="fks-gauge-bar"><div class="fks-gauge-fill" id="gauge-y" style="background:rgb(255,232,125);width:62%;"></div></div>
+  </div>
+  <div class="fks-gauge">
+    <div class="fks-gauge-label">孵化予測</div>
+    <div class="fks-gauge-bar"><div class="fks-gauge-fill" id="gauge-x" style="background:rgba(255,170,204,0.7);width:28%;"></div></div>
+  </div>
+</div>
+<div class="fks-caption">孵化まで観測を継続します</div>
 <script>
-const canvas=document.getElementById('c');
-const ctx=canvas.getContext('2d');
-canvas.width=1920; canvas.height=1080;
+(function(){
+  var cv=document.getElementById('fksEgg');
+  var ctx=cv.getContext('2d');
+  var W=cv.width,H=cv.height;
+  var cx=W*0.5,cy=H*0.5;
+  var COLORS={"r": [255, 132, 132], "b": [132, 186, 255], "y": [255, 232, 125]};
+  var N=140;
+  var pts=[];
+  function eggPoint(){
+    var a=Math.random()*Math.PI*2;
+    var rx=W*0.36,ry=H*0.40;
+    // 卵形: 下部を膨らませ上部をすぼめる
+    var yShape=Math.sin(a)>=0?ry*1.12:ry*0.86;
+    return {
+      x:cx+Math.cos(a)*rx*(0.3+Math.random()*0.7),
+      y:cy+Math.sin(a)*yShape*(0.3+Math.random()*0.7)
+    };
+  }
+  for(var i=0;i<N;i++){
+    var p=eggPoint();
+    var f=i/N;
+    var t=f<0.34?'r':f<0.67?'b':'y';
+    pts.push({x:p.x,y:p.y,t:t,phase:Math.random()*Math.PI*2,sz:1.6+Math.random()*1.8});
+  }
+  var t=0;
+  function draw(){
+    t+=0.02;
+    ctx.clearRect(0,0,W,H);
+    // 卵の輪郭(淡いガイド)
+    ctx.strokeStyle='rgba(255,170,204,0.18)';
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.ellipse(cx,cy,W*0.36,H*0.40,0,0,Math.PI*2);
+    ctx.stroke();
+    for(var i=0;i<pts.length;i++){
+      var p=pts[i];
+      var glow=0.4+0.6*Math.abs(Math.sin(t+p.phase));
+      var c=COLORS[p.t];
+      ctx.globalAlpha=glow;
+      ctx.fillStyle='rgb('+c[0]+','+c[1]+','+c[2]+')';
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.sz,0,Math.PI*2);
+      ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
 
-let glowt=0;
-function drawCanvas(){
-  ctx.clearRect(0,0,1920,1080);
-  const pulse=(Math.sin(glowt*0.018)+1)/2;
-  const r1=ctx.createRadialGradient(960,480,0,960,480,200+pulse*60);
-  r1.addColorStop(0,`rgba(255,170,204,${0.12+pulse*0.08})`);
-  r1.addColorStop(0.5,`rgba(255,170,204,${0.04+pulse*0.02})`);
-  r1.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=r1; ctx.fillRect(0,0,1920,1080);
-  glowt++;
-  requestAnimationFrame(drawCanvas);
+// 計器ゲージがゆっくり揺れながら推移する(常時観測中を表現)
+function jitterGauge(id,base){
+  var el=document.getElementById(id);
+  if(!el)return;
+  setInterval(function(){
+    var v=Math.max(15,Math.min(92,base+(Math.random()-0.5)*10));
+    el.style.width=v+'%';
+  },2600);
 }
-drawCanvas();
-
-let fv=80+Math.random()*900;
-const freqEl=document.getElementById('freq');
-setInterval(()=>{fv+=(Math.random()-.5)*.5;freqEl.textContent=fv.toFixed(3);},250);
-const fragsEl=document.getElementById('fragsEl');
-  const _f0=document.createElement('div');
-  _f0.className='frag';
-  _f0.textContent="卵 観察中";
-  _f0.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f0);
-  const _f1=document.createElement('div');
-  _f1.className='frag';
-  _f1.textContent="栄養 注入";
-  _f1.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f1);
-  const _f2=document.createElement('div');
-  _f2.className='frag';
-  _f2.textContent="酸素 供給";
-  _f2.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f2);
-  const _f3=document.createElement('div');
-  _f3.className='frag';
-  _f3.textContent="温度 維持";
-  _f3.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f3);
-  const _f4=document.createElement('div');
-  _f4.className='frag';
-  _f4.textContent="── もうすぐ";
-  _f4.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f4);
-  const _f5=document.createElement('div');
-  _f5.className='frag';
-  _f5.textContent="パーティクル 変化";
-  _f5.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f5);
-  const _f6=document.createElement('div');
-  _f6.className='frag';
-  _f6.textContent="色が変わった";
-  _f6.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f6);
-  const _f7=document.createElement('div');
-  _f7.className='frag';
-  _f7.textContent="取り出せる";
-  _f7.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f7);
-  const _f8=document.createElement('div');
-  _f8.className='frag';
-  _f8.textContent="── まだ";
-  _f8.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f8);
-  const _f9=document.createElement('div');
-  _f9.className='frag';
-  _f9.textContent="孵化 待機中";
-  _f9.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f9);
-const barsEl=document.getElementById('barsEl');
-[8,12,18,22,18,14,10,14,20,22,18,12].forEach((h,i)=>{
-  const b=document.createElement('div');b.className='sig-bar';b.style.height=h+'px';
-  b.style.animation=`barP ${(0.3+Math.random()*.8).toFixed(2)}s ease-in-out ${(Math.random()*.4).toFixed(2)}s infinite alternate`;
-  barsEl.appendChild(b);
-});
-const tsEl=document.getElementById('ts');
-setInterval(()=>{tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);},1000);
-tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);
+jitterGauge('gauge-r',40);
+jitterGauge('gauge-b',55);
+jitterGauge('gauge-y',62);
+jitterGauge('gauge-x',28);
 </script>
 </body>
 </html>

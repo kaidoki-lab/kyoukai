@@ -6,142 +6,103 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:1920px;height:1080px;background:#000604;overflow:hidden;font-family:'Courier New',monospace;color:#00ccbb;}
-canvas{position:absolute;top:0;left:0;width:1920px;height:1080px;}
-.scanlines{position:absolute;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,0.12) 3px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:20;}
-.ui{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:10;}
-.corner{position:absolute;width:36px;height:36px;}
-.corner--tl{top:48px;left:48px;border-top:1px solid #00ccbb;border-left:1px solid #00ccbb;opacity:.5;}
-.corner--tr{top:48px;right:48px;border-top:1px solid #00ccbb;border-right:1px solid #00ccbb;opacity:.5;}
-.corner--bl{bottom:48px;left:48px;border-bottom:1px solid #00ccbb;border-left:1px solid #00ccbb;opacity:.5;}
-.corner--br{bottom:48px;right:48px;border-bottom:1px solid #00ccbb;border-right:1px solid #00ccbb;opacity:.5;}
-.top-bar{position:absolute;top:54px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:8px;color:rgba(0,204,187,0.35);text-transform:uppercase;}
-.rec{position:absolute;top:50px;right:100px;display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:4px;color:rgba(0,204,187,0.5);}
-.rec-dot{width:7px;height:7px;border-radius:50%;background:#00ccbb;box-shadow:0 0 6px #00ccbb;animation:blink 1.4s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
-.freq-block{position:absolute;left:100px;top:50%;transform:translateY(-50%);}
-.label{font-size:10px;letter-spacing:4px;color:rgba(0,204,187,0.3);margin-bottom:6px;}
-.freq-value{font-size:38px;letter-spacing:3px;color:rgba(0,204,187,0.75);text-shadow:0 0 20px rgba(0,204,187,0.3);}
-.unit{font-size:10px;letter-spacing:4px;color:rgba(0,204,187,0.2);margin-top:4px;}
-.source-block{position:absolute;right:100px;top:50%;transform:translateY(-50%);text-align:right;}
-.source-value{font-size:16px;letter-spacing:4px;color:rgba(0,204,187,0.45);margin-top:6px;}
-.frags{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;}
-.frag{position:absolute;font-size:10px;letter-spacing:2px;color:rgba(0,204,187,0.18);white-space:nowrap;}
-@keyframes fragFade{0%,100%{opacity:0}15%,85%{opacity:1}}
-.bottom-bar{position:absolute;bottom:56px;left:100px;right:100px;display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:4px;color:rgba(0,204,187,0.3);}
-.sig-bars{display:flex;gap:3px;align-items:flex-end;}
-.sig-bar{width:4px;background:rgba(0,204,187,0.6);}
-@keyframes barP{from{opacity:0.2}to{opacity:0.9}}
+
+/* .rpl- プレフィックス付き固有クラス群(本体と同じドットグリッド+自動波紋が主役) */
+.rpl-grid-canvas{position:absolute;inset:0;width:1920px;height:1080px;}
+.rpl-header{position:absolute;top:56px;left:0;width:100%;text-align:center;font-size:13px;letter-spacing:8px;color:rgba(0,204,187,0.6);z-index:6;}
+.rpl-footer{position:absolute;bottom:56px;left:0;width:100%;text-align:center;font-size:13px;letter-spacing:5px;color:rgba(0,204,187,0.45);z-index:6;}
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
-<div class="scanlines"></div>
-<div class="ui">
-  <div class="corner corner--tl"></div><div class="corner corner--tr"></div>
-  <div class="corner corner--bl"></div><div class="corner corner--br"></div>
-  <div class="top-bar">KYOUKAI &nbsp;/&nbsp; 波紋域 &nbsp;──&nbsp; 応答 検出</div>
-  <div class="rec"><div class="rec-dot"></div>REC</div>
-  <div class="freq-block">
-    <div class="label">波紋番号</div>
-    <div class="freq-value" id="freq">----.---</div>
-    <div class="unit">────</div>
-  </div>
-  <div class="source-block">
-    <div class="label" style="text-align:right">応答源</div>
-    <div class="source-value">未知</div>
-  </div>
-  <div class="frags" id="fragsEl"></div>
-  <div class="bottom-bar">
-    <div>応答 検出</div>
-    <div class="sig-bars" id="barsEl"></div>
-    <div id="ts"></div>
-  </div>
-</div>
+<canvas class="rpl-grid-canvas" id="rplCanvas"></canvas>
+<div class="rpl-header">KYOUKAI // 波紋域</div>
+<div class="rpl-footer">触れると世界が応答します(待機中は自動応答)</div>
 <script>
-const canvas=document.getElementById('c');
-const ctx=canvas.getContext('2d');
-canvas.width=1920; canvas.height=1080;
-
-let ripples=[]; let rt=0;
-function spawnRipple(){ ripples.push({x:Math.random()*1920,y:Math.random()*1080,r:0,maxR:150+Math.random()*200,alpha:0.4}); }
-setInterval(spawnRipple,1200);
-function drawCanvas(){
-  ctx.clearRect(0,0,1920,1080);
-  ctx.fillStyle='rgba(0,0,0,0.06)'; ctx.fillRect(0,0,1920,1080);
-  ripples=ripples.filter(r=>r.alpha>0.01);
-  ripples.forEach(r=>{
-    r.r+=1.5; r.alpha*=0.97;
-    ctx.strokeStyle=`rgba(0,204,187,${r.alpha})`; ctx.lineWidth=1.5;
-    ctx.beginPath(); ctx.arc(r.x,r.y,r.r,0,Math.PI*2); ctx.stroke();
-  });
-  rt++;
-  requestAnimationFrame(drawCanvas);
-}
-drawCanvas();
-
-let fv=80+Math.random()*900;
-const freqEl=document.getElementById('freq');
-setInterval(()=>{fv+=(Math.random()-.5)*.5;freqEl.textContent=fv.toFixed(3);},250);
-const fragsEl=document.getElementById('fragsEl');
-  const _f0=document.createElement('div');
-  _f0.className='frag';
-  _f0.textContent="触れると応答する";
-  _f0.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f0);
-  const _f1=document.createElement('div');
-  _f1.className='frag';
-  _f1.textContent="一点だけ";
-  _f1.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f1);
-  const _f2=document.createElement('div');
-  _f2.className='frag';
-  _f2.textContent="命令を聞かない";
-  _f2.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f2);
-  const _f3=document.createElement('div');
-  _f3.className='frag';
-  _f3.textContent="波紋 観測中";
-  _f3.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f3);
-  const _f4=document.createElement('div');
-  _f4.className='frag';
-  _f4.textContent="反応 検出";
-  _f4.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f4);
-  const _f5=document.createElement('div');
-  _f5.className='frag';
-  _f5.textContent="異常ドット 確認";
-  _f5.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f5);
-  const _f6=document.createElement('div');
-  _f6.className='frag';
-  _f6.textContent="── 逃げた";
-  _f6.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f6);
-  const _f7=document.createElement('div');
-  _f7.className='frag';
-  _f7.textContent="世界が応答する";
-  _f7.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f7);
-  const _f8=document.createElement('div');
-  _f8.className='frag';
-  _f8.textContent="触れるな";
-  _f8.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f8);
-  const _f9=document.createElement('div');
-  _f9.className='frag';
-  _f9.textContent="── 触れろ";
-  _f9.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f9);
-const barsEl=document.getElementById('barsEl');
-[8,12,18,22,18,14,10,14,20,22,18,12].forEach((h,i)=>{
-  const b=document.createElement('div');b.className='sig-bar';b.style.height=h+'px';
-  b.style.animation=`barP ${(0.3+Math.random()*.8).toFixed(2)}s ease-in-out ${(Math.random()*.4).toFixed(2)}s infinite alternate`;
-  barsEl.appendChild(b);
-});
-const tsEl=document.getElementById('ts');
-setInterval(()=>{tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);},1000);
-tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);
+(function(){
+  var W=1920,H=1080;
+  var cv=document.getElementById('rplCanvas');
+  cv.width=W;cv.height=H;
+  var ctx=cv.getContext('2d');
+  var PALETTE=[[34, 2, 6], [148, 14, 20], [221, 168, 42], [31, 87, 184], [236, 242, 232]];
+  var step=14,radius=3.0;
+  var cols=Math.floor(W/step),rows=Math.floor(H/step);
+  var offX=(W-(cols-1)*step)*0.5,offY=(H-(rows-1)*step)*0.5;
+  var dots=[];
+  for(var y=0;y<rows;y++){
+    for(var x=0;x<cols;x++){
+      dots.push({
+        x:x,y:y,
+        px:offX+x*step,py:offY+y*step,
+        state:Math.random()<0.02?1:0,
+        scale:0,glow:Math.random()*0.08
+      });
+    }
+  }
+  var ripples=[];
+  var rippleId=1;
+  function spawnRipple(x,y,strength,idle){
+    ripples.push({
+      id:rippleId++,x:x,y:y,radius:0,
+      speed:idle?1.1:2.25,
+      maxRadius:Math.min(Math.max(W,H)*0.34,680),
+      strength:strength,
+      band:Math.max(7,step*0.92),
+      seen:{}
+    });
+    if(ripples.length>18)ripples.splice(0,ripples.length-18);
+  }
+  var idleMs=0,nextIdle=1500,lastFrame=0;
+  function affect(){
+    for(var r=0;r<ripples.length;r++){
+      var rp=ripples[r];
+      var inner=Math.max(0,rp.radius-rp.band),outer=rp.radius+rp.band;
+      var iSq=inner*inner,oSq=outer*outer;
+      for(var i=0;i<dots.length;i++){
+        if(rp.seen[i])continue;
+        var d=dots[i];
+        var dx=d.px-rp.x,dy=d.py-rp.y;
+        var dist=dx*dx+dy*dy;
+        if(dist<iSq||dist>oSq)continue;
+        rp.seen[i]=true;
+        d.state=(d.state+1)%PALETTE.length;
+        d.scale=Math.max(d.scale,1.15*rp.strength);
+        d.glow=Math.max(d.glow,1.0*rp.strength);
+      }
+    }
+  }
+  function frame(ts){
+    var dt=lastFrame?Math.min(48,ts-lastFrame):16.67;
+    lastFrame=ts;
+    idleMs+=dt;
+    ctx.fillStyle='#000604';
+    ctx.fillRect(0,0,W,H);
+    if(idleMs>nextIdle){
+      nextIdle=idleMs+1800+Math.random()*3200;
+      spawnRipple(W*(0.18+Math.random()*0.64),H*(0.18+Math.random()*0.64),0.55,true);
+    }
+    for(var i=ripples.length-1;i>=0;i--){
+      ripples[i].radius+=ripples[i].speed*dt*0.06;
+      if(ripples[i].radius>=ripples[i].maxRadius)ripples.splice(i,1);
+    }
+    affect();
+    for(var i=0;i<dots.length;i++){
+      var d=dots[i];
+      d.scale*=Math.pow(0.91,dt/16.67);
+      d.glow*=Math.pow(0.985,dt/16.67);
+      var c=PALETTE[d.state];
+      var pulse=1+d.scale*0.55;
+      var alpha=Math.max(0.12,Math.min(0.96,0.46+d.glow*0.42));
+      ctx.globalAlpha=alpha;
+      ctx.fillStyle='rgb('+c[0]+','+c[1]+','+c[2]+')';
+      ctx.beginPath();
+      ctx.arc(d.px,d.py,radius*pulse,0,Math.PI*2);
+      ctx.fill();
+    }
+    ctx.globalAlpha=1;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
 </script>
 </body>
 </html>

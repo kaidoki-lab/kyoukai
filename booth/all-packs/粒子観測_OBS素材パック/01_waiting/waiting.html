@@ -6,152 +6,136 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:1920px;height:1080px;background:#000408;overflow:hidden;font-family:'Courier New',monospace;color:#4499ff;}
-canvas{position:absolute;top:0;left:0;width:1920px;height:1080px;}
-.scanlines{position:absolute;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,0.12) 3px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:20;}
-.ui{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:10;}
-.corner{position:absolute;width:36px;height:36px;}
-.corner--tl{top:48px;left:48px;border-top:1px solid #4499ff;border-left:1px solid #4499ff;opacity:.5;}
-.corner--tr{top:48px;right:48px;border-top:1px solid #4499ff;border-right:1px solid #4499ff;opacity:.5;}
-.corner--bl{bottom:48px;left:48px;border-bottom:1px solid #4499ff;border-left:1px solid #4499ff;opacity:.5;}
-.corner--br{bottom:48px;right:48px;border-bottom:1px solid #4499ff;border-right:1px solid #4499ff;opacity:.5;}
-.top-bar{position:absolute;top:54px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:8px;color:rgba(68,153,255,0.35);text-transform:uppercase;}
-.rec{position:absolute;top:50px;right:100px;display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:4px;color:rgba(68,153,255,0.5);}
-.rec-dot{width:7px;height:7px;border-radius:50%;background:#4499ff;box-shadow:0 0 6px #4499ff;animation:blink 1.4s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
-.freq-block{position:absolute;left:100px;top:50%;transform:translateY(-50%);}
-.label{font-size:10px;letter-spacing:4px;color:rgba(68,153,255,0.3);margin-bottom:6px;}
-.freq-value{font-size:38px;letter-spacing:3px;color:rgba(68,153,255,0.75);text-shadow:0 0 20px rgba(68,153,255,0.3);}
-.unit{font-size:10px;letter-spacing:4px;color:rgba(68,153,255,0.2);margin-top:4px;}
-.source-block{position:absolute;right:100px;top:50%;transform:translateY(-50%);text-align:right;}
-.source-value{font-size:16px;letter-spacing:4px;color:rgba(68,153,255,0.45);margin-top:6px;}
-.frags{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;}
-.frag{position:absolute;font-size:10px;letter-spacing:2px;color:rgba(68,153,255,0.18);white-space:nowrap;}
-@keyframes fragFade{0%,100%{opacity:0}15%,85%{opacity:1}}
-.bottom-bar{position:absolute;bottom:56px;left:100px;right:100px;display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:4px;color:rgba(68,153,255,0.3);}
-.sig-bars{display:flex;gap:3px;align-items:flex-end;}
-.sig-bar{width:4px;background:rgba(68,153,255,0.6);}
-@keyframes barP{from{opacity:0.2}to{opacity:0.9}}
+
+/* .ptc- プレフィックス付き固有クラス群(粒子群+観測レティクルが主役) */
+.ptc-stage{position:absolute;inset:0;width:1920px;height:1080px;}
+.ptc-reticle-layer{position:absolute;inset:0;width:1920px;height:1080px;z-index:5;pointer-events:none;}
+.ptc-header{position:absolute;top:56px;left:64px;font-size:13px;letter-spacing:6px;color:rgba(68,153,255,0.7);z-index:6;}
+.ptc-coord{position:absolute;top:56px;right:64px;font-size:13px;letter-spacing:2px;color:rgba(68,153,255,0.85);text-align:right;z-index:6;}
+.ptc-coord span{display:block;}
+.ptc-footer{position:absolute;bottom:56px;left:0;width:100%;text-align:center;font-size:13px;letter-spacing:6px;color:rgba(68,153,255,0.5);z-index:6;}
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
-<div class="scanlines"></div>
-<div class="ui">
-  <div class="corner corner--tl"></div><div class="corner corner--tr"></div>
-  <div class="corner corner--bl"></div><div class="corner corner--br"></div>
-  <div class="top-bar">KYOUKAI &nbsp;/&nbsp; 粒子観測 &nbsp;──&nbsp; 粒子 観測中</div>
-  <div class="rec"><div class="rec-dot"></div>REC</div>
-  <div class="freq-block">
-    <div class="label">粒子密度</div>
-    <div class="freq-value" id="freq">----.---</div>
-    <div class="unit">────</div>
-  </div>
-  <div class="source-block">
-    <div class="label" style="text-align:right">粒子源</div>
-    <div class="source-value">不明</div>
-  </div>
-  <div class="frags" id="fragsEl"></div>
-  <div class="bottom-bar">
-    <div>粒子 観測中</div>
-    <div class="sig-bars" id="barsEl"></div>
-    <div id="ts"></div>
-  </div>
-</div>
+<canvas class="ptc-stage" id="ptcCanvas"></canvas>
+<canvas class="ptc-reticle-layer" id="ptcReticle"></canvas>
+<div class="ptc-header">KYOUKAI // 粒子観測</div>
+<div class="ptc-coord" id="ptcCoord"><span>X: ----</span><span>Y: ----</span></div>
+<div class="ptc-footer">観測レティクルが最も近い粒子を追跡しています</div>
 <script>
-const canvas=document.getElementById('c');
-const ctx=canvas.getContext('2d');
-canvas.width=1920; canvas.height=1080;
-
-let pts=new Array(80).fill(0).map(()=>({
-  x:Math.random()*1920, y:Math.random()*1080,
-  vx:(Math.random()-0.5)*0.8, vy:(Math.random()-0.5)*0.8,
-  r:1+Math.random()*3, alpha:0.1+Math.random()*0.4
-}));
-function drawCanvas(){
-  ctx.clearRect(0,0,1920,1080);
-  ctx.fillStyle='rgba(0,0,0,0.05)'; ctx.fillRect(0,0,1920,1080);
-  pts.forEach(p=>{
-    p.x+=p.vx; p.y+=p.vy;
-    if(p.x<0||p.x>1920) p.vx*=-1;
-    if(p.y<0||p.y>1080) p.vy*=-1;
-    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle=`rgba(68,153,255,${p.alpha})`; ctx.fill();
-    pts.forEach(q=>{
-      const dx=p.x-q.x, dy=p.y-q.y, dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<120&&dist>0){
-        ctx.strokeStyle=`rgba(68,153,255,${0.08*(1-dist/120)})`;
-        ctx.lineWidth=0.5;
-        ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke();
-      }
+// static/particle-engine.jsの引力・反発パラメータ(attDist/repDist/attF/repF/maxSpd)を移植したインライン実装
+(function(){
+  var W=1920,H=1080;
+  var stage=document.getElementById('ptcCanvas');
+  stage.width=W;stage.height=H;
+  var sctx=stage.getContext('2d');
+  var COLORS={"r": [255, 55, 55], "b": [55, 148, 255], "y": [255, 220, 30]};
+  var N=420;
+  var pts=[];
+  for(var i=0;i<N;i++){
+    var f=i/N;
+    var t=f<0.4?'r':f<0.8?'b':'y';
+    pts.push({
+      x:W*0.5+(Math.random()-0.5)*W*0.7,
+      y:H*0.5+(Math.random()-0.5)*H*0.7,
+      vx:(Math.random()-0.5)*0.6,
+      vy:(Math.random()-0.5)*0.6,
+      t:t,
+      sz:t==='r'?2.6:t==='b'?2.0:2.2
     });
-  });
-  requestAnimationFrame(drawCanvas);
-}
-drawCanvas();
+  }
+  var attDist=90,repDist=24,attF=0.010,repF=0.075,maxSpd=1.5;
+  function step(){
+    for(var i=0;i<pts.length;i++){
+      var a=pts[i],fx=0,fy=0;
+      for(var j=0;j<pts.length;j+=3){
+        if(i===j)continue;
+        var b=pts[j];
+        var dx=b.x-a.x,dy=b.y-a.y;
+        var d2=dx*dx+dy*dy;
+        if(d2<1||d2>attDist*attDist)continue;
+        var d=Math.sqrt(d2);
+        if(d<repDist){
+          var f=repF*(1-d/repDist);
+          fx-=(dx/d)*f;fy-=(dy/d)*f;
+        } else {
+          var f2=attF*(1-d/attDist);
+          fx+=(dx/d)*f2;fy+=(dy/d)*f2;
+        }
+      }
+      a.vx=(a.vx+fx)*0.96;a.vy=(a.vy+fy)*0.96;
+      var spd=Math.sqrt(a.vx*a.vx+a.vy*a.vy);
+      if(spd>maxSpd){a.vx=a.vx/spd*maxSpd;a.vy=a.vy/spd*maxSpd;}
+      a.x+=a.vx;a.y+=a.vy;
+      if(a.x<20){a.x=20;a.vx=Math.abs(a.vx);}
+      if(a.x>W-20){a.x=W-20;a.vx=-Math.abs(a.vx);}
+      if(a.y<20){a.y=20;a.vy=Math.abs(a.vy);}
+      if(a.y>H-20){a.y=H-20;a.vy=-Math.abs(a.vy);}
+    }
+  }
+  function draw(){
+    sctx.fillStyle='#000408';
+    sctx.fillRect(0,0,W,H);
+    ['r','b','y'].forEach(function(type){
+      var c=COLORS[type];
+      sctx.fillStyle='rgb('+c[0]+','+c[1]+','+c[2]+')';
+      sctx.beginPath();
+      for(var i=0;i<pts.length;i++){
+        var p=pts[i];
+        if(p.t!==type)continue;
+        sctx.moveTo(p.x+p.sz,p.y);
+        sctx.arc(p.x,p.y,p.sz,0,Math.PI*2);
+      }
+      sctx.fill();
+    });
+  }
 
-let fv=80+Math.random()*900;
-const freqEl=document.getElementById('freq');
-setInterval(()=>{fv+=(Math.random()-.5)*.5;freqEl.textContent=fv.toFixed(3);},250);
-const fragsEl=document.getElementById('fragsEl');
-  const _f0=document.createElement('div');
-  _f0.className='frag';
-  _f0.textContent="粒子 検出";
-  _f0.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f0);
-  const _f1=document.createElement('div');
-  _f1.className='frag';
-  _f1.textContent="運動 継続中";
-  _f1.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f1);
-  const _f2=document.createElement('div');
-  _f2.className='frag';
-  _f2.textContent="意味 後から";
-  _f2.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f2);
-  const _f3=document.createElement('div');
-  _f3.className='frag';
-  _f3.textContent="軌跡 記録";
-  _f3.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f3);
-  const _f4=document.createElement('div');
-  _f4.className='frag';
-  _f4.textContent="衝突 回避";
-  _f4.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f4);
-  const _f5=document.createElement('div');
-  _f5.className='frag';
-  _f5.textContent="密度 変化";
-  _f5.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f5);
-  const _f6=document.createElement('div');
-  _f6.className='frag';
-  _f6.textContent="方向 不定";
-  _f6.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f6);
-  const _f7=document.createElement('div');
-  _f7.className='frag';
-  _f7.textContent="観測 先行";
-  _f7.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f7);
-  const _f8=document.createElement('div');
-  _f8.className='frag';
-  _f8.textContent="── 意味は";
-  _f8.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f8);
-  const _f9=document.createElement('div');
-  _f9.className='frag';
-  _f9.textContent="粒子の群れ";
-  _f9.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f9);
-const barsEl=document.getElementById('barsEl');
-[8,12,18,22,18,14,10,14,20,22,18,12].forEach((h,i)=>{
-  const b=document.createElement('div');b.className='sig-bar';b.style.height=h+'px';
-  b.style.animation=`barP ${(0.3+Math.random()*.8).toFixed(2)}s ease-in-out ${(Math.random()*.4).toFixed(2)}s infinite alternate`;
-  barsEl.appendChild(b);
-});
-const tsEl=document.getElementById('ts');
-setInterval(()=>{tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);},1000);
-tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);
+  var reticle=document.getElementById('ptcReticle');
+  reticle.width=W;reticle.height=H;
+  var rctx=reticle.getContext('2d');
+  var coordEl=document.getElementById('ptcCoord');
+  var trackX=W*0.5,trackY=H*0.5;
+  function nearestParticle(){
+    var best=null,bd=Infinity;
+    for(var i=0;i<pts.length;i++){
+      var p=pts[i];
+      var dx=p.x-trackX,dy=p.y-trackY;
+      var d=dx*dx+dy*dy;
+      if(d<bd){bd=d;best=p;}
+    }
+    return best;
+  }
+  var t=0;
+  function drawReticle(){
+    t+=0.01;
+    trackX=W*0.5+Math.cos(t*0.6)*W*0.32;
+    trackY=H*0.5+Math.sin(t*0.9)*H*0.32;
+    var target=nearestParticle();
+    var rx=target?target.x:trackX, ry=target?target.y:trackY;
+    rctx.clearRect(0,0,W,H);
+    rctx.strokeStyle='rgba(68,153,255,0.85)';
+    rctx.lineWidth=1.5;
+    rctx.beginPath();
+    rctx.moveTo(rx-26,ry);rctx.lineTo(rx-8,ry);
+    rctx.moveTo(rx+8,ry);rctx.lineTo(rx+26,ry);
+    rctx.moveTo(rx,ry-26);rctx.lineTo(rx,ry-8);
+    rctx.moveTo(rx,ry+8);rctx.lineTo(rx,ry+26);
+    rctx.stroke();
+    rctx.strokeStyle='rgba(68,153,255,0.4)';
+    rctx.beginPath();
+    rctx.arc(rx,ry,36,0,Math.PI*2);
+    rctx.stroke();
+    coordEl.innerHTML='<span>X: '+rx.toFixed(1)+'</span><span>Y: '+ry.toFixed(1)+'</span>';
+  }
+
+  function loop(){
+    step();
+    draw();
+    drawReticle();
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
 </script>
 </body>
 </html>

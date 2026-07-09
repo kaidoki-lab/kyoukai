@@ -44,6 +44,14 @@
   - 各部屋waitingに`<canvas>`要素が0件でverify_packs.pyのcanvas存在チェックに落ちた3部屋(daimyojin/matsuri/kanrinin、初版時点)へ演出言語に沿った補助Canvasを追加して契約を満たした経緯あり(gokurakuは引き出しスペクトルバー20枚のCanvasで最初からpass)
   - 検証(再修正後): `python generate_packs.py`で48ファイル+zip17本再生成 → `verify_packs.py` 48/48 pass → `diff_check.py daimyojin gokuraku matsuri kanrinin --commit b7ca038`で12/12 DIFF、再修正後`diff_check.py daimyojin kanrinin --commit b7ca038`でも6/6 DIFF再確認 → `screenshot_packs.py`を全16部屋(48ファイル)に対して再実行し輝度チェック全pass(daimyojin waiting=9.70, kanrinin waiting=43.41含む) → zipサイズ確認(daimyojin 0.15MB, gokuraku 0.006MB, matsuri 3.03MB, kanrinin 1.87MBで全て5MB以内)
   - ROADMAP.mdの工程4を「完了」に更新済み、完了条件チェックボックス全て[x]
+- OBSパック「部屋別個性化リニューアル」の工程5「部屋実装グループD（粒子観測・波紋域・卵部屋・台風ニュース）」を実装
+  - `room_specs/particles.py`: 粒子観測を専用実装化(方式A)。waitingは本体`static/particle-engine.js`のBASE_PARAMS(attDist/repDist/attF/repF/maxSpd)・色定義(r=rgb(255,55,55)/b=rgb(55,148,255)/y=rgb(255,220,30))を移植した引力・反発粒子群+最も近い粒子を追う十字照準の観測レティクル(`.ptc-reticle-layer`)+座標表示、brbは粒子が中心に収束するループ演出、lower_thirdは名前の周囲を粒子が公転するCanvas。一次データは`asset_extract.read_source`で実読込
+  - `room_specs/ripple.py`: 波紋域を専用実装化(方式A)。waitingは本体`static/ripple.js`のパレット(暗赤[34,2,6]→赤[148,14,20]→黄[221,168,42]→青[31,87,184]→白[236,242,232])を移植したドットグリッド+自動波紋、brbは60秒周期の黒戻し波紋(blackoutモード)が中心から広がり画面を初期化するループ、lower_thirdは名前の下から波紋が広がるCanvas
+  - `room_specs/fukashitsu.py`: 卵部屋を専用実装化(方式B・画像同梱)。waitingは本体画像`static/images/fukashitsu/fukashitsu-room-9x16.png`+卵形に配置した粒子明滅Canvas(本体`static/fukashitsu.js`のgetColors()パステル遷移を踏襲)+栄養/酸素/温度+孵化予測の計器4種、brbは中央の卵1つが`scale`アニメーションで鼓動し続け淡いパステルの明滅リングCanvasを添える、lower_thirdは卵形の丸枠(border-radius楕円)テロップ
+  - `room_specs/typhoon_news.py`: 台風ニュースを専用実装化(方式B・画像同梱)。waitingは本体画像`typhoon-news/assets/typhoon-news-bg.png`+速報帯(`.tpn-breaking`)+台風情報パネル(`typhoon-news/script.js`のtyphoonPresetsから代表1件を移植)+薄い雨筋Canvasを移植、情報帯・速報帯の内側は暗くして待機画面として成立させる。brbは全部屋唯一のスタティック砂嵐(ImageDataフル書き換え、480x270内部解像度+pixelated拡大)を専用実装として書き直し+「放送は一時中断しています」お詫びテロップ、lower_thirdは局ロゴ位置(KYK)+2段帯の報道テロップ形式
+  - verify_packs.pyの「waiting/brbにcanvas要素必須」契約に対し、初回実装で卵部屋brb(卵のみのDOM構成)・台風ニュースwaiting(パネルのみのDOM構成)がcanvas 0件で不合格になったため、演出言語に沿った補助Canvas(卵部屋=鼓動同期の明滅リング、台風ニュース=雨筋レイヤー)を追加して契約を満たした
+  - 検証: `python generate_packs.py`で48ファイル+zip17本再生成 → `verify_packs.py` 48/48 pass → `diff_check.py particles ripple fukashitsu typhoon-news --commit b7ca038`で12/12 DIFF確認 → `legacy_templates`参照がroom_specs全16ファイルから消えていることをgrepで確認(`__init__.py`のローダーのみ残存、契約通り) → `screenshot_packs.py`を全16部屋(48ファイル)に対して再実行し輝度チェック全pass(particles waiting=3.49, ripple waiting=4.99, fukashitsu waiting=59.83, typhoon-news waiting=38.84含む) → zipサイズ確認(fukashitsu 1.26MB, typhoon-news 1.70MBで全て5MB以内)
+  - ROADMAP.mdの工程5を「完了」に更新済み、完了条件チェックボックス全て[x]
 
 ## 以前やったこと（2026-07-08）
 
@@ -133,7 +141,7 @@
 - **ローカル**: `C:/Users/pc/Documents/Claude/Projects/kyoukai` が最新
 - **ブランチ**: main、本サイト側は全変更プッシュ済み
 - **最新コミット**: `9320147 Add Amazon/Rakuten areas to kanrinin; update room image`
-- **OBSパック 部屋別個性化リニューアル（`ROADMAP.md` 現行版）**: 工程1（基盤リファクタ）・工程2（部屋実装グループA: 観測域・記録室・評議録・境界域）・工程3（部屋実装グループB: 崩落域・逆観測室・悪魔の間・なまはげ）・工程4（部屋実装グループC: AI大明神・極楽域・棒入れ祭・管理人室）完了。工程5〜6は未着手。`booth/all-packs/`・`booth/verify_report.json`・`booth/room_specs/`・`booth/pack_base.py`・`booth/asset_extract.py`・`booth/legacy_templates.py`・`booth/diff_check.py`は現状未コミット
+- **OBSパック 部屋別個性化リニューアル（`ROADMAP.md` 現行版）**: 工程1（基盤リファクタ）・工程2（部屋実装グループA: 観測域・記録室・評議録・境界域）・工程3（部屋実装グループB: 崩落域・逆観測室・悪魔の間・なまはげ）・工程4（部屋実装グループC: AI大明神・極楽域・棒入れ祭・管理人室）・工程5（部屋実装グループD: 粒子観測・波紋域・卵部屋・台風ニュース）完了。工程6（全再生成・検証拡張・商品資材更新）は未着手。これで16部屋全てが専用実装になり、`legacy_templates.py`はroom_specs全16ファイルから参照されなくなった(`__init__.py`のローダー内でのみ利用)。`booth/all-packs/`・`booth/verify_report.json`・`booth/room_specs/`・`booth/pack_base.py`・`booth/asset_extract.py`・`booth/legacy_templates.py`・`booth/diff_check.py`は現状未コミット
 - 旧世代のBOOTH販売展開（前ラウンド）成果物（`booth/all-packs`旧版, `booth/thumbnails`, `booth/listings`, `booth/signal-pack`, `booth/verify_report.json`旧版）はユーザー指示で削除済み（git履歴には残っている。コミット`3101d72`）
 
 ---
@@ -158,8 +166,7 @@
 3. **観測域（/observation）の更新** — 更新頻度を上げたい部屋、未着手
 
 ### OBSパック 部屋別個性化リニューアル（`ROADMAP.md`）
-- 工程5: 部屋実装グループD（粒子観測・波紋域・卵部屋・台風ニュース）
-- 工程6: 全再生成・検証拡張（verify_packs差別化チェック・final_checkのzipサイズ上限）・thumbnails/listings再生成・コミット
+- 工程6: 全再生成・検証拡張（verify_packs差別化チェック・final_checkのzipサイズ上限）・thumbnails/listings再生成・コミット（唯一の残工程）
 - 工程1〜6完了後、`ROADMAP.md`・`booth/`配下の新規/変更ファイルをコミットするかどうかまろに確認する（現状未コミット）
 
 ---

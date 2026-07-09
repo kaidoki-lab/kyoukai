@@ -5,143 +5,106 @@
 <title>台風ニュース - 待機画面</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:1920px;height:1080px;background:#000010;overflow:hidden;font-family:'Courier New',monospace;color:#ff0033;}
-canvas{position:absolute;top:0;left:0;width:1920px;height:1080px;}
-.scanlines{position:absolute;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,0.12) 3px,rgba(0,0,0,0.12) 4px);pointer-events:none;z-index:20;}
-.ui{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:10;}
-.corner{position:absolute;width:36px;height:36px;}
-.corner--tl{top:48px;left:48px;border-top:1px solid #ff0033;border-left:1px solid #ff0033;opacity:.5;}
-.corner--tr{top:48px;right:48px;border-top:1px solid #ff0033;border-right:1px solid #ff0033;opacity:.5;}
-.corner--bl{bottom:48px;left:48px;border-bottom:1px solid #ff0033;border-left:1px solid #ff0033;opacity:.5;}
-.corner--br{bottom:48px;right:48px;border-bottom:1px solid #ff0033;border-right:1px solid #ff0033;opacity:.5;}
-.top-bar{position:absolute;top:54px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:8px;color:rgba(255,0,51,0.35);text-transform:uppercase;}
-.rec{position:absolute;top:50px;right:100px;display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:4px;color:rgba(255,0,51,0.5);}
-.rec-dot{width:7px;height:7px;border-radius:50%;background:#ff0033;box-shadow:0 0 6px #ff0033;animation:blink 1.4s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.1}}
-.freq-block{position:absolute;left:100px;top:50%;transform:translateY(-50%);}
-.label{font-size:10px;letter-spacing:4px;color:rgba(255,0,51,0.3);margin-bottom:6px;}
-.freq-value{font-size:38px;letter-spacing:3px;color:rgba(255,0,51,0.75);text-shadow:0 0 20px rgba(255,0,51,0.3);}
-.unit{font-size:10px;letter-spacing:4px;color:rgba(255,0,51,0.2);margin-top:4px;}
-.source-block{position:absolute;right:100px;top:50%;transform:translateY(-50%);text-align:right;}
-.source-value{font-size:16px;letter-spacing:4px;color:rgba(255,0,51,0.45);margin-top:6px;}
-.frags{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;}
-.frag{position:absolute;font-size:10px;letter-spacing:2px;color:rgba(255,0,51,0.18);white-space:nowrap;}
-@keyframes fragFade{0%,100%{opacity:0}15%,85%{opacity:1}}
-.bottom-bar{position:absolute;bottom:56px;left:100px;right:100px;display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:4px;color:rgba(255,0,51,0.3);}
-.sig-bars{display:flex;gap:3px;align-items:flex-end;}
-.sig-bar{width:4px;background:rgba(255,0,51,0.6);}
-@keyframes barP{from{opacity:0.2}to{opacity:0.9}}
+html,body{width:1920px;height:1080px;background:#000010;overflow:hidden;font-family:'Courier New',monospace;color:#fff;}
+
+/* .tpn- プレフィックス付き固有クラス群(速報帯+情報パネルのL字ニュース画面) */
+.tpn-bg{position:absolute;top:0;left:0;width:1920px;height:1080px;background-color:#000010;background-image:url('assets/typhoon-news-bg.png');background-repeat:no-repeat;background-position:center center;background-size:cover;z-index:1;}
+.tpn-bg-dim{position:absolute;top:0;left:0;width:1920px;height:1080px;background:rgba(0,0,4,0.62);z-index:2;}
+.tpn-breaking{position:absolute;top:0;left:0;width:1920px;display:flex;align-items:center;z-index:6;background:rgba(0,0,0,0.55);border-bottom:3px solid #ff0033;}
+.tpn-breaking-label{background:#ff0033;color:#fff;font-size:24px;font-weight:bold;letter-spacing:6px;padding:18px 34px;}
+.tpn-breaking-text{padding:18px 30px;font-size:26px;letter-spacing:2px;}
+.tpn-breaking-text b{color:#ff0033;}
+.tpn-panel{position:absolute;top:150px;right:64px;width:460px;padding:30px 34px;background:rgba(4,0,2,0.72);border:1px solid rgba(255,0,51,0.4);border-radius:6px;z-index:6;}
+.tpn-panel-kicker{font-size:12px;letter-spacing:4px;color:rgba(255,0,51,0.8);margin-bottom:10px;}
+.tpn-panel-title{font-size:24px;margin-bottom:20px;letter-spacing:1px;}
+.tpn-panel dl{display:grid;grid-template-columns:1fr auto;row-gap:14px;font-size:15px;}
+.tpn-panel dt{opacity:0.65;letter-spacing:2px;}
+.tpn-panel dd{text-align:right;font-size:18px;}
+.tpn-eye-title{position:absolute;left:64px;top:220px;font-size:56px;font-weight:bold;letter-spacing:4px;line-height:1.3;text-shadow:0 4px 18px rgba(0,0,0,0.8);z-index:6;}
+.tpn-eye-title span{display:block;}
+.tpn-caption{position:absolute;bottom:150px;left:0;width:1920px;text-align:center;font-size:22px;letter-spacing:3px;z-index:6;background:rgba(255,0,51,0.14);padding:14px 0;}
+.tpn-ticker{position:absolute;bottom:0;left:0;width:1920px;height:80px;background:#ff0033;display:flex;align-items:center;overflow:hidden;z-index:6;}
+.tpn-ticker-track{white-space:nowrap;font-size:24px;letter-spacing:1px;color:#fff;padding-left:1920px;animation:tpnScroll 24s linear infinite;}
+@keyframes tpnScroll{0%{transform:translateX(0);}100%{transform:translateX(-100%);}}
+.tpn-rain-canvas{position:absolute;top:0;left:0;width:1920px;height:1080px;z-index:3;pointer-events:none;}
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
-<div class="scanlines"></div>
-<div class="ui">
-  <div class="corner corner--tl"></div><div class="corner corner--tr"></div>
-  <div class="corner corner--bl"></div><div class="corner corner--br"></div>
-  <div class="top-bar">KYOUKAI &nbsp;/&nbsp; 台風ニュース &nbsp;──&nbsp; 速報 送信中</div>
-  <div class="rec"><div class="rec-dot"></div>REC</div>
-  <div class="freq-block">
-    <div class="label">台風番号</div>
-    <div class="freq-value" id="freq">----.---</div>
-    <div class="unit">────</div>
-  </div>
-  <div class="source-block">
-    <div class="label" style="text-align:right">情報源</div>
-    <div class="source-value">気象庁</div>
-  </div>
-  <div class="frags" id="fragsEl"></div>
-  <div class="bottom-bar">
-    <div>速報 送信中</div>
-    <div class="sig-bars" id="barsEl"></div>
-    <div id="ts"></div>
-  </div>
-</div>
+<div class="tpn-bg"></div>
+<div class="tpn-bg-dim"></div>
+<canvas class="tpn-rain-canvas" id="tpnRain"></canvas>
+<header class="tpn-breaking">
+  <div class="tpn-breaking-label">速報</div>
+  <div class="tpn-breaking-text">大型で非常に強い台風「<b id="tpn-name">後ほど連絡します</b>」が接近中</div>
+</header>
+<div class="tpn-eye-title"><span id="tpn-eye1">後ほど</span><span id="tpn-eye2">連絡します</span></div>
+<aside class="tpn-panel">
+  <div class="tpn-panel-kicker">台風情報</div>
+  <div class="tpn-panel-title">台風「<span id="tpn-name2">後ほど連絡します</span>」</div>
+  <dl>
+    <div><dt>台風番号</dt><dd>第<span id="tpn-number">999</span>号</dd></div>
+    <div><dt>中心気圧</dt><dd><span id="tpn-pressure">890</span> hPa</dd></div>
+    <div><dt>最大風速</dt><dd><span id="tpn-wind">65</span> m/s</dd></div>
+    <div><dt>最大瞬間風速</dt><dd><span id="tpn-gust">95</span> m/s</dd></div>
+    <div><dt>進行方向</dt><dd id="tpn-direction">北北西</dd></div>
+    <div><dt>速度</dt><dd><span id="tpn-speed">20</span> km/h</dd></div>
+  </dl>
+</aside>
+<div class="tpn-caption">待機中 ── まもなく配信を再開します</div>
+<footer class="tpn-ticker">
+  <div class="tpn-ticker-track" id="tpn-ticker-track"></div>
+</footer>
 <script>
-const canvas=document.getElementById('c');
-const ctx=canvas.getContext('2d');
-canvas.width=1920; canvas.height=1080;
+const PRESET={"name": "後ほど連絡します", "number": "999", "pressure": 890, "wind": 65, "gust": 95, "direction": "北北西", "speed": 20, "ticker": "台風「後ほど連絡します」の影響で、全国的に荒天となる見込みです。気象庁は不要不急の返信を控えるよう呼びかけています。"};
+document.getElementById('tpn-name').textContent=PRESET.name;
+document.getElementById('tpn-name2').textContent=PRESET.name;
+document.getElementById('tpn-number').textContent=PRESET.number;
+document.getElementById('tpn-pressure').textContent=PRESET.pressure;
+document.getElementById('tpn-wind').textContent=PRESET.wind;
+document.getElementById('tpn-gust').textContent=PRESET.gust;
+document.getElementById('tpn-direction').textContent=PRESET.direction;
+document.getElementById('tpn-speed').textContent=PRESET.speed;
+document.getElementById('tpn-ticker-track').textContent=PRESET.ticker+'\u3000'+PRESET.ticker;
 
-let tickerX=1920; let tickerTexts=["台風接近中", "── 後ほど連絡します", "速報 発令", "検討します", "お母さんに聞いて", "警戒レベル上昇", "── 了解しました", "避難勧告 発令", "ただいま調整中", "続報をお待ちください"]; let ti=0;
-function drawCanvas(){
-  ctx.clearRect(0,0,1920,1080);
-  ctx.fillStyle='rgba(0,0,0,0.08)'; ctx.fillRect(0,0,1920,1080);
-  ctx.font='bold 16px "Courier New"';
-  ctx.fillStyle=`rgba(255,0,51,0.5)`;
-  const fullText=tickerTexts.join('  ///  ');
-  ctx.fillText(fullText, tickerX, 540);
-  const w=ctx.measureText(fullText).width;
-  tickerX-=1.5;
-  if(tickerX+w<0) tickerX=1920;
-  ctx.fillStyle=`rgba(255,0,51,0.07)`; ctx.fillRect(0,520,1920,36);
-  ti++;
-  requestAnimationFrame(drawCanvas);
+// 目玉タイトルの改行分割(本体splitNameForEye相当の簡略移植)
+function splitName(name){
+  if(name.length<=5)return [name,''];
+  const mid=Math.ceil(name.length/2);
+  return [name.slice(0,mid),name.slice(mid)];
 }
-drawCanvas();
+const parts=splitName(PRESET.name);
+document.getElementById('tpn-eye1').textContent=parts[0];
+document.getElementById('tpn-eye2').textContent=parts[1];
 
-let fv=80+Math.random()*900;
-const freqEl=document.getElementById('freq');
-setInterval(()=>{fv+=(Math.random()-.5)*.5;freqEl.textContent=fv.toFixed(3);},250);
-const fragsEl=document.getElementById('fragsEl');
-  const _f0=document.createElement('div');
-  _f0.className='frag';
-  _f0.textContent="台風接近中";
-  _f0.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f0);
-  const _f1=document.createElement('div');
-  _f1.className='frag';
-  _f1.textContent="── 後ほど連絡します";
-  _f1.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f1);
-  const _f2=document.createElement('div');
-  _f2.className='frag';
-  _f2.textContent="速報 発令";
-  _f2.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f2);
-  const _f3=document.createElement('div');
-  _f3.className='frag';
-  _f3.textContent="検討します";
-  _f3.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f3);
-  const _f4=document.createElement('div');
-  _f4.className='frag';
-  _f4.textContent="お母さんに聞いて";
-  _f4.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f4);
-  const _f5=document.createElement('div');
-  _f5.className='frag';
-  _f5.textContent="警戒レベル上昇";
-  _f5.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f5);
-  const _f6=document.createElement('div');
-  _f6.className='frag';
-  _f6.textContent="── 了解しました";
-  _f6.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f6);
-  const _f7=document.createElement('div');
-  _f7.className='frag';
-  _f7.textContent="避難勧告 発令";
-  _f7.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f7);
-  const _f8=document.createElement('div');
-  _f8.className='frag';
-  _f8.textContent="ただいま調整中";
-  _f8.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f8);
-  const _f9=document.createElement('div');
-  _f9.className='frag';
-  _f9.textContent="続報をお待ちください";
-  _f9.style.cssText=`left:${5+Math.random()*88}%;top:${8+Math.random()*82}%;animation:fragFade ${5+Math.random()*7}s ease-in-out ${Math.random()*10}s infinite;`;
-  fragsEl.appendChild(_f9);
-const barsEl=document.getElementById('barsEl');
-[8,12,18,22,18,14,10,14,20,22,18,12].forEach((h,i)=>{
-  const b=document.createElement('div');b.className='sig-bar';b.style.height=h+'px';
-  b.style.animation=`barP ${(0.3+Math.random()*.8).toFixed(2)}s ease-in-out ${(Math.random()*.4).toFixed(2)}s infinite alternate`;
-  barsEl.appendChild(b);
-});
-const tsEl=document.getElementById('ts');
-setInterval(()=>{tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);},1000);
-tsEl.textContent=new Date().toISOString().replace('T',' ').slice(0,19);
+// 荒天を示す薄い雨筋レイヤー(待機画面としての質感補強、砂嵐のような全画素書き換えではない)
+(function(){
+  const cv=document.getElementById('tpnRain');
+  const ctx=cv.getContext('2d');
+  const W=1920,H=1080;
+  cv.width=W;cv.height=H;
+  const N=90;
+  const drops=[];
+  for(let i=0;i<N;i++){
+    drops.push({x:Math.random()*W,y:Math.random()*H,len:20+Math.random()*30,speed:14+Math.random()*10});
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='rgba(200,210,255,0.18)';
+    ctx.lineWidth=1.5;
+    for(let i=0;i<drops.length;i++){
+      const d=drops[i];
+      ctx.beginPath();
+      ctx.moveTo(d.x,d.y);
+      ctx.lineTo(d.x-4,d.y+d.len);
+      ctx.stroke();
+      d.y+=d.speed;
+      d.x-=1.2;
+      if(d.y>H){d.y=-d.len;d.x=Math.random()*W;}
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
 </script>
 </body>
 </html>
