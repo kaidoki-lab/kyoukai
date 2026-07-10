@@ -7,7 +7,7 @@
 ```text
 KYOUKAI終幕制作進捗
 
-[ ] 1. 最終ルートの名前・到達条件・終了条件
+[x] 1. 最終ルートの名前・到達条件・終了条件
 [ ] 2. 最終電話の会話・発信者・着信仕様
 [ ] 3. 最上階・鍵穴イベント仕様
 [ ] 4. 消滅の鍵の正式仕様
@@ -167,19 +167,66 @@ KYOUKAI終幕制作進捗
 - `tests/test_home_entrances.py`
 - 必要に応じて新規テストファイル
 
-## 現時点で変更しないもの
+## 製作物01
 
-- 最終ルートID
-- 最終ルート表示名
-- 最終ルート到達条件
+受領日: 2026-07-11  
+仕様名: 最終ルートの名前・到達条件・終了条件  
+状態: 完了  
+変更ファイル:
+- `docs/境界ワールド.md`
+- `static/kyoukai-scenario-events.js`
+- `static/kyoukai-scenario.js`
+- `static/kanrinin.js`
+- `docs/KYOUKAI_ENDING_IMPLEMENTATION_LOG.md`
+
+追加ファイル:
+- `data/scenarios/route_e.json`
+- `tests/test_route_e_scenario.py`
+
+実装内容:
+- Route_E「観測の完了」の基本定義を追加した。
+- Route_Eの内部IDを `route_e`、種別を `final`、`is_final_route: true` として登録した。
+- Route_AからRoute_Dがすべて completed、シナリオモード、`active_route_id === null`、`final_route_available === true`、`ending_completed !== true` のときだけRoute_E電話イベントが候補になるようにした。
+- Route_D完了時にRoute_Eを自動開始せず、`route_e` を available、`final_route_available` を true にする待機状態を追加した。
+- Route_D完了後の管理人室再入室と20秒待機をRoute_E電話イベントの条件にした。
+- 電話を取った時点で `route_e` を active、`active_route_id` を `route_e` にするため、Route_E専用の `start_effects` を追加した。
+- 最終電話本文、発信者、最上階・鍵穴・消滅の鍵・逆観測室・管理日誌本文は未実装のまま、後続仕様を差し込めるイベントIDだけを骨格として定義した。
+- `route_e_stage`, `ending_completed`, `kyoukai_completed_at` の保存土台と欠損キー補完を追加した。
+- Route_E待機中に管理人室を20秒以内に離れた場合、再入室で20秒を測り直せるよう、Route_E待機状態だけ `phone_wait_started_at` をリセットする処理を追加した。
+
+既存仕様への影響:
+- Route_AからRoute_Dの会話文、イベントID、開始条件、完了条件は変更していない。
+- Route_D完了処理にはRoute_E待機状態を作る効果だけを追加した。
+- 自由見学モードでは `getNextPhoneEvent()` がシナリオモード以外を除外するため、Route_Eは発生しない。
+- 最上階はRoute_E電話完了後に `top_floor_unlocked` が true になる土台を追加したが、鍵穴イベントは未実装。
+
+保存データへの影響:
+- `normalizeState()` により、既存の `kyoukai_scenario_state_v1` に新規キーがなくても安全に補完される。
+- localStorageのキー名と `schema_version` は変更していない。
+- 既存Route_AからRoute_Dの保存状態は維持される。
+
+確認内容:
+- `tests/test_route_e_scenario.py` を追加し、Route_E定義、開始条件、Route_D完了後の待機化、管理人室再入室と20秒条件、電話取得時active化、完了条件骨格、欠損キー補完を確認する。
+- 既存のRoute_A系テスト、ホーム/エレベーター系テスト、Route_B/C/D系テストも実行対象とする。
+
+未解決事項:
+- 最終電話の会話・発信者・着信表示は制作物02待ち。
+- 最上階・鍵穴イベントは制作物03待ち。
+- 消滅の鍵の正式仕様は制作物04待ち。
+- 逆観測室の終幕演出・最終文は制作物05待ち。
+- 管理日誌の終幕ページ本文は制作物06待ち。
+- 状態フラグの正式保存設計と再訪演出は制作物07待ち。
+
+次の番号へ進める状態か: はい。制作物02「最終電話の会話・発信者・着信仕様」を受領可能。
+
+## 後続仕様まで変更しないもの
+
 - 最終電話の発信者と会話文
 - 最上階の正式名称
 - 鍵穴の操作内容
 - 消滅の鍵の最終的な意味
 - 逆観測室の最終文
 - 管理日誌の終幕本文
-- 新規状態フラグ
-- localStorageスキーマ更新
 - 終幕後の再訪開始位置
 - 終幕用画像、音、UI
 - SNS/Shorts/告知文

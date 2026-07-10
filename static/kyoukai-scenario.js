@@ -188,6 +188,9 @@
       top_floor_unlocked: false,
       annihilation_key_obtained: false,
       top_floor_keyhole_active: false,
+      route_e_stage: "not_started",
+      ending_completed: false,
+      kyoukai_completed_at: null,
       updated_at: new Date().toISOString()
     };
   }
@@ -216,6 +219,12 @@
     next.room_states = Object.assign(defaultRoomStates(), next.room_states || next.room_state || {});
     next.room_state = next.room_states;
     next.floor_state = Object.assign(defaultFloorStates(), next.floor_state || {});
+    next.final_route_available = Boolean(next.final_route_available);
+    next.top_floor_unlocked = Boolean(next.top_floor_unlocked);
+    next.annihilation_key_obtained = Boolean(next.annihilation_key_obtained);
+    next.top_floor_keyhole_active = Boolean(next.top_floor_keyhole_active);
+    next.ending_completed = Boolean(next.ending_completed);
+    next.route_e_stage = next.route_e_stage || "not_started";
 
     next.completed_events.forEach(function (eventId) {
       next.event_status[eventId] = "completed";
@@ -320,6 +329,8 @@
     if (state.mode !== "scenario") return true;
     var number = Number(floorNumber);
     var key = String(number).padStart(2, "0");
+    var topFloorRoom = getTopFloorRoom();
+    if (topFloorRoom && topFloorRoom.floor === number && state.top_floor_unlocked) return true;
     return ["unlocked", "completed"].indexOf(state.floor_state[key]) !== -1 || state.unlocked_floor_ids.indexOf(getFloorId(number)) !== -1;
   }
 
@@ -328,6 +339,9 @@
     if (state.mode !== "scenario") return true;
     var room = roomById(roomId);
     if (!room) return true;
+    if (room.topFloorOnly) {
+      return Boolean(state.top_floor_unlocked || state.unlocked_rooms.indexOf(roomId) !== -1);
+    }
     if (!canEnterFloor(room.floor)) return false;
     var roomState = state.room_states[roomId] || room.defaultState || "normal";
     if (roomState === "disabled") return false;
@@ -402,6 +416,9 @@
       if (requirement.type === "room_state") return state.room_states[requirement.room || requirement.room_id] === requirement.state;
       if (requirement.type === "floor_state") return state.floor_state[String(requirement.floor).padStart(2, "0")] === requirement.state;
       if (requirement.type === "floor_unlocked") return state.unlocked_floor_ids.indexOf(requirement.floor_id) !== -1;
+      if (requirement.type === "state_equals") return state[requirement.key] === requirement.value;
+      if (requirement.type === "state_not_equals") return state[requirement.key] !== requirement.value;
+      if (requirement.type === "counter_gte") return Number(state[requirement.counter_id] || 0) >= Number(requirement.value || 0);
       if (requirement.type === "room_stay_seconds") return compareSeconds(Number(ctx.roomStaySeconds || 0), requirement.operator || ">=", Number(requirement.value || 0));
       if (requirement.type === "room_entered") return state.room_entry_history.some(function (entry) { return entry.room_id === requirement.room_id; });
       if (requirement.type === "interaction_completed") return state.interaction_history.indexOf(requirement.target) !== -1 || ctx.interactionTarget === requirement.target;
@@ -489,6 +506,8 @@
     } else if (effect.type === "enable_event") setEventStatus(state, effect.event_id, "enabled");
     else if (effect.type === "set_target_room") state.current_target_room_id = effect.room_id;
     else if (effect.type === "clear_target_room") state.current_target_room_id = null;
+    else if (effect.type === "set_state_value") state[effect.key] = effect.value;
+    else if (effect.type === "set_timestamp") state[effect.key] = new Date().toISOString();
     else if (effect.type === "append_diary_entry") {
       if (state.diary_entry_ids.indexOf(effect.entry_id) === -1) state.diary_entry_ids.push(effect.entry_id);
     } else if (effect.type === "unlock_floor") unlockFloor(state, effect.floor_id);
@@ -549,6 +568,11 @@
     if (state.phone_state !== "ringing" || state.active_phone_event_id !== eventId) return null;
     state.phone_state = "conversation";
     state.current_event = eventId;
+    if (Array.isArray(event.start_effects) && event.start_effects.length) {
+      event.start_effects.every(function (effect) {
+        return applyEffect(state, effect);
+      });
+    }
     state.conversation_history.push({
       event_id: event.event_id,
       caller: event.caller_display_name || event.caller,
@@ -570,6 +594,12 @@
     state = applyEffects(event, { sequenceEventId: eventId });
     state.phone_state = "idle";
     state.active_phone_event_id = null;
+    state.phone_wait_started_at = null;
+    return saveState(state);
+  }
+
+  function resetPhoneWait() {
+    var state = getState();
     state.phone_wait_started_at = null;
     return saveState(state);
   }
@@ -631,7 +661,7 @@
     }).filter(Boolean).map(function (entry) {
       return {
         entry_id: entry.entry_id,
-        category: entry.route_id === "route_d" ? "Route_D" : entry.route_id === "route_c" ? "Route_C" : entry.route_id === "route_b" ? "Route_B" : "Route_A",
+        category: entry.route_id === "route_e" ? "Route_E" : entry.route_id === "route_d" ? "Route_D" : entry.route_id === "route_c" ? "Route_C" : entry.route_id === "route_b" ? "Route_B" : "Route_A",
         title: entry.title || "混線している観測",
         body: entry.text
       };
@@ -681,6 +711,7 @@
     cancelPhoneRinging: cancelPhoneRinging,
     acceptPhoneEvent: acceptPhoneEvent,
     finishPhoneEvent: finishPhoneEvent,
+    resetPhoneWait: resetPhoneWait,
     completeScenarioEvent: completeScenarioEvent,
     completeEvent: completeScenarioEvent,
     getActiveRoomEvent: getActiveRoomEvent,

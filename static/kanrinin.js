@@ -448,6 +448,17 @@
 
   window.addEventListener("pagehide", () => {
     window.clearTimeout(phoneTimer);
+    if (!phoneRinging && window.KYOUKAI_SCENARIO) {
+      const state = window.KYOUKAI_SCENARIO.getState();
+      if (
+        state.final_route_available === true &&
+        state.route_status?.route_e === "available" &&
+        state.active_route_id === null &&
+        state.ending_completed !== true
+      ) {
+        window.KYOUKAI_SCENARIO.resetPhoneWait?.();
+      }
+    }
     if (phoneRinging) window.KYOUKAI_SCENARIO?.cancelPhoneRinging();
     stopPhoneAudio();
   });

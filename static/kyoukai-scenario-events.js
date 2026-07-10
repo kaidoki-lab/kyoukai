@@ -108,9 +108,41 @@
     failure_requirements: []
   };
 
+  var routeE = {
+    schema_version: 1,
+    route_id: "route_e",
+    name: "観測の完了",
+    type: "final",
+    is_final_route: true,
+    theme: "観測する側と観測される側の記録が揃い、観測が完了する",
+    status_default: "not_started",
+    shared_room_ids: ["kanrinin"],
+    reserved_room_ids: ["top-floor", "observer"],
+    start_requirements: [
+      { type: "mode_equals", value: "scenario" },
+      { type: "route_status_equals", route_id: "route_a", value: "completed" },
+      { type: "route_status_equals", route_id: "route_b", value: "completed" },
+      { type: "route_status_equals", route_id: "route_c", value: "completed" },
+      { type: "route_status_equals", route_id: "route_d", value: "completed" },
+      { type: "state_equals", key: "final_route_available", value: true },
+      { type: "state_not_equals", key: "ending_completed", value: true },
+      { type: "route_status_equals", route_id: "route_e", value: "available" },
+      { type: "active_route_equals", value: null }
+    ],
+    completion_requirements: [
+      { type: "event_completed", event_id: "route_e_phone_001" },
+      { type: "event_completed", event_id: "route_e_top_floor_001" },
+      { type: "event_completed", event_id: "route_e_annihilation_key_001" },
+      { type: "event_completed", event_id: "route_e_observer_final_001" },
+      { type: "event_completed", event_id: "route_e_manager_return_001" },
+      { type: "event_completed", event_id: "route_e_final_diary_001" }
+    ],
+    failure_requirements: []
+  };
+
   window.KYOUKAI_SCENARIO_EVENTS = {
-    version: "route-d-v1",
-    routes: [routeA, routeB, routeC, routeD],
+    version: "route-e-foundation-v1",
+    routes: [routeA, routeB, routeC, routeD, routeE],
     phoneEvents: [
       {
         event_id: "route_a_phone_001",
@@ -309,6 +341,53 @@
           { type: "append_diary_entry", entry_id: "route_d_diary_001" }
         ],
         next_events: ["route_d_room_ripple_001"]
+      },
+      {
+        event_id: "route_e_phone_001",
+        route_id: "route_e",
+        caller_id: null,
+        caller_display_name: "",
+        caller: "",
+        room: "kanrinin",
+        floor: null,
+        priority: 10,
+        requirements: [
+          { type: "mode_equals", value: "scenario" },
+          { type: "route_status_equals", route_id: "route_a", value: "completed" },
+          { type: "route_status_equals", route_id: "route_b", value: "completed" },
+          { type: "route_status_equals", route_id: "route_c", value: "completed" },
+          { type: "route_status_equals", route_id: "route_d", value: "completed" },
+          { type: "route_status_equals", route_id: "route_e", value: "available" },
+          { type: "state_equals", key: "final_route_available", value: true },
+          { type: "state_not_equals", key: "ending_completed", value: true },
+          { type: "active_route_equals", value: null },
+          { type: "room_reentered_after_event", room_id: "kanrinin", after_event_id: "route_d_manager_return_001" },
+          { type: "room_stay_seconds", room_id: "kanrinin", operator: ">=", value: 20 },
+          { type: "active_phone_event_equals", value: null },
+          { type: "event_enabled", event_id: "route_e_phone_001" },
+          { type: "event_not_completed", event_id: "route_e_phone_001" }
+        ],
+        phone_config: {
+          ring_audio: "/static/audio/kanrinin/red-phone-ring.mp3",
+          retry_enabled: true,
+          retry_trigger: "kanrinin_reentry",
+          retry_interval_seconds: 60
+        },
+        conversation: [],
+        start_effects: [
+          { type: "set_route_status", route_id: "route_e", value: "active" },
+          { type: "set_active_route", route_id: "route_e" },
+          { type: "set_state_value", key: "route_e_stage", value: "route_e_phone_active" }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_e_phone_001" },
+          { type: "set_state_value", key: "route_e_stage", value: "route_e_phone_completed" },
+          { type: "set_state_value", key: "top_floor_unlocked", value: true },
+          { type: "set_state_value", key: "top_floor_keyhole_active", value: false },
+          { type: "enable_event", event_id: "route_e_top_floor_001" },
+          { type: "set_target_room", room_id: "top-floor" }
+        ],
+        next_events: ["route_e_top_floor_001"]
       }
     ],
     roomEvents: [
@@ -879,6 +958,12 @@
           { type: "clear_target_room" },
           { type: "append_diary_entry", entry_id: "route_d_diary_complete" },
           { type: "enable_phone_pool", pool_id: "normal_route_phone_pool" },
+          { type: "set_route_status", route_id: "route_e", value: "available" },
+          { type: "set_state_value", key: "final_route_available", value: true },
+          { type: "set_state_value", key: "route_e_stage", value: "route_e_available" },
+          { type: "set_state_value", key: "top_floor_unlocked", value: false },
+          { type: "set_state_value", key: "top_floor_keyhole_active", value: false },
+          { type: "enable_event", event_id: "route_e_phone_001" },
           { type: "set_manager_state", state: "visible" }
         ],
         next_events: []

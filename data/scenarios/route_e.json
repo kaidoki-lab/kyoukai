@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "route_id": "route_e",
+  "name": "観測の完了",
+  "type": "final",
+  "is_final_route": true,
+  "theme": "観測する側と観測される側の記録が揃い、観測が完了する",
+  "status_default": "not_started",
+  "shared_room_ids": ["kanrinin"],
+  "reserved_room_ids": ["top-floor", "observer"],
+  "start_requirements": [
+    { "type": "mode_equals", "value": "scenario" },
+    { "type": "route_status_equals", "route_id": "route_a", "value": "completed" },
+    { "type": "route_status_equals", "route_id": "route_b", "value": "completed" },
+    { "type": "route_status_equals", "route_id": "route_c", "value": "completed" },
+    { "type": "route_status_equals", "route_id": "route_d", "value": "completed" },
+    { "type": "state_equals", "key": "final_route_available", "value": true },
+    { "type": "state_not_equals", "key": "ending_completed", "value": true },
+    { "type": "route_status_equals", "route_id": "route_e", "value": "available" },
+    { "type": "active_route_equals", "value": null }
+  ],
+  "completion_requirements": [
+    { "type": "event_completed", "event_id": "route_e_phone_001" },
+    { "type": "event_completed", "event_id": "route_e_top_floor_001" },
+    { "type": "event_completed", "event_id": "route_e_annihilation_key_001" },
+    { "type": "event_completed", "event_id": "route_e_observer_final_001" },
+    { "type": "event_completed", "event_id": "route_e_manager_return_001" },
+    { "type": "event_completed", "event_id": "route_e_final_diary_001" }
+  ],
+  "failure_requirements": [],
+  "phone_events": ["route_e_phone_001"],
+  "room_events": [
+    "route_e_top_floor_001",
+    "route_e_annihilation_key_001",
+    "route_e_observer_final_001"
+  ],
+  "manager_events": ["route_e_manager_return_001"],
+  "diary_entries": ["route_e_final_diary_001"],
+  "completion_state": {
+    "active_route_id": null,
+    "route_status": {
+      "route_a": "completed",
+      "route_b": "completed",
+      "route_c": "completed",
+      "route_d": "completed",
+      "route_e": "completed"
+    },
+    "ending_completed": true,
+    "kyoukai_completed_at": "ISO_DATE_TIME"
+  },
+  "branch_slots": []
+}
