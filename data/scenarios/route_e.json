@@ -28,7 +28,15 @@
     { "type": "event_completed", "event_id": "route_e_final_diary_001" }
   ],
   "failure_requirements": [],
-  "phone_events": ["route_e_phone_001"],
+  "phone_events": [
+    "route_e_phone_wait_001",
+    "route_e_phone_ring_001",
+    "route_e_phone_answer_001",
+    "route_e_phone_dialogue_001",
+    "route_e_phone_complete_001",
+    "route_e_phone_missed_001",
+    "route_e_phone_001"
+  ],
   "room_events": [
     "route_e_top_floor_001",
     "route_e_annihilation_key_001",

@@ -19,6 +19,41 @@ KYOUKAI終幕制作進捗
 [ ] 10. 終了告知・Shorts・SNS文面
 ```
 
+## 制作物02
+
+受領日: 2026-07-11
+仕様名: 最終電話の会話・発信者・着信仕様
+状態: 完了
+
+変更ファイル:
+- `data/scenarios/route_e.json`
+- `static/kyoukai-scenario-events.js`
+- `static/kyoukai-scenario.js`
+- `static/kanrinin.js`
+- `static/kanrinin.css`
+- `templates/kanrinin.html`
+- `main.py`
+- `tests/test_route_e_scenario.py`
+- `tests/test_route_a_scenario.py`
+
+実装内容:
+- 最終電話の発信者を `route_e_caller_001`、表示名を `記録なし`、種別を `unknown_record` として登録した。
+- Route_AからRoute_Dの個別完了、シナリオモード、管理人室、Route_E待機状態、終幕未完了、最終電話未完了を着信条件にした。
+- 通常電話より高い priority を設定し、Route_E最終電話を優先するようにした。
+- 初回は管理人室再入室後20秒、通話途中離脱後はRoute_E activeのまま1.5秒で再着信する条件を追加した。
+- 電話を取った時点で `route_e` を active、`active_route_id` を `route_e` にし、`route_e_started_at` と受話時刻を保存するようにした。
+- 会話本文10件をデータ側に登録し、改行指定を保持した。
+- 最終電話だけ手動進行にし、発信者名 `記録なし` を上部、本文を下部に表示するようにした。
+- 通話完了時に `route_e_phone_completed` と完了時刻を保存し、`top_floor_unlocked` を true、`route_e_stage` を `route_e_top_floor_unlocked` に更新するようにした。
+- 通話完了後は `最上階が開放されました。` を短時間だけ表示するようにした。
+- 通話途中の退出・リロードでは電話UI状態を idle に戻し、Route_E active、最上階未開放、電話未完了を維持して再入室時に冒頭から再着信するようにした。
+
+未実装として残す内容:
+- 最上階内部イベント、鍵穴、消滅の鍵、逆観測室、管理人日記終幕ページ、Route_E完了処理、終幕後の再訪仕様、新規音源、SNS告知は制作物03以降で扱う。
+
+確認内容:
+- Route_E最終電話の発信者、本文、手動進行、20秒待機、1.5秒復帰、完了状態、最上階開放フラグをテスト対象に追加した。
+
 この進捗表は、各番号の仕様を受領し、実装と確認が完了した時点でのみ更新する。
 
 ## 事前準備

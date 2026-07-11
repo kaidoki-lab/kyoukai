@@ -136,10 +136,38 @@ html, body {
   opacity: 0;
   transition: opacity 0.4s ease;
   pointer-events: none;
+  white-space: pre-line;
 }
 
 .kanrinin-message.is-visible {
   opacity: 1;
+}
+
+.kanrinin-message--dialogue {
+  bottom: 5%;
+  width: min(88%, 620px);
+  max-height: 45%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  line-height: 1.75;
+  overflow: hidden;
+}
+
+.kanrinin-message__speaker {
+  display: block;
+  color: #b89a5f;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.kanrinin-message__text {
+  display: block;
+  color: #e0d7c5;
+  font-size: clamp(14px, 3.6vw, 17px);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 /* ---------- Key box modal ---------- */

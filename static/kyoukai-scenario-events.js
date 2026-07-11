@@ -345,45 +345,91 @@
       {
         event_id: "route_e_phone_001",
         route_id: "route_e",
-        caller_id: null,
-        caller_display_name: "",
-        caller: "",
+        caller_id: "route_e_caller_001",
+        caller_display_name: "記録なし",
+        caller: "記録なし",
         room: "kanrinin",
         floor: null,
-        priority: 10,
+        priority: 100,
         requirements: [
           { type: "mode_equals", value: "scenario" },
           { type: "route_status_equals", route_id: "route_a", value: "completed" },
           { type: "route_status_equals", route_id: "route_b", value: "completed" },
           { type: "route_status_equals", route_id: "route_c", value: "completed" },
           { type: "route_status_equals", route_id: "route_d", value: "completed" },
-          { type: "route_status_equals", route_id: "route_e", value: "available" },
           { type: "state_equals", key: "final_route_available", value: true },
           { type: "state_not_equals", key: "ending_completed", value: true },
-          { type: "active_route_equals", value: null },
-          { type: "room_reentered_after_event", room_id: "kanrinin", after_event_id: "route_d_manager_return_001" },
-          { type: "room_stay_seconds", room_id: "kanrinin", operator: ">=", value: 20 },
+          { type: "state_not_equals", key: "route_e_phone_completed", value: true },
           { type: "active_phone_event_equals", value: null },
           { type: "event_enabled", event_id: "route_e_phone_001" },
-          { type: "event_not_completed", event_id: "route_e_phone_001" }
+          { type: "event_not_completed", event_id: "route_e_phone_complete_001" },
+          {
+            type: "any_of",
+            requirements: [
+              [
+                { type: "route_status_equals", route_id: "route_e", value: "available" },
+                { type: "active_route_equals", value: null },
+                { type: "room_reentered_after_event", room_id: "kanrinin", after_event_id: "route_d_manager_return_001" },
+                { type: "room_stay_seconds", room_id: "kanrinin", operator: ">=", value: 20 }
+              ],
+              [
+                { type: "route_status_equals", route_id: "route_e", value: "active" },
+                { type: "active_route_equals", value: "route_e" },
+                { type: "room_stay_seconds", room_id: "kanrinin", operator: ">=", value: 1.5 }
+              ]
+            ]
+          }
         ],
         phone_config: {
           ring_audio: "/static/audio/kanrinin/red-phone-ring.mp3",
           retry_enabled: true,
           retry_trigger: "kanrinin_reentry",
-          retry_interval_seconds: 60
+          retry_interval_seconds: 3,
+          dialogue_mode: "manual",
+          character_interval_ms: 45,
+          resume_ring_delay_ms: 1500
         },
-        conversation: [],
+        caller_profile: {
+          resident_type: "unknown_record",
+          identity_confirmed: false,
+          registered: false
+        },
+        conversation: [
+          { id: "route_e_phone_line_001", speaker: "記録なし", text: "聞こえています。" },
+          { id: "route_e_phone_line_002", speaker: "記録なし", text: "四つの記録を確認しました。" },
+          { id: "route_e_phone_line_003", speaker: "記録なし", text: "受信。\n保管。\n生成。\n集合。" },
+          { id: "route_e_phone_line_004", speaker: "記録なし", text: "あなたが触れたものは、\nすべて次の形に移されています。" },
+          { id: "route_e_phone_line_005", speaker: "記録なし", text: "これ以上、\n下の階で確認するものはありません。" },
+          { id: "route_e_phone_line_006", speaker: "記録なし", text: "最上階を開きました。" },
+          { id: "route_e_phone_line_007", speaker: "記録なし", text: "鍵は、\n最初から管理人室にあります。" },
+          { id: "route_e_phone_line_008", speaker: "記録なし", text: "持ってきてください。" },
+          { id: "route_e_phone_line_009", speaker: "記録なし", text: "最後に確認するのは、\nあなたが見ていたものではありません。" },
+          { id: "route_e_phone_line_010", speaker: "記録なし", text: "通話を終了します。" }
+        ],
         start_effects: [
           { type: "set_route_status", route_id: "route_e", value: "active" },
           { type: "set_active_route", route_id: "route_e" },
-          { type: "set_state_value", key: "route_e_stage", value: "route_e_phone_active" }
+          { type: "set_state_value", key: "route_e_stage", value: "route_e_phone_active" },
+          { type: "set_timestamp", key: "route_e_started_at" },
+          { type: "set_state_value", key: "route_e_phone_answered", value: true },
+          { type: "set_timestamp", key: "route_e_phone_answered_at" },
+          { type: "set_state_value", key: "route_e_phone_completed", value: false },
+          { type: "set_state_value", key: "top_floor_unlocked", value: false },
+          { type: "set_state_value", key: "route_e_phone_answer_lock", value: true },
+          { type: "complete_event", event_id: "route_e_phone_answer_001" }
         ],
         effects: [
+          { type: "complete_event", event_id: "route_e_phone_dialogue_001" },
+          { type: "complete_event", event_id: "route_e_phone_complete_001" },
           { type: "complete_event", event_id: "route_e_phone_001" },
-          { type: "set_state_value", key: "route_e_stage", value: "route_e_phone_completed" },
+          { type: "set_route_status", route_id: "route_e", value: "active" },
+          { type: "set_active_route", route_id: "route_e" },
+          { type: "set_state_value", key: "route_e_stage", value: "route_e_top_floor_unlocked" },
+          { type: "set_state_value", key: "route_e_phone_completed", value: true },
+          { type: "set_timestamp", key: "route_e_phone_completed_at" },
           { type: "set_state_value", key: "top_floor_unlocked", value: true },
           { type: "set_state_value", key: "top_floor_keyhole_active", value: false },
+          { type: "set_state_value", key: "route_e_phone_answer_lock", value: false },
           { type: "enable_event", event_id: "route_e_top_floor_001" },
           { type: "set_target_room", room_id: "top-floor" }
         ],
