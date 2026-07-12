@@ -8,9 +8,15 @@
   const returnLink = document.querySelector("[data-top-floor-return]");
   const MESSAGE_MS = 2600;
   const REPEAT_COOLDOWN_MS = 1300;
+  const USE_PRELUDE_MS = 1600;
+  const INSERT_MS = 650;
+  const TURN_MS = 1250;
+  const COMPLETE_MS = 2050;
   let messageTimer = 0;
   let interactionLock = false;
   let lastRepeatAt = 0;
+  let pendingUseStart = false;
+  let keyUseTimerIds = [];
 
   function showMessage(text, duration = MESSAGE_MS) {
     if (!messageEl || !text) return;
@@ -22,6 +28,17 @@
     }, duration);
   }
 
+  function clearKeyUseTimers() {
+    keyUseTimerIds.forEach((timerId) => window.clearTimeout(timerId));
+    keyUseTimerIds = [];
+  }
+
+  function queueKeyUseTimer(callback, delay) {
+    const timerId = window.setTimeout(callback, delay);
+    keyUseTimerIds.push(timerId);
+    return timerId;
+  }
+
   function canUseTopFloor(state) {
     return Boolean(
       state &&
@@ -30,6 +47,18 @@
       state.route_status?.route_e === "active" &&
       state.route_e_phone_completed === true &&
       state.top_floor_unlocked === true &&
+      state.ending_completed !== true
+    );
+  }
+
+  function canUseAnnihilationKey(state) {
+    return Boolean(
+      canUseTopFloor(state) &&
+      state.top_floor_entered === true &&
+      hasAnnihilationKey(state) &&
+      state.annihilation_key_obtained === true &&
+      state.annihilation_key_used !== true &&
+      state.top_floor_keyhole_completed !== true &&
       state.ending_completed !== true
     );
   }
@@ -58,7 +87,7 @@
     const active = canUseTopFloor(state);
     room.dataset.routeE = active ? "active" : "locked";
     room.dataset.keyholeState = active ? state.keyhole_state || "inactive" : "inactive";
-    keyholeButton.disabled = !active || state.keyhole_state === "processing" || state.top_floor_keyhole_completed === true;
+    keyholeButton.disabled = !active || state.keyhole_state === "processing" || state.top_floor_keyhole_completed === true || state.annihilation_key_use_lock === true;
     keyholeButton.setAttribute("aria-disabled", keyholeButton.disabled ? "true" : "false");
   }
 
@@ -95,6 +124,7 @@
       next.keyhole_interaction_lock = false;
     });
     scenario?.completeScenarioEvent("route_e_keyhole_ready_001", { interactionTarget: "top-floor-keyhole" });
+    scenario?.completeScenarioEvent("route_e_annihilation_key_ready_001", { interactionTarget: "top-floor-keyhole" });
     syncVisuals(state || scenario?.getState());
     startAnnihilationKeyUse();
   }
@@ -145,11 +175,119 @@
     }, 850);
   }
 
+  function ensureUseKeyElement() {
+    if (!room) return null;
+    let keyEl = room.querySelector("[data-annihilation-key-visual]");
+    if (keyEl) return keyEl;
+    keyEl = document.createElement("span");
+    keyEl.className = "top-floor-room__use-key";
+    keyEl.setAttribute("data-annihilation-key-visual", "");
+    keyEl.setAttribute("aria-hidden", "true");
+    room.append(keyEl);
+    return keyEl;
+  }
+
+  function removeUseStartListeners() {
+    document.removeEventListener("click", beginAnnihilationKeyUse, true);
+    document.removeEventListener("keydown", beginAnnihilationKeyUseByKey, true);
+  }
+
+  function finalizeAnnihilationKeyUse() {
+    scenario?.completeScenarioEvent("route_e_annihilation_key_use_001", {
+      interactionTarget: "top-floor-keyhole",
+      sequenceEventId: "route_e_annihilation_key_use_001",
+    });
+    const completed = scenario?.completeScenarioEvent("route_e_annihilation_key_complete_001", {
+      interactionTarget: "top-floor-keyhole",
+      sequenceEventId: "route_e_annihilation_key_complete_001",
+    });
+    saveState((next) => {
+      next.annihilation_key_obtained = true;
+      next.annihilation_key_used = true;
+      next.annihilation_key_used_at = next.annihilation_key_used_at || new Date().toISOString();
+      next.annihilation_key_consumed = true;
+      next.top_floor_keyhole_completed = true;
+      next.top_floor_event_completed = true;
+      next.keyhole_state = "completed";
+      next.route_e_stage = "keyhole_completed";
+      next.current_target_room_id = "observer";
+      next.annihilation_key_use_lock = false;
+      next.items = (next.items || []).filter((item) => item !== "annihilation_key");
+    });
+    room?.classList.remove("is-using-key");
+    room?.classList.add("has-used-key");
+    showMessage("消滅したものはありません。", 2200);
+    queueKeyUseTimer(() => {
+      showMessage("続いていた状態だけが、\n終了しました。", 0);
+    }, 1100);
+    interactionLock = false;
+    syncVisuals(completed || scenario?.getState());
+  }
+
+  function runAnnihilationKeyAnimation() {
+    if (!scenario || !room) return;
+    const state = scenario.getState();
+    if (!canUseAnnihilationKey(state) || state.keyhole_state !== "ready") {
+      interactionLock = false;
+      syncVisuals(state);
+      return;
+    }
+    clearKeyUseTimers();
+    const keyEl = ensureUseKeyElement();
+    keyEl?.classList.remove("is-inserted", "is-turned");
+    room.classList.add("is-using-key");
+    scenario.completeScenarioEvent("route_e_annihilation_key_insert_001", {
+      interactionTarget: "top-floor-keyhole",
+      sequenceEventId: "route_e_annihilation_key_insert_001",
+    });
+    syncVisuals(scenario.getState());
+    queueKeyUseTimer(() => keyEl?.classList.add("is-inserted"), INSERT_MS);
+    queueKeyUseTimer(() => {
+      keyEl?.classList.add("is-turned");
+      scenario.completeScenarioEvent("route_e_annihilation_key_turn_001", {
+        interactionTarget: "top-floor-keyhole",
+        sequenceEventId: "route_e_annihilation_key_turn_001",
+      });
+    }, TURN_MS);
+    queueKeyUseTimer(finalizeAnnihilationKeyUse, COMPLETE_MS);
+  }
+
+  function beginAnnihilationKeyUse(event) {
+    if (!pendingUseStart) return;
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    }
+    pendingUseStart = false;
+    removeUseStartListeners();
+    runAnnihilationKeyAnimation();
+  }
+
+  function beginAnnihilationKeyUseByKey(event) {
+    if (!pendingUseStart) return;
+    if (!["Enter", " "].includes(event.key)) return;
+    beginAnnihilationKeyUse(event);
+  }
+
   function startAnnihilationKeyUse() {
+    const state = scenario?.getState();
+    if (!canUseAnnihilationKey(state) || pendingUseStart) {
+      interactionLock = false;
+      syncVisuals(state);
+      return;
+    }
     document.dispatchEvent(new CustomEvent("kyoukai:route-e-keyhole-ready", {
-      detail: { room_id: "top-floor", event_id: "route_e_keyhole_ready_001" },
+      detail: { room_id: "top-floor", event_id: "route_e_annihilation_key_ready_001" },
     }));
     if (typeof window.onKeyholeReady === "function") window.onKeyholeReady();
+    showMessage("鍵穴の奥で、\n何かが待っている。", USE_PRELUDE_MS);
+    queueKeyUseTimer(() => {
+      showMessage("消滅の鍵を差し込みます。", 0);
+      pendingUseStart = true;
+      document.addEventListener("click", beginAnnihilationKeyUse, true);
+      document.addEventListener("keydown", beginAnnihilationKeyUseByKey, true);
+    }, USE_PRELUDE_MS);
   }
 
   window.KYOUKAI_ROUTE_E_TOP_FLOOR = {

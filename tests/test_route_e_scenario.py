@@ -12,6 +12,7 @@ class RouteEFoundationTests(unittest.TestCase):
         self.route_e_json = json.loads(self.route_e_json_path.read_text(encoding="utf-8"))
         self.events_js = (BASE_DIR / "static" / "kyoukai-scenario-events.js").read_text(encoding="utf-8")
         self.scenario_js = (BASE_DIR / "static" / "kyoukai-scenario.js").read_text(encoding="utf-8")
+        self.kanrinin_html = (BASE_DIR / "templates" / "kanrinin.html").read_text(encoding="utf-8")
         self.kanrinin_js = (BASE_DIR / "static" / "kanrinin.js").read_text(encoding="utf-8")
         self.top_floor_html = (BASE_DIR / "templates" / "top-floor.html").read_text(encoding="utf-8")
         self.top_floor_js = (BASE_DIR / "static" / "top-floor.js").read_text(encoding="utf-8")
@@ -158,8 +159,8 @@ class RouteEFoundationTests(unittest.TestCase):
         self.assertIn('data-top-floor-room', self.top_floor_html)
         self.assertIn('data-top-floor-keyhole', self.top_floor_html)
         self.assertIn('aria-label="鍵穴を調べる"', self.top_floor_html)
-        self.assertIn('/static/top-floor.js?v=topfloor2', self.top_floor_html)
-        self.assertIn('/static/space.css?v=topfloor2', self.top_floor_html)
+        self.assertIn('/static/top-floor.js?v=topfloor3', self.top_floor_html)
+        self.assertIn('/static/space.css?v=topfloor3', self.top_floor_html)
         self.assertIn('.top-floor-room__keyhole', self.space_css)
         self.assertIn('width: max(44px', self.space_css)
 
@@ -183,6 +184,100 @@ class RouteEFoundationTests(unittest.TestCase):
         ]:
             with self.subTest(token=token):
                 self.assertIn(token, self.top_floor_js)
+
+    def test_deliverable_04_registers_annihilation_key_events(self):
+        for event_id in [
+            "route_e_annihilation_key_available_001",
+            "route_e_annihilation_key_obtain_001",
+            "route_e_annihilation_key_box_empty_001",
+            "route_e_annihilation_key_ready_001",
+            "route_e_annihilation_key_insert_001",
+            "route_e_annihilation_key_turn_001",
+            "route_e_annihilation_key_use_001",
+            "route_e_annihilation_key_complete_001",
+        ]:
+            with self.subTest(event_id=event_id):
+                self.assertIn(event_id, self.route_e_json_path.read_text(encoding="utf-8"))
+                self.assertIn(event_id, self.events_js)
+
+    def test_annihilation_key_state_defaults_and_recovery_exist(self):
+        for token in [
+            "annihilation_key_obtained: false",
+            "annihilation_key_obtained_at: null",
+            "annihilation_key_used: false",
+            "annihilation_key_used_at: null",
+            "annihilation_key_consumed: false",
+            "annihilation_key_obtain_lock: false",
+            "annihilation_key_use_lock: false",
+            'key_box_state: "contains_annihilation_key"',
+            'next.key_box_state = "empty"',
+            'next.keyhole_state = hasAnnihilationKey(next) ? "ready" : "waiting_for_key"',
+            "next.annihilation_key_use_lock = false",
+            "next.annihilation_key_used = false",
+            "next.annihilation_key_consumed = false",
+            'item !== "annihilation_key"',
+            'effect.type === "add_item"',
+            'effect.type === "remove_item"',
+        ]:
+            with self.subTest(token=token):
+                self.assertIn(token, self.scenario_js)
+
+    def test_kanrinin_key_box_obtains_key_only_after_route_e_phone(self):
+        for token in [
+            'data-annihilation-key-item',
+            "消滅の鍵",
+            "canObtainAnnihilationKey",
+            'state.mode === "scenario"',
+            'state.active_route_id === "route_e"',
+            'state.route_status?.route_e === "active"',
+            "state.route_e_phone_completed === true",
+            "state.ending_completed !== true",
+            "state.annihilation_key_obtained !== true",
+            "route_e_annihilation_key_obtain_001",
+            "annihilationKeyItem.hidden = !canObtain",
+            "消滅の鍵を持ち出した。",
+            "鍵ボックスには、\\n何も残っていない。",
+            "空になっている。",
+        ]:
+            with self.subTest(token=token):
+                self.assertTrue(token in self.kanrinin_js or token in self.kanrinin_html)
+        self.assertIn('{ type: "mode_equals", value: "scenario" }', self.events_js)
+        self.assertIn('{ type: "state_equals", key: "route_e_phone_completed", value: true }', self.events_js)
+        self.assertIn('{ type: "set_state_value", key: "annihilation_key_obtained", value: true }', self.events_js)
+        self.assertIn('{ type: "set_timestamp", key: "annihilation_key_obtained_at" }', self.events_js)
+        self.assertIn('{ type: "set_state_value", key: "route_e_stage", value: "annihilation_key_obtained" }', self.events_js)
+        self.assertIn('{ type: "set_state_value", key: "key_box_state", value: "empty" }', self.events_js)
+        self.assertIn('{ type: "add_item", item_id: "annihilation_key" }', self.events_js)
+
+    def test_top_floor_uses_annihilation_key_without_confirmation_or_404(self):
+        for token in [
+            "canUseAnnihilationKey",
+            "state.top_floor_entered === true",
+            "state.annihilation_key_obtained === true",
+            "state.annihilation_key_used !== true",
+            "state.top_floor_keyhole_completed !== true",
+            "鍵穴の奥で、\\n何かが待っている。",
+            "消滅の鍵を差し込みます。",
+            "beginAnnihilationKeyUse",
+            "route_e_annihilation_key_insert_001",
+            "route_e_annihilation_key_turn_001",
+            "route_e_annihilation_key_use_001",
+            "route_e_annihilation_key_complete_001",
+            "消滅したものはありません。",
+            "続いていた状態だけが、\\n終了しました。",
+            'next.route_e_stage = "keyhole_completed"',
+            'next.current_target_room_id = "observer"',
+        ]:
+            with self.subTest(token=token):
+                self.assertIn(token, self.top_floor_js)
+        self.assertIn('{ type: "set_state_value", key: "annihilation_key_used", value: true }', self.events_js)
+        self.assertIn('{ type: "set_timestamp", key: "annihilation_key_used_at" }', self.events_js)
+        self.assertIn('{ type: "set_state_value", key: "annihilation_key_consumed", value: true }', self.events_js)
+        self.assertIn('{ type: "set_state_value", key: "top_floor_keyhole_completed", value: true }', self.events_js)
+        self.assertIn('{ type: "set_state_value", key: "top_floor_event_completed", value: true }', self.events_js)
+        self.assertIn('{ type: "set_target_room", room_id: "observer" }', self.events_js)
+        self.assertNotIn('window.location.href = "/kanrinin/deleted"', self.top_floor_js)
+        self.assertNotIn("confirm(", self.top_floor_js)
 
 
 if __name__ == "__main__":

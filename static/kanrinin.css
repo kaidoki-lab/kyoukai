@@ -212,6 +212,40 @@ html, body {
   margin-bottom: 14px;
 }
 
+.kanrinin-modal__key {
+  display: block;
+  width: 100%;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(212, 188, 126, 0.58);
+  background: rgba(52, 38, 21, 0.62);
+  color: #f0e4c2;
+  font-size: 14px;
+  letter-spacing: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.kanrinin-modal__key:hover,
+.kanrinin-modal__key:focus-visible {
+  background: rgba(96, 73, 38, 0.72);
+  outline: 1px solid rgba(244, 226, 176, 0.38);
+  outline-offset: 2px;
+}
+
+.kanrinin-modal__key[hidden] {
+  display: none;
+}
+
+.kanrinin-modal__state {
+  min-height: 1.6em;
+  margin: 0 0 12px;
+  color: #b8aa8e;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
 .kanrinin-modal__list--links a {
   color: #cfc6b4;
   text-decoration: none;

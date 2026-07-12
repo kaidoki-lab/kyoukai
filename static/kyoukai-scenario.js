@@ -187,6 +187,13 @@
       final_route_available: false,
       top_floor_unlocked: false,
       annihilation_key_obtained: false,
+      annihilation_key_obtained_at: null,
+      annihilation_key_used: false,
+      annihilation_key_used_at: null,
+      annihilation_key_consumed: false,
+      annihilation_key_obtain_lock: false,
+      annihilation_key_use_lock: false,
+      key_box_state: "contains_annihilation_key",
       top_floor_keyhole_active: false,
       top_floor_entered: false,
       top_floor_entered_at: null,
@@ -236,6 +243,16 @@
     next.final_route_available = Boolean(next.final_route_available);
     next.top_floor_unlocked = Boolean(next.top_floor_unlocked);
     next.annihilation_key_obtained = Boolean(next.annihilation_key_obtained);
+    next.annihilation_key_used = Boolean(next.annihilation_key_used);
+    next.annihilation_key_consumed = Boolean(next.annihilation_key_consumed);
+    next.annihilation_key_obtain_lock = Boolean(next.annihilation_key_obtain_lock);
+    next.annihilation_key_use_lock = Boolean(next.annihilation_key_use_lock);
+    next.key_box_state = next.key_box_state || "contains_annihilation_key";
+    if (next.annihilation_key_obtained === true) next.key_box_state = "empty";
+    if (next.annihilation_key_used === true) next.annihilation_key_consumed = true;
+    if (next.annihilation_key_consumed === true && Array.isArray(next.items)) {
+      next.items = next.items.filter(function (item) { return item !== "annihilation_key"; });
+    }
     next.top_floor_keyhole_active = Boolean(next.top_floor_keyhole_active);
     next.top_floor_entered = Boolean(next.top_floor_entered);
     next.top_floor_event_completed = Boolean(next.top_floor_event_completed);
@@ -247,6 +264,10 @@
     if (next.keyhole_state === "processing" && next.top_floor_keyhole_completed !== true) {
       next.keyhole_state = hasAnnihilationKey(next) ? "ready" : "waiting_for_key";
       next.keyhole_interaction_lock = false;
+      next.annihilation_key_use_lock = false;
+      next.annihilation_key_used = false;
+      next.annihilation_key_used_at = null;
+      next.annihilation_key_consumed = false;
     }
     next.route_e_phone_answered = Boolean(next.route_e_phone_answered);
     next.route_e_phone_completed = Boolean(next.route_e_phone_completed);
@@ -400,6 +421,7 @@
 
   function hasAnnihilationKey(state) {
     var next = state || getState();
+    if (next.annihilation_key_used === true || next.annihilation_key_consumed === true) return false;
     return Boolean(
       next.annihilation_key_obtained === true ||
       (Array.isArray(next.items) && next.items.indexOf("annihilation_key") !== -1)
@@ -550,6 +572,11 @@
     else if (effect.type === "clear_target_room") state.current_target_room_id = null;
     else if (effect.type === "set_state_value") state[effect.key] = effect.value;
     else if (effect.type === "set_timestamp") state[effect.key] = new Date().toISOString();
+    else if (effect.type === "add_item") {
+      state.items = unique((state.items || []).concat([effect.item_id]));
+    } else if (effect.type === "remove_item") {
+      state.items = (state.items || []).filter(function (item) { return item !== effect.item_id; });
+    }
     else if (effect.type === "append_diary_entry") {
       if (state.diary_entry_ids.indexOf(effect.entry_id) === -1) state.diary_entry_ids.push(effect.entry_id);
     } else if (effect.type === "unlock_floor") unlockFloor(state, effect.floor_id);

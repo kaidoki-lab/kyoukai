@@ -10,7 +10,7 @@
   <meta property="og:url" content="https://www.void-kyoukai.net/kanrinin" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="stylesheet" href="/static/kanrinin.css?v=routee2">
+  <link rel="stylesheet" href="/static/kanrinin.css?v=routee4">
   <link rel="stylesheet" href="/static/kyoukai-scenario-ui.css?v=routea2">
   <script src="/static/kyoukai-transition.js"></script>
   <script defer src="/static/analytics.js"></script>
@@ -49,6 +49,10 @@
           <li>203号室　鍵紛失</li>
           <li>■■■■室　管理者専用</li>
         </ul>
+        <button type="button" class="kanrinin-modal__key" id="annihilationKeyItem" data-annihilation-key-item hidden>
+          消滅の鍵
+        </button>
+        <p class="kanrinin-modal__state" id="keyBoxStateText" data-key-box-state-text></p>
         <p class="kanrinin-modal__footer">現在は開錠できません。管理人の許可が必要です。</p>
         <button type="button" class="kanrinin-modal__close" id="keyBoxModalClose">閉じる</button>
       </div>
@@ -80,6 +84,6 @@
   </div>
 
   <script src="/static/outside-items.js"></script>
-  <script defer src="/static/kanrinin.js?v=routee2"></script>
+  <script defer src="/static/kanrinin.js?v=routee4"></script>
 </body>
 </html>

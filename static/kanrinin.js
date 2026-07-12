@@ -30,6 +30,8 @@
   const messageEl = document.getElementById("kanrininMessage");
   const keyBoxModal = document.getElementById("keyBoxModal");
   const keyBoxModalClose = document.getElementById("keyBoxModalClose");
+  const annihilationKeyItem = document.getElementById("annihilationKeyItem");
+  const keyBoxStateText = document.getElementById("keyBoxStateText");
   const snsModal = document.getElementById("snsModal");
   const snsModalClose = document.getElementById("snsModalClose");
   const snsModalList = document.getElementById("snsModalList");
@@ -185,8 +187,44 @@
     window.open(url, "_blank", "noopener,noreferrer");
   }
 
+  function canObtainAnnihilationKey(state) {
+    return Boolean(
+      state &&
+      state.mode === "scenario" &&
+      state.active_route_id === "route_e" &&
+      state.route_status?.route_e === "active" &&
+      state.route_e_phone_completed === true &&
+      state.ending_completed !== true &&
+      state.annihilation_key_obtained !== true
+    );
+  }
+
+  function isRouteEKeyBoxEmpty(state) {
+    return Boolean(
+      state &&
+      state.mode === "scenario" &&
+      state.active_route_id === "route_e" &&
+      (state.annihilation_key_obtained === true || state.key_box_state === "empty")
+    );
+  }
+
+  function renderKeyBoxModal() {
+    const state = window.KYOUKAI_SCENARIO?.getState?.();
+    const canObtain = canObtainAnnihilationKey(state);
+    const isEmpty = isRouteEKeyBoxEmpty(state);
+    if (annihilationKeyItem) {
+      annihilationKeyItem.hidden = !canObtain;
+      annihilationKeyItem.disabled = !canObtain || state?.annihilation_key_obtain_lock === true;
+    }
+    if (keyBoxStateText) {
+      keyBoxStateText.textContent = isEmpty ? "空になっている。" : "";
+    }
+    if (isEmpty) showMessage("空になっている。", 1800);
+  }
+
   function openKeyBoxModal() {
     if (!keyBoxModal) return;
+    renderKeyBoxModal();
     keyBoxModal.classList.add("is-open");
     keyBoxModal.setAttribute("aria-hidden", "false");
   }
@@ -195,6 +233,37 @@
     if (!keyBoxModal) return;
     keyBoxModal.classList.remove("is-open");
     keyBoxModal.setAttribute("aria-hidden", "true");
+  }
+
+  function showAnnihilationKeyObtainedMessages() {
+    showMessage("消滅の鍵を持ち出した。", 1800);
+    window.setTimeout(() => {
+      showMessage("鍵ボックスには、\n何も残っていない。", 2600);
+    }, 950);
+  }
+
+  function obtainAnnihilationKey() {
+    if (!window.KYOUKAI_SCENARIO) return;
+    let state = window.KYOUKAI_SCENARIO.getState();
+    if (state.annihilation_key_obtained === true || state.key_box_state === "empty") {
+      renderKeyBoxModal();
+      showMessage("空になっている。", 1800);
+      return;
+    }
+    if (!canObtainAnnihilationKey(state) || state.annihilation_key_obtain_lock === true) return;
+    state.annihilation_key_obtain_lock = true;
+    window.KYOUKAI_SCENARIO.saveState(state);
+    state = window.KYOUKAI_SCENARIO.completeScenarioEvent("route_e_annihilation_key_obtain_001", {
+      interactionTarget: "annihilation-key",
+      sequenceEventId: "route_e_annihilation_key_obtain_001",
+    });
+    if (state.annihilation_key_obtained !== true) {
+      state.annihilation_key_obtain_lock = false;
+      window.KYOUKAI_SCENARIO.saveState(state);
+      return;
+    }
+    renderKeyBoxModal();
+    showAnnihilationKeyObtainedMessages();
   }
 
   function openSnsModal() {
@@ -296,6 +365,12 @@
   }
 
   function runAnnihilation() {
+    const state = window.KYOUKAI_SCENARIO?.getState?.();
+    if (canObtainAnnihilationKey(state) || isRouteEKeyBoxEmpty(state)) {
+      trackArea("annihilation-route-e");
+      openKeyBoxModal();
+      return;
+    }
     window.clearTimeout(revealTimer);
     if (eyeGap) eyeGap.classList.add("is-revealed");
     showMessage("管理人が鍵を回しました。", 4000);
@@ -527,6 +602,9 @@
 
   if (keyBoxModalClose) {
     keyBoxModalClose.addEventListener("click", closeKeyBoxModal);
+  }
+  if (annihilationKeyItem) {
+    annihilationKeyItem.addEventListener("click", obtainAnnihilationKey);
   }
   if (keyBoxModal) {
     keyBoxModal.addEventListener("click", (event) => {

@@ -430,6 +430,7 @@
           { type: "set_state_value", key: "top_floor_unlocked", value: true },
           { type: "set_state_value", key: "top_floor_keyhole_active", value: false },
           { type: "set_state_value", key: "route_e_phone_answer_lock", value: false },
+          { type: "enable_event", event_id: "route_e_annihilation_key_available_001" },
           { type: "enable_event", event_id: "route_e_top_floor_001" },
           { type: "set_target_room", room_id: "top-floor" }
         ],
@@ -437,6 +438,55 @@
       }
     ],
     roomEvents: [
+      {
+        event_id: "route_e_annihilation_key_available_001",
+        route_id: "route_e",
+        room_id: "kanrinin",
+        requirements: [
+          { type: "mode_equals", value: "scenario" },
+          { type: "route_status_equals", route_id: "route_e", value: "active" },
+          { type: "active_route_equals", value: "route_e" },
+          { type: "state_equals", key: "route_e_phone_completed", value: true },
+          { type: "state_not_equals", key: "ending_completed", value: true },
+          { type: "state_not_equals", key: "annihilation_key_obtained", value: true }
+        ],
+        effects: []
+      },
+      {
+        event_id: "route_e_annihilation_key_obtain_001",
+        route_id: "route_e",
+        room_id: "kanrinin",
+        requirements: [
+          { type: "mode_equals", value: "scenario" },
+          { type: "route_status_equals", route_id: "route_e", value: "active" },
+          { type: "active_route_equals", value: "route_e" },
+          { type: "state_equals", key: "route_e_phone_completed", value: true },
+          { type: "state_not_equals", key: "ending_completed", value: true },
+          { type: "state_not_equals", key: "annihilation_key_obtained", value: true },
+          { type: "interaction_completed", target: "annihilation-key" }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_e_annihilation_key_obtain_001" },
+          { type: "set_state_value", key: "annihilation_key_obtained", value: true },
+          { type: "set_timestamp", key: "annihilation_key_obtained_at" },
+          { type: "set_state_value", key: "annihilation_key_used", value: false },
+          { type: "set_state_value", key: "annihilation_key_consumed", value: false },
+          { type: "set_state_value", key: "annihilation_key_obtain_lock", value: false },
+          { type: "set_state_value", key: "route_e_stage", value: "annihilation_key_obtained" },
+          { type: "set_state_value", key: "key_box_state", value: "empty" },
+          { type: "add_item", item_id: "annihilation_key" },
+          { type: "enable_event", event_id: "route_e_annihilation_key_ready_001" }
+        ]
+      },
+      {
+        event_id: "route_e_annihilation_key_box_empty_001",
+        route_id: "route_e",
+        room_id: "kanrinin",
+        requirements: [
+          { type: "state_equals", key: "key_box_state", value: "empty" }
+        ],
+        effects: []
+      },
       {
         event_id: "route_e_top_floor_unlock_001",
         route_id: "route_e",
@@ -510,6 +560,26 @@
         ]
       },
       {
+        event_id: "route_e_annihilation_key_ready_001",
+        route_id: "route_e",
+        room_id: "top-floor",
+        requirements: [
+          { type: "mode_equals", value: "scenario" },
+          { type: "route_status_equals", route_id: "route_e", value: "active" },
+          { type: "active_route_equals", value: "route_e" },
+          { type: "state_equals", key: "route_e_phone_completed", value: true },
+          { type: "state_equals", key: "top_floor_unlocked", value: true },
+          { type: "state_equals", key: "top_floor_entered", value: true },
+          { type: "state_equals", key: "annihilation_key_obtained", value: true },
+          { type: "state_not_equals", key: "annihilation_key_used", value: true },
+          { type: "state_not_equals", key: "top_floor_keyhole_completed", value: true },
+          { type: "state_not_equals", key: "ending_completed", value: true }
+        ],
+        effects: [
+          { type: "set_state_value", key: "keyhole_state", value: "ready" }
+        ]
+      },
+      {
         event_id: "route_e_keyhole_processing_001",
         route_id: "route_e",
         room_id: "top-floor",
@@ -518,6 +588,76 @@
           { type: "state_not_equals", key: "top_floor_keyhole_completed", value: true }
         ],
         effects: []
+      },
+      {
+        event_id: "route_e_annihilation_key_insert_001",
+        route_id: "route_e",
+        room_id: "top-floor",
+        requirements: [
+          { type: "state_equals", key: "keyhole_state", value: "ready" },
+          { type: "state_equals", key: "annihilation_key_obtained", value: true },
+          { type: "state_not_equals", key: "annihilation_key_used", value: true },
+          { type: "state_not_equals", key: "top_floor_keyhole_completed", value: true }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_e_annihilation_key_insert_001" },
+          { type: "set_state_value", key: "keyhole_state", value: "processing" },
+          { type: "set_state_value", key: "annihilation_key_use_lock", value: true }
+        ]
+      },
+      {
+        event_id: "route_e_annihilation_key_turn_001",
+        route_id: "route_e",
+        room_id: "top-floor",
+        requirements: [
+          { type: "state_equals", key: "keyhole_state", value: "processing" },
+          { type: "state_equals", key: "annihilation_key_obtained", value: true },
+          { type: "state_not_equals", key: "top_floor_keyhole_completed", value: true }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_e_annihilation_key_turn_001" }
+        ]
+      },
+      {
+        event_id: "route_e_annihilation_key_use_001",
+        route_id: "route_e",
+        room_id: "top-floor",
+        requirements: [
+          { type: "state_equals", key: "keyhole_state", value: "processing" },
+          { type: "state_equals", key: "annihilation_key_obtained", value: true },
+          { type: "state_not_equals", key: "annihilation_key_used", value: true },
+          { type: "state_not_equals", key: "top_floor_keyhole_completed", value: true }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_e_annihilation_key_use_001" },
+          { type: "set_state_value", key: "annihilation_key_used", value: true },
+          { type: "set_timestamp", key: "annihilation_key_used_at" },
+          { type: "set_state_value", key: "annihilation_key_consumed", value: true },
+          { type: "remove_item", item_id: "annihilation_key" }
+        ]
+      },
+      {
+        event_id: "route_e_annihilation_key_complete_001",
+        route_id: "route_e",
+        room_id: "top-floor",
+        requirements: [
+          { type: "state_equals", key: "annihilation_key_used", value: true },
+          { type: "state_equals", key: "annihilation_key_consumed", value: true },
+          { type: "state_not_equals", key: "ending_completed", value: true }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_e_annihilation_key_complete_001" },
+          { type: "complete_event", event_id: "route_e_annihilation_key_001" },
+          { type: "complete_event", event_id: "route_e_top_floor_001" },
+          { type: "complete_event", event_id: "route_e_keyhole_complete_001" },
+          { type: "set_state_value", key: "top_floor_keyhole_completed", value: true },
+          { type: "set_state_value", key: "top_floor_event_completed", value: true },
+          { type: "set_state_value", key: "keyhole_state", value: "completed" },
+          { type: "set_state_value", key: "annihilation_key_use_lock", value: false },
+          { type: "set_state_value", key: "route_e_stage", value: "keyhole_completed" },
+          { type: "set_target_room", room_id: "observer" }
+        ],
+        next_events: ["route_e_observer_final_001"]
       },
       {
         event_id: "route_e_keyhole_complete_001",

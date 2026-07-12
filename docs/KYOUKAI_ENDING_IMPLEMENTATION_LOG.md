@@ -19,6 +19,42 @@ KYOUKAI終幕制作進捗
 [ ] 10. 終了告知・Shorts・SNS文面
 ```
 
+## 制作物04
+
+受領日: 2026-07-13
+仕様名: 消滅の鍵の正式仕様
+状態: 実装・検証完了
+変更ファイル:
+- `data/scenarios/route_e.json`
+- `static/kyoukai-scenario-events.js`
+- `static/kyoukai-scenario.js`
+- `templates/kanrinin.html`
+- `static/kanrinin.js`
+- `static/kanrinin.css`
+- `templates/top-floor.html`
+- `static/top-floor.js`
+- `static/space.css`
+- `main.py`
+- `tests/test_route_e_scenario.py`
+
+実装内容:
+- `annihilation_key` をRoute_E専用の正式な鍵として扱い、管理人室の鍵ボックスからのみ取得できるようにした。
+- 取得条件をシナリオモード、Route_E active、最終電話完了、終幕未完了、未取得に限定し、フリーモードでは取得処理を発生させない。
+- 取得時に `annihilation_key_obtained`, `annihilation_key_obtained_at`, `annihilation_key_used`, `annihilation_key_consumed`, `key_box_state`, `route_e_stage` を更新し、鍵ボックス再確認時は空表示のみ返すようにした。
+- 最上階の鍵穴で、鍵所持時のみ「鍵穴の奥で、何かが待っている。」「消滅の鍵を差し込みます。」を表示し、次クリック/タップで差し込み・回転演出を開始するようにした。
+- 使用完了時に `annihilation_key_used`, `annihilation_key_used_at`, `annihilation_key_consumed`, `top_floor_keyhole_completed`, `top_floor_event_completed`, `keyhole_state`, `route_e_stage`, `current_target_room_id` を更新し、次工程の観測者遷移待ちへ進める状態にした。
+- Route_Eの鍵使用では通常404へ遷移せず、既存の `/kanrinin/deleted` 404導線はRoute_E外の旧動作として残した。
+- 使用中リロード時に未完了なら `keyhole_state` を `ready` へ戻し、鍵所持を維持する回復処理を追加した。
+
+未実装として残す内容:
+- 観測者の最終演出・最終文章
+- 管理人日記の最終更新
+- Route_E全体の完了処理・`ending_completed`
+- 終幕後の再訪問仕様
+
+確認内容:
+- `tests/test_route_e_scenario.py` に制作物04の取得条件、状態保存、鍵ボックス空表示、鍵穴使用、404非遷移、回復処理のテストを追加した。
+
 ## 制作物02
 
 受領日: 2026-07-11
@@ -280,7 +316,7 @@ KYOUKAI終幕制作進捗
 未解決事項:
 - 最終電話の会話・発信者・着信表示は制作物02待ち。
 - 最上階・鍵穴イベントは制作物03待ち。
-- 消滅の鍵の正式仕様は制作物04待ち。
+- 消滅の鍵の正式仕様は制作物04で完了。
 - 逆観測室の終幕演出・最終文は制作物05待ち。
 - 管理日誌の終幕ページ本文は制作物06待ち。
 - 状態フラグの正式保存設計と再訪演出は制作物07待ち。

@@ -3087,9 +3087,50 @@ a.sp-link:hover,
   box-shadow: 0 0 24px rgba(218, 230, 255, 0.22);
 }
 
+.top-floor-room[data-keyhole-state="processing"] .top-floor-room__keyhole,
+.top-floor-room[data-keyhole-state="completed"] .top-floor-room__keyhole {
+  opacity: 0.18;
+  box-shadow: 0 0 30px rgba(235, 225, 188, 0.22);
+}
+
 .top-floor-room__keyhole:focus-visible {
   outline: 1px solid rgba(255, 242, 211, 0.54);
   outline-offset: 4px;
+}
+
+.top-floor-room__use-key {
+  position: fixed;
+  left: 50%;
+  top: 71%;
+  z-index: 5;
+  width: max(14px, min(3vw, 24px));
+  height: max(86px, min(18vw, 150px));
+  transform: translate(-50%, -50%) rotate(0deg);
+  transform-origin: 50% 18%;
+  border-radius: 8px 8px 3px 3px;
+  background:
+    linear-gradient(90deg, transparent 0 28%, rgba(250, 235, 181, 0.88) 29% 70%, transparent 71%),
+    linear-gradient(180deg, #d8c078 0 20%, #8c6e35 21% 100%);
+  box-shadow: 0 0 24px rgba(228, 204, 129, 0.24);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    top 0.58s ease,
+    transform 0.6s ease,
+    opacity 0.32s ease;
+}
+
+.top-floor-room.is-using-key .top-floor-room__use-key {
+  opacity: 1;
+}
+
+.top-floor-room__use-key.is-inserted {
+  top: 52%;
+}
+
+.top-floor-room__use-key.is-turned {
+  top: 52%;
+  transform: translate(-50%, -50%) rotate(88deg);
 }
 
 .top-floor-room__message {
