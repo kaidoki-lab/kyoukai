@@ -188,6 +188,14 @@
       top_floor_unlocked: false,
       annihilation_key_obtained: false,
       top_floor_keyhole_active: false,
+      top_floor_entered: false,
+      top_floor_entered_at: null,
+      top_floor_event_completed: false,
+      top_floor_keyhole_completed: false,
+      keyhole_state: "inactive",
+      keyhole_touched: false,
+      keyhole_touched_without_key: false,
+      keyhole_interaction_lock: false,
       route_e_stage: "not_started",
       route_e_started_at: null,
       route_e_phone_answered: false,
@@ -229,6 +237,17 @@
     next.top_floor_unlocked = Boolean(next.top_floor_unlocked);
     next.annihilation_key_obtained = Boolean(next.annihilation_key_obtained);
     next.top_floor_keyhole_active = Boolean(next.top_floor_keyhole_active);
+    next.top_floor_entered = Boolean(next.top_floor_entered);
+    next.top_floor_event_completed = Boolean(next.top_floor_event_completed);
+    next.top_floor_keyhole_completed = Boolean(next.top_floor_keyhole_completed);
+    next.keyhole_touched = Boolean(next.keyhole_touched);
+    next.keyhole_touched_without_key = Boolean(next.keyhole_touched_without_key);
+    next.keyhole_interaction_lock = Boolean(next.keyhole_interaction_lock);
+    next.keyhole_state = next.keyhole_state || "inactive";
+    if (next.keyhole_state === "processing" && next.top_floor_keyhole_completed !== true) {
+      next.keyhole_state = hasAnnihilationKey(next) ? "ready" : "waiting_for_key";
+      next.keyhole_interaction_lock = false;
+    }
     next.route_e_phone_answered = Boolean(next.route_e_phone_answered);
     next.route_e_phone_completed = Boolean(next.route_e_phone_completed);
     next.route_e_phone_answer_lock = Boolean(next.route_e_phone_answer_lock);
@@ -377,6 +396,14 @@
       "reaction_amplified_by_repetition",
       "almost_speaking"
     ].indexOf(roomState) !== -1 || state.unlocked_rooms.indexOf(roomId) !== -1;
+  }
+
+  function hasAnnihilationKey(state) {
+    var next = state || getState();
+    return Boolean(
+      next.annihilation_key_obtained === true ||
+      (Array.isArray(next.items) && next.items.indexOf("annihilation_key") !== -1)
+    );
   }
 
   function showNotice(message) {
@@ -716,6 +743,7 @@
     maybeSetInitialMode: maybeSetInitialMode,
     canEnterFloor: canEnterFloor,
     canEnterRoom: canEnterRoom,
+    hasAnnihilationKey: hasAnnihilationKey,
     roomById: roomById,
     getEventById: getEventById,
     requirementsMet: requirementsMet,

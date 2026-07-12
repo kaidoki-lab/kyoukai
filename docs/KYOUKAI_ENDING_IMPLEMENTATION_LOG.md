@@ -54,6 +54,39 @@ KYOUKAI終幕制作進捗
 確認内容:
 - Route_E最終電話の発信者、本文、手動進行、20秒待機、1.5秒復帰、完了状態、最上階開放フラグをテスト対象に追加した。
 
+## 制作物03
+
+受領日: 2026-07-13
+仕様名: 最上階・鍵穴イベント仕様
+状態: 完了
+
+変更ファイル:
+- `data/scenarios/route_e.json`
+- `static/kyoukai-scenario-events.js`
+- `static/kyoukai-scenario.js`
+- `templates/top-floor.html`
+- `static/top-floor.js`
+- `static/space.css`
+- `main.py`
+- `tests/test_route_e_scenario.py`
+- `tests/test_route_a_scenario.py`
+
+実装内容:
+- 最上階の表示名をページ上では `最上階`、エレベーター/フロア表示では既存通り `KEY` として維持した。
+- `top_floor_entered`, `top_floor_entered_at`, `top_floor_event_completed`, `top_floor_keyhole_completed`, `keyhole_state`, `keyhole_touched`, `keyhole_touched_without_key`, `keyhole_interaction_lock` の保存土台を追加した。
+- `keyhole_state` が未完了の `processing` で復帰した場合、鍵所持状態に応じて `ready` または `waiting_for_key` へ戻す補正を追加した。
+- Route_E active、最終電話完了、`top_floor_unlocked === true`、終幕未完了の時だけ最上階の鍵穴が操作できるようにした。
+- 最上階初回入室時に `route_e_top_floor_enter_001` を記録し、`route_e_stage` を `top_floor_entered` に更新するようにした。
+- 最上階画面に小さな鍵穴ホットスポットと短いメッセージ表示だけを追加し、画面全体をクリック領域にしない構造にした。
+- 鍵なし接触では `形は合っている。`、続けて `ここには、まだ何もありません。` を表示し、以後の再接触では短く `反応はありません。` のみを表示するようにした。
+- 鍵所持状態では `keyhole_state = "ready"` に更新し、制作物04用の `startAnnihilationKeyUse()` / `kyoukai:route-e-keyhole-ready` へ接続するだけに留めた。
+
+未実装として残す内容:
+- 消滅の鍵の正式な取得、使用確認、挿入/回転/消費演出、404演出、逆観測室への本遷移、Route_E完了処理は制作物04以降で扱う。
+
+確認内容:
+- 最上階開放条件、入室記録、鍵穴状態、鍵なしメッセージ、鍵あり接続フック、PC/スマホ向けホットスポット最小サイズをテスト対象に追加した。
+
 この進捗表は、各番号の仕様を受領し、実装と確認が完了した時点でのみ更新する。
 
 ## 事前準備

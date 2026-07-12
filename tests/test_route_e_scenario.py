@@ -13,6 +13,9 @@ class RouteEFoundationTests(unittest.TestCase):
         self.events_js = (BASE_DIR / "static" / "kyoukai-scenario-events.js").read_text(encoding="utf-8")
         self.scenario_js = (BASE_DIR / "static" / "kyoukai-scenario.js").read_text(encoding="utf-8")
         self.kanrinin_js = (BASE_DIR / "static" / "kanrinin.js").read_text(encoding="utf-8")
+        self.top_floor_html = (BASE_DIR / "templates" / "top-floor.html").read_text(encoding="utf-8")
+        self.top_floor_js = (BASE_DIR / "static" / "top-floor.js").read_text(encoding="utf-8")
+        self.space_css = (BASE_DIR / "static" / "space.css").read_text(encoding="utf-8")
 
     def test_route_e_definition_is_final_route(self):
         self.assertEqual(self.route_e_json["route_id"], "route_e")
@@ -103,6 +106,14 @@ class RouteEFoundationTests(unittest.TestCase):
     def test_state_defaults_and_missing_key_normalization_support_ending(self):
         for token in [
             'route_e_stage: "not_started"',
+            "top_floor_entered: false",
+            "top_floor_entered_at: null",
+            "top_floor_event_completed: false",
+            "top_floor_keyhole_completed: false",
+            'keyhole_state: "inactive"',
+            "keyhole_touched: false",
+            "keyhole_touched_without_key: false",
+            "keyhole_interaction_lock: false",
             "route_e_started_at: null",
             "route_e_phone_answered: false",
             "route_e_phone_completed: false",
@@ -118,6 +129,60 @@ class RouteEFoundationTests(unittest.TestCase):
         ]:
             with self.subTest(token=token):
                 self.assertIn(token, self.scenario_js)
+
+    def test_deliverable_03_registers_top_floor_and_keyhole_events(self):
+        for event_id in [
+            "route_e_top_floor_unlock_001",
+            "route_e_top_floor_enter_001",
+            "route_e_keyhole_available_001",
+            "route_e_keyhole_touch_without_key_001",
+            "route_e_keyhole_ready_001",
+            "route_e_keyhole_processing_001",
+            "route_e_keyhole_complete_001",
+        ]:
+            with self.subTest(event_id=event_id):
+                self.assertIn(event_id, self.route_e_json_path.read_text(encoding="utf-8"))
+                self.assertIn(event_id, self.events_js)
+        for token in [
+            '{ type: "state_equals", key: "route_e_phone_completed", value: true }',
+            '{ type: "state_equals", key: "top_floor_unlocked", value: true }',
+            '{ type: "set_state_value", key: "top_floor_entered", value: true }',
+            '{ type: "set_timestamp", key: "top_floor_entered_at" }',
+            '{ type: "set_state_value", key: "route_e_stage", value: "top_floor_entered" }',
+        ]:
+            with self.subTest(token=token):
+                self.assertIn(token, self.events_js)
+
+    def test_top_floor_page_exposes_keyhole_without_full_screen_click_area(self):
+        self.assertIn('aria-label="最上階"', self.top_floor_html)
+        self.assertIn('data-top-floor-room', self.top_floor_html)
+        self.assertIn('data-top-floor-keyhole', self.top_floor_html)
+        self.assertIn('aria-label="鍵穴を調べる"', self.top_floor_html)
+        self.assertIn('/static/top-floor.js?v=topfloor2', self.top_floor_html)
+        self.assertIn('/static/space.css?v=topfloor2', self.top_floor_html)
+        self.assertIn('.top-floor-room__keyhole', self.space_css)
+        self.assertIn('width: max(44px', self.space_css)
+
+    def test_top_floor_script_handles_entry_keyhole_and_future_key_use_hook(self):
+        for token in [
+            'active_route_id === "route_e"',
+            'state.route_status?.route_e === "active"',
+            "state.route_e_phone_completed === true",
+            "state.top_floor_unlocked === true",
+            "top_floor_entered = true",
+            "route_e_top_floor_enter_001",
+            "hasAnnihilationKey",
+            "keyhole_state = \"waiting_for_key\"",
+            "keyhole_state = \"ready\"",
+            "route_e_keyhole_touch_without_key_001",
+            "startAnnihilationKeyUse",
+            "kyoukai:route-e-keyhole-ready",
+            "形は合っている。",
+            "ここには、まだ何もありません。",
+            "反応はありません。",
+        ]:
+            with self.subTest(token=token):
+                self.assertIn(token, self.top_floor_js)
 
 
 if __name__ == "__main__":

@@ -38,6 +38,13 @@
     "route_e_phone_001"
   ],
   "room_events": [
+    "route_e_top_floor_unlock_001",
+    "route_e_top_floor_enter_001",
+    "route_e_keyhole_available_001",
+    "route_e_keyhole_touch_without_key_001",
+    "route_e_keyhole_ready_001",
+    "route_e_keyhole_processing_001",
+    "route_e_keyhole_complete_001",
     "route_e_top_floor_001",
     "route_e_annihilation_key_001",
     "route_e_observer_final_001"

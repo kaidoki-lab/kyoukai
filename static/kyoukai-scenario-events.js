@@ -438,6 +438,97 @@
     ],
     roomEvents: [
       {
+        event_id: "route_e_top_floor_unlock_001",
+        route_id: "route_e",
+        room_id: "top-floor",
+        requirements: [
+          { type: "mode_equals", value: "scenario" },
+          { type: "route_status_equals", route_id: "route_e", value: "active" },
+          { type: "active_route_equals", value: "route_e" },
+          { type: "state_equals", key: "route_e_phone_completed", value: true },
+          { type: "state_equals", key: "top_floor_unlocked", value: true },
+          { type: "state_not_equals", key: "ending_completed", value: true }
+        ],
+        effects: []
+      },
+      {
+        event_id: "route_e_top_floor_enter_001",
+        route_id: "route_e",
+        room_id: "top-floor",
+        requirements: [
+          { type: "mode_equals", value: "scenario" },
+          { type: "route_status_equals", route_id: "route_e", value: "active" },
+          { type: "active_route_equals", value: "route_e" },
+          { type: "state_equals", key: "route_e_phone_completed", value: true },
+          { type: "state_equals", key: "top_floor_unlocked", value: true },
+          { type: "state_not_equals", key: "ending_completed", value: true },
+          { type: "event_not_completed", event_id: "route_e_top_floor_enter_001" }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_e_top_floor_enter_001" },
+          { type: "set_state_value", key: "top_floor_entered", value: true },
+          { type: "set_timestamp", key: "top_floor_entered_at" },
+          { type: "set_state_value", key: "route_e_stage", value: "top_floor_entered" },
+          { type: "set_state_value", key: "top_floor_keyhole_active", value: true }
+        ]
+      },
+      {
+        event_id: "route_e_keyhole_available_001",
+        route_id: "route_e",
+        room_id: "top-floor",
+        requirements: [
+          { type: "state_equals", key: "top_floor_entered", value: true },
+          { type: "state_not_equals", key: "top_floor_keyhole_completed", value: true }
+        ],
+        effects: []
+      },
+      {
+        event_id: "route_e_keyhole_touch_without_key_001",
+        route_id: "route_e",
+        room_id: "top-floor",
+        requirements: [
+          { type: "state_equals", key: "top_floor_entered", value: true },
+          { type: "state_not_equals", key: "top_floor_keyhole_completed", value: true }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_e_keyhole_touch_without_key_001" },
+          { type: "set_state_value", key: "keyhole_touched", value: true },
+          { type: "set_state_value", key: "keyhole_touched_without_key", value: true },
+          { type: "set_state_value", key: "keyhole_state", value: "waiting_for_key" }
+        ]
+      },
+      {
+        event_id: "route_e_keyhole_ready_001",
+        route_id: "route_e",
+        room_id: "top-floor",
+        requirements: [
+          { type: "state_equals", key: "top_floor_entered", value: true },
+          { type: "state_not_equals", key: "top_floor_keyhole_completed", value: true }
+        ],
+        effects: [
+          { type: "set_state_value", key: "keyhole_state", value: "ready" }
+        ]
+      },
+      {
+        event_id: "route_e_keyhole_processing_001",
+        route_id: "route_e",
+        room_id: "top-floor",
+        requirements: [
+          { type: "state_equals", key: "keyhole_state", value: "ready" },
+          { type: "state_not_equals", key: "top_floor_keyhole_completed", value: true }
+        ],
+        effects: []
+      },
+      {
+        event_id: "route_e_keyhole_complete_001",
+        route_id: "route_e",
+        room_id: "top-floor",
+        requirements: [
+          { type: "state_equals", key: "top_floor_keyhole_completed", value: true }
+        ],
+        effects: []
+      },
+      {
         event_id: "route_a_room_observation_001",
         route_id: "route_a",
         room_id: "observation",

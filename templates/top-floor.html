@@ -11,13 +11,13 @@
   <meta property="og:url" content="https://www.void-kyoukai.net/top-floor" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="stylesheet" href="/static/space.css?v=topfloor1" />
+  <link rel="stylesheet" href="/static/space.css?v=topfloor2" />
   <script src="/static/kyoukai-transition.js"></script>
   <script defer src="/static/analytics.js"></script>
 </head>
 <body class="top-floor-body">
   <script>window.KYOUKAI_ROOM = 'top-floor';</script>
-  <main class="top-floor-room" aria-label="KYOUKAI top floor">
+  <main class="top-floor-room" aria-label="最上階" data-top-floor-room>
     <img
       class="top-floor-room__image"
       src="/static/images/top-floor/room-9x16.png"
@@ -25,7 +25,15 @@
       width="1024"
       height="1792"
     />
-    <a class="top-floor-room__return" href="/elevator" aria-label="Return to elevator">ELEVATOR</a>
+    <button
+      type="button"
+      class="top-floor-room__keyhole"
+      data-top-floor-keyhole
+      aria-label="鍵穴を調べる"
+    ></button>
+    <p class="top-floor-room__message" data-top-floor-message aria-live="polite"></p>
+    <a class="top-floor-room__return" href="/elevator" aria-label="Return to elevator" data-top-floor-return>ELEVATOR</a>
   </main>
+  <script defer src="/static/top-floor.js?v=topfloor2"></script>
 </body>
 </html>

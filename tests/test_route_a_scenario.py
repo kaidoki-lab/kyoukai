@@ -124,9 +124,9 @@ class ScenarioRouteTests(unittest.TestCase):
                 self.assertNotIn(line, self.route_b_room_js)
 
     def test_cache_busts_scenario_assets(self):
-        self.assertIn("kyoukai-building-data.js?v=routee2", self.main_py)
-        self.assertIn("kyoukai-scenario-events.js?v=routee2", self.main_py)
-        self.assertIn("kyoukai-scenario.js?v=routee2", self.main_py)
+        self.assertIn("kyoukai-building-data.js?v=routee3", self.main_py)
+        self.assertIn("kyoukai-scenario-events.js?v=routee3", self.main_py)
+        self.assertIn("kyoukai-scenario.js?v=routee3", self.main_py)
 
 
 if __name__ == "__main__":
