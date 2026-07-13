@@ -10,3 +10,11 @@ __pycache__/
 
 # ローカル開発用
 .claude/
+
+kyoukai.db
+.git/
+.agents/
+.codex/
+node_modules/
+booth/
+shorts_factory/
