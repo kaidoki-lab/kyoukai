@@ -5,7 +5,7 @@
   "type": "final",
   "is_final_route": true,
   "theme": "観測する側と観測される側の記録が揃い、観測が完了する",
-  "status_default": "not_started",
+  "status_default": "locked",
   "shared_room_ids": ["kanrinin"],
   "reserved_room_ids": ["top-floor", "observer"],
   "start_requirements": [

@@ -109,7 +109,7 @@ class RouteEFoundationTests(unittest.TestCase):
 
     def test_state_defaults_and_missing_key_normalization_support_ending(self):
         for token in [
-            'route_e_stage: "not_started"',
+            'route_e_stage: "locked"',
             "top_floor_entered: false",
             "top_floor_entered_at: null",
             "top_floor_event_completed: false",
@@ -397,6 +397,31 @@ class RouteEFoundationTests(unittest.TestCase):
         self.assertIn('{ type: "set_route_status", route_id: "route_e", value: "completed" }', self.events_js)
         self.assertIn('{ type: "set_state_value", key: "ending_variant", value: "observation_completed" }', self.events_js)
         self.assertIn("static/kanrinin-diary.json", self.kanrinin_js)
+
+    def test_deliverable_07_version_migration_and_revisit_guards(self):
+        for token in [
+            'var SCHEMA_VERSION = 2',
+            'schema_version: SCHEMA_VERSION',
+            'var ROUTE_E_STAGES',
+            'var ROUTE_E_STATUSES',
+            'kyoukai_scenario_state_corrupt_backup',
+            'function persistState(state)',
+            'function resetRouteEForDevelopment()',
+            'resetRouteEForDevelopment: resetRouteEForDevelopment',
+            'route_e_completed_at: null',
+            'next.annihilation_key_obtain_lock = false',
+            'next.observer_final_transition_lock = false',
+            'next.route_e_complete_lock = false',
+        ]:
+            with self.subTest(token=token):
+                self.assertIn(token, self.scenario_js)
+        self.assertIn('"status_default": "locked"', self.route_e_json_path.read_text(encoding="utf-8"))
+        self.assertIn('state.ending_completed === true', self.kanrinin_js)
+        self.assertIn('showMessage("音はしない。", 1800)', self.kanrinin_js)
+        self.assertIn('canVisitCompletedTopFloor', self.top_floor_js)
+        self.assertIn('showMessage("閉じています。", 1800)', self.top_floor_js)
+        self.assertIn('shouldResumeManagerReturn', self.observer_js)
+        self.assertIn('観測は完了しています。', self.observer_js)
 
 
 if __name__ == "__main__":

@@ -83,6 +83,24 @@
     );
   }
 
+  function shouldResumeManagerReturn(state) {
+    return Boolean(
+      state &&
+      state.mode === "scenario" &&
+      state.active_route_id === "route_e" &&
+      state.route_status?.route_e === "active" &&
+      state.observer_final_event_completed === true &&
+      state.manager_return_completed !== true &&
+      state.ending_completed !== true
+    );
+  }
+
+  const initialScenarioState = scenario?.getState?.();
+  if (shouldResumeManagerReturn(initialScenarioState)) {
+    window.location.replace("/kanrinin");
+    return;
+  }
+
   function createFinalObserverUi() {
     const layer = document.createElement("section");
     layer.className = "observer-final";
@@ -583,6 +601,12 @@
       state.awareUntil = performance.now() + 1400;
     });
     hotspot.addEventListener("click", () => {
+      const current = scenario?.getState?.();
+      if (current?.ending_completed === true) {
+        showBubble("観測は完了しています。", 2200);
+        window.setTimeout(() => showBubble("ここには、\n記録だけが残っています。", 2600), 900);
+        return;
+      }
       sendTo(hotspotTarget(hotspot), performance.now(), pick(hotspotLines));
     });
   });

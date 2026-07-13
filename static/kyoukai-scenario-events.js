@@ -115,7 +115,7 @@
     type: "final",
     is_final_route: true,
     theme: "観測する側と観測される側の記録が揃い、観測が完了する",
-    status_default: "not_started",
+    status_default: "locked",
     shared_room_ids: ["kanrinin"],
     reserved_room_ids: ["top-floor", "observer"],
     start_requirements: [
@@ -1397,7 +1397,9 @@
           { type: "set_state_value", key: "route_e_stage", value: "completed" },
           { type: "set_state_value", key: "ending_completed", value: true },
           { type: "set_state_value", key: "ending_variant", value: "observation_completed" },
+          { type: "set_timestamp", key: "route_e_completed_at" },
           { type: "set_timestamp", key: "kyoukai_completed_at" },
+          { type: "set_state_value", key: "completed_scenario_count", value: 5 },
           { type: "complete_event", event_id: "route_e_complete_001" }
         ],
         next_events: []

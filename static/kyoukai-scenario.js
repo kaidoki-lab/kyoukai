@@ -2,6 +2,13 @@
   "use strict";
 
   var STORAGE_KEY = "kyoukai_scenario_state_v1";
+  var SCHEMA_VERSION = 2;
+  var ROUTE_E_STAGES = [
+    "locked", "phone_waiting", "phone_active", "top_floor_unlocked", "top_floor_entered",
+    "annihilation_key_obtained", "keyhole_completed", "observer_transition", "observer_active",
+    "manager_return", "final_diary_available", "completed"
+  ];
+  var ROUTE_E_STATUSES = ["locked", "available", "active", "completed"];
   var building = window.KYOUKAI_BUILDING || { roomsPerFloor: 5, rooms: [], initialScenarioFloors: 3 };
   var events = window.KYOUKAI_SCENARIO_EVENTS || { phoneEvents: [], managerEvents: [], roomEvents: [], routes: [], diaryEntries: [] };
   var roomsPerFloor = Number(building.roomsPerFloor || 5);
@@ -149,7 +156,7 @@
   function createDefaultState() {
     var roomStates = defaultRoomStates();
     return {
-      schema_version: 1,
+      schema_version: SCHEMA_VERSION,
       mode: null,
       first_room_id: null,
       active_route_id: null,
@@ -228,8 +235,9 @@
       final_diary_view_lock: false,
       route_e_complete_lock: false,
       ending_variant: null,
-      route_e_stage: "not_started",
+      route_e_stage: "locked",
       route_e_started_at: null,
+      route_e_completed_at: null,
       route_e_phone_answered: false,
       route_e_phone_answered_at: null,
       route_e_phone_completed: false,
@@ -247,8 +255,21 @@
 
   function normalizeState(state) {
     var defaults = createDefaultState();
-    var next = Object.assign(defaults, state || {});
-    next.schema_version = 1;
+    var source = state || {};
+    var next = Object.assign(defaults, source);
+    var nestedRoutes = source.routes || {};
+    var nestedEnding = source.ending || {};
+    if (!next.mode && typeof source.scenario_mode === "boolean") next.mode = source.scenario_mode ? "scenario" : "free";
+    if (nestedEnding.final_route_available !== undefined && source.final_route_available === undefined) next.final_route_available = nestedEnding.final_route_available;
+    if (nestedEnding.ending_completed !== undefined && source.ending_completed === undefined) next.ending_completed = nestedEnding.ending_completed;
+    if (nestedEnding.ending_variant !== undefined && source.ending_variant === undefined) next.ending_variant = nestedEnding.ending_variant;
+    if (nestedEnding.kyoukai_completed_at !== undefined && source.kyoukai_completed_at === undefined) next.kyoukai_completed_at = nestedEnding.kyoukai_completed_at;
+    Object.keys(nestedRoutes).forEach(function (routeId) {
+      if (nestedRoutes[routeId] && nestedRoutes[routeId].status && !source.route_status?.[routeId]) {
+        next.route_status[routeId] = nestedRoutes[routeId].status;
+      }
+    });
+    next.schema_version = SCHEMA_VERSION;
     next.route_status = Object.assign(defaultRouteStatus(), next.route_status || {});
     next.event_status = Object.assign({}, next.event_status || {});
     next.event_completed_at = Object.assign({}, next.event_completed_at || {});
@@ -270,8 +291,9 @@
     next.annihilation_key_obtained = Boolean(next.annihilation_key_obtained);
     next.annihilation_key_used = Boolean(next.annihilation_key_used);
     next.annihilation_key_consumed = Boolean(next.annihilation_key_consumed);
-    next.annihilation_key_obtain_lock = Boolean(next.annihilation_key_obtain_lock);
-    next.annihilation_key_use_lock = Boolean(next.annihilation_key_use_lock);
+    // UI locks are runtime-only; persisting one can block a resumed session forever.
+    next.annihilation_key_obtain_lock = false;
+    next.annihilation_key_use_lock = false;
     next.key_box_state = next.key_box_state || "contains_annihilation_key";
     if (next.annihilation_key_obtained === true) next.key_box_state = "empty";
     if (next.annihilation_key_used === true) next.annihilation_key_consumed = true;
@@ -284,7 +306,7 @@
     next.top_floor_keyhole_completed = Boolean(next.top_floor_keyhole_completed);
     next.keyhole_touched = Boolean(next.keyhole_touched);
     next.keyhole_touched_without_key = Boolean(next.keyhole_touched_without_key);
-    next.keyhole_interaction_lock = Boolean(next.keyhole_interaction_lock);
+    next.keyhole_interaction_lock = false;
     next.observer_final_mode = Boolean(next.observer_final_mode);
     next.observer_final_event_started = Boolean(next.observer_final_event_started);
     next.observer_final_event_completed = Boolean(next.observer_final_event_completed);
@@ -292,18 +314,18 @@
     next.final_text_12_displayed = Boolean(next.final_text_12_displayed);
     next.return_control_unlocked = Boolean(next.return_control_unlocked);
     next.user_selected_manager_return = Boolean(next.user_selected_manager_return);
-    next.observer_final_transition_lock = Boolean(next.observer_final_transition_lock);
-    next.observer_final_text_lock = Boolean(next.observer_final_text_lock);
-    next.observer_final_return_lock = Boolean(next.observer_final_return_lock);
+    next.observer_final_transition_lock = false;
+    next.observer_final_text_lock = false;
+    next.observer_final_return_lock = false;
     next.manager_return_completed = Boolean(next.manager_return_completed);
     next.final_diary_entry_unlocked = Boolean(next.final_diary_entry_unlocked);
     next.final_diary_entry_viewed = Boolean(next.final_diary_entry_viewed);
     next.final_diary_entry_unread = Boolean(next.final_diary_entry_unread);
     next.final_diary_update_notice_shown = Boolean(next.final_diary_update_notice_shown);
-    next.manager_return_complete_lock = Boolean(next.manager_return_complete_lock);
-    next.final_diary_unlock_lock = Boolean(next.final_diary_unlock_lock);
-    next.final_diary_view_lock = Boolean(next.final_diary_view_lock);
-    next.route_e_complete_lock = Boolean(next.route_e_complete_lock);
+    next.manager_return_complete_lock = false;
+    next.final_diary_unlock_lock = false;
+    next.final_diary_view_lock = false;
+    next.route_e_complete_lock = false;
     next.ending_variant = next.ending_variant || null;
     next.keyhole_state = next.keyhole_state || "inactive";
     if (next.keyhole_state === "processing" && next.top_floor_keyhole_completed !== true) {
@@ -316,9 +338,67 @@
     }
     next.route_e_phone_answered = Boolean(next.route_e_phone_answered);
     next.route_e_phone_completed = Boolean(next.route_e_phone_completed);
-    next.route_e_phone_answer_lock = Boolean(next.route_e_phone_answer_lock);
+    next.route_e_phone_answer_lock = false;
     next.ending_completed = Boolean(next.ending_completed);
-    next.route_e_stage = next.route_e_stage || "not_started";
+    var stageAliases = {
+      not_started: "locked",
+      route_e_available: "phone_waiting",
+      route_e_top_floor_unlocked: "top_floor_unlocked"
+    };
+    next.route_e_stage = stageAliases[next.route_e_stage] || next.route_e_stage;
+    if (!ROUTE_E_STAGES.includes(next.route_e_stage)) next.route_e_stage = "locked";
+    if (!ROUTE_E_STATUSES.includes(next.route_status.route_e)) next.route_status.route_e = "locked";
+
+    var standardRoutesCompleted = ["route_a", "route_b", "route_c", "route_d"].every(function (routeId) {
+      return next.route_status[routeId] === "completed";
+    });
+    if (Object.keys(source).length && standardRoutesCompleted && !next.ending_completed && next.route_status.route_e === "locked") {
+      next.final_route_available = true;
+      next.route_status.route_e = "available";
+      next.route_e_stage = "phone_waiting";
+    }
+    if (!standardRoutesCompleted && !next.ending_completed) {
+      next.final_route_available = false;
+      next.route_status.route_e = "locked";
+      next.route_e_stage = "locked";
+    }
+    if (next.route_e_phone_completed === true) {
+      next.final_route_available = true;
+      next.top_floor_unlocked = true;
+      if (!next.ending_completed) next.route_status.route_e = "active";
+      if (["locked", "phone_waiting"].includes(next.route_e_stage)) next.route_e_stage = "top_floor_unlocked";
+    }
+    if (next.ending_completed === true) {
+      next.final_route_available = true;
+      next.route_status.route_e = "completed";
+      next.route_e_stage = "completed";
+      next.active_route_id = null;
+      next.route_e_phone_completed = true;
+      next.top_floor_unlocked = true;
+      next.top_floor_entered = true;
+      next.top_floor_event_completed = true;
+      next.top_floor_keyhole_completed = true;
+      next.keyhole_state = "completed";
+      next.annihilation_key_obtained = true;
+      next.annihilation_key_used = true;
+      next.annihilation_key_consumed = true;
+      next.key_box_state = "empty";
+      next.observer_final_mode = false;
+      next.observer_final_event_completed = true;
+      next.observer_reversed = true;
+      next.manager_return_completed = true;
+      next.final_diary_entry_unlocked = true;
+      next.final_diary_entry_viewed = true;
+      next.final_diary_entry_unread = false;
+      next.ending_variant = "observation_completed";
+      if (!next.kyoukai_completed_at) next.kyoukai_completed_at = next.updated_at || new Date().toISOString();
+      if (!next.route_e_completed_at) next.route_e_completed_at = next.kyoukai_completed_at;
+    }
+    if (next.final_diary_entry_viewed === true && !next.ending_completed) next.final_diary_entry_unread = false;
+    var completedRouteCount = ["route_a", "route_b", "route_c", "route_d", "route_e"].filter(function (routeId) {
+      return next.route_status[routeId] === "completed";
+    }).length;
+    next.completed_scenario_count = Math.max(Number(next.completed_scenario_count || 0), completedRouteCount);
 
     next.completed_events.forEach(function (eventId) {
       next.event_status[eventId] = "completed";
@@ -350,17 +430,36 @@
     try {
       var saved = window.localStorage.getItem(STORAGE_KEY);
       if (!saved) return createDefaultState();
-      return normalizeState(JSON.parse(saved));
+      var parsed = JSON.parse(saved);
+      var normalized = normalizeState(parsed);
+      if (Number(parsed.schema_version || 1) !== SCHEMA_VERSION || JSON.stringify(parsed) !== JSON.stringify(normalized)) persistState(normalized);
+      return normalized;
     } catch (error) {
       console.warn("[KYOUKAI] scenario state reset:", error);
+      try {
+        var corrupt = window.localStorage.getItem(STORAGE_KEY);
+        if (corrupt) window.localStorage.setItem("kyoukai_scenario_state_corrupt_backup", corrupt);
+      } catch (backupError) {
+        console.warn("[KYOUKAI] corrupt state backup unavailable:", backupError);
+      }
       return createDefaultState();
     }
+  }
+
+  function persistState(state) {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (error) {
+      console.error("[KYOUKAI] scenario state save failed:", error);
+      document.dispatchEvent(new CustomEvent("kyoukai:scenario-save-error", { detail: { message: "記録を保存できませんでした。" } }));
+    }
+    return state;
   }
 
   function saveState(state) {
     var next = normalizeState(state || {});
     next.updated_at = new Date().toISOString();
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    persistState(next);
     document.dispatchEvent(new CustomEvent("kyoukai:scenario-state", { detail: clone(next) }));
     return next;
   }
@@ -739,6 +838,48 @@
     return saveState(state);
   }
 
+  function resetRouteEForDevelopment() {
+    var state = getState();
+    if (!window.location.hostname.match(/^(localhost|127\.0\.0\.1)$/)) return state;
+    ["route_e_phone_001", "route_e_top_floor_001", "route_e_annihilation_key_001", "route_e_observer_final_001", "route_e_manager_return_001", "route_e_final_diary_001", "route_e_complete_001"].forEach(function (eventId) {
+      delete state.event_status[eventId];
+      delete state.event_completed_at[eventId];
+      state.completed_events = state.completed_events.filter(function (id) { return id !== eventId; });
+    });
+    state.route_status.route_e = "available";
+    state.active_route_id = null;
+    state.final_route_available = true;
+    state.route_e_stage = "phone_waiting";
+    state.route_e_started_at = null;
+    state.route_e_completed_at = null;
+    state.route_e_phone_answered = false;
+    state.route_e_phone_completed = false;
+    state.route_e_phone_completed_at = null;
+    state.top_floor_unlocked = false;
+    state.top_floor_entered = false;
+    state.top_floor_event_completed = false;
+    state.top_floor_keyhole_completed = false;
+    state.keyhole_state = "inactive";
+    state.annihilation_key_obtained = false;
+    state.annihilation_key_used = false;
+    state.annihilation_key_consumed = false;
+    state.key_box_state = "contains_annihilation_key";
+    state.observer_final_mode = false;
+    state.observer_final_event_started = false;
+    state.observer_final_event_completed = false;
+    state.observer_reversed = false;
+    state.manager_return_completed = false;
+    state.final_diary_entry_unlocked = false;
+    state.final_diary_entry_viewed = false;
+    state.final_diary_entry_unread = false;
+    state.final_diary_update_notice_shown = false;
+    state.ending_completed = false;
+    state.ending_variant = null;
+    state.kyoukai_completed_at = null;
+    state.diary_entry_ids = state.diary_entry_ids.filter(function (id) { return id !== "route_e_final_diary_001"; });
+    return saveState(state);
+  }
+
   function getActiveRoomEvent(roomId) {
     var state = getState();
     if (state.mode !== "scenario") return null;
@@ -833,7 +974,8 @@
     getManagerEvent: getManagerEvent,
     setRoomEventActive: setRoomEventActive,
     getDiaryEntries: getDiaryEntries,
-    markRoomEntered: markRoomEntered
+    markRoomEntered: markRoomEntered,
+    resetRouteEForDevelopment: resetRouteEForDevelopment
   };
 
   if (document.readyState === "loading") {

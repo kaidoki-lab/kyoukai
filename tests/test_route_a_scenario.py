@@ -60,7 +60,7 @@ class ScenarioRouteTests(unittest.TestCase):
 
     def test_scenario_engine_supports_route_requirements_and_effects(self):
         for token in [
-            "schema_version: 1",
+            "schema_version: SCHEMA_VERSION",
             "route_status_equals",
             "active_route_equals",
             "floor_unlocked",

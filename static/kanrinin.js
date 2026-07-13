@@ -204,7 +204,7 @@
     return Boolean(
       state &&
       state.mode === "scenario" &&
-      state.active_route_id === "route_e" &&
+      (state.active_route_id === "route_e" || state.ending_completed === true) &&
       (state.annihilation_key_obtained === true || state.key_box_state === "empty")
     );
   }
@@ -529,7 +529,7 @@
   function schedulePhoneCheck() {
     if (!redPhoneArea || !window.KYOUKAI_SCENARIO) return;
     const state = window.KYOUKAI_SCENARIO.getState();
-    if (state.mode !== "scenario") return;
+    if (state.mode !== "scenario" || state.ending_completed === true || state.route_e_phone_completed === true) return;
     if (window.KYOUKAI_SCENARIO.getManagerEvent("kanrinin")) return;
     window.KYOUKAI_SCENARIO.startPhoneWait();
     const elapsedSeconds = window.KYOUKAI_SCENARIO.getPhoneWaitSeconds();
@@ -556,6 +556,10 @@
   bindArea("redPhoneArea", () => {
     trackArea("red-phone");
     if (!window.KYOUKAI_SCENARIO) return;
+    if (window.KYOUKAI_SCENARIO.getState().ending_completed === true) {
+      showMessage("音はしない。", 1800);
+      return;
+    }
     if (scenarioLineActive) return;
     if (phoneAnswerLocked) return;
     if (!phoneRinging || !activePhoneEvent) {
@@ -590,6 +594,10 @@
     if (!event.detail || !event.detail.message) return;
     event.preventDefault();
     showMessage(event.detail.message, 4200);
+  });
+
+  document.addEventListener("kyoukai:scenario-save-error", (event) => {
+    showMessage(event.detail?.message || "記録を保存できませんでした。", 2600);
   });
 
   function runManagerReturnIfReady() {

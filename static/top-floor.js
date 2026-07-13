@@ -52,6 +52,10 @@
     );
   }
 
+  function canVisitCompletedTopFloor(state) {
+    return Boolean(state && state.mode === "scenario" && state.ending_completed === true && state.top_floor_unlocked === true);
+  }
+
   function canUseAnnihilationKey(state) {
     return Boolean(
       canUseTopFloor(state) &&
@@ -85,17 +89,21 @@
 
   function syncVisuals(state) {
     if (!room || !keyholeButton) return;
-    const active = canUseTopFloor(state);
+    const active = canUseTopFloor(state) || canVisitCompletedTopFloor(state);
     room.dataset.routeE = active ? "active" : "locked";
     room.dataset.keyholeState = active ? state.keyhole_state || "inactive" : "inactive";
-    keyholeButton.disabled = !active || state.keyhole_state === "processing" || state.top_floor_keyhole_completed === true || state.annihilation_key_use_lock === true;
+    keyholeButton.disabled = !active || state.keyhole_state === "processing" || (state.top_floor_keyhole_completed === true && !canVisitCompletedTopFloor(state)) || state.annihilation_key_use_lock === true;
     keyholeButton.setAttribute("aria-disabled", keyholeButton.disabled ? "true" : "false");
   }
 
   function enterTopFloor() {
     if (!scenario) return null;
     let state = scenario.getState();
-    if (!canUseTopFloor(state)) {
+    if (!canUseTopFloor(state) && !canVisitCompletedTopFloor(state)) {
+      syncVisuals(state);
+      return state;
+    }
+    if (canVisitCompletedTopFloor(state)) {
       syncVisuals(state);
       return state;
     }
@@ -147,6 +155,11 @@
   function touchKeyhole() {
     if (!scenario || interactionLock) return;
     let state = scenario.getState();
+    if (canVisitCompletedTopFloor(state)) {
+      showMessage("閉じています。", 1800);
+      window.setTimeout(() => showMessage("反応はありません。", 1800), 850);
+      return;
+    }
     if (!canUseTopFloor(state) || state.top_floor_keyhole_completed === true) return;
     if (state.keyhole_state === "processing") return;
     interactionLock = true;
@@ -333,6 +346,20 @@
   document.addEventListener("kyoukai:scenario-state", (event) => {
     syncVisuals(event.detail || scenario?.getState());
   });
+
+  const initialState = scenario?.getState?.();
+  if (
+    initialState?.mode === "scenario" &&
+    initialState.active_route_id === "route_e" &&
+    initialState.route_status?.route_e === "active" &&
+    initialState.annihilation_key_used === true &&
+    initialState.top_floor_keyhole_completed === true &&
+    initialState.observer_final_event_completed !== true &&
+    initialState.ending_completed !== true
+  ) {
+    window.location.replace("/observer");
+    return;
+  }
 
   enterTopFloor();
 })();
