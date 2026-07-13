@@ -58,12 +58,15 @@
     "route_e_observer_text_001",
     "route_e_observer_reverse_001",
     "route_e_observer_complete_001",
+    "route_e_manager_return_complete_001",
     "route_e_top_floor_001",
     "route_e_annihilation_key_001",
-    "route_e_observer_final_001"
+    "route_e_observer_final_001",
+    "route_e_diary_final_view_001",
+    "route_e_complete_001"
   ],
-  "manager_events": ["route_e_manager_return_001"],
-  "diary_entries": ["route_e_final_diary_001"],
+  "manager_events": ["route_e_manager_return_001", "route_e_manager_return_complete_001"],
+  "diary_entries": ["route_e_final_diary_001", "route_e_diary_final_view_001"],
   "completion_state": {
     "active_route_id": null,
     "route_status": {

@@ -357,8 +357,46 @@ class RouteEFoundationTests(unittest.TestCase):
         ]:
             with self.subTest(token=token):
                 self.assertIn(token, self.events_js)
-        self.assertNotIn('{ type: "set_route_status", route_id: "route_e", value: "completed" }', self.events_js)
-        self.assertNotIn('{ type: "set_state_value", key: "ending_completed", value: true }', self.events_js)
+        self.assertIn('{ type: "set_route_status", route_id: "route_e", value: "completed" }', self.events_js)
+        self.assertIn('{ type: "set_state_value", key: "ending_completed", value: true }', self.events_js)
+
+    def test_deliverable_06_unlocks_final_diary_after_manager_return(self):
+        for token in [
+            "route_e_manager_return_complete_001",
+            "route_e_diary_final_view_001",
+            "route_e_complete_001",
+            "manager_return_completed: false",
+            "final_diary_entry_unlocked: false",
+            "final_diary_entry_viewed: false",
+            "final_diary_entry_unread: false",
+            "final_diary_update_notice_shown: false",
+            "manager_return_completed_at",
+            "final_diary_entry_unlocked_at",
+            "final_diary_entry_viewed_at",
+            "観測完了記録",
+            "観測対象の移動を確認。",
+            "KYOUKAIは閉鎖されません。",
+            "観測記録を完了しました。",
+            "canUnlockFinalDiary",
+            "completeRouteEFromDiary",
+            "final_diary_view_lock",
+        ]:
+            with self.subTest(token=token):
+                self.assertTrue(
+                    token in self.events_js
+                    or token in self.scenario_js
+                    or token in self.kanrinin_js
+                    or token in self.route_e_json_path.read_text(encoding="utf-8")
+                )
+        self.assertIn(
+            '{ type: "room_reentered_after_event", room_id: "kanrinin", after_event_id: "route_e_observer_complete_001" }',
+            self.events_js,
+        )
+        self.assertIn('{ type: "set_state_value", key: "final_diary_entry_unlocked", value: true }', self.events_js)
+        self.assertIn('{ type: "set_state_value", key: "final_diary_entry_viewed", value: true }', self.events_js)
+        self.assertIn('{ type: "set_route_status", route_id: "route_e", value: "completed" }', self.events_js)
+        self.assertIn('{ type: "set_state_value", key: "ending_variant", value: "observation_completed" }', self.events_js)
+        self.assertIn("static/kanrinin-diary.json", self.kanrinin_js)
 
 
 if __name__ == "__main__":

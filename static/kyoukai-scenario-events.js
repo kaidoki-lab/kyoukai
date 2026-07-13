@@ -749,14 +749,13 @@
         effects: [
           { type: "complete_event", event_id: "route_e_observer_complete_001" },
           { type: "complete_event", event_id: "route_e_observer_final_001" },
-          { type: "complete_event", event_id: "route_e_manager_return_001" },
           { type: "set_state_value", key: "observer_final_event_completed", value: true },
           { type: "set_timestamp", key: "observer_final_event_completed_at" },
           { type: "set_state_value", key: "observer_final_return_lock", value: false },
           { type: "set_state_value", key: "route_e_stage", value: "manager_return" },
           { type: "set_target_room", room_id: "kanrinin" }
         ],
-        next_events: ["route_e_final_diary_001"]
+        next_events: ["route_e_manager_return_001"]
       },
       {
         event_id: "route_e_keyhole_complete_001",
@@ -1190,6 +1189,36 @@
     ],
     managerEvents: [
       {
+        event_id: "route_e_manager_return_001",
+        route_id: "route_e",
+        room_id: "kanrinin",
+        requirements: [
+          { type: "mode_equals", value: "scenario" },
+          { type: "route_status_equals", route_id: "route_e", value: "active" },
+          { type: "active_route_equals", value: "route_e" },
+          { type: "state_equals", key: "observer_final_event_completed", value: true },
+          { type: "state_equals", key: "observer_reversed", value: true },
+          { type: "state_not_equals", key: "manager_return_completed", value: true },
+          { type: "state_not_equals", key: "ending_completed", value: true },
+          { type: "room_reentered_after_event", room_id: "kanrinin", after_event_id: "route_e_observer_complete_001" }
+        ],
+        manager_state_sequence: ["hidden", "visible"],
+        conversation: [],
+        effects: [
+          { type: "complete_event", event_id: "route_e_manager_return_001" },
+          { type: "complete_event", event_id: "route_e_manager_return_complete_001" },
+          { type: "set_state_value", key: "manager_return_completed", value: true },
+          { type: "set_timestamp", key: "manager_return_completed_at" },
+          { type: "set_state_value", key: "final_diary_entry_unlocked", value: true },
+          { type: "set_timestamp", key: "final_diary_entry_unlocked_at" },
+          { type: "set_state_value", key: "final_diary_entry_unread", value: true },
+          { type: "set_state_value", key: "final_diary_update_notice_shown", value: true },
+          { type: "set_state_value", key: "route_e_stage", value: "final_diary_available" },
+          { type: "append_diary_entry", entry_id: "route_e_final_diary_001" }
+        ],
+        next_events: ["route_e_final_diary_001"]
+      },
+      {
         event_id: "route_a_manager_return_001",
         route_id: "route_a",
         room_id: "kanrinin",
@@ -1343,6 +1372,35 @@
           { type: "set_manager_state", state: "visible" }
         ],
         next_events: []
+      },
+      {
+        event_id: "route_e_final_diary_001",
+        route_id: "route_e",
+        room_id: "kanrinin",
+        requirements: [
+          { type: "mode_equals", value: "scenario" },
+          { type: "route_status_equals", route_id: "route_e", value: "active" },
+          { type: "active_route_equals", value: "route_e" },
+          { type: "state_equals", key: "manager_return_completed", value: true },
+          { type: "state_equals", key: "final_diary_entry_unlocked", value: true },
+          { type: "state_not_equals", key: "final_diary_entry_viewed", value: true },
+          { type: "state_not_equals", key: "ending_completed", value: true }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_e_diary_final_view_001" },
+          { type: "complete_event", event_id: "route_e_final_diary_001" },
+          { type: "set_state_value", key: "final_diary_entry_viewed", value: true },
+          { type: "set_timestamp", key: "final_diary_entry_viewed_at" },
+          { type: "set_state_value", key: "final_diary_entry_unread", value: false },
+          { type: "set_route_status", route_id: "route_e", value: "completed" },
+          { type: "set_active_route", route_id: null },
+          { type: "set_state_value", key: "route_e_stage", value: "completed" },
+          { type: "set_state_value", key: "ending_completed", value: true },
+          { type: "set_state_value", key: "ending_variant", value: "observation_completed" },
+          { type: "set_timestamp", key: "kyoukai_completed_at" },
+          { type: "complete_event", event_id: "route_e_complete_001" }
+        ],
+        next_events: []
       }
     ],
     diaryEntries: [
@@ -1471,6 +1529,12 @@
         route_id: "route_d",
         title: "Route_D complete",
         text: "6F各領域で集合反応を確認。波形、群体、低解像度形状、祭事音、面反応は同一現象の断片である可能性あり。音声としては未成立。今後の進行には、開放ではなく接触条件が必要となる。"
+      },
+      {
+        entry_id: "route_e_final_diary_001",
+        route_id: "route_e",
+        title: "観測完了記録",
+        text: "観測対象の移動を確認。\n\n最上階の鍵穴は閉じています。\n消滅の鍵は返却されていません。\n\n消失した部屋、\n記録、\n訪問者はありません。\n\n継続していた観測状態のみ、\n終了しています。\n\n観測する側と、\n観測される側の記録は、\n同一のものとして保管されました。\n\n本件を未解決案件から除外します。\n\nKYOUKAIは閉鎖されません。\n\n以後、\n記録済み領域として扱います。"
       }
     ],
     branchSlots: [

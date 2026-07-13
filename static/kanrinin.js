@@ -25,6 +25,7 @@
   const DIARY_DATA_URL = "/static/kanrinin-diary.json";
   let diaryPages = [];
   let currentDiaryIndex = 0;
+  let finalDiaryNoticeShownThisVisit = false;
 
   const eyeGap = document.getElementById("kanrininEyeGap");
   const messageEl = document.getElementById("kanrininMessage");
@@ -324,10 +325,65 @@
     });
   }
 
+  function canUnlockFinalDiary(state) {
+    return Boolean(
+      state &&
+      state.mode === "scenario" &&
+      state.active_route_id === "route_e" &&
+      state.route_status?.route_e === "active" &&
+      state.annihilation_key_used === true &&
+      state.top_floor_keyhole_completed === true &&
+      state.observer_final_event_completed === true &&
+      state.observer_reversed === true &&
+      state.route_e_stage === "manager_return" &&
+      state.manager_return_completed !== true &&
+      state.final_diary_entry_unlocked !== true &&
+      state.ending_completed !== true
+    );
+  }
+
+  function completeManagerReturn() {
+    const scenario = window.KYOUKAI_SCENARIO;
+    if (!scenario) return false;
+    const state = scenario.getState();
+    if (state.manager_return_completed === true || !canUnlockFinalDiary(state)) return false;
+    if (state.manager_return_complete_lock === true) return false;
+    state.manager_return_complete_lock = true;
+    scenario.saveState(state);
+    scenario.completeScenarioEvent("route_e_manager_return_001", {
+      sequenceEventId: "route_e_manager_return_complete_001",
+    });
+    return true;
+  }
+
+  function showFinalDiaryNoticeOnce() {
+    const scenario = window.KYOUKAI_SCENARIO;
+    const state = scenario?.getState?.();
+    if (!state?.final_diary_entry_unread || state.final_diary_update_notice_shown !== true || finalDiaryNoticeShownThisVisit) return;
+    finalDiaryNoticeShownThisVisit = true;
+    showMessage("管理日誌が更新されました。", 3200);
+  }
+
+  function completeRouteEFromDiary() {
+    const scenario = window.KYOUKAI_SCENARIO;
+    if (!scenario) return;
+    const state = scenario.getState();
+    if (state.ending_completed === true || state.final_diary_entry_viewed === true) return;
+    if (state.final_diary_view_lock === true) return;
+    state.final_diary_view_lock = true;
+    scenario.saveState(state);
+    scenario.completeScenarioEvent("route_e_final_diary_001", {
+      interactionTarget: "diary_route_e_final",
+      sequenceEventId: "route_e_diary_final_view_001",
+    });
+    showMessage("観測記録を完了しました。", 3200);
+  }
+
   function openDiary() {
     if (diaryPages.length) {
       diaryPages = mergeScenarioDiaryPages(diaryPages);
       showDiaryModal();
+      completeRouteEFromDiary();
       return;
     }
     if (diaryBodyEl) diaryBodyEl.textContent = "……読み込み中。";
@@ -337,6 +393,7 @@
         const basePages = Array.isArray(data) ? data : [];
         diaryPages = mergeScenarioDiaryPages(basePages);
         showDiaryModal();
+        completeRouteEFromDiary();
       })
       .catch(() => {
         diaryPages = [];
@@ -556,7 +613,11 @@
         window.KYOUKAI_SCENARIO.completeScenarioEvent(managerEvent.event_id, {
           sequenceEventId: managerEvent.event_id,
         });
-        showMessage("上階の閉鎖が、一つだけ解かれた。", 3600);
+        if (managerEvent.event_id === "route_e_manager_return_001") {
+          showFinalDiaryNoticeOnce();
+        } else {
+          showMessage("上階の閉鎖が、一つだけ解かれた。", 3600);
+        }
       },
     });
     return true;
@@ -568,6 +629,7 @@
 
   document.addEventListener("kyoukai:scenario-state", syncManagerPresence);
   syncManagerPresence();
+  showFinalDiaryNoticeOnce();
 
   window.addEventListener("pagehide", () => {
     window.clearTimeout(phoneTimer);

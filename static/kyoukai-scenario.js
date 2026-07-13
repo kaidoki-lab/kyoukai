@@ -215,6 +215,19 @@
       observer_final_transition_lock: false,
       observer_final_text_lock: false,
       observer_final_return_lock: false,
+      manager_return_completed: false,
+      manager_return_completed_at: null,
+      final_diary_entry_unlocked: false,
+      final_diary_entry_unlocked_at: null,
+      final_diary_entry_viewed: false,
+      final_diary_entry_viewed_at: null,
+      final_diary_entry_unread: false,
+      final_diary_update_notice_shown: false,
+      manager_return_complete_lock: false,
+      final_diary_unlock_lock: false,
+      final_diary_view_lock: false,
+      route_e_complete_lock: false,
+      ending_variant: null,
       route_e_stage: "not_started",
       route_e_started_at: null,
       route_e_phone_answered: false,
@@ -282,6 +295,16 @@
     next.observer_final_transition_lock = Boolean(next.observer_final_transition_lock);
     next.observer_final_text_lock = Boolean(next.observer_final_text_lock);
     next.observer_final_return_lock = Boolean(next.observer_final_return_lock);
+    next.manager_return_completed = Boolean(next.manager_return_completed);
+    next.final_diary_entry_unlocked = Boolean(next.final_diary_entry_unlocked);
+    next.final_diary_entry_viewed = Boolean(next.final_diary_entry_viewed);
+    next.final_diary_entry_unread = Boolean(next.final_diary_entry_unread);
+    next.final_diary_update_notice_shown = Boolean(next.final_diary_update_notice_shown);
+    next.manager_return_complete_lock = Boolean(next.manager_return_complete_lock);
+    next.final_diary_unlock_lock = Boolean(next.final_diary_unlock_lock);
+    next.final_diary_view_lock = Boolean(next.final_diary_view_lock);
+    next.route_e_complete_lock = Boolean(next.route_e_complete_lock);
+    next.ending_variant = next.ending_variant || null;
     next.keyhole_state = next.keyhole_state || "inactive";
     if (next.keyhole_state === "processing" && next.top_floor_keyhole_completed !== true) {
       next.keyhole_state = hasAnnihilationKey(next) ? "ready" : "waiting_for_key";
