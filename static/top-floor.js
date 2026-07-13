@@ -12,6 +12,7 @@
   const INSERT_MS = 650;
   const TURN_MS = 1250;
   const COMPLETE_MS = 2050;
+  const OBSERVER_TRANSITION_MS = 1700;
   let messageTimer = 0;
   let interactionLock = false;
   let lastRepeatAt = 0;
@@ -219,9 +220,34 @@
     showMessage("消滅したものはありません。", 2200);
     queueKeyUseTimer(() => {
       showMessage("続いていた状態だけが、\n終了しました。", 0);
+      queueKeyUseTimer(transitionToFinalObserver, OBSERVER_TRANSITION_MS);
     }, 1100);
     interactionLock = false;
     syncVisuals(completed || scenario?.getState());
+  }
+
+  function transitionToFinalObserver() {
+    if (!scenario || !room) return;
+    const state = scenario.getState();
+    if (
+      state.mode !== "scenario" ||
+      state.active_route_id !== "route_e" ||
+      state.route_status?.route_e !== "active" ||
+      state.annihilation_key_used !== true ||
+      state.top_floor_keyhole_completed !== true ||
+      state.top_floor_event_completed !== true ||
+      state.observer_final_event_completed === true ||
+      state.ending_completed === true
+    ) {
+      return;
+    }
+    room.classList.add("is-observer-transitioning");
+    scenario.completeScenarioEvent("route_e_observer_transition_001", {
+      sequenceEventId: "route_e_observer_transition_001",
+    });
+    queueKeyUseTimer(() => {
+      window.location.href = "/observer";
+    }, 1250);
   }
 
   function runAnnihilationKeyAnimation() {
@@ -294,6 +320,7 @@
     enterTopFloor,
     touchKeyhole,
     startAnnihilationKeyUse,
+    transitionToFinalObserver,
   };
 
   keyholeButton?.addEventListener("click", touchKeyhole);

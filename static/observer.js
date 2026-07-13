@@ -5,6 +5,7 @@
   const sprite = document.getElementById("mascotSprite");
   const outsideBox = document.getElementById("outsideBox");
   const roomHotspots = [...document.querySelectorAll("[data-room-hotspot]")];
+  const scenario = window.KYOUKAI_SCENARIO;
   const bgWidth = () => window.innerHeight * 9 / 16;
   const bgLeft = () => (window.innerWidth - bgWidth()) / 2;
   const imageX = (ratio) => bgLeft() + bgWidth() * ratio;
@@ -52,6 +53,168 @@
     "\u3053\u308c\u304b\u306a",
     "\u307f\u3064\u3051\u305f"
   ];
+
+  const finalObserverLines = [
+    "あなたは、\nここを見ていました。",
+    "部屋を開き、\n音を聞き、\n残されたものに触れました。",
+    "そのたびに、\n記録は増えていきました。",
+    "記録されていたのは、\n部屋だけではありません。",
+    "ここからも、\nあなたを見ていました。",
+    "あなたが何を選び、\nどこで立ち止まり、\n何に触れたのか。",
+    "すべてが揃いました。",
+    "観測するものと、\n観測されるもの。",
+    "その境界は、\nもう必要ありません。",
+    "観測は完了しました。",
+    "KYOUKAIは、\n記録として残ります。",
+    "あなたは、\nここから出ることができます。"
+  ];
+
+  function canStartFinalObserver(state) {
+    return Boolean(
+      state &&
+      state.mode === "scenario" &&
+      state.active_route_id === "route_e" &&
+      state.route_status?.route_e === "active" &&
+      state.annihilation_key_used === true &&
+      state.top_floor_keyhole_completed === true &&
+      state.top_floor_event_completed === true &&
+      state.observer_final_event_completed !== true &&
+      state.ending_completed !== true
+    );
+  }
+
+  function createFinalObserverUi() {
+    const layer = document.createElement("section");
+    layer.className = "observer-final";
+    layer.setAttribute("aria-live", "polite");
+    layer.setAttribute("data-observer-final", "");
+
+    const text = document.createElement("p");
+    text.className = "observer-final__text";
+    text.setAttribute("data-observer-final-text", "");
+
+    const returnButton = document.createElement("button");
+    returnButton.type = "button";
+    returnButton.className = "observer-final__return";
+    returnButton.hidden = true;
+    returnButton.textContent = "管理人室へ戻る";
+    returnButton.setAttribute("data-observer-final-return", "");
+
+    layer.append(text, returnButton);
+    room.append(layer);
+    return { layer, text, returnButton };
+  }
+
+  function startFinalObserverMode() {
+    if (!scenario || !room) return false;
+    let routeState = scenario.getState();
+    if (!canStartFinalObserver(routeState)) return false;
+
+    room.dataset.observerMode = "route_e_final";
+    room.classList.add("observer-room--route-e-final");
+    outsideBox?.setAttribute("aria-hidden", "true");
+    outsideBox?.setAttribute("tabindex", "-1");
+    roomHotspots.forEach((hotspot) => {
+      hotspot.disabled = true;
+      hotspot.setAttribute("aria-hidden", "true");
+    });
+    mascot?.setAttribute("aria-hidden", "true");
+    bubble?.classList.add("hidden");
+
+    scenario.completeScenarioEvent("route_e_observer_enter_001", {
+      sequenceEventId: "route_e_observer_enter_001",
+    });
+
+    const { text, returnButton } = createFinalObserverUi();
+    let lineIndex = -1;
+    let typing = false;
+    let currentFullText = "";
+    let currentTypedText = "";
+    let typingTimer = 0;
+
+    function saveTextComplete() {
+      routeState = scenario.getState();
+      if (routeState.final_text_12_displayed === true) return;
+      scenario.completeScenarioEvent("route_e_observer_text_001", {
+        sequenceEventId: "route_e_observer_text_001",
+      });
+    }
+
+    function revealReturnControl() {
+      saveTextComplete();
+      returnButton.hidden = false;
+      returnButton.focus({ preventScroll: true });
+    }
+
+    function renderFullLine() {
+      window.clearTimeout(typingTimer);
+      typing = false;
+      currentTypedText = currentFullText;
+      text.textContent = currentFullText;
+      if (lineIndex === finalObserverLines.length - 1) revealReturnControl();
+    }
+
+    function typeNextCharacter() {
+      if (!typing) return;
+      if (currentTypedText.length >= currentFullText.length) {
+        renderFullLine();
+        return;
+      }
+      currentTypedText = currentFullText.slice(0, currentTypedText.length + 1);
+      text.textContent = currentTypedText;
+      typingTimer = window.setTimeout(typeNextCharacter, 50);
+    }
+
+    function showNextLine() {
+      if (typing) {
+        renderFullLine();
+        return;
+      }
+      if (lineIndex >= finalObserverLines.length - 1) return;
+      lineIndex += 1;
+      currentFullText = finalObserverLines[lineIndex];
+      currentTypedText = "";
+      typing = true;
+      text.textContent = "";
+      typeNextCharacter();
+    }
+
+    function handleAdvance(event) {
+      if (event.target?.closest?.("[data-observer-final-return]")) return;
+      event.preventDefault();
+      showNextLine();
+    }
+
+    function returnToManagerRoom() {
+      routeState = scenario.getState();
+      if (routeState.observer_final_return_lock === true || routeState.observer_final_event_completed === true) return;
+      routeState.observer_final_return_lock = true;
+      scenario.saveState(routeState);
+      scenario.completeScenarioEvent("route_e_observer_reverse_001", {
+        interactionTarget: "observer-final-return",
+        sequenceEventId: "route_e_observer_reverse_001",
+      });
+      scenario.completeScenarioEvent("route_e_observer_complete_001", {
+        interactionTarget: "observer-final-return",
+        sequenceEventId: "route_e_observer_complete_001",
+      });
+      room.classList.add("observer-room--returning");
+      window.setTimeout(() => {
+        window.location.href = "/kanrinin";
+      }, 900);
+    }
+
+    document.addEventListener("click", handleAdvance);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") handleAdvance(event);
+    });
+    returnButton.addEventListener("click", returnToManagerRoom);
+
+    window.setTimeout(showNextLine, 1500);
+    return true;
+  }
+
+  if (startFinalObserverMode()) return;
 
   const state = {
     mouse: { x: window.innerWidth / 2, y: window.innerHeight / 2 },

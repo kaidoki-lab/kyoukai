@@ -665,6 +665,84 @@ body {
   display: none;
 }
 
+.observer-room--route-e-final .observer-bg-night {
+  opacity: 0.54;
+  animation: none;
+}
+
+.observer-room--route-e-final .outside-box,
+.observer-room--route-e-final .ma-gate,
+.observer-room--route-e-final .room-hotspot,
+.observer-room--route-e-final .mascot {
+  pointer-events: none;
+  opacity: 0;
+}
+
+.observer-room--route-e-final::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 42;
+  background:
+    radial-gradient(circle at 58% 45%, rgba(255, 255, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(4, 3, 7, 0.18), rgba(4, 3, 7, 0.48));
+  pointer-events: none;
+}
+
+.observer-room--returning::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: #030204;
+  animation: observerFinalReturn 0.9s ease forwards;
+}
+
+.observer-final {
+  position: fixed;
+  left: 50%;
+  bottom: max(12svh, 72px);
+  z-index: 60;
+  width: min(78vw, 620px);
+  transform: translateX(-50%);
+  color: rgba(252, 248, 236, 0.94);
+  font-family: "Yu Gothic", "Meiryo", system-ui, sans-serif;
+  text-align: left;
+  text-shadow: 0 0 18px rgba(0, 0, 0, 0.88);
+}
+
+.observer-final__text {
+  min-height: 7.6em;
+  margin: 0;
+  font-size: clamp(17px, 2.6vw, 23px);
+  line-height: 1.86;
+  letter-spacing: 0;
+  white-space: pre-line;
+}
+
+.observer-final__return {
+  display: block;
+  min-width: 168px;
+  min-height: 44px;
+  margin: 26px 0 0 auto;
+  padding: 9px 18px;
+  border: 1px solid rgba(245, 235, 205, 0.54);
+  border-radius: 4px;
+  background: rgba(8, 7, 10, 0.62);
+  color: rgba(252, 248, 236, 0.94);
+  font: inherit;
+  font-size: 14px;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+
+.observer-final__return:hover,
+.observer-final__return:focus-visible {
+  background: rgba(245, 235, 205, 0.13);
+  outline: 1px solid rgba(245, 235, 205, 0.44);
+  outline-offset: 3px;
+}
+
 @keyframes idle-bob {
   0%, 100% { translate: 0 0; }
   50% { translate: 1px 0; }
@@ -720,6 +798,11 @@ body {
   100% { opacity: 0; }
 }
 
+@keyframes observerFinalReturn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 @media (max-width: 780px) {
   .external-panel {
     top: auto;
@@ -746,5 +829,21 @@ body {
   .mascot {
     top: 43%;
     scale: .86;
+  }
+
+  .observer-final {
+    bottom: max(9svh, 56px);
+    width: min(84vw, 360px);
+  }
+
+  .observer-final__text {
+    min-height: 45svh;
+    font-size: 16px;
+    line-height: 1.78;
+  }
+
+  .observer-final__return {
+    width: 100%;
+    margin-top: 18px;
   }
 }

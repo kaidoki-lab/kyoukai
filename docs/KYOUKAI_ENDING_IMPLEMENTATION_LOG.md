@@ -55,6 +55,36 @@ KYOUKAI終幕制作進捗
 確認内容:
 - `tests/test_route_e_scenario.py` に制作物04の取得条件、状態保存、鍵ボックス空表示、鍵穴使用、404非遷移、回復処理のテストを追加した。
 
+## 制作物05
+
+受領日: 2026-07-13
+仕様名: 逆観測室の終幕演出・最終文
+状態: 実装・検証完了
+変更ファイル:
+- `data/scenarios/route_e.json`
+- `static/kyoukai-scenario-events.js`
+- `static/kyoukai-scenario.js`
+- `templates/top-floor.html`
+- `static/top-floor.js`
+- `static/space.css`
+- `templates/observer.html`
+- `static/observer.js`
+- `static/observer.css`
+- `main.py`
+- `tests/test_route_a_scenario.py`
+- `tests/test_route_e_scenario.py`
+
+実装内容:
+- 消滅の鍵使用後、最上階の完了文を表示したあと短い暗転で `/observer` に遷移するようにした。
+- `/observer` は通常状態を維持しつつ、Route_E条件を満たす場合だけ `route_e_final` 表示へ切り替えるようにした。
+- 終幕専用の12テキストを一文ずつ表示し、クリック/タップまたはEnter/Spaceで進行する。自動送り、選択肢、発言者名は出さない。
+- 最終文後にだけ「管理人室へ戻る」ボタンを表示し、押下時に `observer_final_event_completed`, `observer_reversed`, `user_selected_manager_return`, `route_e_stage = "manager_return"` を保存して管理人室へ戻すようにした。
+- 実カメラ、マイク、個人情報、ホラーUI、スタッフロール、SNS導線は追加していない。
+- Route_E全体の完了、`ending_completed`, `kyoukai_completed_at`, 管理人日記終幕ページ解放は制作物06以降に残した。
+
+確認内容:
+- `tests/test_route_e_scenario.py` に制作物05の遷移条件、終幕テキスト、帰還ボタン、状態保存、Route_E未完了維持のテストを追加した。
+
 ## 制作物02
 
 受領日: 2026-07-11
@@ -317,7 +347,7 @@ KYOUKAI終幕制作進捗
 - 最終電話の会話・発信者・着信表示は制作物02待ち。
 - 最上階・鍵穴イベントは制作物03待ち。
 - 消滅の鍵の正式仕様は制作物04で完了。
-- 逆観測室の終幕演出・最終文は制作物05待ち。
+- 逆観測室の終幕演出・最終文は制作物05で完了。
 - 管理日誌の終幕ページ本文は制作物06待ち。
 - 状態フラグの正式保存設計と再訪演出は制作物07待ち。
 

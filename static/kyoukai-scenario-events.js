@@ -655,9 +655,108 @@
           { type: "set_state_value", key: "keyhole_state", value: "completed" },
           { type: "set_state_value", key: "annihilation_key_use_lock", value: false },
           { type: "set_state_value", key: "route_e_stage", value: "keyhole_completed" },
+          { type: "enable_event", event_id: "route_e_observer_transition_001" },
           { type: "set_target_room", room_id: "observer" }
         ],
         next_events: ["route_e_observer_final_001"]
+      },
+      {
+        event_id: "route_e_observer_transition_001",
+        route_id: "route_e",
+        room_id: "top-floor",
+        requirements: [
+          { type: "mode_equals", value: "scenario" },
+          { type: "route_status_equals", route_id: "route_e", value: "active" },
+          { type: "active_route_equals", value: "route_e" },
+          { type: "state_equals", key: "annihilation_key_used", value: true },
+          { type: "state_equals", key: "top_floor_keyhole_completed", value: true },
+          { type: "state_equals", key: "top_floor_event_completed", value: true },
+          { type: "state_not_equals", key: "observer_final_event_completed", value: true },
+          { type: "state_not_equals", key: "ending_completed", value: true }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_e_observer_transition_001" },
+          { type: "set_state_value", key: "observer_final_mode", value: true },
+          { type: "set_state_value", key: "observer_final_transition_lock", value: false },
+          { type: "set_state_value", key: "route_e_stage", value: "observer_transition" },
+          { type: "set_target_room", room_id: "observer" }
+        ],
+        next_events: ["route_e_observer_enter_001"]
+      },
+      {
+        event_id: "route_e_observer_enter_001",
+        route_id: "route_e",
+        room_id: "observer",
+        requirements: [
+          { type: "mode_equals", value: "scenario" },
+          { type: "route_status_equals", route_id: "route_e", value: "active" },
+          { type: "active_route_equals", value: "route_e" },
+          { type: "state_equals", key: "annihilation_key_used", value: true },
+          { type: "state_equals", key: "top_floor_keyhole_completed", value: true },
+          { type: "state_not_equals", key: "observer_final_event_completed", value: true },
+          { type: "state_not_equals", key: "ending_completed", value: true }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_e_observer_enter_001" },
+          { type: "set_state_value", key: "observer_final_mode", value: true },
+          { type: "set_state_value", key: "observer_final_event_started", value: true },
+          { type: "set_timestamp", key: "observer_final_event_started_at" },
+          { type: "set_state_value", key: "route_e_stage", value: "observer_active" }
+        ],
+        next_events: ["route_e_observer_text_001"]
+      },
+      {
+        event_id: "route_e_observer_text_001",
+        route_id: "route_e",
+        room_id: "observer",
+        requirements: [
+          { type: "state_equals", key: "observer_final_event_started", value: true },
+          { type: "state_not_equals", key: "observer_final_event_completed", value: true },
+          { type: "state_not_equals", key: "ending_completed", value: true }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_e_observer_text_001" },
+          { type: "set_state_value", key: "final_text_12_displayed", value: true },
+          { type: "set_state_value", key: "return_control_unlocked", value: true },
+          { type: "set_state_value", key: "observer_final_text_lock", value: false }
+        ]
+      },
+      {
+        event_id: "route_e_observer_reverse_001",
+        route_id: "route_e",
+        room_id: "observer",
+        requirements: [
+          { type: "state_equals", key: "return_control_unlocked", value: true },
+          { type: "state_not_equals", key: "observer_final_event_completed", value: true },
+          { type: "state_not_equals", key: "ending_completed", value: true }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_e_observer_reverse_001" },
+          { type: "set_state_value", key: "observer_reversed", value: true },
+          { type: "set_state_value", key: "user_selected_manager_return", value: true }
+        ]
+      },
+      {
+        event_id: "route_e_observer_complete_001",
+        route_id: "route_e",
+        room_id: "observer",
+        requirements: [
+          { type: "state_equals", key: "observer_reversed", value: true },
+          { type: "state_equals", key: "user_selected_manager_return", value: true },
+          { type: "state_not_equals", key: "observer_final_event_completed", value: true },
+          { type: "state_not_equals", key: "ending_completed", value: true }
+        ],
+        effects: [
+          { type: "complete_event", event_id: "route_e_observer_complete_001" },
+          { type: "complete_event", event_id: "route_e_observer_final_001" },
+          { type: "complete_event", event_id: "route_e_manager_return_001" },
+          { type: "set_state_value", key: "observer_final_event_completed", value: true },
+          { type: "set_timestamp", key: "observer_final_event_completed_at" },
+          { type: "set_state_value", key: "observer_final_return_lock", value: false },
+          { type: "set_state_value", key: "route_e_stage", value: "manager_return" },
+          { type: "set_target_room", room_id: "kanrinin" }
+        ],
+        next_events: ["route_e_final_diary_001"]
       },
       {
         event_id: "route_e_keyhole_complete_001",

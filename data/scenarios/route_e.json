@@ -53,6 +53,11 @@
     "route_e_annihilation_key_use_001",
     "route_e_annihilation_key_complete_001",
     "route_e_keyhole_complete_001",
+    "route_e_observer_transition_001",
+    "route_e_observer_enter_001",
+    "route_e_observer_text_001",
+    "route_e_observer_reverse_001",
+    "route_e_observer_complete_001",
     "route_e_top_floor_001",
     "route_e_annihilation_key_001",
     "route_e_observer_final_001"

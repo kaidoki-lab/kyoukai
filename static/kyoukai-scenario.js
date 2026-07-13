@@ -203,6 +203,18 @@
       keyhole_touched: false,
       keyhole_touched_without_key: false,
       keyhole_interaction_lock: false,
+      observer_final_mode: false,
+      observer_final_event_started: false,
+      observer_final_event_started_at: null,
+      observer_final_event_completed: false,
+      observer_final_event_completed_at: null,
+      observer_reversed: false,
+      final_text_12_displayed: false,
+      return_control_unlocked: false,
+      user_selected_manager_return: false,
+      observer_final_transition_lock: false,
+      observer_final_text_lock: false,
+      observer_final_return_lock: false,
       route_e_stage: "not_started",
       route_e_started_at: null,
       route_e_phone_answered: false,
@@ -260,6 +272,16 @@
     next.keyhole_touched = Boolean(next.keyhole_touched);
     next.keyhole_touched_without_key = Boolean(next.keyhole_touched_without_key);
     next.keyhole_interaction_lock = Boolean(next.keyhole_interaction_lock);
+    next.observer_final_mode = Boolean(next.observer_final_mode);
+    next.observer_final_event_started = Boolean(next.observer_final_event_started);
+    next.observer_final_event_completed = Boolean(next.observer_final_event_completed);
+    next.observer_reversed = Boolean(next.observer_reversed);
+    next.final_text_12_displayed = Boolean(next.final_text_12_displayed);
+    next.return_control_unlocked = Boolean(next.return_control_unlocked);
+    next.user_selected_manager_return = Boolean(next.user_selected_manager_return);
+    next.observer_final_transition_lock = Boolean(next.observer_final_transition_lock);
+    next.observer_final_text_lock = Boolean(next.observer_final_text_lock);
+    next.observer_final_return_lock = Boolean(next.observer_final_return_lock);
     next.keyhole_state = next.keyhole_state || "inactive";
     if (next.keyhole_state === "processing" && next.top_floor_keyhole_completed !== true) {
       next.keyhole_state = hasAnnihilationKey(next) ? "ready" : "waiting_for_key";

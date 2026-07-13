@@ -17,6 +17,9 @@ class RouteEFoundationTests(unittest.TestCase):
         self.top_floor_html = (BASE_DIR / "templates" / "top-floor.html").read_text(encoding="utf-8")
         self.top_floor_js = (BASE_DIR / "static" / "top-floor.js").read_text(encoding="utf-8")
         self.space_css = (BASE_DIR / "static" / "space.css").read_text(encoding="utf-8")
+        self.observer_html = (BASE_DIR / "templates" / "observer.html").read_text(encoding="utf-8")
+        self.observer_js = (BASE_DIR / "static" / "observer.js").read_text(encoding="utf-8")
+        self.observer_css = (BASE_DIR / "static" / "observer.css").read_text(encoding="utf-8")
 
     def test_route_e_definition_is_final_route(self):
         self.assertEqual(self.route_e_json["route_id"], "route_e")
@@ -195,6 +198,11 @@ class RouteEFoundationTests(unittest.TestCase):
             "route_e_annihilation_key_turn_001",
             "route_e_annihilation_key_use_001",
             "route_e_annihilation_key_complete_001",
+            "route_e_observer_transition_001",
+            "route_e_observer_enter_001",
+            "route_e_observer_text_001",
+            "route_e_observer_reverse_001",
+            "route_e_observer_complete_001",
         ]:
             with self.subTest(event_id=event_id):
                 self.assertIn(event_id, self.route_e_json_path.read_text(encoding="utf-8"))
@@ -210,6 +218,18 @@ class RouteEFoundationTests(unittest.TestCase):
             "annihilation_key_obtain_lock: false",
             "annihilation_key_use_lock: false",
             'key_box_state: "contains_annihilation_key"',
+            "observer_final_mode: false",
+            "observer_final_event_started: false",
+            "observer_final_event_started_at: null",
+            "observer_final_event_completed: false",
+            "observer_final_event_completed_at: null",
+            "observer_reversed: false",
+            "final_text_12_displayed: false",
+            "return_control_unlocked: false",
+            "user_selected_manager_return: false",
+            "observer_final_transition_lock: false",
+            "observer_final_text_lock: false",
+            "observer_final_return_lock: false",
             'next.key_box_state = "empty"',
             'next.keyhole_state = hasAnnihilationKey(next) ? "ready" : "waiting_for_key"',
             "next.annihilation_key_use_lock = false",
@@ -267,6 +287,9 @@ class RouteEFoundationTests(unittest.TestCase):
             "続いていた状態だけが、\\n終了しました。",
             'next.route_e_stage = "keyhole_completed"',
             'next.current_target_room_id = "observer"',
+            "transitionToFinalObserver",
+            "route_e_observer_transition_001",
+            'window.location.href = "/observer"',
         ]:
             with self.subTest(token=token):
                 self.assertIn(token, self.top_floor_js)
@@ -278,6 +301,64 @@ class RouteEFoundationTests(unittest.TestCase):
         self.assertIn('{ type: "set_target_room", room_id: "observer" }', self.events_js)
         self.assertNotIn('window.location.href = "/kanrinin/deleted"', self.top_floor_js)
         self.assertNotIn("confirm(", self.top_floor_js)
+
+    def test_deliverable_05_observer_final_mode_text_and_return(self):
+        for token in [
+            '/static/observer.js?v=4',
+            '/static/observer.css?v=5',
+            "data-observer-room",
+        ]:
+            with self.subTest(token=token):
+                self.assertIn(token, self.observer_html)
+        for token in [
+            "startFinalObserverMode",
+            "canStartFinalObserver",
+            'state.mode === "scenario"',
+            'state.active_route_id === "route_e"',
+            'state.route_status?.route_e === "active"',
+            "state.annihilation_key_used === true",
+            "state.top_floor_keyhole_completed === true",
+            "state.top_floor_event_completed === true",
+            "state.observer_final_event_completed !== true",
+            "state.ending_completed !== true",
+            "route_e_observer_enter_001",
+            "route_e_observer_text_001",
+            "route_e_observer_reverse_001",
+            "route_e_observer_complete_001",
+            "あなたは、\\nここを見ていました。",
+            "観測は完了しました。",
+            "KYOUKAIは、\\n記録として残ります。",
+            "あなたは、\\nここから出ることができます。",
+            "管理人室へ戻る",
+            'window.location.href = "/kanrinin"',
+        ]:
+            with self.subTest(token=token):
+                self.assertIn(token, self.observer_js)
+        self.assertIn(".observer-room--route-e-final", self.observer_css)
+        self.assertIn(".observer-final__text", self.observer_css)
+        self.assertIn(".observer-final__return", self.observer_css)
+        self.assertNotIn("confirm(", self.observer_js)
+        self.assertNotIn("ending_completed = true", self.observer_js)
+
+    def test_deliverable_05_events_keep_route_e_active_until_later_specs(self):
+        for token in [
+            '{ type: "set_state_value", key: "observer_final_mode", value: true }',
+            '{ type: "set_state_value", key: "observer_final_event_started", value: true }',
+            '{ type: "set_timestamp", key: "observer_final_event_started_at" }',
+            '{ type: "set_state_value", key: "route_e_stage", value: "observer_active" }',
+            '{ type: "set_state_value", key: "final_text_12_displayed", value: true }',
+            '{ type: "set_state_value", key: "return_control_unlocked", value: true }',
+            '{ type: "set_state_value", key: "observer_reversed", value: true }',
+            '{ type: "set_state_value", key: "user_selected_manager_return", value: true }',
+            '{ type: "set_state_value", key: "observer_final_event_completed", value: true }',
+            '{ type: "set_timestamp", key: "observer_final_event_completed_at" }',
+            '{ type: "set_state_value", key: "route_e_stage", value: "manager_return" }',
+            '{ type: "set_target_room", room_id: "kanrinin" }',
+        ]:
+            with self.subTest(token=token):
+                self.assertIn(token, self.events_js)
+        self.assertNotIn('{ type: "set_route_status", route_id: "route_e", value: "completed" }', self.events_js)
+        self.assertNotIn('{ type: "set_state_value", key: "ending_completed", value: true }', self.events_js)
 
 
 if __name__ == "__main__":
