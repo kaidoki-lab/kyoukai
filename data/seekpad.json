@@ -1,0 +1,16 @@
+{
+  "video_id": "1Pxmckc7Rys",
+  "title": "記録 SEEKPAD-01",
+  "pads": [
+    {"key": 0, "label": "風船を割る"},
+    {"key": 1, "label": "車がぶつかる"},
+    {"key": 2, "label": "ビルが解体される"},
+    {"key": 3, "label": "ドミノが倒れる"},
+    {"key": 4, "label": "木が倒れる"},
+    {"key": 5, "label": "卵を落とす"},
+    {"key": 6, "label": "ガラス瓶が割れる"},
+    {"key": 7, "label": "レンガを砕く"},
+    {"key": 8, "label": "プールに飛び込む"},
+    {"key": 9, "label": "ボウリングのストライク"}
+  ]
+}

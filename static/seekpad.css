@@ -1,0 +1,118 @@
+.seekpad-body {
+  font-family: var(--sp-mono);
+}
+
+.seekpad-panel {
+  max-width: 720px;
+}
+
+.seekpad-subtitle {
+  margin: 0 0 14px;
+  color: rgba(23, 241, 255, 0.62);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+}
+
+.seekpad-player-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  margin: 20px auto 0;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.7);
+}
+
+.seekpad-player-wrap #player,
+.seekpad-player-wrap iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.seekpad-pad-area {
+  position: relative;
+  margin-top: 16px;
+}
+
+#seekpad-hint {
+  position: absolute;
+  top: -34px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: rgba(255, 238, 190, 0.85);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+#seekpad-hint.is-hidden {
+  opacity: 0;
+}
+
+.seekpad-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.seekpad-pad {
+  min-width: 64px;
+  min-height: 64px;
+  padding: 10px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 1px solid rgba(23, 241, 255, 0.24);
+  background: rgba(255, 255, 255, 0.045);
+  color: rgba(255, 238, 190, 0.92);
+  font-family: var(--sp-mono);
+  font-size: 20px;
+  line-height: 1.1;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background 0.06s ease, border-color 0.06s ease;
+}
+
+.seekpad-pad span {
+  display: block;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  white-space: normal;
+}
+
+.seekpad-pad:active {
+  background: rgba(23, 241, 255, 0.14);
+}
+
+.seekpad-pad.is-hit {
+  background: rgba(23, 241, 255, 0.32);
+  border-color: rgba(23, 241, 255, 0.7);
+}
+
+@media (max-width: 480px) {
+  .seekpad-grid {
+    gap: 6px;
+  }
+
+  .seekpad-pad {
+    min-width: 56px;
+    min-height: 64px;
+    font-size: 16px;
+  }
+
+  .seekpad-pad span {
+    font-size: 9px;
+  }
+}

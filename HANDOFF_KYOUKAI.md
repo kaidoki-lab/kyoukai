@@ -263,3 +263,10 @@ static/kyoukai-elevator.js   # エレベーター（1階=M表示）
 vercel.json                  # excludeFiles 要注意
 data/kyoukai_world.md        # 世界観辞典（AI引き継ぎ用正本）
 ```
+
+## 2026-09-18 追記(SEEKPADチャットより)
+
+- 記録室配下に SEEKPAD パッドページ `/archive/seekpad` を追加(YouTube IFrame API で本編 `1Pxmckc7Rys` を埋め込み、0〜9パッド/数字キーで10区間へシーク)。
+- 追加: `data/seekpad.json`、`templates/seekpad.html`、`static/seekpad.js`、`static/seekpad.css`、`tests/test_seekpad_page.py`。変更: `main.py`(ルート1本)、`templates/archive.html`(リンク1行)。
+- 本編の動画IDを差し替えるときは `data/seekpad.json` の `video_id` を編集。
+- 仕様・経緯は `C:\Users\pc\Desktop\SEEKPAD\SPEC_KYOUKAI_PADPAGE.md` と `HANDOFF_SEEKPAD.md`。

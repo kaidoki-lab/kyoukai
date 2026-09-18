@@ -1265,6 +1265,11 @@ async def archive_log_detail(request: Request, log_id: str) -> HTMLResponse:
         return HTMLResponse("archive log not found", status_code=404)
     return render_template(request, f"archive-log-{log_id}.html")
 
+@app.get("/archive/seekpad", response_class=HTMLResponse)
+async def archive_seekpad(request: Request) -> HTMLResponse:
+    data = json.loads((BASE_DIR / "data" / "seekpad.json").read_text(encoding="utf-8"))
+    return render_template(request, "seekpad.html", seekpad=data)
+
 @app.get("/signal", response_class=HTMLResponse)
 async def signal_room(request: Request) -> HTMLResponse:
     return render_template(request, "signal.html")
@@ -1367,6 +1372,11 @@ async def ma_room(request: Request) -> HTMLResponse:
 @app.get("/fukashitsu", response_class=HTMLResponse)
 async def fukashitsu_room(request: Request) -> HTMLResponse:
     return render_template(request, "fukashitsu.html")
+
+
+@app.get("/baiyoushitsu", response_class=HTMLResponse)
+async def baiyoushitsu_room(request: Request) -> HTMLResponse:
+    return render_template(request, "baiyoushitsu.html")
 
 @app.get("/kanrinin", response_class=HTMLResponse)
 @app.get("/manager", response_class=HTMLResponse)
