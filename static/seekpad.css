@@ -116,3 +116,34 @@
     font-size: 9px;
   }
 }
+
+/* 記録の切り替え(SEEKPAD-01 / -02 …) */
+.seekpad-episodes {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0 4px;
+}
+
+.seekpad-episode {
+  min-width: 34px;
+  padding: 4px 8px;
+  border: 1px solid rgba(183, 194, 160, 0.3);
+  border-radius: 4px;
+  color: rgba(183, 194, 160, 0.72);
+  font-family: var(--sp-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-decoration: none;
+}
+
+.seekpad-episode:hover {
+  border-color: rgba(23, 241, 255, 0.5);
+  color: rgba(23, 241, 255, 0.85);
+}
+
+.seekpad-episode.is-current {
+  border-color: rgba(23, 241, 255, 0.7);
+  background: rgba(23, 241, 255, 0.12);
+  color: #d9fdff;
+}

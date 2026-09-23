@@ -3,23 +3,35 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>記録 SEEKPAD-01 / KYOUKAI</title>
+  <title>{{ seekpad.title }} / KYOUKAI</title>
   <meta name="theme-color" content="#050407" />
-  <meta property="og:title" content="記録 SEEKPAD-01 / KYOUKAI" />
-  <meta property="og:description" content="観測対象: 衝突 / 操作: 0〜9" />
-  <meta property="og:url" content="https://www.void-kyoukai.net/archive/seekpad" />
+  <meta property="og:title" content="{{ seekpad.title }} / KYOUKAI" />
+  <meta property="og:description" content="{{ seekpad.subtitle }}" />
+  <meta property="og:url" content="https://www.void-kyoukai.net/archive/seekpad/{{ seekpad.id }}" />
   <meta property="og:type" content="website" />
   <link rel="stylesheet" href="/static/space.css" />
-  <link rel="stylesheet" href="/static/seekpad.css?v=1" />
+  <link rel="stylesheet" href="/static/seekpad.css?v=2" />
   <script defer src="/static/analytics.js"></script>
 </head>
 <body class="archive-log-body seekpad-body">
   <main class="archive-log-shell seekpad-shell" data-log-view="detail">
     <article class="archive-log-panel archive-log-panel--detail seekpad-panel">
       <p class="archive-log-kicker">OBSERVATION RECORD</p>
-      <h1>記録 SEEKPAD-01</h1>
-      <p class="seekpad-subtitle">観測対象: 衝突 / 操作: 0〜9</p>
-      <p>記録された断片へ、鍵を送ることができます。0から9までの鍵はそれぞれ衝突の瞬間へ接続されています。指、または数字キーで送信してください。</p>
+      <h1>{{ seekpad.title }}</h1>
+      <p class="seekpad-subtitle">{{ seekpad.subtitle }}</p>
+      <p>{{ seekpad.intro }}</p>
+
+      {% if seekpad.episodes|length > 1 %}
+      <nav class="seekpad-episodes" aria-label="seekpad records">
+        {% for item in seekpad.episodes %}
+        {% if item.id == seekpad.id %}
+        <span class="seekpad-episode is-current" aria-current="page">{{ item.number }}</span>
+        {% else %}
+        <a class="seekpad-episode" href="/archive/seekpad/{{ item.id }}">{{ item.number }}</a>
+        {% endif %}
+        {% endfor %}
+      </nav>
+      {% endif %}
 
       <div class="seekpad-player-wrap" data-video-id="{{ seekpad.video_id }}">
         <div id="player"></div>
@@ -42,6 +54,6 @@
   </main>
 
   <script src="https://www.youtube.com/iframe_api"></script>
-  <script defer src="/static/seekpad.js?v=1"></script>
+  <script defer src="/static/seekpad.js?v=2"></script>
 </body>
 </html>

@@ -1265,9 +1265,39 @@ async def archive_log_detail(request: Request, log_id: str) -> HTMLResponse:
         return HTMLResponse("archive log not found", status_code=404)
     return render_template(request, f"archive-log-{log_id}.html")
 
+def load_seekpad(episode_id: str | None = None) -> dict | None:
+    """data/seekpad.json から1話分のパッド定義を返す。
+
+    episode_id 未指定なら default の話数。該当する話数が無ければ None。
+    戻り値には他の話数への導線用に episodes(全話のid/number/title)も入れる。
+    """
+    data = json.loads((BASE_DIR / "data" / "seekpad.json").read_text(encoding="utf-8"))
+    episodes = data.get("episodes", [])
+    target = episode_id or data.get("default") or (episodes[0]["id"] if episodes else None)
+    episode = next((item for item in episodes if item["id"] == target), None)
+    if episode is None:
+        return None
+    return dict(
+        episode,
+        episodes=[
+            {"id": item["id"], "number": item.get("number", ""), "title": item.get("title", "")}
+            for item in episodes
+        ],
+    )
+
+
 @app.get("/archive/seekpad", response_class=HTMLResponse)
 async def archive_seekpad(request: Request) -> HTMLResponse:
-    data = json.loads((BASE_DIR / "data" / "seekpad.json").read_text(encoding="utf-8"))
+    data = load_seekpad()
+    if data is None:
+        return HTMLResponse("seekpad not found", status_code=404)
+    return render_template(request, "seekpad.html", seekpad=data)
+
+@app.get("/archive/seekpad/{episode_id}", response_class=HTMLResponse)
+async def archive_seekpad_episode(request: Request, episode_id: str) -> HTMLResponse:
+    data = load_seekpad(episode_id)
+    if data is None:
+        return HTMLResponse("seekpad not found", status_code=404)
     return render_template(request, "seekpad.html", seekpad=data)
 
 @app.get("/signal", response_class=HTMLResponse)
