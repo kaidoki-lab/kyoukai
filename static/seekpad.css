@@ -147,3 +147,70 @@
   background: rgba(23, 241, 255, 0.12);
   color: #d9fdff;
 }
+
+/* 他区画への回遊導線(YouTubeから来た人がここで行き止まらないようにする) */
+.seekpad-exits {
+  margin-top: 30px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(23, 241, 255, 0.16);
+}
+
+.seekpad-exits-kicker {
+  margin: 0 0 6px;
+  color: rgba(23, 241, 255, 0.62);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+}
+
+.seekpad-exits-lead {
+  margin: 0 0 14px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.seekpad-exit-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.seekpad-exit {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 12px 14px;
+  border: 1px solid rgba(183, 194, 160, 0.3);
+  border-radius: 4px;
+  color: rgba(255, 238, 190, 0.92);
+  text-decoration: none;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+.seekpad-exit:hover,
+.seekpad-exit:focus-visible {
+  border-color: rgba(23, 241, 255, 0.55);
+  background: rgba(23, 241, 255, 0.07);
+}
+
+.seekpad-exit-name {
+  font-family: var(--sp-mono);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+
+.seekpad-exit-note {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+@media (max-width: 560px) {
+  .seekpad-exit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .seekpad-exit {
+    padding: 11px 12px;
+  }
+}

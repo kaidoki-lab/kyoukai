@@ -70,6 +70,33 @@
     flashPad(key);
   }
 
+  // 「開いただけ」と「実際に叩いた」を分けて数えたい。
+  // 連打がそのままイベントになると溢れるので、セッション中の最初の1回だけ送る。
+  var playReported = false;
+
+  function reportFirstPlay(key) {
+    if (playReported) return;
+    playReported = true;
+    if (typeof window.trackKyoukaiEvent !== "function") return;
+    window.trackKyoukaiEvent("seekpad_play", {
+      episode_id: playerWrap ? playerWrap.getAttribute("data-episode-id") || "" : "",
+      first_key: key
+    });
+  }
+
+  function bindExits() {
+    var exits = document.querySelectorAll(".seekpad-exit[data-exit]");
+    exits.forEach(function (exit) {
+      exit.addEventListener("click", function () {
+        if (typeof window.trackKyoukaiEvent !== "function") return;
+        window.trackKyoukaiEvent("seekpad_exit", {
+          exit_to: exit.getAttribute("data-exit"),
+          played: playReported ? "yes" : "no"
+        });
+      });
+    });
+  }
+
   function flashPad(key) {
     var pad = document.querySelector('.seekpad-pad[data-key="' + key + '"]');
     if (!pad) return;
@@ -117,6 +144,7 @@
     pads.forEach(function (pad) {
       pad.addEventListener("pointerdown", function () {
         var key = Number(pad.getAttribute("data-key"));
+        reportFirstPlay(key);
         jump(key);
       });
     });
@@ -130,12 +158,14 @@
       hintEl = document.getElementById("seekpad-hint");
     }
     bindPads();
+    bindExits();
   });
 
   document.addEventListener("keydown", function (e) {
     var num = keyToNumber(e.key);
     if (num === null) return;
     e.preventDefault();
+    reportFirstPlay(num);
     jump(num);
   });
 })();

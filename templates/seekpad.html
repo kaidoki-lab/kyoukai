@@ -14,6 +14,7 @@
   <script defer src="/static/analytics.js"></script>
 </head>
 <body class="archive-log-body seekpad-body">
+  <script>window.KYOUKAI_ROOM = 'seekpad';</script>
   <main class="archive-log-shell seekpad-shell" data-log-view="detail">
     <article class="archive-log-panel archive-log-panel--detail seekpad-panel">
       <p class="archive-log-kicker">OBSERVATION RECORD</p>
@@ -33,7 +34,7 @@
       </nav>
       {% endif %}
 
-      <div class="seekpad-player-wrap" data-video-id="{{ seekpad.video_id }}">
+      <div class="seekpad-player-wrap" data-video-id="{{ seekpad.video_id }}" data-episode-id="{{ seekpad.id }}">
         <div id="player"></div>
       </div>
 
@@ -46,8 +47,27 @@
         </div>
       </div>
 
+      <section class="seekpad-exits" aria-labelledby="seekpad-exits-title">
+        <p class="seekpad-exits-kicker" id="seekpad-exits-title">OTHER SECTORS</p>
+        <p class="seekpad-exits-lead">この記録室は KYOUKAI の一区画です。ほかにも、押すと反応する区画があります。</p>
+        <div class="seekpad-exit-grid">
+          <a class="seekpad-exit" href="/outside" data-exit="outside">
+            <span class="seekpad-exit-name">自販機</span>
+            <span class="seekpad-exit-note">番号を押して買う。何が出るかは出てから分かる</span>
+          </a>
+          <a class="seekpad-exit" href="/daimyojin" data-exit="daimyojin">
+            <span class="seekpad-exit-name">AI大明神室</span>
+            <span class="seekpad-exit-note">今日の観測運を引く</span>
+          </a>
+          <a class="seekpad-exit" href="/elevator" data-exit="elevator">
+            <span class="seekpad-exit-name">エレベーター</span>
+            <span class="seekpad-exit-note">他の階へ。この城の入口でもある</span>
+          </a>
+        </div>
+      </section>
+
       <nav class="archive-log-nav" aria-label="archive log navigation">
-        <a href="/archive">archiveへ戻る</a>
+        <a href="/archive">残留域(archive)へ</a>
         <a href="/archive/logs">observation logsを見る</a>
       </nav>
     </article>
