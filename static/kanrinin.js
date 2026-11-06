@@ -2,7 +2,6 @@
   const LINKS = {
     ofuse: "https://ofuse.me/be78f6ed",
     booth: "https://voidscan.booth.pm/",
-    crowdfunding: "https://motion-gallery.net/projects/kyoukai",
     // 消滅の鍵の遷移先。意図的に存在しないパスへ送り、グローバル404演出（templates/404.html, kyoukai-404.js）を発生させる。
     exit: "/kanrinin/deleted",
   };
@@ -461,11 +460,6 @@
   bindArea("boothArea", () => {
     trackArea("booth");
     openExternal(LINKS.booth);
-  });
-
-  bindArea("crowdfundingArea", () => {
-    trackArea("crowdfunding");
-    openExternal(LINKS.crowdfunding);
   });
 
   bindArea("snsArea", () => {
